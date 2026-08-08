@@ -276,7 +276,7 @@ def ask_ai(question):
 
     # Fallback to Gemini
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
         headers = {"content-type": "application/json"}
         payload = {
             "contents": [{"parts": [{"text": question}]}]
@@ -285,8 +285,10 @@ def ask_ai(question):
             r = requests.post(url, headers=headers, json=payload)
             if r.status_code == 200:
                 return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+            else:
+                return f"خطأ من خوادم Gemini (رمز الخطأ {r.status_code}):\n<code>{r.text}</code>"
         except Exception as e:
-            print("Gemini API error:", e)
+            return f"فشل الاتصال بخدمة Gemini: {str(e)}"
             
     return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي السحابية."
 
