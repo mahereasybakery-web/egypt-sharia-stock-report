@@ -2,12 +2,15 @@ import json
 import os
 import time
 import requests
+import base64
 from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_PAT = "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg"
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not BOT_TOKEN or not CHAT_ID:
     print("Error: Secrets are not configured properly.")
@@ -15,6 +18,7 @@ if not BOT_TOKEN or not CHAT_ID:
 
 STRINGS_PATH = "strings.json"
 NEWS_PATH = "news.txt"
+offset = 0
 
 # Helper function to round values safely
 def safe_round(val, decimals=2):
@@ -27,6 +31,10 @@ def safe_round(val, decimals=2):
 
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
+    if not os.path.exists(STRINGS_PATH):
+        print("Strings file missing, skipping report generation.")
+        return
+
     with open(STRINGS_PATH, "r", encoding="utf-8") as f:
         s = json.load(f)
 
@@ -42,27 +50,31 @@ def send_report():
         },
         "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name", "description", "Recommend.All"]
     }
-    r_stocks = requests.post("https://scanner.tradingview.com/egypt/scan", json=stocks_payload).json()
+    try:
+        r_stocks = requests.post("https://scanner.tradingview.com/egypt/scan", json=stocks_payload).json()
+    except Exception as e:
+        print("Error fetching stocks:", e)
+        return
 
     # 2. Fetch Forex (USD/EGP)
-    fx_payload = {
-        "symbols": {
-            "tickers": ["FX_IDC:USDEGP"],
-            "query": {"types": []}
-        },
-        "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
-    }
-    r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json=fx_payload).json()
+    try:
+        r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
+            "symbols": {"tickers": ["FX_IDC:USDEGP"], "query": {"types": []}},
+            "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+        }).json()
+    except Exception as e:
+        print("Error fetching FX:", e)
+        r_fx = {}
 
     # 3. Fetch Gold
-    gold_payload = {
-        "symbols": {
-            "tickers": ["TVC:GOLD"],
-            "query": {"types": []}
-        },
-        "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
-    }
-    r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json=gold_payload).json()
+    try:
+        r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
+            "symbols": {"tickers": ["TVC:GOLD"], "query": {"types": []}},
+            "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+        }).json()
+    except Exception as e:
+        print("Error fetching Gold:", e)
+        r_gold = {}
 
     # Parse Stocks
     parsed_stocks = {}
@@ -205,6 +217,158 @@ def trigger_next_runner():
     except Exception as e:
         print("Error dispatching next runner:", e)
 
+def reply_telegram(text):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "HTML"
+    }
+    try:
+        requests.post(url, json=payload)
+    except Exception as e:
+        print("Error sending reply:", e)
+
+def update_github_news(new_content):
+    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/news.txt"
+    headers = {
+        "Authorization": f"Bearer {GH_PAT}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "TelegramBot"
+    }
+    # Get current SHA
+    r_get = requests.get(url, headers=headers)
+    sha = ""
+    if r_get.status_code == 200:
+        sha = r_get.json().get("sha", "")
+        
+    content_b64 = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
+    payload = {
+        "message": "Update news.txt via Telegram Bot",
+        "content": content_b64
+    }
+    if sha:
+        payload["sha"] = sha
+        
+    r_put = requests.put(url, headers=headers, json=payload)
+    return r_put.status_code in [200, 201]
+
+def ask_ai(question):
+    # Try Claude first
+    if CLAUDE_API_KEY:
+        url = "https://api.anthropic.com/v1/messages"
+        headers = {
+            "x-api-key": CLAUDE_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        payload = {
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 1000,
+            "messages": [{"role": "user", "content": question}]
+        }
+        try:
+            r = requests.post(url, headers=headers, json=payload)
+            if r.status_code == 200:
+                return r.json()["content"][0]["text"]
+        except Exception as e:
+            print("Claude API error:", e)
+
+    # Fallback to Gemini
+    if GEMINI_API_KEY:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+        headers = {"content-type": "application/json"}
+        payload = {
+            "contents": [{"parts": [{"text": question}]}]
+        }
+        try:
+            r = requests.post(url, headers=headers, json=payload)
+            if r.status_code == 200:
+                return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+        except Exception as e:
+            print("Gemini API error:", e)
+            
+    return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي السحابية."
+
+def handle_telegram_command(text):
+    text_lower = text.lower()
+    if text_lower.startswith("/start") or text_lower.startswith("/help"):
+        help_msg = (
+            "<b>🤖 أهلاً بك في مساعد أسهم الشريعة الذكي!</b>\n\n"
+            "إليك الأوامر المتاحة:\n"
+            "📌 <code>/report</code> : لتوليد وإرسال التقرير المالي فوراً.\n"
+            "📌 <code>/add_news [الخبر]</code> : لإضافة خبر لقائمة الأخبار وتحديثها على GitHub.\n"
+            "📌 <code>/ask [سؤالك]</code> : لطرح أي سؤال مالي أو فني على الذكاء الاصطناعي (Claude/Gemini)."
+        )
+        reply_telegram(help_msg)
+        
+    elif text_lower.startswith("/report"):
+        reply_telegram("🔄 جاري توليد وإرسال التقرير المحدث الآن...")
+        send_report()
+        
+    elif text_lower.startswith("/add_news"):
+        news_content = text[len("/add_news"):].strip()
+        if not news_content:
+            reply_telegram("⚠️ يرجى كتابة نص الخبر بعد الأمر. مثال:\n<code>/add_news خبر جديد هنا</code>")
+            return
+            
+        # Append news content locally
+        local_content = ""
+        if os.path.exists(NEWS_PATH):
+            with open(NEWS_PATH, "r", encoding="utf-8") as nf:
+                local_content = nf.read().strip()
+                
+        updated_content = news_content if not local_content else f"{local_content}\n\n{news_content}"
+        
+        # Write local
+        with open(NEWS_PATH, "w", encoding="utf-8") as nf:
+            nf.write(updated_content)
+            
+        # Update on GitHub
+        success = update_github_news(updated_content)
+        if success:
+            reply_telegram("✅ تمت إضافة الخبر وتحديث الملف على GitHub بنجاح!")
+        else:
+            reply_telegram("❌ فشل تحديث الخبر على GitHub. يرجى التحقق من الاتصال.")
+            
+    elif text_lower.startswith("/ask"):
+        question = text[len("/ask"):].strip()
+        if not question:
+            reply_telegram("⚠️ يرجى كتابة السؤال بعد الأمر. مثال:\n<code>/ask ما توقعاتك لسهم طلعت مصطفى؟</code>")
+            return
+        reply_telegram("🔄 جاري التفكير والتحليل...")
+        answer = ask_ai(question)
+        reply_telegram(answer)
+        
+    else:
+        # Default fallback: treat as ask prompt
+        reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
+        answer = ask_ai(text)
+        reply_telegram(answer)
+
+def poll_telegram_messages():
+    global offset
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
+    params = {"offset": offset, "timeout": 5}
+    try:
+        r = requests.get(url, params=params, timeout=10)
+        if r.status_code == 200:
+            updates = r.json().get("result", [])
+            for update in updates:
+                offset = update["update_id"] + 1
+                msg = update.get("message", {})
+                chat_id = str(msg.get("chat", {}).get("id", ""))
+                
+                # Verify sender is the authorized user
+                if chat_id != CHAT_ID:
+                    continue
+                    
+                text = msg.get("text", "").strip()
+                if text:
+                    handle_telegram_command(text)
+    except Exception as e:
+        print("Polling error:", e)
+
 def sleep_until_next_15min_mark():
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
@@ -223,8 +387,13 @@ def sleep_until_next_15min_mark():
     if seconds_to_wait <= 0:
         seconds_to_wait = 900
         
-    print(f"[{now.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until next clock mark...")
-    time.sleep(seconds_to_wait)
+    print(f"[{now.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until next clock mark (polling active)...")
+    
+    # Poll Telegram every 5 seconds during the sleep period
+    start_time = time.time()
+    while (time.time() - start_time) < seconds_to_wait:
+        poll_telegram_messages()
+        time.sleep(5)
 
 # Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
 TOTAL_CYCLES = 12
