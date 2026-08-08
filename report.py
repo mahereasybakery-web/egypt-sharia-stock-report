@@ -205,15 +205,35 @@ def trigger_next_runner():
     except Exception as e:
         print("Error dispatching next runner:", e)
 
-# Run perpetual 15-minute loop (12 cycles = 3 hours per runner)
+def sleep_until_next_15min_mark():
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    minute = now.minute
+    second = now.second
+    microsecond = now.microsecond
+    
+    # Calculate next 15-minute boundary (:00, :15, :30, :45)
+    next_minute = ((minute // 15) + 1) * 15
+    if next_minute == 60:
+        seconds_to_wait = (60 - minute) * 60 - second
+    else:
+        seconds_to_wait = (next_minute - minute) * 60 - second
+        
+    seconds_to_wait -= (microsecond / 1000000.0)
+    if seconds_to_wait <= 0:
+        seconds_to_wait = 900
+        
+    print(f"[{now.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until next clock mark...")
+    time.sleep(seconds_to_wait)
+
+# Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
 TOTAL_CYCLES = 12
 for i in range(TOTAL_CYCLES):
     print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} ===")
     send_report()
     
-    # Before the 3 hours finish (at cycle 11), trigger the next runner so it seamlessly takes over
+    # Before the runner finishes, trigger the next runner so it seamlessly takes over
     if i == TOTAL_CYCLES - 2:
         trigger_next_runner()
         
-    print("Sleeping for 15 minutes (900 seconds)...")
-    time.sleep(900)
+    sleep_until_next_15min_mark()
