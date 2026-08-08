@@ -18,6 +18,15 @@ NEWS_PATH = "news.txt"
 with open(STRINGS_PATH, "r", encoding="utf-8") as f:
     s = json.load(f)
 
+# Helper function to round values safely (handles None/null values)
+def safe_round(val, decimals=2):
+    if val is None:
+        return 0
+    try:
+        return round(float(val), decimals)
+    except (ValueError, TypeError):
+        return 0
+
 # 1. Fetch stock prices
 stocks_payload = {
     "symbols": {
@@ -59,10 +68,10 @@ egx30 = {"close": 0, "chgPct": 0, "open": 0}
 for item in r_stocks.get("data", []):
     sym = item["s"].replace("EGX:", "")
     d = item["d"]
-    close = round(d[0], 2)
-    chg_pct = round(d[2], 2)
-    open_p = round(d[3], 2)
-    rec_val = d[9] or 0
+    close = safe_round(d[0])
+    chg_pct = safe_round(d[2])
+    open_p = safe_round(d[3])
+    rec_val = d[9] if d[9] is not None else 0
     
     # Recommendation logic
     rec_text = s["watch"]
@@ -96,12 +105,20 @@ for item in r_stocks.get("data", []):
 usdegp = {"close": 0, "chgPct": 0, "open": 0}
 for item in r_fx.get("data", []):
     d = item["d"]
-    usdegp = {"close": round(d[0], 2), "chgPct": round(d[2], 2), "open": round(d[3], 2)}
+    usdegp = {
+        "close": safe_round(d[0]),
+        "chgPct": safe_round(d[2]),
+        "open": safe_round(d[3])
+    }
 
 xauusd = {"close": 0, "chgPct": 0, "open": 0}
 for item in r_gold.get("data", []):
     d = item["d"]
-    xauusd = {"close": round(d[0], 2), "chgPct": round(d[2], 2), "open": round(d[3], 2)}
+    xauusd = {
+        "close": safe_round(d[0]),
+        "chgPct": safe_round(d[2]),
+        "open": safe_round(d[3])
+    }
 
 # Sort stocks descending by change percentage
 sorted_keys = sorted(parsed_stocks.keys(), key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
