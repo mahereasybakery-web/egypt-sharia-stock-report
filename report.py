@@ -1,7 +1,7 @@
 import json
 import os
 import requests
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -139,13 +139,14 @@ if os.path.exists(NEWS_PATH):
 
 news_html = "\n\n".join(news_lines_rtl)
 
-# DateTime formatting
-now = datetime.now()
+# DateTime formatting (Egypt Cairo Timezone UTC+3)
+egypt_tz = timezone(timedelta(hours=3))
+now = datetime.now(egypt_tz)
 today = now.strftime("%Y/%m/%d")
 hour = int(now.strftime("%I"))
 minute = now.strftime("%M")
 period = s["am"] if now.strftime("%p") == "AM" else s["pm"]
-time_display = f"{hour}:{minute} {period}"
+time_display = f"{hour:02d}:{minute} {period}"
 
 # Format Telegram message
 tg_msg = f"{s['rlm']}<b>{s['report_title']}</b>\n"
