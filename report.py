@@ -1,0 +1,163 @@
+import json
+import os
+import requests
+from datetime import datetime
+
+# Get secrets from environment variables
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+if not BOT_TOKEN or not CHAT_ID:
+    print("Error: Secrets are not configured properly.")
+    exit(1)
+
+STRINGS_PATH = "strings.json"
+NEWS_PATH = "news.txt"
+
+# Load localized strings
+with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+    s = json.load(f)
+
+# 1. Fetch stock prices
+stocks_payload = {
+    "symbols": {
+        "tickers": [
+            "EGX:OCDI", "EGX:ORHD", "EGX:EFIH", "EGX:RACC",
+            "EGX:EGAL", "EGX:TMGH", "EGX:EFID", "EGX:ETEL",
+            "EGX:ADIB", "EGX:EGX30"
+        ],
+        "query": {"types": []}
+    },
+    "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name", "description", "Recommend.All"]
+}
+r_stocks = requests.post("https://scanner.tradingview.com/egypt/scan", json=stocks_payload).json()
+
+# 2. Fetch Forex (USD/EGP)
+fx_payload = {
+    "symbols": {
+        "tickers": ["FX_IDC:USDEGP"],
+        "query": {"types": []}
+    },
+    "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+}
+r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json=fx_payload).json()
+
+# 3. Fetch Gold
+gold_payload = {
+    "symbols": {
+        "tickers": ["TVC:GOLD"],
+        "query": {"types": []}
+    },
+    "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+}
+r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json=gold_payload).json()
+
+# Parse Stocks
+parsed_stocks = {}
+egx30 = {"close": 0, "chgPct": 0, "open": 0}
+
+for item in r_stocks.get("data", []):
+    sym = item["s"].replace("EGX:", "")
+    d = item["d"]
+    close = round(d[0], 2)
+    chg_pct = round(d[2], 2)
+    open_p = round(d[3], 2)
+    rec_val = d[9] or 0
+    
+    # Recommendation logic
+    rec_text = s["watch"]
+    rec_emoji = s["e_watch"]
+    if rec_val > 0.5:
+        rec_text = s["strong_buy"]
+        rec_emoji = s["e_rocket"]
+    elif rec_val > 0.1:
+        rec_text = s["buy"]
+        rec_emoji = ""
+    elif rec_val < -0.5:
+        rec_text = s["strong_sell"]
+        rec_emoji = s["e_down"]
+    elif rec_val < -0.1:
+        rec_text = s["sell"]
+        rec_emoji = ""
+        
+    rec_full = f"{rec_emoji} {rec_text}".strip()
+    
+    if sym == "EGX30":
+        egx30 = {"close": close, "chgPct": chg_pct, "open": open_p}
+    else:
+        parsed_stocks[sym] = {
+            "close": close,
+            "chgPct": chg_pct,
+            "open": open_p,
+            "rec": rec_full
+        }
+
+# Parse Forex & Gold
+usdegp = {"close": 0, "chgPct": 0, "open": 0}
+for item in r_fx.get("data", []):
+    d = item["d"]
+    usdegp = {"close": round(d[0], 2), "chgPct": round(d[2], 2), "open": round(d[3], 2)}
+
+xauusd = {"close": 0, "chgPct": 0, "open": 0}
+for item in r_gold.get("data", []):
+    d = item["d"]
+    xauusd = {"close": round(d[0], 2), "chgPct": round(d[2], 2), "open": round(d[3], 2)}
+
+# Sort stocks descending by change percentage
+sorted_keys = sorted(parsed_stocks.keys(), key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
+
+# Parse News
+news_lines_rtl = []
+if os.path.exists(NEWS_PATH):
+    with open(NEWS_PATH, "r", encoding="utf-8") as nf:
+        content = nf.read().strip()
+        if content:
+            blocks = content.split("\n\n")
+            for block in blocks:
+                lines = block.strip().split("\n")
+                if len(lines) >= 2:
+                    desc = lines[0].strip()
+                    link = lines[1].strip()
+                    news_lines_rtl.append(f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>")
+
+news_html = "\n\n".join(news_lines_rtl)
+
+# DateTime formatting
+now = datetime.now()
+today = now.strftime("%Y/%m/%d")
+hour = int(now.strftime("%I"))
+minute = now.strftime("%M")
+period = s["am"] if now.strftime("%p") == "AM" else s["pm"]
+time_display = f"{hour}:{minute} {period}"
+
+# Format Telegram message
+tg_msg = f"{s['rlm']}<b>{s['report_title']}</b>\n"
+tg_msg += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
+tg_msg += f"{s['rlm']}{s['line']}\n\n"
+
+# Stocks block
+tg_msg += f"{s['rlm']}<b>{s['e_green']} {s['stocks_prices']}:</b>\n"
+for k in sorted_keys:
+    item = parsed_stocks[k]
+    dir_emoji = s["e_green"] if item["chgPct"] >= 0 else s["e_red"]
+    tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({item['chgPct']}%) | {item['rec']}\n"
+
+# Indices block
+tg_msg += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
+tg_msg += f"{s['rlm']}{s['e_blue']} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30['chgPct']}%)\n"
+tg_msg += f"{s['rlm']}{s['e_dollar']} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp['chgPct']}%)\n"
+tg_msg += f"{s['rlm']}{s['e_gold']} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd['chgPct']}%)\n\n"
+
+# News block
+if news_html:
+    tg_msg += f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_html}"
+
+# Send message
+url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+payload = {
+    "chat_id": CHAT_ID,
+    "text": tg_msg,
+    "parse_mode": "HTML"
+}
+requests.post(url, json=payload)
+print("Report sent successfully!")
