@@ -2,8 +2,12 @@ name: Send Sharia Stock Report
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
+
+concurrency:
+  group: report-loop
+  cancel-in-progress: true
 
 jobs:
   run-report:
