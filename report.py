@@ -44,7 +44,13 @@ def send_report():
             "tickers": [
                 "EGX:OCDI", "EGX:ORHD", "EGX:EFIH", "EGX:RACC",
                 "EGX:EGAL", "EGX:TMGH", "EGX:EFID", "EGX:ETEL",
-                "EGX:ADIB", "EGX:FWRY", "EGX:EGX30"
+                "EGX:ADIB", "EGX:FWRY", "EGX:ORAS", "EGX:PHDC",
+                "EGX:SKPC", "EGX:MCQE", "EGX:FAITA", "EGX:ISPH",
+                "EGX:JUFO", "EGX:AMOC", "EGX:MASR", "EGX:ORWE",
+                "EGX:RMDA", "EGX:OLFI", "EGX:ARCC", "EGX:FAIT",
+                "EGX:IFAP", "EGX:MTIE", "EGX:SAUD", "EGX:ATQA",
+                "EGX:CIRA", "EGX:EGAS", "EGX:MPCO", "EGX:ACGC",
+                "EGX:ETRS", "EGX:LCSW", "EGX:ICFC", "EGX:EGX30"
             ],
             "query": {"types": []}
         },
@@ -137,7 +143,12 @@ def send_report():
 
     # Sort stocks descending by change percentage
     portfolio_list = ["RACC", "FWRY", "EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
-    watchlist_list = []
+    watchlist_list = [
+        "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
+        "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
+        "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW",
+        "ICFC"
+    ]
     
     sorted_portfolio = sorted([k for k in portfolio_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
