@@ -427,14 +427,36 @@ def sleep_until_next_15min_mark():
         poll_telegram_messages()
         time.sleep(5)
 
-# Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
-TOTAL_CYCLES = 12
-for i in range(TOTAL_CYCLES):
-    print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} ===")
-    send_report()
+if __name__ == "__main__":
+    # Get Cairo timezone
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
     
-    # Before the runner finishes, trigger the next runner so it seamlessly takes over
-    if i == TOTAL_CYCLES - 2:
-        trigger_next_runner()
+    # Check weekday (0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
+    # Sunday to Thursday is [6, 0, 1, 2, 3]
+    day = now.weekday()
+    if day in [4, 5]: # Friday or Saturday
+        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday), exiting to conserve actions minutes.")
+        exit(0)
         
-    sleep_until_next_15min_mark()
+    # Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
+    TOTAL_CYCLES = 12
+    for i in range(TOTAL_CYCLES):
+        loop_now = datetime.now(egypt_tz)
+        print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
+        
+        # Check active hour range: 09:00 to 15:30 Cairo time
+        current_time_minutes = loop_now.hour * 60 + loop_now.minute
+        if 9 * 60 <= current_time_minutes <= 15 * 60 + 30:
+            send_report()
+        else:
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Outside automated report hours (9:00 AM - 3:30 PM), skipping.")
+            
+        # Before the runner finishes, trigger the next runner if it is still before 3:00 PM Cairo time
+        if i == TOTAL_CYCLES - 2:
+            if loop_now.hour < 15:
+                trigger_next_runner()
+            else:
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later, stopping perpetual loop generation.")
+                
+        sleep_until_next_15min_mark()
