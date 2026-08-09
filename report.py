@@ -36,7 +36,15 @@ def fetch_rss_news():
         "جريدة البورصة": "https://alborsaanews.com/feed",
         "حبي جرنال": "https://hapijournal.com/feed",
         "إيكونومي بلس": "https://economyplusme.com/feed",
-        "إنتربرايز": "https://enterprise.press/ar/feed"
+        "إنتربرايز": "https://enterprise.press/ar/feed",
+        "اليوم السابع": "https://www.youm7.com/rss/SectionRSS?SectionID=9",
+        "أموال الغد": "https://amwalalghad.com/feed",
+        "جريدة الشروق": "https://www.shorouknews.com/rss/economy",
+        "سي إن بي سي عربية": "https://www.cnbcarabia.com/rss",
+        "الوطن": "https://www.elwatannews.com/home/rss/economy",
+        "المصري اليوم": "https://www.almasryalyoum.com/rss/sections/2/feed",
+        "صدى البلد": "https://www.elbalad.news/rss.aspx?id=12",
+        "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4"
     }
     
     headers = {
@@ -53,19 +61,25 @@ def fetch_rss_news():
                 
             root = ET.fromstring(xml_data)
             
-            # Find all <item> or <entry> elements
+            # Find all <item> or <entry> elements using wildcards or standard structures
             items = root.findall(".//item")
             if not items:
                 items = root.findall(".//{http://www.w3.org/2005/Atom}entry")
+            if not items:
+                items = [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
                 
             for item in items[:15]:  # Top 15 items per source
-                title_elem = item.find("title")
-                if title_elem is None:
-                    title_elem = item.find("{http://www.w3.org/2005/Atom}title")
-                    
-                link_elem = item.find("link")
-                if link_elem is None:
-                    link_elem = item.find("{http://www.w3.org/2005/Atom}link")
+                title_elem = None
+                for child in item:
+                    if child.tag.endswith("title"):
+                        title_elem = child
+                        break
+                        
+                link_elem = None
+                for child in item:
+                    if child.tag.endswith("link"):
+                        link_elem = child
+                        break
                     
                 title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
                 link = ""
@@ -75,6 +89,7 @@ def fetch_rss_news():
                         link = link_elem.attrib.get("href", "").strip()
                         
                 if title and link:
+                    link = link.replace(" ", "%20")
                     news_items.append({
                         "title": title,
                         "link": link,
