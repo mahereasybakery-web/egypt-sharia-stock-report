@@ -174,28 +174,28 @@ def send_report():
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
         if chg_val > 0:
-            chg_str = f"🟢 +{chg_val}%"
+            chg_str = f"+{chg_val}%"
         elif chg_val < 0:
-            chg_str = f"🔴 {chg_val}%"
+            chg_str = f"{chg_val}%"
         else:
             chg_str = f"0.0%"
             
         dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> (<b>{chg_str}</b>) | {item['rec']}\n"
+        tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
     # Indices block
     egx30_dir = s["e_green"] if egx30["chgPct"] >= 0 else s["e_red"]
     usdegp_dir = s["e_green"] if usdegp["chgPct"] >= 0 else s["e_red"]
     xauusd_dir = s["e_green"] if xauusd["chgPct"] >= 0 else s["e_red"]
 
-    egx30_chg = f"🟢 +{egx30['chgPct']}%" if egx30['chgPct'] > 0 else (f"🔴 {egx30['chgPct']}%" if egx30['chgPct'] < 0 else "0.0%")
-    usdegp_chg = f"🟢 +{usdegp['chgPct']}%" if usdegp['chgPct'] > 0 else (f"🔴 {usdegp['chgPct']}%" if usdegp['chgPct'] < 0 else "0.0%")
-    xauusd_chg = f"🟢 +{xauusd['chgPct']}%" if xauusd['chgPct'] > 0 else (f"🔴 {xauusd['chgPct']}%" if xauusd['chgPct'] < 0 else "0.0%")
+    egx30_chg = f"+{egx30['chgPct']}%" if egx30['chgPct'] > 0 else (f"{egx30['chgPct']}%" if egx30['chgPct'] < 0 else "0.0%")
+    usdegp_chg = f"+{usdegp['chgPct']}%" if usdegp['chgPct'] > 0 else (f"{usdegp['chgPct']}%" if usdegp['chgPct'] < 0 else "0.0%")
+    xauusd_chg = f"+{xauusd['chgPct']}%" if xauusd['chgPct'] > 0 else (f"{xauusd['chgPct']}%" if xauusd['chgPct'] < 0 else "0.0%")
 
     tg_msg += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
-    tg_msg += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> (<b>{egx30_chg}</b>)\n"
-    tg_msg += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> (<b>{usdegp_chg}</b>)\n"
-    tg_msg += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ (<b>{xauusd_chg}</b>)\n\n"
+    tg_msg += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
+    tg_msg += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
+    tg_msg += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
 
     # News block
     if news_html:
