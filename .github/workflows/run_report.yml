@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 6 * * 0,1,2,3,4'
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Bypass time checks and send report immediately'
+        required: false
+        default: 'true'
 
 concurrency:
   group: report-loop
@@ -31,4 +36,5 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          FORCE_RUN: ${{ github.event.inputs.force }}
         run: python report.py
