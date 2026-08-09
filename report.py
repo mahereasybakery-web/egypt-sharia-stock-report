@@ -328,12 +328,31 @@ def send_report():
     news_lines_rtl = []
     try:
         live_news = get_filtered_market_news(portfolio_list, watchlist_list)
-        for item in live_news[:5]:  # Display top 5 live matching news articles to keep message clean
+        
+        # Group news by tag
+        grouped = {}
+        for item in live_news:
             tag = item["tag"]
-            title = item["title"]
-            link = item["link"]
-            source = item["source"]
-            news_lines_rtl.append(f"{s['rlm']}🔥 <b>{tag}</b> {title}\n{s['rlm']}{s['e_link']} <a href='{link}'>المصدر: {source} (رابط مباشر)</a>")
+            if tag not in grouped:
+                grouped[tag] = []
+            grouped[tag].append(item)
+            
+        # Format grouped news
+        # Sort groups: show stock-specific news first, then general [البورصة]
+        sorted_tags = sorted(grouped.keys(), key=lambda t: (1 if t == "[البورصة]" else 0, t))
+        
+        # We limit the number of groups we display to 8 to avoid message truncation in Telegram
+        for tag in sorted_tags[:8]:
+            items_in_tag = grouped[tag]
+            group_text = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
+            # Display up to 3 articles per stock
+            for item in items_in_tag[:3]:
+                title = item["title"]
+                link = item["link"]
+                source = item["source"]
+                group_text += f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
+            news_lines_rtl.append(group_text.strip())
+            
     except Exception as e:
         print("Error getting live news:", e)
         
