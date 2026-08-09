@@ -48,7 +48,7 @@ def send_report():
             ],
             "query": {"types": []}
         },
-        "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name", "description", "Recommend.All"]
+        "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name", "description", "Recommend.All"]
     }
     try:
         r_stocks = requests.post("https://scanner.tradingview.com/egypt/scan", json=stocks_payload).json()
@@ -60,7 +60,7 @@ def send_report():
     try:
         r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
             "symbols": {"tickers": ["FX_IDC:USDEGP"], "query": {"types": []}},
-            "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+            "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name"]
         }).json()
     except Exception as e:
         print("Error fetching FX:", e)
@@ -70,7 +70,7 @@ def send_report():
     try:
         r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
             "symbols": {"tickers": ["TVC:GOLD"], "query": {"types": []}},
-            "columns": ["close", "change", "change_pct", "open", "high", "low", "volume", "name"]
+            "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name"]
         }).json()
     except Exception as e:
         print("Error fetching Gold:", e)
@@ -84,7 +84,7 @@ def send_report():
         sym = item["s"].replace("EGX:", "")
         d = item["d"]
         close = safe_round(d[0])
-        chg_pct = safe_round(d[2])
+        chg_pct = safe_round(d[1])
         open_p = safe_round(d[3])
         rec_val = d[9] if d[9] is not None else 0
         
@@ -122,7 +122,7 @@ def send_report():
         d = item["d"]
         usdegp = {
             "close": safe_round(d[0]),
-            "chgPct": safe_round(d[2]),
+            "chgPct": safe_round(d[1]),
             "open": safe_round(d[3])
         }
 
@@ -131,7 +131,7 @@ def send_report():
         d = item["d"]
         xauusd = {
             "close": safe_round(d[0]),
-            "chgPct": safe_round(d[2]),
+            "chgPct": safe_round(d[1]),
             "open": safe_round(d[3])
         }
 
