@@ -447,6 +447,10 @@ if __name__ == "__main__":
         
         # Check active hour range: 09:00 to 15:30 Cairo time
         current_time_minutes = loop_now.hour * 60 + loop_now.minute
+        if current_time_minutes > 15 * 60 + 30:
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Time is past 3:30 PM, terminating run to conserve minutes.")
+            exit(0)
+            
         if 9 * 60 <= current_time_minutes <= 15 * 60 + 30:
             send_report()
         else:
