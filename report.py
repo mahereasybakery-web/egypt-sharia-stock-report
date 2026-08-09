@@ -3,6 +3,8 @@ import os
 import time
 import requests
 import base64
+import urllib.request
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
@@ -28,6 +30,144 @@ def safe_round(val, decimals=2):
         return round(float(val), decimals)
     except (ValueError, TypeError):
         return 0
+
+def fetch_rss_news():
+    feeds = {
+        "جريدة البورصة": "https://alborsaanews.com/feed",
+        "حبي جرنال": "https://hapijournal.com/feed",
+        "إيكونومي بلس": "https://economyplusme.com/feed",
+        "إنتربرايز": "https://enterprise.press/ar/feed"
+    }
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    news_items = []
+    
+    for source_name, url in feeds.items():
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as response:
+                xml_data = response.read()
+                
+            root = ET.fromstring(xml_data)
+            
+            # Find all <item> or <entry> elements
+            items = root.findall(".//item")
+            if not items:
+                items = root.findall(".//{http://www.w3.org/2005/Atom}entry")
+                
+            for item in items[:15]:  # Top 15 items per source
+                title_elem = item.find("title")
+                if title_elem is None:
+                    title_elem = item.find("{http://www.w3.org/2005/Atom}title")
+                    
+                link_elem = item.find("link")
+                if link_elem is None:
+                    link_elem = item.find("{http://www.w3.org/2005/Atom}link")
+                    
+                title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
+                link = ""
+                if link_elem is not None:
+                    link = link_elem.text.strip() if link_elem.text else ""
+                    if not link:
+                        link = link_elem.attrib.get("href", "").strip()
+                        
+                if title and link:
+                    news_items.append({
+                        "title": title,
+                        "link": link,
+                        "source": source_name
+                    })
+        except Exception as e:
+            print(f"Error fetching from {source_name}: {e}")
+            
+    return news_items
+
+def get_filtered_market_news(portfolio_list, watchlist_list):
+    all_news = fetch_rss_news()
+    
+    stock_keywords = {
+        "TMGH": ["طلعت مصطفى", "طلعت مصطفي", "TMGH"],
+        "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "ADIB"],
+        "EFID": ["إيديتا", "ايديتا", "EFID"],
+        "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
+        "FWRY": ["فوري", "FWRY"],
+        "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
+        "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي ", "ETEL"],
+        "ORHD": ["أوراسكوم للتنمية", "اوراسكوم للتنمية", "ORHD"],
+        "EFIH": ["إي فاينانس", "اي فاينانس", "EFIH"],
+        "OCDI": ["سوديك", "سودك", "OCDI"],
+        "ORAS": ["أوراسكوم كونستراكشون", "اوراسكوم كونستراكشون", "أوراسكوم للإنشاء", "ORAS"],
+        "PHDC": ["بالم هيلز", "PHDC"],
+        "SKPC": ["سيدي كرير", "سيدبك", "SKPC"],
+        "MCQE": ["أسمنت قنا", "اسمنت قنا", "MCQE"],
+        "FAITA": ["فيصل الإسلامي", "فيصل الاسلامي", "FAITA"],
+        "ISPH": ["ابن سينا", "ISPH"],
+        "JUFO": ["جهينة", "جهينه", "JUFO"],
+        "AMOC": ["أموك", "اموك", "الأسكندرية للزيوت المعدنية", "AMOC"],
+        "MASR": ["مدينة مصر", "مدينة نصر", "MASR"],
+        "ORWE": ["النساجون الشرقيون", "النساجون", "ORWE"],
+        "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
+        "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
+        "ARCC": ["العربية للأسمنت", "العربيه للأسمنت", "ARCC"],
+        "FAIT": ["فيصل الإسلامي", "فيصل الاسلامي", "FAIT"],
+        "IFAP": ["الدولية للمحاصيل", "الدوليه للمحاصيل", "IFAP"],
+        "MTIE": ["إم إم جروب", "ام ام جروب", "MTIE"],
+        "SAUD": ["البركة", "بنك البركة", "SAUD"],
+        "ATQA": ["عتاقة", "عتاقه", "مصر الوطنية للصلب", "ATQA"],
+        "CIRA": ["القاهرة للاستثمار", "سيرا", "CIRA"],
+        "EGAS": ["غاز مصر", "EGAS"],
+        "MPCO": ["المنصورة للدواجن", "المنصوره للدواجن", "MPCO"],
+        "ACGC": ["عربية لحليج الأقطان", "حليج الأقطان", "ACGC"],
+        "ETRS": ["إيجيترانس", "ايجيترانس", "المصرية لخدمات النقل", "ETRS"],
+        "LCSW": ["ليسيكو", "LCSW"],
+        "ICFC": ["الدولية للأسمدة", "الدوليه للأسمده", "ICFC"]
+    }
+    
+    filtered = []
+    seen_links = set()
+    
+    for item in all_news:
+        title = item["title"]
+        link = item["link"]
+        source = item["source"]
+        
+        if link in seen_links:
+            continue
+            
+        matched_stock = None
+        for ticker, keywords in stock_keywords.items():
+            # Check if this ticker is in either portfolio or watchlist
+            if ticker not in portfolio_list and ticker not in watchlist_list:
+                continue
+            for kw in keywords:
+                if kw.lower() in title.lower():
+                    matched_stock = ticker
+                    break
+            if matched_stock:
+                break
+                
+        is_market_news = False
+        if not matched_stock:
+            market_keywords = ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]
+            for mkw in market_keywords:
+                if mkw in title:
+                    is_market_news = True
+                    break
+                    
+        if matched_stock or is_market_news:
+            seen_links.add(link)
+            tag = f"[{matched_stock}]" if matched_stock else "[البورصة]"
+            filtered.append({
+                "tag": tag,
+                "title": title,
+                "link": link,
+                "source": source
+            })
+            
+    return filtered
 
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
@@ -153,14 +293,26 @@ def send_report():
     sorted_portfolio = sorted([k for k in portfolio_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
 
-    # Parse News
+    # Parse News from Live RSS feeds
     news_lines_rtl = []
-    if os.path.exists(NEWS_PATH):
+    try:
+        live_news = get_filtered_market_news(portfolio_list, watchlist_list)
+        for item in live_news[:5]:  # Display top 5 live matching news articles to keep message clean
+            tag = item["tag"]
+            title = item["title"]
+            link = item["link"]
+            source = item["source"]
+            news_lines_rtl.append(f"{s['rlm']}🔥 <b>{tag}</b> {title}\n{s['rlm']}{s['e_link']} <a href='{link}'>المصدر: {source} (رابط مباشر)</a>")
+    except Exception as e:
+        print("Error getting live news:", e)
+        
+    # Graceful fallback to news.txt if no live news matched or error occurred
+    if not news_lines_rtl and os.path.exists(NEWS_PATH):
         with open(NEWS_PATH, "r", encoding="utf-8") as nf:
             content = nf.read().strip()
             if content:
                 blocks = content.split("\n\n")
-                for block in blocks:
+                for block in blocks[:5]:
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
                         desc = lines[0].strip()
