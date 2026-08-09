@@ -136,11 +136,7 @@ def send_report():
         }
 
     # Sort stocks descending by change percentage
-    portfolio_list = ["TMGH", "ADIB", "EFID"]
-    watchlist_list = ["OCDI", "ORHD", "EFIH", "RACC", "EGAL", "ETEL"]
-    
-    sorted_portfolio = sorted([k for k in portfolio_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
-    sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
+    sorted_keys = sorted(parsed_stocks.keys(), key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
 
     # Parse News
     news_lines_rtl = []
@@ -172,18 +168,9 @@ def send_report():
     tg_msg += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
     tg_msg += f"{s['rlm']}{s['line']}\n\n"
 
-    # Portfolio block
-    tg_msg += f"{s['rlm']}<b>{s.get('portfolio_title', '💼 الأسهم المستثمر بها (المحفظة)')}:</b>\n"
-    for k in sorted_portfolio:
-        item = parsed_stocks[k]
-        chg_val = item["chgPct"]
-        chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
-        dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
-
-    # Watchlist block
-    tg_msg += f"\n{s['rlm']}<b>{s.get('watchlist_title', '🔍 أسهم الشريعة للمراقبة والمتابعة')}:</b>\n"
-    for k in sorted_watchlist:
+    # Stocks block
+    tg_msg += f"{s['rlm']}<b>{s['e_green']} {s.get('portfolio_title', 'أسهم مستثمر بها')}:</b>\n"
+    for k in sorted_keys:
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
         chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
