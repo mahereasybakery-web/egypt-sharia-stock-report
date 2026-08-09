@@ -47,6 +47,12 @@ def fetch_rss_news():
         "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4"
     }
     
+    # Add Google News Search (representing 100+ sources)
+    import urllib.parse
+    gnews_query = 'البورصة المصرية OR أسهم مصر OR اقتصاد مصر OR "طلعت مصطفى" OR "فوري" OR "سوديك" OR "إيديتا" OR "أبوظبي الإسلامي" OR "مصر للألومنيوم" OR "المصرية للاتصالات" OR "إي فاينانس" OR "أوراسكوم"'
+    encoded_query = urllib.parse.quote(gnews_query)
+    feeds["أخبار جوجل"] = f"https://news.google.com/rss/search?q={encoded_query}&hl=ar&gl=EG&ceid=EG:ar"
+    
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
@@ -68,7 +74,9 @@ def fetch_rss_news():
             if not items:
                 items = [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
                 
-            for item in items[:15]:  # Top 15 items per source
+            # For Google News, we can process more items (up to 30) since it aggregates many sources
+            limit = 30 if source_name == "أخبار جوجل" else 15
+            for item in items[:limit]:
                 title_elem = None
                 for child in item:
                     if child.tag.endswith("title"):
@@ -90,10 +98,18 @@ def fetch_rss_news():
                         
                 if title and link:
                     link = link.replace(" ", "%20")
+                    item_source = source_name
+                    if source_name == "أخبار جوجل":
+                        parts = title.rsplit(" - ", 1)
+                        if len(parts) == 2:
+                            title = parts[0].strip()
+                            actual_source = parts[1].strip()
+                            item_source = f"{actual_source} (جوجل)"
+                    
                     news_items.append({
                         "title": title,
                         "link": link,
-                        "source": source_name
+                        "source": item_source
                     })
         except Exception as e:
             print(f"Error fetching from {source_name}: {e}")
