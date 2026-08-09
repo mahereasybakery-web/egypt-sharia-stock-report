@@ -615,6 +615,13 @@ if __name__ == "__main__":
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
     
+    # Check FORCE_RUN flag
+    force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
+    if force_run:
+        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN is enabled. Sending an immediate report and exiting.")
+        send_report()
+        exit(0)
+        
     # Check weekday (0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
     # Sunday to Thursday is [6, 0, 1, 2, 3]
     day = now.weekday()
