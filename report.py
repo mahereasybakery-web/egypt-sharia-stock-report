@@ -286,6 +286,95 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             
     return filtered
 
+def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list, s):
+    """
+    Analyzes news for all stocks in a single Gemini API request.
+    Returns a dictionary mapping ticker tag -> analysis HTML block.
+    """
+    if not GEMINI_API_KEY:
+        print("Gemini API key is missing. Skipping batch AI analysis.")
+        return {}
+        
+    target_tags = []
+    
+    # Portfolio stocks with news
+    for k in portfolio_list:
+        tag = f"[{k}]"
+        if tag in grouped_news:
+            target_tags.append(tag)
+            
+    # Watchlist stocks with news
+    for k in watchlist_list:
+        tag = f"[{k}]"
+        if tag in grouped_news and tag not in target_tags:
+            target_tags.append(tag)
+            
+    # Limit to 10 stocks to keep response size and latency small
+    target_tags = target_tags[:10]
+    
+    if not target_tags:
+        return {}
+        
+    prompt = (
+        "أنت خبير مالي ومحلل أسهم محترف في البورصة المصرية.\n"
+        "مهمتك هي تحليل الأخبار لكل سهم وتقديم تقييم مالي وتوقعات مستقبلية مختصرة جداً.\n"
+        "لكل سهم من الأسهم التالية، قم بتحليل الأخبار المرفقة وقدم تحليلاً باللغة العربية الفصحى (بين 30 إلى 50 كلمة لكل سهم) يشمل:\n"
+        "1. التقييم المالي للخبر والتأثير المتوقع على سعر ومستقبل السهم (إيجابي / سلبي / محايد).\n"
+        "2. نظرة مستقبلية قصيرة للسهم.\n\n"
+        "يجب أن تكون الإجابة بصيغة JSON كائن (JSON object) فقط، حيث المفاتيح هي اسم السهم (مثال: 'FWRY' أو 'ETEL') والقيم هي نص التحليل المالي والتقييم مباشرة بدون أي نصوص برمجية أو علامات ماركداون إضافية.\n\n"
+        "الأسهم والأخبار المتاحة:\n"
+    )
+    
+    for tag in target_tags:
+        ticker = tag.replace("[", "").replace("]", "")
+        prompt += f"--- سهم {ticker} ---\n"
+        for idx, item in enumerate(grouped_news[tag][:3]):
+            prompt += f"- {item['title']} (المصدر: {item['source']})\n"
+        prompt += "\n"
+        
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    { "text": prompt }
+                ]
+            }
+        ],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.2
+        }
+    }
+    
+    analyses = {}
+    try:
+        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=15)
+        if r.status_code == 200:
+            res_json = r.json()
+            raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+            
+            # Clean up JSON blocks
+            if raw_text.startswith("```"):
+                lines = raw_text.splitlines()
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                raw_text = "\n".join(lines).strip()
+                
+            parsed_json = json.loads(raw_text)
+            for ticker, analysis in parsed_json.items():
+                clean_ticker = ticker.strip().upper().replace("[", "").replace("]", "")
+                tag = f"[{clean_ticker}]"
+                analyses[tag] = f"🧠 <b>تحليل AI لسهم {clean_ticker}:</b> {analysis.strip()}"
+        else:
+            print(f"Gemini batch API returned status {r.status_code}: {r.text}")
+    except Exception as e:
+        print("Error in Gemini batch AI news analysis:", e)
+        
+    return analyses
+
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
     if not os.path.exists(STRINGS_PATH):
@@ -477,6 +566,9 @@ def send_report():
         # Sort groups: prioritized stock groups first, then watchlist groups, then general [البورصة] last.
         sorted_tags = sorted(grouped.keys(), key=lambda t: (get_tag_priority(t), t))
         
+        # Get AI analysis mapping in a single batch request
+        ai_analyses = batch_analyze_news_with_gemini(grouped, portfolio_list, watchlist_list, s)
+        
         for tag in sorted_tags:
             items_in_tag = grouped[tag]
             group_text = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
@@ -485,6 +577,11 @@ def send_report():
                 link = item["link"]
                 source = item["source"]
                 group_text += f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
+            
+            # Append AI analysis if available for this tag
+            if tag in ai_analyses:
+                group_text += f"{s['rlm']}{ai_analyses[tag]}\n"
+                
             news_blocks.append(group_text.strip())
             
     except Exception as e:
