@@ -449,7 +449,7 @@ def send_report():
     sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
 
     # Parse News from Live RSS feeds
-    news_html = ""
+    news_blocks = []
     try:
         live_news = get_filtered_market_news(portfolio_list, watchlist_list)
         
@@ -461,68 +461,64 @@ def send_report():
                 grouped[tag] = []
             grouped[tag].append(item)
             
-        # Sort groups: show stock-specific news first, then general [البورصة]
-        sorted_tags = sorted(grouped.keys(), key=lambda t: (1 if t == "[البورصة]" else 0, t))
-        
-        current_len = 0
-        news_blocks = []
-        truncated = False
+        # Define tag priority function based on user requirement:
+        # Priority 0: Invested stocks (portfolio_list)
+        # Priority 1: Watchlist stocks (watchlist_list)
+        # Priority 2: General news ([البورصة])
+        def get_tag_priority(t):
+            ticker = t.replace("[", "").replace("]", "")
+            if ticker in portfolio_list:
+                return 0
+            elif ticker in watchlist_list:
+                return 1
+            else:
+                return 2
+                
+        # Sort groups: prioritized stock groups first, then watchlist groups, then general [البورصة] last.
+        sorted_tags = sorted(grouped.keys(), key=lambda t: (get_tag_priority(t), t))
         
         for tag in sorted_tags:
             items_in_tag = grouped[tag]
             group_text = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
-            added_any = False
             for item in items_in_tag[:3]:
                 title = item["title"]
                 link = item["link"]
                 source = item["source"]
-                item_line = f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
-                
-                # Check if adding this item would exceed the 3500 limit
-                if current_len + len(group_text) + len(item_line) > 3500:
-                    truncated = True
-                    break
-                else:
-                    group_text += item_line
-                    added_any = True
+                group_text += f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
+            news_blocks.append(group_text.strip())
             
-            if truncated:
-                break
-                
-            if added_any:
-                block_str = group_text.strip()
-                news_blocks.append(block_str)
-                current_len += len(block_str) + 2
-                
-        if truncated:
-            news_blocks.append(f"{s['rlm']}... (تم اقتطاع بقية الأخبار لتفادي تجاوز الحد الأقصى)")
-            
-        news_html = "\n\n".join(news_blocks)
-        
     except Exception as e:
         print("Error getting live news:", e)
         
-    # Graceful fallback to news.txt if no live news matched or error occurred
-    if not news_html and os.path.exists(NEWS_PATH):
+    # Graceful fallback to news.txt if no live news matched
+    if not news_blocks and os.path.exists(NEWS_PATH):
         with open(NEWS_PATH, "r", encoding="utf-8") as nf:
             content = nf.read().strip()
             if content:
                 blocks = content.split("\n\n")
-                news_blocks = []
-                current_len = 0
-                for block in blocks[:5]:
+                for block in blocks:
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
                         desc = lines[0].strip()
                         link = lines[1].strip()
-                        item_line = f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>"
-                        if current_len + len(item_line) > 3500:
-                            news_blocks.append(f"{s['rlm']}... (تم اقتطاع بقية الأخبار لتفادي تجاوز الحد الأقصى)")
-                            break
-                        else:
-                            news_blocks.append(item_line)
-                            current_len += len(item_line) + 2
-                news_html = "\n\n".join(news_blocks)
+                        news_blocks.append(f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>")
+
+    # Group news blocks into chunks under 3500 characters
+    news_message_chunks = []
+    current_chunk = []
+    current_len = 0
+    for block in news_blocks:
+        block_len = len(block) + 2  # plus "\n\n" separator
+        if current_len + block_len > 3500:
+            if current_chunk:
+                news_message_chunks.append("\n\n".join(current_chunk))
+            current_chunk = [block]
+            current_len = block_len
+        else:
+            current_chunk.append(block)
+            current_len += block_len
+    if current_chunk:
+        news_message_chunks.append("\n\n".join(current_chunk))
 
     # DateTime formatting (Egypt Cairo Timezone UTC+3)
     egypt_tz = timezone(timedelta(hours=3))
@@ -600,19 +596,12 @@ def send_report():
     # Check length and split if necessary to avoid Telegram's 4096 character limit
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
-    news_part = ""
-    if news_html:
-        news_part = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_html}"
-        
-    combined_len = len(tg_msg) + len(news_part)
-    
-    if combined_len <= 4000:
-        # Send as single combined message
-        if news_part:
-            tg_msg += news_part
+    # If we have only 1 chunk and it fits together with tg_msg under 4000 chars, send combined!
+    if len(news_message_chunks) == 1 and (len(tg_msg) + len(news_message_chunks[0]) + 100 <= 4000):
+        combined_msg = tg_msg + f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_message_chunks[0]}"
         payload = {
             "chat_id": CHAT_ID,
-            "text": tg_msg,
+            "text": combined_msg,
             "parse_mode": "HTML",
             "disable_web_page_preview": True
         }
@@ -639,9 +628,11 @@ def send_report():
         except Exception as e:
             print("Telegram Part 1 error:", e)
             
-        # Send news developments as Part 2
-        if news_part:
-            news_msg = f"{s['rlm']}<b>{s['report_title']} - {s['e_rocket']} {s['latest_news_developments']} ({today})</b>\n\n{news_html}"
+        # Send each news chunk as a separate Telegram message
+        for idx, chunk in enumerate(news_message_chunks):
+            # If there's only 1 chunk, no need to add part label
+            part_label = f" (جزء {idx + 1})" if len(news_message_chunks) > 1 else ""
+            news_msg = f"{s['rlm']}<b>{s['report_title']} - {s['e_rocket']} {s['latest_news_developments']}{part_label} ({today})</b>\n\n{chunk}"
             payload2 = {
                 "chat_id": CHAT_ID,
                 "text": news_msg,
@@ -650,11 +641,11 @@ def send_report():
             }
             try:
                 r_tg2 = requests.post(url, json=payload2)
-                print("Telegram Part 2 (News) Response:", r_tg2.status_code)
+                print(f"Telegram News Part {idx + 1} Response:", r_tg2.status_code)
                 if r_tg2.status_code != 200:
-                    print("Telegram part 2 error body:", r_tg2.text)
+                    print(f"Telegram news part {idx + 1} error body:", r_tg2.text)
             except Exception as e:
-                print("Telegram Part 2 error:", e)
+                print(f"Telegram News Part {idx + 1} error:", e)
 
 def trigger_next_runner():
     print("Dispatching next runner to maintain perpetual cloud loop...")
