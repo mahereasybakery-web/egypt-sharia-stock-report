@@ -505,12 +505,33 @@ def send_report():
     time_display = f"{hour:02d}:{minute} {period}"
 
     # Format Telegram message
+    total_minutes = now.hour * 60 + now.minute
+    market_status_text = ""
+    portfolio_header = s.get('portfolio_title', 'أسهم مستثمر بها')
+    watchlist_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
+    
+    if total_minutes < 10 * 60:  # Before 10:00 AM Cairo Time
+        market_status_text = "⚠️ <b>السوق مغلق حالياً (يفتح 10:00 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
+        portfolio_header = f"📊 {portfolio_header} (إغلاق الجلسة السابقة)"
+        watchlist_header = f"📊 {watchlist_header} (إغلاق الجلسة السابقة)"
+    elif 10 * 60 <= total_minutes <= 14 * 60 + 30:  # 10:00 AM to 2:30 PM (Active trading)
+        portfolio_header = f"🟢 {portfolio_header} (حركة لحظية)"
+        watchlist_header = f"⏸️ {watchlist_header} (حركة لحظية)"
+    else:  # After 2:30 PM
+        market_status_text = "🔒 <b>انتهت جلسة تداول اليوم (السوق مغلق)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
+        portfolio_header = f"📈 {portfolio_header} (إغلاق جلسة اليوم)"
+        watchlist_header = f"📈 {watchlist_header} (إغلاق جلسة اليوم)"
+
     tg_msg = f"{s['rlm']}<b>{s['report_title']}</b>\n"
     tg_msg += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
-    tg_msg += f"{s['rlm']}{s['line']}\n\n"
+    tg_msg += f"{s['rlm']}{s['line']}\n"
+    if market_status_text:
+        tg_msg += f"{s['rlm']}{market_status_text}"
+    else:
+        tg_msg += "\n"
 
     # Portfolio block
-    tg_msg += f"{s['rlm']}<b>{s['e_green']} {s.get('portfolio_title', 'أسهم مستثمر بها')}:</b>\n"
+    tg_msg += f"{s['rlm']}<b>{portfolio_header}:</b>\n"
     for k in sorted_portfolio:
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
@@ -521,7 +542,7 @@ def send_report():
         tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
     # Watchlist block
-    tg_msg += f"\n{s['rlm']}<b>{s['e_green']} {s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')}:</b>\n"
+    tg_msg += f"\n{s['rlm']}<b>{watchlist_header}:</b>\n"
     for k in sorted_watchlist:
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
