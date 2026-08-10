@@ -62,42 +62,55 @@ def fetch_rss_news():
     
     news_items = []
     
+    # We will import feedparser locally to avoid issues if not available,
+    # but run_report.yml installs it.
+    try:
+        import feedparser
+    except ImportError:
+        feedparser = None
+        print("Warning: feedparser is not installed. RSS parsing may fail.")
+
     for source_name, url in feeds.items():
         try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=10) as response:
-                xml_data = response.read()
+            r = requests.get(url, headers=headers, timeout=10, verify=False)
+            if r.status_code != 200:
+                print(f"Error fetching from {source_name}: HTTP {r.status_code}")
+                continue
                 
-            root = ET.fromstring(xml_data)
-            
-            # Find all <item> or <entry> elements using wildcards or standard structures
-            items = root.findall(".//item")
-            if not items:
-                items = root.findall(".//{http://www.w3.org/2005/Atom}entry")
-            if not items:
-                items = [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
-                
-            # For Google News, we can process more items (up to 30) since it aggregates many sources
+            if feedparser:
+                feed = feedparser.parse(r.content)
+                items = feed.entries
+            else:
+                # Fallback to ElementTree if feedparser is missing
+                root = ET.fromstring(r.content)
+                items_xml = root.findall(".//item")
+                if not items_xml:
+                    items_xml = root.findall(".//{http://www.w3.org/2005/Atom}entry")
+                if not items_xml:
+                    items_xml = [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
+                    
+                items = []
+                for item in items_xml:
+                    title_elem = None
+                    link_elem = None
+                    for child in item:
+                        if child.tag.endswith("title"): title_elem = child
+                        if child.tag.endswith("link"): link_elem = child
+                    t = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
+                    l = link_elem.text.strip() if link_elem is not None and link_elem.text else ""
+                    if not l and link_elem is not None:
+                        l = link_elem.attrib.get("href", "").strip()
+                    items.append({"title": t, "link": l})
+
             limit = 30 if source_name == "أخبار جوجل" else 15
-            for item in items[:limit]:
-                title_elem = None
-                for child in item:
-                    if child.tag.endswith("title"):
-                        title_elem = child
-                        break
-                        
-                link_elem = None
-                for child in item:
-                    if child.tag.endswith("link"):
-                        link_elem = child
-                        break
-                title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
-                link = ""
-                if link_elem is not None:
-                    link = link_elem.text.strip() if link_elem.text else ""
-                    if not link:
-                        link = link_elem.attrib.get("href", "").strip()
-                        
+            for entry in items[:limit]:
+                if feedparser:
+                    title = entry.title if 'title' in entry else ""
+                    link = entry.link if 'link' in entry else ""
+                else:
+                    title = entry.get("title", "")
+                    link = entry.get("link", "")
+                    
                 if title and link:
                     link = link.replace(" ", "%20")
                     item_source = source_name
@@ -109,7 +122,7 @@ def fetch_rss_news():
                             item_source = f"{actual_source} (جوجل)"
                     
                     news_items.append({
-                        "title": title,
+                        "title": title.strip(),
                         "link": link,
                         "source": item_source
                     })
