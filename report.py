@@ -220,6 +220,44 @@ def send_report():
     with open(STRINGS_PATH, "r", encoding="utf-8") as f:
         s = json.load(f)
 
+    company_websites = {
+        "TMGH": "https://www.tmg-holding.com",
+        "FWRY": "https://fawry.com",
+        "EGAL": "http://www.egyptalum.com.eg",
+        "ETEL": "https://ir.te.eg",
+        "EFID": "https://www.edita.com.eg",
+        "ADIB": "https://www.adib.eg",
+        "ORHD": "https://www.orascomdevelopment.com",
+        "EFIH": "https://www.efinanceinvestment.com",
+        "OCDI": "https://sodic.com",
+        "RACC": "https://rayacc.com",
+        "ORAS": "https://orascom.com",
+        "PHDC": "https://www.palmhillsdevelopments.com",
+        "SKPC": "http://www.sidpec.com",
+        "MCQE": "http://www.qenacement.com",
+        "FAITA": "https://www.faisalbank.com.eg",
+        "FAIT": "https://www.faisalbank.com.eg",
+        "ISPH": "https://ibnsina-pharma.com",
+        "JUFO": "https://www.juhayna.com",
+        "AMOC": "http://www.amoc-eg.com",
+        "MASR": "https://madinetmasr.com",
+        "ORWE": "https://www.orientalweavers.com",
+        "RMDA": "https://www.rameda.com",
+        "OLFI": "https://www.obourland.com",
+        "ARCC": "https://www.arabiancement.com",
+        "IFAP": "http://www.iac-eg.com",
+        "MTIE": "http://www.mti-egypt.com",
+        "SAUD": "https://www.albaraka.com.eg",
+        "ATQA": "http://misrnationalsteel.com",
+        "CIRA": "https://cira.com.eg",
+        "EGAS": "http://www.egyptgas.com.eg",
+        "MPCO": "http://www.manspoultry.com",
+        "ACGC": "http://www.acgc-egypt.com",
+        "ETRS": "https://www.egytrans.com",
+        "LCSW": "https://www.lecico.com",
+        "ICFC": "http://www.icf-eg.com"
+    }
+
     # 1. Fetch stock prices
     stocks_payload = {
         "symbols": {
@@ -403,7 +441,9 @@ def send_report():
         chg_val = item["chgPct"]
         chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
         dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        ticker_link = company_websites.get(k, "#")
+        ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
+        tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
     # Watchlist block
     tg_msg += f"\n{s['rlm']}<b>{s['e_green']} {s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')}:</b>\n"
@@ -412,7 +452,17 @@ def send_report():
         chg_val = item["chgPct"]
         chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
         dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{k}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        ticker_link = company_websites.get(k, "#")
+        ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
+        tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+
+    # Investor Relations Priority Links Section
+    tg_msg += f"\n{s['rlm']}<b>🔗 {s.get('ir_priority_title', 'مواقع علاقات المستثمرين (أولوية المتابعة)')}:</b>\n"
+    for k in portfolio_list:
+        site = company_websites.get(k)
+        if site:
+            domain = site.replace("https://", "").replace("http://", "").replace("www.", "").split("/")[0]
+            tg_msg += f"{s['rlm']}• <b>{k}</b>: <a href='{site}'>{domain}</a>\n"
 
     # Indices block
     egx30_dir = s["e_green"] if egx30["chgPct"] >= 0 else s["e_red"]
