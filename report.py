@@ -134,13 +134,16 @@ def fetch_rss_news():
 def is_whole_word_match(word, text):
     if not word or not text:
         return False
-    # If the word is alphanumeric and ASCII (like English ticker/keywords: TMGH, ETEL, WE), use standard \b boundary
-    if word.isalnum() and word.isascii():
-        pattern = rf"\b{re.escape(word)}\b"
-    else:
-        # For Arabic, assert no Arabic letter immediately before or after the word
-        pattern = rf"(?<![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]){re.escape(word)}(?![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF])"
-    return re.search(pattern, text, re.IGNORECASE) is not None
+        
+    word = word.lower().strip()
+    text = text.lower()
+    
+    if word == "وي":
+        # Specific check for "وي" (WE) to avoid false positives like "قوي" or "سنوي"
+        pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?وي(?:$|[^\w\u0600-\u06FF])"
+        return re.search(pattern, text) is not None
+        
+    return word in text
 
 def fetch_corporate_websites_news():
     corporate_urls = {
