@@ -653,7 +653,7 @@ def send_report():
         portfolio_header = f"📊 {portfolio_header} (إغلاق الجلسة السابقة)"
         watchlist_header = f"📊 {watchlist_header} (إغلاق الجلسة السابقة)"
     elif 10 * 60 <= total_minutes <= 14 * 60 + 30:  # 10:00 AM to 2:30 PM (Active trading)
-        portfolio_header = f"💎 {portfolio_header} (حركة لحظية)"
+        portfolio_header = f"💼 {portfolio_header} (حركة لحظية)"
         watchlist_header = f"📋 {watchlist_header} (حركة لحظية)"
     else:  # After 2:30 PM
         market_status_text = "🔒 <b>انتهت جلسة تداول اليوم (السوق مغلق)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
