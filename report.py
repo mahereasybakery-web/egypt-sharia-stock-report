@@ -149,9 +149,9 @@ def fetch_corporate_websites_news():
     results = []
     for ticker, url in corporate_urls.items():
         try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=4) as response:
-                html = response.read().decode('utf-8', errors='ignore')
+            # Using requests.get with timeout is much more robust
+            r = requests.get(url, headers=headers, timeout=4, verify=False)
+            html = r.text
             
             # Simple regex to find <a> tags and extract their links and text
             links = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
