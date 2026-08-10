@@ -449,7 +449,7 @@ def send_report():
     sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
 
     # Parse News from Live RSS feeds
-    news_lines_rtl = []
+    news_html = ""
     try:
         live_news = get_filtered_market_news(portfolio_list, watchlist_list)
         
@@ -461,39 +461,68 @@ def send_report():
                 grouped[tag] = []
             grouped[tag].append(item)
             
-        # Format grouped news
         # Sort groups: show stock-specific news first, then general [البورصة]
         sorted_tags = sorted(grouped.keys(), key=lambda t: (1 if t == "[البورصة]" else 0, t))
         
-        # We limit the number of groups we display to 8 to avoid message truncation in Telegram
-        for tag in sorted_tags[:8]:
+        current_len = 0
+        news_blocks = []
+        truncated = False
+        
+        for tag in sorted_tags:
             items_in_tag = grouped[tag]
             group_text = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
-            # Display up to 3 articles per stock
+            added_any = False
             for item in items_in_tag[:3]:
                 title = item["title"]
                 link = item["link"]
                 source = item["source"]
-                group_text += f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
-            news_lines_rtl.append(group_text.strip())
+                item_line = f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
+                
+                # Check if adding this item would exceed the 3500 limit
+                if current_len + len(group_text) + len(item_line) > 3500:
+                    truncated = True
+                    break
+                else:
+                    group_text += item_line
+                    added_any = True
             
+            if truncated:
+                break
+                
+            if added_any:
+                block_str = group_text.strip()
+                news_blocks.append(block_str)
+                current_len += len(block_str) + 2
+                
+        if truncated:
+            news_blocks.append(f"{s['rlm']}... (تم اقتطاع بقية الأخبار لتفادي تجاوز الحد الأقصى)")
+            
+        news_html = "\n\n".join(news_blocks)
+        
     except Exception as e:
         print("Error getting live news:", e)
         
     # Graceful fallback to news.txt if no live news matched or error occurred
-    if not news_lines_rtl and os.path.exists(NEWS_PATH):
+    if not news_html and os.path.exists(NEWS_PATH):
         with open(NEWS_PATH, "r", encoding="utf-8") as nf:
             content = nf.read().strip()
             if content:
                 blocks = content.split("\n\n")
+                news_blocks = []
+                current_len = 0
                 for block in blocks[:5]:
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
                         desc = lines[0].strip()
                         link = lines[1].strip()
-                        news_lines_rtl.append(f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>")
-
-    news_html = "\n\n".join(news_lines_rtl)
+                        item_line = f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>"
+                        if current_len + len(item_line) > 3500:
+                            news_blocks.append(f"{s['rlm']}... (تم اقتطاع بقية الأخبار لتفادي تجاوز الحد الأقصى)")
+                            break
+                        else:
+                            news_blocks.append(item_line)
+                            current_len += len(item_line) + 2
+                news_html = "\n\n".join(news_blocks)
 
     # DateTime formatting (Egypt Cairo Timezone UTC+3)
     egypt_tz = timezone(timedelta(hours=3))
@@ -619,8 +648,6 @@ def send_report():
         # Send news developments as Part 2
         if news_part:
             news_msg = f"{s['rlm']}<b>{s['report_title']} - {s['e_rocket']} {s['latest_news_developments']} ({today})</b>\n\n{news_html}"
-            if len(news_msg) > 4000:
-                news_msg = news_msg[:3900] + "\n... (تم اقتطاع بقية الأخبار لطولها)"
             payload2 = {
                 "chat_id": CHAT_ID,
                 "text": news_msg,
