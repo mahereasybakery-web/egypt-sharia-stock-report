@@ -5,6 +5,7 @@ import requests
 import base64
 import urllib.request
 import xml.etree.ElementTree as ET
+import re
 from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
@@ -88,7 +89,6 @@ def fetch_rss_news():
                     if child.tag.endswith("link"):
                         link_elem = child
                         break
-                    
                 title = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
                 link = ""
                 if link_elem is not None:
@@ -116,6 +116,17 @@ def fetch_rss_news():
             
     return news_items
 
+def is_whole_word_match(word, text):
+    if not word or not text:
+        return False
+    # If the word is alphanumeric and ASCII (like English ticker/keywords: TMGH, ETEL, WE), use standard \b boundary
+    if word.isalnum() and word.isascii():
+        pattern = rf"\b{re.escape(word)}\b"
+    else:
+        # For Arabic, assert no Arabic letter immediately before or after the word
+        pattern = rf"(?<![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]){re.escape(word)}(?![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF])"
+    return re.search(pattern, text, re.IGNORECASE) is not None
+
 def get_filtered_market_news(portfolio_list, watchlist_list):
     all_news = fetch_rss_news()
     
@@ -126,7 +137,7 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
         "FWRY": ["فوري", "FWRY"],
         "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
-        "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي ", "ETEL"],
+        "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي", "ETEL"],
         "ORHD": ["أوراسكوم للتنمية", "اوراسكوم للتنمية", "ORHD"],
         "EFIH": ["إي فاينانس", "اي فاينانس", "EFIH"],
         "OCDI": ["سوديك", "سودك", "OCDI"],
@@ -174,7 +185,7 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             if ticker not in portfolio_list and ticker not in watchlist_list:
                 continue
             for kw in keywords:
-                if kw.lower() in title.lower():
+                if is_whole_word_match(kw, title):
                     matched_stock = ticker
                     break
             if matched_stock:
@@ -184,7 +195,7 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         if not matched_stock:
             market_keywords = ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]
             for mkw in market_keywords:
-                if mkw in title:
+                if is_whole_word_match(mkw, title):
                     is_market_news = True
                     break
                     
