@@ -4,6 +4,8 @@ import time
 import requests
 import base64
 import urllib.request
+import urllib.parse
+from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 import re
 from datetime import datetime, timezone, timedelta
@@ -127,7 +129,83 @@ def is_whole_word_match(word, text):
         pattern = rf"(?<![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]){re.escape(word)}(?![\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF])"
     return re.search(pattern, text, re.IGNORECASE) is not None
 
+def fetch_corporate_websites_news():
+    corporate_urls = {
+        "FWRY": "https://fawry.com/press-releases/",
+        "ETEL": "https://ir.te.eg/ar/news-press-releases/press-releases/",
+        "TMGH": "https://www.tmg-holding.com/investor-relations/news-and-announcements/",
+        "EFID": "https://www.edita.com.eg/investor-relations/press-releases/",
+        "OCDI": "https://sodic.com/investor-relations/disclosures-and-press-releases/",
+        "EFIH": "https://www.efinanceinvestment.com/press-releases",
+        "ADIB": "https://www.adib.eg/investor-relations/financial-press-releases",
+        "ORHD": "https://www.orascomdevelopment.com/investor-relations/press-releases",
+        "RACC": "https://rayacc.com/investor-relations/press-releases/"
+    }
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
+    results = []
+    for ticker, url in corporate_urls.items():
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=4) as response:
+                html = response.read().decode('utf-8', errors='ignore')
+            
+            # Simple regex to find <a> tags and extract their links and text
+            links = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
+            
+            found_count = 0
+            for l_url, l_text in links:
+                l_text_clean = re.sub(r'<[^>]+>', '', l_text).strip()
+                l_text_clean = re.sub(r'\s+', ' ', l_text_clean)
+                
+                # Check for corporate press release indicators in Arabic or English
+                if len(l_text_clean) > 15 and (
+                    any(x in l_text_clean for x in ["إفصاح", "بيان", "صحفي", "نتائج", "أرباح", "مجلس", "إدارة", "شراكة", "توقيع", "استحواذ", "تعاون", "افتتاح", "زيادة", "مالية"]) or
+                    any(y in l_url.lower() for y in ["press", "release", "news", "disclosure", "pdf"]) or
+                    any(z in l_text_clean.lower() for z in ["press", "release", "disclosure", "financial", "result"])
+                ):
+                    full_link = l_url
+                    if l_url.startswith("/"):
+                        full_link = urljoin(url, l_url)
+                    elif not l_url.startswith("http"):
+                        full_link = urljoin(url, l_url)
+                        
+                    results.append({
+                        "tag": f"[{ticker}]",
+                        "title": l_text_clean,
+                        "link": full_link,
+                        "source": "الموقع الرسمي"
+                    })
+                    found_count += 1
+                    if found_count >= 2:  # Keep top 2 announcements per site
+                        break
+        except Exception as e:
+            print(f"Skipping corporate site {ticker} news fetch: {e}")
+            
+    return results
+
 def get_filtered_market_news(portfolio_list, watchlist_list):
+    filtered = []
+    seen_links = set()
+    
+    # 1. Fetch news directly from corporate websites first (with absolute priority)
+    try:
+        corp_news = fetch_corporate_websites_news()
+        for item in corp_news:
+            link = item["link"]
+            if link not in seen_links:
+                seen_links.add(link)
+                # Ensure the ticker is in our watched list
+                ticker = item["tag"].strip("[]")
+                if ticker in portfolio_list or ticker in watchlist_list:
+                    filtered.append(item)
+    except Exception as e:
+        print("Error fetching corporate news:", e)
+        
+    # 2. Fetch news from standard RSS feeds and Google News
     all_news = fetch_rss_news()
     
     stock_keywords = {
@@ -167,9 +245,6 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         "LCSW": ["ليسيكو", "LCSW"],
         "ICFC": ["الدولية للأسمدة", "الدوليه للأسمده", "ICFC"]
     }
-    
-    filtered = []
-    seen_links = set()
     
     for item in all_news:
         title = item["title"]
