@@ -417,22 +417,66 @@ def send_report():
     tg_msg += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
     tg_msg += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
 
-    # News block
-    if news_html:
-        tg_msg += f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_html}"
-
-    # Send message
+    # Check length and split if necessary to avoid Telegram's 4096 character limit
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": tg_msg,
-        "parse_mode": "HTML"
-    }
-    try:
-        r_tg = requests.post(url, json=payload)
-        print("Telegram Response:", r_tg.status_code)
-    except Exception as e:
-        print("Telegram error:", e)
+    
+    news_part = ""
+    if news_html:
+        news_part = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_html}"
+        
+    combined_len = len(tg_msg) + len(news_part)
+    
+    if combined_len <= 4000:
+        # Send as single combined message
+        if news_part:
+            tg_msg += news_part
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": tg_msg,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True
+        }
+        try:
+            r_tg = requests.post(url, json=payload)
+            print("Telegram Combined Response:", r_tg.status_code)
+            if r_tg.status_code != 200:
+                print("Telegram combined error body:", r_tg.text)
+        except Exception as e:
+            print("Telegram combined error:", e)
+    else:
+        # Send stock report first as Part 1
+        payload1 = {
+            "chat_id": CHAT_ID,
+            "text": tg_msg,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": True
+        }
+        try:
+            r_tg1 = requests.post(url, json=payload1)
+            print("Telegram Part 1 (Stocks) Response:", r_tg1.status_code)
+            if r_tg1.status_code != 200:
+                print("Telegram part 1 error body:", r_tg1.text)
+        except Exception as e:
+            print("Telegram Part 1 error:", e)
+            
+        # Send news developments as Part 2
+        if news_part:
+            news_msg = f"{s['rlm']}<b>{s['report_title']} - {s['e_rocket']} {s['latest_news_developments']} ({today})</b>\n\n{news_html}"
+            if len(news_msg) > 4000:
+                news_msg = news_msg[:3900] + "\n... (تم اقتطاع بقية الأخبار لطولها)"
+            payload2 = {
+                "chat_id": CHAT_ID,
+                "text": news_msg,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True
+            }
+            try:
+                r_tg2 = requests.post(url, json=payload2)
+                print("Telegram Part 2 (News) Response:", r_tg2.status_code)
+                if r_tg2.status_code != 200:
+                    print("Telegram part 2 error body:", r_tg2.text)
+            except Exception as e:
+                print("Telegram Part 2 error:", e)
 
 def trigger_next_runner():
     print("Dispatching next runner to maintain perpetual cloud loop...")
