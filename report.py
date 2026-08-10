@@ -581,13 +581,7 @@ def send_report():
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
         tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
-    # Investor Relations Priority Links Section
-    tg_msg += f"\n{s['rlm']}<b>🔗 {s.get('ir_priority_title', 'مواقع علاقات المستثمرين (أولوية المتابعة)')}:</b>\n"
-    for k in portfolio_list:
-        site = company_websites.get(k)
-        if site:
-            domain = site.replace("https://", "").replace("http://", "").replace("www.", "").split("/")[0]
-            tg_msg += f"{s['rlm']}• <b>{k}</b>: <a href='{site}'>{domain}</a>\n"
+
 
     # Indices block
     egx30_dir = s["e_green"] if egx30["chgPct"] >= 0 else s["e_red"]
