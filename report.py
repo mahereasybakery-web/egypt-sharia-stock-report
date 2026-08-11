@@ -238,26 +238,6 @@ def fetch_egx_beta_news():
             unique_items.append(item)
             
     return unique_items
-                        title = head_match.group(1)
-                    elif cont_match and cont_match.group(1) and cont_match.group(1) != "null":
-                        title = cont_match.group(1)
-                        
-                    if title and title != "null":
-                        try:
-                            # It's inside a regex from a script string, so it might be double escaped.
-                            # We can replace \\u with \u and then decode
-                            title = title.replace('\\\\u', '\\u').encode('utf-8').decode('unicode_escape')
-                            title = title.encode('utf-8').decode('unicode_escape') # just in case
-                        except:
-                            pass
-                        items.append({
-                            "title": title.strip(),
-                            "link": f"https://beta.egx.com.eg/ar/news/{code}",
-                            "source": "البورصة المصرية"
-                        })
-    except Exception as e:
-        print("Error fetching EGX Beta news:", e)
-    return items
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
