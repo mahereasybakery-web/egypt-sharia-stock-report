@@ -1038,8 +1038,14 @@ if __name__ == "__main__":
     # Check FORCE_RUN flag
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     if force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN is enabled. Sending an immediate report and exiting.")
+        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN is enabled. Sending an immediate report.")
         send_report()
+        
+        # Automatically restart the normal continuous loop so the chain is not broken
+        if now.hour < 15 or (now.hour == 15 and now.minute < 30):
+            print(f"[{now.strftime('%H:%M:%S')}] Market is open. Triggering next runner to resume continuous background loop.")
+            trigger_next_runner()
+            
         exit(0)
         
     # Check weekday (0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
