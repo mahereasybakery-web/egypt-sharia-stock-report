@@ -907,6 +907,23 @@ def handle_telegram_command(text):
         answer = ask_ai(text)
         reply_telegram(answer)
 
+def wait_for_market_open():
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    
+    # Target time is 08:45:00
+    target_time = now.replace(hour=8, minute=45, second=0, microsecond=0)
+    
+    if now < target_time:
+        seconds_to_wait = (target_time - now).total_seconds()
+        print(f"[{now.strftime('%H:%M:%S')}] Early Wake active. Waiting {seconds_to_wait:.1f} seconds until market open (08:45 AM)...")
+        
+        start_time = time.time()
+        while (time.time() - start_time) < seconds_to_wait:
+            poll_telegram_messages()
+            time.sleep(5)
+        print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Market is now open! Proceeding to report generation.")
+
 def poll_telegram_messages():
     global offset
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
@@ -975,19 +992,21 @@ if __name__ == "__main__":
         print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday), exiting to conserve actions minutes.")
         exit(0)
         
+    wait_for_market_open()
+        
     # Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
-    TOTAL_CYCLES = 12
+    TOTAL_CYCLES = 15
     for i in range(TOTAL_CYCLES):
         loop_now = datetime.now(egypt_tz)
         print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
         
-        # Check active hour range: 09:00 to 15:30 Cairo time
+        # Check active hour range: 08:45 to 15:30 Cairo time
         current_time_minutes = loop_now.hour * 60 + loop_now.minute
         if current_time_minutes > 15 * 60 + 30:
             print(f"[{loop_now.strftime('%H:%M:%S')}] Time is past 3:30 PM, terminating run to conserve minutes.")
             exit(0)
             
-        if 9 * 60 <= current_time_minutes <= 15 * 60 + 30:
+        if 8 * 60 + 45 <= current_time_minutes <= 15 * 60 + 30:
             send_report()
         else:
             print(f"[{loop_now.strftime('%H:%M:%S')}] Outside automated report hours (9:00 AM - 3:30 PM), skipping.")
