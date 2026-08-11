@@ -406,7 +406,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list,
     
     analyses = {}
     try:
-        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=15)
+        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=60)
         if r.status_code == 200:
             res_json = r.json()
             raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
