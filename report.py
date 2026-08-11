@@ -547,6 +547,42 @@ def send_report():
             ticker, data = f.result()
             parsed_stocks[ticker] = data
 
+    def fetch_tv_recommendations(tickers, s):
+        url = "https://scanner.tradingview.com/egypt/scan"
+        payload = {
+            "symbols": {"tickers": [f"EGX:{t}" for t in tickers]},
+            "columns": ["name", "Recommend.All"]
+        }
+        headers = {"Content-Type": "application/json"}
+        rec_map = {}
+        try:
+            r = requests.post(url, json=payload, headers=headers, timeout=5)
+            data = r.json()
+            for item in data.get("data", []):
+                t = item["d"][0]
+                rec_val = item["d"][1]
+                rec_str = ""
+                if rec_val is not None:
+                    if rec_val >= 0.5:
+                        rec_str = f"🚀 {s['strong_buy']}"
+                    elif rec_val >= 0.1:
+                        rec_str = f"🟢 {s['buy']}"
+                    elif rec_val <= -0.5:
+                        rec_str = f"🔴 {s['strong_sell']}"
+                    elif rec_val <= -0.1:
+                        rec_str = f"⭕ {s['sell']}"
+                    else:
+                        rec_str = "⚪ محايد"
+                rec_map[t] = rec_str
+        except Exception as e:
+            print("Error fetching TV recommendations:", e)
+        return rec_map
+
+    tv_recs = fetch_tv_recommendations(all_tickers, s)
+    for ticker in all_tickers:
+        if ticker in parsed_stocks:
+            parsed_stocks[ticker]["rec"] = tv_recs.get(ticker, "")
+
     egx30 = fetch_mubasher_egx30()
 
     # 2. Fetch Forex (USD/EGP)
