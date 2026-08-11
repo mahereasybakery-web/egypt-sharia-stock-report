@@ -204,6 +204,48 @@ def fetch_corporate_websites_news():
             
     return results
 
+def fetch_egx_beta_news():
+    url = "https://beta.egx.com.eg/"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    items = []
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        # Look for marketNews array inside the response
+        match = re.search(r'\\?"marketNews\\?":\[(.*?)\]', r.text)
+        if match:
+            news_array = match.group(1)
+            # Find each object inside
+            objects = re.findall(r'\{(.*?)\}', news_array)
+            for obj in objects:
+                code_match = re.search(r'\\?"code\\?":(\d+)', obj)
+                head_match = re.search(r'\\?"headingArabic\\?":\\?"(.*?)\\?"(?:,|})', obj)
+                cont_match = re.search(r'\\?"contentArabic\\?":\\?"(.*?)\\?"(?:,|})', obj)
+                
+                if code_match:
+                    code = code_match.group(1)
+                    title = ""
+                    if head_match and head_match.group(1) and head_match.group(1) != "null":
+                        title = head_match.group(1)
+                    elif cont_match and cont_match.group(1) and cont_match.group(1) != "null":
+                        title = cont_match.group(1)
+                        
+                    if title and title != "null":
+                        try:
+                            # It's inside a regex from a script string, so it might be double escaped.
+                            # We can replace \\u with \u and then decode
+                            title = title.replace('\\\\u', '\\u').encode('utf-8').decode('unicode_escape')
+                            title = title.encode('utf-8').decode('unicode_escape') # just in case
+                        except:
+                            pass
+                        items.append({
+                            "title": title.strip(),
+                            "link": f"https://beta.egx.com.eg/ar/news/{code}",
+                            "source": "البورصة المصرية"
+                        })
+    except Exception as e:
+        print("Error fetching EGX Beta news:", e)
+    return items
+
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
     seen_links = set()
@@ -224,6 +266,10 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         
     # 2. Fetch news from standard RSS feeds and Google News
     all_news = fetch_rss_news()
+    
+    # 3. Fetch EGX Beta news
+    egx_beta_news = fetch_egx_beta_news()
+    all_news.extend(egx_beta_news)
     
     stock_keywords = {
         "TMGH": ["طلعت مصطفى", "طلعت مصطفي", "TMGH"],
