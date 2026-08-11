@@ -8,6 +8,7 @@ import urllib.parse
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 import re
+import concurrent.futures
 from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
@@ -439,29 +440,55 @@ def send_report():
         "ICFC": "http://www.icf-eg.com"
     }
 
+    def fetch_mubasher_price(ticker):
+        url = f"https://english.mubasher.info/markets/EGX/stocks/{ticker}"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        try:
+            r = requests.get(url, headers=headers, timeout=5)
+            price_match = re.search(r'market-summary__last-price[^>]*>\s*([\d\.,]+)', r.text)
+            pct_match = re.search(r'market-summary__change-percentage[^>]*>\s*([\-\+\d\.,]+)%', r.text)
+            open_match = re.search(r'Open</span>\s*<span class="market-summary__block-number">([\d\.,]+)</span>', r.text)
+            
+            price = float(price_match.group(1).replace(',', '')) if price_match else 0
+            chg_pct = float(pct_match.group(1).replace(',', '')) if pct_match else 0
+            open_p = float(open_match.group(1).replace(',', '')) if open_match else 0
+            return ticker, {"close": price, "chgPct": chg_pct, "open": open_p, "rec": ""}
+        except Exception as e:
+            return ticker, {"close": 0, "chgPct": 0, "open": 0, "rec": ""}
+
+    def fetch_mubasher_egx30():
+        url = "https://english.mubasher.info/markets/EGX/indices/EGX30"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        try:
+            r = requests.get(url, headers=headers, timeout=5)
+            price_match = re.search(r'market-summary__last-price[^>]*>\s*([\d\.,]+)', r.text)
+            pct_match = re.search(r'market-summary__change-percentage[^>]*>\s*([\-\+\d\.,]+)%', r.text)
+            open_match = re.search(r'Open</span>\s*<span class="market-summary__block-number">([\d\.,]+)</span>', r.text)
+            price = float(price_match.group(1).replace(',', '')) if price_match else 0
+            chg_pct = float(pct_match.group(1).replace(',', '')) if pct_match else 0
+            open_p = float(open_match.group(1).replace(',', '')) if open_match else 0
+            return {"close": price, "chgPct": chg_pct, "open": open_p}
+        except Exception as e:
+            return {"close": 0, "chgPct": 0, "open": 0}
+
     # 1. Fetch stock prices
-    stocks_payload = {
-        "symbols": {
-            "tickers": [
-                "EGX:OCDI", "EGX:ORHD", "EGX:EFIH", "EGX:RACC",
-                "EGX:EGAL", "EGX:TMGH", "EGX:EFID", "EGX:ETEL",
-                "EGX:ADIB", "EGX:FWRY", "EGX:ORAS", "EGX:PHDC",
-                "EGX:SKPC", "EGX:MCQE", "EGX:FAITA", "EGX:ISPH",
-                "EGX:JUFO", "EGX:AMOC", "EGX:MASR", "EGX:ORWE",
-                "EGX:RMDA", "EGX:OLFI", "EGX:ARCC", "EGX:FAIT",
-                "EGX:IFAP", "EGX:MTIE", "EGX:SAUD", "EGX:ATQA",
-                "EGX:CIRA", "EGX:EGAS", "EGX:MPCO", "EGX:ACGC",
-                "EGX:ETRS", "EGX:LCSW", "EGX:ICFC", "EGX:EGX30"
-            ],
-            "query": {"types": []}
-        },
-        "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name", "description", "Recommend.All"]
-    }
-    try:
-        r_stocks = requests.post("https://scanner.tradingview.com/egypt/scan", json=stocks_payload).json()
-    except Exception as e:
-        print("Error fetching stocks:", e)
-        return
+    portfolio_list = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
+    watchlist_list = [
+        "RACC", "FWRY", "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
+        "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
+        "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW",
+        "ICFC"
+    ]
+    all_tickers = portfolio_list + watchlist_list
+    
+    parsed_stocks = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetch_mubasher_price, t) for t in all_tickers]
+        for f in concurrent.futures.as_completed(futures):
+            ticker, data = f.result()
+            parsed_stocks[ticker] = data
+
+    egx30 = fetch_mubasher_egx30()
 
     # 2. Fetch Forex (USD/EGP)
     try:
@@ -483,46 +510,6 @@ def send_report():
         print("Error fetching Gold:", e)
         r_gold = {}
 
-    # Parse Stocks
-    parsed_stocks = {}
-    egx30 = {"close": 0, "chgPct": 0, "open": 0}
-
-    for item in r_stocks.get("data", []):
-        sym = item["s"].replace("EGX:", "")
-        d = item["d"]
-        close = safe_round(d[0])
-        chg_pct = safe_round(d[1])
-        open_p = safe_round(d[3])
-        rec_val = d[9] if d[9] is not None else 0
-        
-        # Recommendation logic
-        rec_text = s["watch"]
-        rec_emoji = s["e_watch"]
-        if rec_val > 0.5:
-            rec_text = s["strong_buy"]
-            rec_emoji = s["e_rocket"]
-        elif rec_val > 0.1:
-            rec_text = s["buy"]
-            rec_emoji = ""
-        elif rec_val < -0.5:
-            rec_text = s["strong_sell"]
-            rec_emoji = s["e_down"]
-        elif rec_val < -0.1:
-            rec_text = s["sell"]
-            rec_emoji = ""
-            
-        rec_full = f"{rec_emoji} {rec_text}".strip()
-        
-        if sym == "EGX30":
-            egx30 = {"close": close, "chgPct": chg_pct, "open": open_p}
-        else:
-            parsed_stocks[sym] = {
-                "close": close,
-                "chgPct": chg_pct,
-                "open": open_p,
-                "rec": rec_full
-            }
-
     # Parse Forex & Gold
     usdegp = {"close": 0, "chgPct": 0, "open": 0}
     for item in r_fx.get("data", []):
@@ -543,13 +530,6 @@ def send_report():
         }
 
     # Sort stocks descending by change percentage
-    portfolio_list = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
-    watchlist_list = [
-        "RACC", "FWRY", "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
-        "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
-        "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW",
-        "ICFC"
-    ]
     
     sorted_portfolio = sorted([k for k in portfolio_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
