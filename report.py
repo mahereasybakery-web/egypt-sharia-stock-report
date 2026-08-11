@@ -210,21 +210,34 @@ def fetch_egx_beta_news():
     items = []
     try:
         r = requests.get(url, headers=headers, timeout=10)
-        # Look for marketNews array inside the response
-        match = re.search(r'\\?"marketNews\\?":\[(.*?)\]', r.text)
-        if match:
-            news_array = match.group(1)
-            # Find each object inside
-            objects = re.findall(r'\{(.*?)\}', news_array)
-            for obj in objects:
-                code_match = re.search(r'\\?"code\\?":(\d+)', obj)
-                head_match = re.search(r'\\?"headingArabic\\?":\\?"(.*?)\\?"(?:,|})', obj)
-                cont_match = re.search(r'\\?"contentArabic\\?":\\?"(.*?)\\?"(?:,|})', obj)
-                
-                if code_match:
-                    code = code_match.group(1)
-                    title = ""
-                    if head_match and head_match.group(1) and head_match.group(1) != "null":
+        
+        objects = re.findall(r'\\"headingArabic\\":\\"(.*?)\\".*?\\"contentArabic\\":\\"(.*?)\\"', r.text)
+        objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
+        
+        for heading, content in objects + objects_unescaped:
+            if heading and heading != "null":
+                try:
+                    heading = heading.encode('utf-8').decode('unicode_escape')
+                except:
+                    pass
+                items.append({
+                    "tag": "EGX",
+                    "title": heading,
+                    "link": "https://beta.egx.com.eg/",
+                    "source": "بورصة مصر (Beta)"
+                })
+    except Exception as e:
+        print("Error fetching EGX Beta news:", e)
+        
+    unique_items = []
+    seen = set()
+    for item in items:
+        identifier = f"{item['tag']}_{item['title']}"
+        if identifier not in seen:
+            seen.add(identifier)
+            unique_items.append(item)
+            
+    return unique_items
                         title = head_match.group(1)
                     elif cont_match and cont_match.group(1) and cont_match.group(1) != "null":
                         title = cont_match.group(1)
@@ -687,16 +700,16 @@ def send_report():
         portfolio_header = f"📈 {portfolio_header} (إغلاق جلسة اليوم)"
         watchlist_header = f"📈 {watchlist_header} (إغلاق جلسة اليوم)"
 
-    tg_msg = f"{s['rlm']}<b>{s['report_title']}</b>\n"
-    tg_msg += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
-    tg_msg += f"{s['rlm']}{s['line']}\n"
+    tg_msg_portfolio = f"{s['rlm']}<b>{s['report_title']}</b>\n"
+    tg_msg_portfolio += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
+    tg_msg_portfolio += f"{s['rlm']}{s['line']}\n"
     if market_status_text:
-        tg_msg += f"{s['rlm']}{market_status_text}"
+        tg_msg_portfolio += f"{s['rlm']}{market_status_text}"
     else:
-        tg_msg += "\n"
+        tg_msg_portfolio += "\n"
 
     # Portfolio block
-    tg_msg += f"{s['rlm']}<b>{portfolio_header}:</b>\n"
+    tg_msg_portfolio += f"{s['rlm']}<b>{portfolio_header}:</b>\n"
     for k in sorted_portfolio:
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
@@ -704,10 +717,10 @@ def send_report():
         dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
         ticker_link = company_websites.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        tg_msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
     # Watchlist block
-    tg_msg += f"\n{s['rlm']}<b>{watchlist_header}:</b>\n"
+    tg_msg_watchlist = f"{s['rlm']}<b>{watchlist_header}:</b>\n"
     for k in sorted_watchlist:
         item = parsed_stocks[k]
         chg_val = item["chgPct"]
@@ -715,7 +728,7 @@ def send_report():
         dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
         ticker_link = company_websites.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
-        tg_msg += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        tg_msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
 
 
 
@@ -728,64 +741,66 @@ def send_report():
     usdegp_chg = f"+{usdegp['chgPct']}%" if usdegp['chgPct'] > 0 else (f"{usdegp['chgPct']}%" if usdegp['chgPct'] < 0 else "0.0%")
     xauusd_chg = f"+{xauusd['chgPct']}%" if xauusd['chgPct'] > 0 else (f"{xauusd['chgPct']}%" if xauusd['chgPct'] < 0 else "0.0%")
 
-    tg_msg += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
-    tg_msg += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
-    tg_msg += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
-    tg_msg += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
+    tg_msg_watchlist += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
+    tg_msg_watchlist += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
+    tg_msg_watchlist += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
+    tg_msg_watchlist += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
 
     # Check length and split if necessary to avoid Telegram's 4096 character limit
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
-    # If we have only 1 chunk and it fits together with tg_msg under 4000 chars, send combined!
-    if len(news_message_chunks) == 1 and (len(tg_msg) + len(news_message_chunks[0]) + 100 <= 4000):
-        combined_msg = tg_msg + f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n{news_message_chunks[0]}"
-        payload = {
-            "chat_id": CHAT_ID,
-            "text": combined_msg,
-            "parse_mode": "HTML",
-            "disable_web_page_preview": True
-        }
-        try:
-            r_tg = requests.post(url, json=payload)
-            print("Telegram Combined Response:", r_tg.status_code)
-            if r_tg.status_code != 200:
-                print("Telegram combined error body:", r_tg.text)
-        except Exception as e:
-            print("Telegram combined error:", e)
-    else:
-        # Send stock report first as Part 1
-        payload1 = {
-            "chat_id": CHAT_ID,
-            "text": tg_msg,
-            "parse_mode": "HTML",
-            "disable_web_page_preview": True
-        }
-        try:
-            r_tg1 = requests.post(url, json=payload1)
-            print("Telegram Part 1 (Stocks) Response:", r_tg1.status_code)
-            if r_tg1.status_code != 200:
-                print("Telegram part 1 error body:", r_tg1.text)
-        except Exception as e:
-            print("Telegram Part 1 error:", e)
-            
-        # Send each news chunk as a separate Telegram message
-        for idx, chunk in enumerate(news_message_chunks):
-            # If there's only 1 chunk, no need to add part label
-            part_label = f" (جزء {idx + 1})" if len(news_message_chunks) > 1 else ""
-            news_msg = f"{s['rlm']}<b>{s['report_title']} - {s['e_rocket']} {s['latest_news_developments']}{part_label} ({today})</b>\n\n{chunk}"
-            payload2 = {
+    # Send Portfolio first
+    payload1 = {
+        "chat_id": CHAT_ID,
+        "text": tg_msg_portfolio,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+    try:
+        r_tg1 = requests.post(url, json=payload1)
+        print("Telegram Part 1 (Portfolio) Response:", r_tg1.status_code)
+        if r_tg1.status_code != 200:
+            print("Telegram part 1 error body:", r_tg1.text)
+    except Exception as e:
+        print("Telegram Part 1 error:", e)
+
+    # Send Watchlist next
+    payload2 = {
+        "chat_id": CHAT_ID,
+        "text": tg_msg_watchlist,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+    try:
+        r_tg2 = requests.post(url, json=payload2)
+        print("Telegram Part 2 (Watchlist) Response:", r_tg2.status_code)
+        if r_tg2.status_code != 200:
+            print("Telegram part 2 error body:", r_tg2.text)
+    except Exception as e:
+        print("Telegram Part 2 error:", e)
+
+    # Send News chunks
+    if news_message_chunks:
+        for i, chunk in enumerate(news_message_chunks):
+            # Prepend header only on the first chunk
+            if i == 0:
+                chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
+                
+            payload_news = {
                 "chat_id": CHAT_ID,
-                "text": news_msg,
+                "text": chunk,
                 "parse_mode": "HTML",
                 "disable_web_page_preview": True
             }
             try:
-                r_tg2 = requests.post(url, json=payload2)
-                print(f"Telegram News Part {idx + 1} Response:", r_tg2.status_code)
-                if r_tg2.status_code != 200:
-                    print(f"Telegram news part {idx + 1} error body:", r_tg2.text)
+                r_news = requests.post(url, json=payload_news)
+                print(f"Telegram News Part {i+1} Response:", r_news.status_code)
+                if r_news.status_code != 200:
+                    print(f"Telegram news part {i+1} error body:", r_news.text)
             except Exception as e:
-                print(f"Telegram News Part {idx + 1} error:", e)
+                print(f"Telegram News Part {i+1} error:", e)
+
+
 
 def trigger_next_runner():
     print("Dispatching next runner to maintain perpetual cloud loop...")
