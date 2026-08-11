@@ -546,13 +546,13 @@ def send_report():
                     if rec_val >= 0.5:
                         rec_str = f"🚀 {s['strong_buy']}"
                     elif rec_val >= 0.1:
-                        rec_str = f"🟢 {s['buy']}"
+                        rec_str = f"📈 {s['buy']}"
                     elif rec_val <= -0.5:
-                        rec_str = f"🔴 {s['strong_sell']}"
+                        rec_str = f"📉 {s['strong_sell']}"
                     elif rec_val <= -0.1:
-                        rec_str = f"⭕ {s['sell']}"
+                        rec_str = f"🔻 {s['sell']}"
                     else:
-                        rec_str = "⚪ محايد"
+                        rec_str = "⏸️ محايد"
                 rec_map[t] = rec_str
         except Exception as e:
             print("Error fetching TV recommendations:", e)
