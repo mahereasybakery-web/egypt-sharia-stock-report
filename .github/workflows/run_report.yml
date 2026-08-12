@@ -3,8 +3,6 @@ name: Send Sharia Stock Report
 on:
   schedule:
     - cron: '0 4 * * 0,1,2,3,4'
-  repository_dispatch:
-    types: [trigger-next]
   workflow_dispatch:
     inputs:
       force:
@@ -14,7 +12,7 @@ on:
 
 concurrency:
   group: report-loop
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   run-report:
@@ -38,5 +36,6 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
           FORCE_RUN: ${{ github.event.inputs.force }}
         run: python report.py
