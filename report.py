@@ -798,7 +798,7 @@ def trigger_next_runner():
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "PerpetualRunner"
     }
-    payload = {"ref": "main"}
+    payload = {"ref": "main", "inputs": {"force": "false"}}
     try:
         r_disp = requests.post(url, headers=headers, json=payload)
         print("Next runner dispatch status:", r_disp.status_code)
