@@ -25,7 +25,8 @@ except ImportError:
 # Environment secrets and fallbacks
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-GH_PAT = os.getenv("GH_PAT", "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg")
+env_pat = os.getenv("GH_PAT")
+GH_PAT = env_pat if env_pat else "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg"
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -205,7 +206,7 @@ def ask_ai(question):
 
     # Fallback to Gemini 3.5 Flash
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
         headers = {"content-type": "application/json"}
         payload = {
             "contents": [{"parts": [{"text": question}]}]
@@ -461,7 +462,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             prompt += f"- {item['title']} (المصدر: {item['source']})\n"
         prompt += "\n"
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
