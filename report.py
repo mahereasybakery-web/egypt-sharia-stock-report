@@ -206,7 +206,7 @@ def ask_ai(question):
 
     # Fallback to Gemini 3.5 Flash
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
         headers = {"content-type": "application/json"}
         payload = {
             "contents": [{"parts": [{"text": question}]}]
@@ -462,7 +462,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             prompt += f"- {item['title']} (المصدر: {item['source']})\n"
         prompt += "\n"
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
