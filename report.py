@@ -1,45 +1,225 @@
-import json
 import os
+import sys
 import time
-import requests
+import json
 import base64
+import re
 import urllib.parse
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
-import re
 import concurrent.futures
 import urllib3
+from datetime import datetime, timezone, timedelta
+import requests
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Try importing feedparser safely
 try:
     import feedparser
 except ImportError:
     feedparser = None
-    print("Warning: feedparser is not installed.")
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-from datetime import datetime, timezone, timedelta
+    print("Warning: feedparser is not installed globally.")
 
-# Get secrets from environment variables
+# Environment secrets and fallbacks
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_PAT = os.getenv("GH_PAT", "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-if not BOT_TOKEN or not CHAT_ID:
-    print("Error: Secrets are not configured properly.")
-    exit(1)
-
+# Configuration paths
 STRINGS_PATH = "strings.json"
 NEWS_PATH = "news.txt"
 offset = 0
 
-# Helper function to round values safely
+# Tickers definition
+PORTFOLIO = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
+WATCHLIST = [
+    "RACC", "FWRY", "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
+    "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
+    "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW", "ICFC"
+]
+ALL_TICKERS = PORTFOLIO + WATCHLIST
+
+# Company websites mapping
+COMPANY_WEBSITES = {
+    "TMGH": "https://www.tmg-holding.com",
+    "FWRY": "https://fawry.com",
+    "EGAL": "http://www.egyptalum.com.eg",
+    "ETEL": "https://ir.te.eg",
+    "EFID": "https://www.edita.com.eg",
+    "ADIB": "https://www.adib.eg",
+    "ORHD": "https://www.orascomdevelopment.com",
+    "EFIH": "https://www.efinanceinvestment.com",
+    "OCDI": "https://sodic.com",
+    "RACC": "https://rayacc.com",
+    "ORAS": "https://orascom.com",
+    "PHDC": "https://www.palmhillsdevelopments.com",
+    "SKPC": "http://www.sidpec.com",
+    "MCQE": "http://www.qenacement.com",
+    "FAITA": "https://www.faisalbank.com.eg",
+    "FAIT": "https://www.faisalbank.com.eg",
+    "ISPH": "https://ibnsina-pharma.com",
+    "JUFO": "https://www.juhayna.com",
+    "AMOC": "http://www.amoc-eg.com",
+    "MASR": "https://madinetmasr.com",
+    "ORWE": "https://www.orientalweavers.com",
+    "RMDA": "https://www.rameda.com",
+    "OLFI": "https://www.obourland.com",
+    "ARCC": "https://www.arabiancement.com",
+    "IFAP": "http://www.iac-eg.com",
+    "MTIE": "http://www.mti-egypt.com",
+    "SAUD": "https://www.albaraka.com.eg",
+    "ATQA": "http://misrnationalsteel.com",
+    "CIRA": "https://cira.com.eg",
+    "EGAS": "http://www.egyptgas.com.eg",
+    "MPCO": "http://www.manspoultry.com",
+    "ACGC": "http://www.acgc-egypt.com",
+    "ETRS": "https://www.egytrans.com",
+    "LCSW": "https://www.lecico.com",
+    "ICFC": "http://www.icf-eg.com"
+}
+
+# Stock keywords for news filtering
+STOCK_KEYWORDS = {
+    "TMGH": ["طلعت مصطفى", "طلعت مصطفي", "TMGH"],
+    "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "ADIB"],
+    "EFID": ["إيديتا", "ايديتا", "EFID"],
+    "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
+    "FWRY": ["فوري", "FWRY"],
+    "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
+    "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي", "ETEL"],
+    "ORHD": ["أوراسكوم للتنمية", "اوراسكوم للتنمية", "ORHD"],
+    "EFIH": ["إي فاينانس", "اي فاينانس", "EFIH"],
+    "OCDI": ["سوديك", "سودك", "OCDI"],
+    "ORAS": ["أوراسكوم كونستراكشون", "اوراسكوم كونستراكشون", "أوراسكوم للإنشاء", "ORAS"],
+    "PHDC": ["بالم هيلز", "PHDC"],
+    "SKPC": ["سيدي كرير", "سيدبك", "SKPC"],
+    "MCQE": ["أسمنت قنا", "اسمنت قنا", "MCQE"],
+    "FAITA": ["فيصل الإسلامي", "فيصل الاسلامي", "FAITA"],
+    "ISPH": ["ابن سينا", "ISPH"],
+    "JUFO": ["جهينة", "جهينه", "JUFO"],
+    "AMOC": ["أموك", "اموك", "الأسكندرية للزيوت المعدنية", "AMOC"],
+    "MASR": ["مدينة مصر", "مدينة نصر", "MASR"],
+    "ORWE": ["النساجون الشرقيون", "النساجون", "ORWE"],
+    "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
+    "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
+    "ARCC": ["العربية للأسمنت", "العربيه للأسمنت", "ARCC"],
+    "FAIT": ["بنك فيصل", "FAIT"],
+    "IFAP": ["الدولية للمحاصيل", "الدوليه للمحاصيل", "IFAP"],
+    "MTIE": ["إم إم جروب", "ام ام جروب", "MTIE"],
+    "SAUD": ["البركة", "بنك البركة", "SAUD"],
+    "ATQA": ["عتاقة", "عتاقه", "مصر الوطنية للصلب", "ATQA"],
+    "CIRA": ["القاهرة للاستثمار", "سيرا", "CIRA"],
+    "EGAS": ["غاز مصر", "EGAS"],
+    "MPCO": ["المنصورة للدواجن", "المنصوره للدواجن", "MPCO"],
+    "ACGC": ["عربية لحليج الأقطان", "حليج الأقطان", "ACGC"],
+    "ETRS": ["إيجيترانس", "ايجيترانس", "المصرية لخدمات النقل", "ETRS"],
+    "LCSW": ["ليسيكو", "LCSW"],
+    "ICFC": ["الدولية للأسمدة", "الدوليه للأسمده", "ICFC"]
+}
+
 def safe_round(val, decimals=2):
     if val is None:
-        return 0
+        return 0.0
     try:
         return round(float(val), decimals)
     except (ValueError, TypeError):
-        return 0
+        return 0.0
+
+def reply_telegram(text):
+    if not BOT_TOKEN or not CHAT_ID:
+        return
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        print("Error sending telegram message:", e)
+
+def trigger_next_runner():
+    print("Dispatching next runner to maintain perpetual cloud loop...")
+    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/actions/workflows/run_report.yml/dispatches"
+    headers = {
+        "Authorization": f"Bearer {GH_PAT}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "PerpetualRunner"
+    }
+    payload = {"ref": "main", "inputs": {"force": "false"}}
+    try:
+        r = requests.post(url, headers=headers, json=payload, timeout=10)
+        print("Next runner dispatch status:", r.status_code)
+    except Exception as e:
+        print("Error dispatching next runner:", e)
+
+def update_github_news(new_content):
+    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/news.txt"
+    headers = {
+        "Authorization": f"Bearer {GH_PAT}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "TelegramBot"
+    }
+    r_get = requests.get(url, headers=headers, timeout=10)
+    sha = ""
+    if r_get.status_code == 200:
+        sha = r_get.json().get("sha", "")
+        
+    content_b64 = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
+    payload = {
+        "message": "Update news.txt via Telegram Bot",
+        "content": content_b64
+    }
+    if sha:
+        payload["sha"] = sha
+        
+    r_put = requests.put(url, headers=headers, json=payload, timeout=10)
+    return r_put.status_code in [200, 201]
+
+def ask_ai(question):
+    # Try Claude first
+    if CLAUDE_API_KEY:
+        url = "https://api.anthropic.com/v1/messages"
+        headers = {
+            "x-api-key": CLAUDE_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+        payload = {
+            "model": "claude-3-5-sonnet-20241022",
+            "max_tokens": 1000,
+            "messages": [{"role": "user", "content": question}]
+        }
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            if r.status_code == 200:
+                return r.json()["content"][0]["text"]
+        except Exception as e:
+            print("Claude API error:", e)
+
+    # Fallback to Gemini 3.5 Flash
+    if GEMINI_API_KEY:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
+        headers = {"content-type": "application/json"}
+        payload = {
+            "contents": [{"parts": [{"text": question}]}]
+        }
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            if r.status_code == 200:
+                return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+            else:
+                return f"خطأ من خوادم Gemini (رمز الخطأ {r.status_code}):\n<code>{r.text}</code>"
+        except Exception as e:
+            return f"فشل الاتصال بخدمة Gemini: {str(e)}"
+            
+    return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي."
 
 def fetch_rss_news():
     feeds = {
@@ -57,43 +237,29 @@ def fetch_rss_news():
         "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4"
     }
     
-    # Add Google News Search (representing 100+ sources)
     gnews_query = 'البورصة المصرية OR أسهم مصر OR اقتصاد مصر OR "طلعت مصطفى" OR "فوري" OR "سوديك" OR "إيديتا" OR "أبوظبي الإسلامي" OR "مصر للألومنيوم" OR "المصرية للاتصالات" OR "إي فاينانس" OR "أوراسكوم"'
     encoded_query = urllib.parse.quote(gnews_query)
     feeds["أخبار جوجل"] = f"https://news.google.com/rss/search?q={encoded_query}&hl=ar&gl=EG&ceid=EG:ar"
     
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    
+    headers = {"User-Agent": "Mozilla/5.0"}
     news_items = []
     
     for source_name, url in feeds.items():
         try:
             r = requests.get(url, headers=headers, timeout=10, verify=False)
             if r.status_code != 200:
-                print(f"Error fetching from {source_name}: HTTP {r.status_code}")
                 continue
                 
             if feedparser:
                 feed = feedparser.parse(r.content)
                 items = feed.entries
             else:
-                # Fallback to ElementTree if feedparser is missing
                 root = ET.fromstring(r.content)
-                items_xml = root.findall(".//item")
-                if not items_xml:
-                    items_xml = root.findall(".//{http://www.w3.org/2005/Atom}entry")
-                if not items_xml:
-                    items_xml = [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
-                    
+                items_xml = root.findall(".//item") or root.findall(".//{http://www.w3.org/2005/Atom}entry") or [elem for elem in root.iter() if elem.tag.endswith("item") or elem.tag.endswith("entry")]
                 items = []
                 for item in items_xml:
-                    title_elem = None
-                    link_elem = None
-                    for child in item:
-                        if child.tag.endswith("title"): title_elem = child
-                        if child.tag.endswith("link"): link_elem = child
+                    title_elem = next((child for child in item if child.tag.endswith("title")), None)
+                    link_elem = next((child for child in item if child.tag.endswith("link")), None)
                     t = title_elem.text.strip() if title_elem is not None and title_elem.text else ""
                     l = link_elem.text.strip() if link_elem is not None and link_elem.text else ""
                     if not l and link_elem is not None:
@@ -102,13 +268,8 @@ def fetch_rss_news():
 
             limit = 30 if source_name == "أخبار جوجل" else 15
             for entry in items[:limit]:
-                if feedparser:
-                    title = entry.title if 'title' in entry else ""
-                    link = entry.link if 'link' in entry else ""
-                else:
-                    title = entry.get("title", "")
-                    link = entry.get("link", "")
-                    
+                title = entry.title if feedparser and 'title' in entry else entry.get("title", "")
+                link = entry.link if feedparser and 'link' in entry else entry.get("link", "")
                 if title and link:
                     link = link.replace(" ", "%20")
                     item_source = source_name
@@ -116,9 +277,7 @@ def fetch_rss_news():
                         parts = title.rsplit(" - ", 1)
                         if len(parts) == 2:
                             title = parts[0].strip()
-                            actual_source = parts[1].strip()
-                            item_source = f"{actual_source} (جوجل)"
-                    
+                            item_source = f"{parts[1].strip()} (جوجل)"
                     news_items.append({
                         "title": title.strip(),
                         "link": link,
@@ -128,20 +287,6 @@ def fetch_rss_news():
             print(f"Error fetching from {source_name}: {e}")
             
     return news_items
-
-def is_whole_word_match(word, text):
-    if not word or not text:
-        return False
-        
-    word = word.lower().strip()
-    text = text.lower()
-    
-    if word == "وي":
-        # Specific check for "وي" (WE) to avoid false positives like "قوي" or "سنوي"
-        pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?وي(?:$|[^\w\u0600-\u06FF])"
-        return re.search(pattern, text) is not None
-        
-    return word in text
 
 def fetch_corporate_websites_news():
     corporate_urls = {
@@ -156,49 +301,34 @@ def fetch_corporate_websites_news():
         "RACC": "https://rayacc.com/investor-relations/press-releases/"
     }
     
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    
+    headers = {"User-Agent": "Mozilla/5.0"}
     results = []
     for ticker, url in corporate_urls.items():
         try:
-            # Using requests.get with timeout is much more robust
-            r = requests.get(url, headers=headers, timeout=4, verify=False)
+            r = requests.get(url, headers=headers, timeout=5, verify=False)
             html = r.text
-            
-            # Simple regex to find <a> tags and extract their links and text
             links = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
-            
-            found_count = 0
+            found = 0
             for l_url, l_text in links:
                 l_text_clean = re.sub(r'<[^>]+>', '', l_text).strip()
                 l_text_clean = re.sub(r'\s+', ' ', l_text_clean)
-                
-                # Check for corporate press release indicators in Arabic or English
                 if len(l_text_clean) > 15 and (
                     any(x in l_text_clean for x in ["إفصاح", "بيان", "صحفي", "نتائج", "أرباح", "مجلس", "إدارة", "شراكة", "توقيع", "استحواذ", "تعاون", "افتتاح", "زيادة", "مالية"]) or
                     any(y in l_url.lower() for y in ["press", "release", "news", "disclosure", "pdf"]) or
                     any(z in l_text_clean.lower() for z in ["press", "release", "disclosure", "financial", "result"])
                 ):
-                    full_link = l_url
-                    if l_url.startswith("/"):
-                        full_link = urljoin(url, l_url)
-                    elif not l_url.startswith("http"):
-                        full_link = urljoin(url, l_url)
-                        
+                    full_link = l_url if l_url.startswith("http") else urljoin(url, l_url)
                     results.append({
                         "tag": f"[{ticker}]",
                         "title": l_text_clean,
                         "link": full_link,
                         "source": "الموقع الرسمي"
                     })
-                    found_count += 1
-                    if found_count >= 2:  # Keep top 2 announcements per site
+                    found += 1
+                    if found >= 2:
                         break
         except Exception as e:
-            print(f"Skipping corporate site {ticker} news fetch: {e}")
-            
+            print(f"Skipping corporate site {ticker}: {e}")
     return results
 
 def fetch_egx_beta_news():
@@ -207,10 +337,8 @@ def fetch_egx_beta_news():
     items = []
     try:
         r = requests.get(url, headers=headers, timeout=10)
-        
         objects = re.findall(r'\\"headingArabic\\":\\"(.*?)\\".*?\\"contentArabic\\":\\"(.*?)\\"', r.text)
         objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
-        
         for heading, content in objects + objects_unescaped:
             if heading and heading != "null":
                 try:
@@ -226,90 +354,53 @@ def fetch_egx_beta_news():
     except Exception as e:
         print("Error fetching EGX Beta news:", e)
         
-    unique_items = []
+    unique = []
     seen = set()
     for item in items:
-        identifier = f"{item['tag']}_{item['title']}"
-        if identifier not in seen:
-            seen.add(identifier)
-            unique_items.append(item)
-            
-    return unique_items
+        uid = f"{item['tag']}_{item['title']}"
+        if uid not in seen:
+            seen.add(uid)
+            unique.append(item)
+    return unique
+
+def is_whole_word_match(word, text):
+    if not word or not text:
+        return False
+    word = word.lower().strip()
+    text = text.lower()
+    if word == "وي":
+        pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?وي(?:$|[^\w\u0600-\u06FF])"
+        return re.search(pattern, text) is not None
+    return word in text
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
     seen_links = set()
     
-    # 1. Fetch news directly from corporate websites first (with absolute priority)
     try:
         corp_news = fetch_corporate_websites_news()
         for item in corp_news:
             link = item["link"]
             if link not in seen_links:
                 seen_links.add(link)
-                # Ensure the ticker is in our watched list
                 ticker = item["tag"].strip("[]")
                 if ticker in portfolio_list or ticker in watchlist_list:
                     filtered.append(item)
     except Exception as e:
-        print("Error fetching corporate news:", e)
+        print("Error getting corporate news:", e)
         
-    # 2. Fetch news from standard RSS feeds and Google News
     all_news = fetch_rss_news()
-    
-    # 3. Fetch EGX Beta news
-    egx_beta_news = fetch_egx_beta_news()
-    all_news.extend(egx_beta_news)
-    
-    stock_keywords = {
-        "TMGH": ["طلعت مصطفى", "طلعت مصطفي", "TMGH"],
-        "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "ADIB"],
-        "EFID": ["إيديتا", "ايديتا", "EFID"],
-        "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
-        "FWRY": ["فوري", "FWRY"],
-        "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
-        "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي", "ETEL"],
-        "ORHD": ["أوراسكوم للتنمية", "اوراسكوم للتنمية", "ORHD"],
-        "EFIH": ["إي فاينانس", "اي فاينانس", "EFIH"],
-        "OCDI": ["سوديك", "سودك", "OCDI"],
-        "ORAS": ["أوراسكوم كونستراكشون", "اوراسكوم كونستراكشون", "أوراسكوم للإنشاء", "ORAS"],
-        "PHDC": ["بالم هيلز", "PHDC"],
-        "SKPC": ["سيدي كرير", "سيدبك", "SKPC"],
-        "MCQE": ["أسمنت قنا", "اسمنت قنا", "MCQE"],
-        "FAITA": ["فيصل الإسلامي", "فيصل الاسلامي", "FAITA"],
-        "ISPH": ["ابن سينا", "ISPH"],
-        "JUFO": ["جهينة", "جهينه", "JUFO"],
-        "AMOC": ["أموك", "اموك", "الأسكندرية للزيوت المعدنية", "AMOC"],
-        "MASR": ["مدينة مصر", "مدينة نصر", "MASR"],
-        "ORWE": ["النساجون الشرقيون", "النساجون", "ORWE"],
-        "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
-        "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
-        "ARCC": ["العربية للأسمنت", "العربيه للأسمنت", "ARCC"],
-        "FAIT": ["بنك فيصل", "FAIT"],
-        "IFAP": ["الدولية للمحاصيل", "الدوليه للمحاصيل", "IFAP"],
-        "MTIE": ["إم إم جروب", "ام ام جروب", "MTIE"],
-        "SAUD": ["البركة", "بنك البركة", "SAUD"],
-        "ATQA": ["عتاقة", "عتاقه", "مصر الوطنية للصلب", "ATQA"],
-        "CIRA": ["القاهرة للاستثمار", "سيرا", "CIRA"],
-        "EGAS": ["غاز مصر", "EGAS"],
-        "MPCO": ["المنصورة للدواجن", "المنصوره للدواجن", "MPCO"],
-        "ACGC": ["عربية لحليج الأقطان", "حليج الأقطان", "ACGC"],
-        "ETRS": ["إيجيترانس", "ايجيترانس", "المصرية لخدمات النقل", "ETRS"],
-        "LCSW": ["ليسيكو", "LCSW"],
-        "ICFC": ["الدولية للأسمدة", "الدوليه للأسمده", "ICFC"]
-    }
+    all_news.extend(fetch_egx_beta_news())
     
     for item in all_news:
         title = item["title"]
         link = item["link"]
         source = item["source"]
-        
         if link in seen_links:
             continue
             
         matched_stock = None
-        for ticker, keywords in stock_keywords.items():
-            # Check if this ticker is in either portfolio or watchlist
+        for ticker, keywords in STOCK_KEYWORDS.items():
             if ticker not in portfolio_list and ticker not in watchlist_list:
                 continue
             for kw in keywords:
@@ -319,15 +410,14 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             if matched_stock:
                 break
                 
-        is_market_news = False
+        is_market = False
         if not matched_stock:
-            market_keywords = ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]
-            for mkw in market_keywords:
+            for mkw in ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]:
                 if is_whole_word_match(mkw, title):
-                    is_market_news = True
+                    is_market = True
                     break
                     
-        if matched_stock or is_market_news:
+        if matched_stock or is_market:
             seen_links.add(link)
             tag = f"[{matched_stock}]" if matched_stock else "[البورصة]"
             filtered.append({
@@ -336,33 +426,18 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
                 "link": link,
                 "source": source
             })
-            
     return filtered
 
-def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list, s):
-    """
-    Analyzes news for all stocks in a single Gemini API request.
-    Returns a dictionary mapping ticker tag -> analysis HTML block.
-    """
+def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list):
     if not GEMINI_API_KEY:
-        print("Gemini API key is missing. Skipping batch AI analysis.")
+        print("Gemini API key missing. Skipping AI analysis.")
         return {}
         
     target_tags = []
-    
-    # Portfolio stocks with news
-    for k in portfolio_list:
+    for k in portfolio_list + watchlist_list:
         tag = f"[{k}]"
         if tag in grouped_news:
             target_tags.append(tag)
-            
-    # Watchlist stocks with news
-    for k in watchlist_list:
-        tag = f"[{k}]"
-        if tag in grouped_news and tag not in target_tags:
-            target_tags.append(tag)
-            
-    # Limit to 10 stocks to keep response size and latency small
     target_tags = target_tags[:10]
     
     if not target_tags:
@@ -382,19 +457,13 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list,
     for tag in target_tags:
         ticker = tag.replace("[", "").replace("]", "")
         prompt += f"--- سهم {ticker} ---\n"
-        for idx, item in enumerate(grouped_news[tag][:3]):
+        for item in grouped_news[tag][:3]:
             prompt += f"- {item['title']} (المصدر: {item['source']})\n"
         prompt += "\n"
         
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
     body = {
-        "contents": [
-            {
-                "parts": [
-                    { "text": prompt }
-                ]
-            }
-        ],
+        "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseMimeType": "application/json",
             "temperature": 0.2
@@ -403,261 +472,168 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list,
     
     analyses = {}
     try:
-        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=60)
+        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=45)
         if r.status_code == 200:
             res_json = r.json()
             raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
-            
-            # Clean up JSON blocks
             if raw_text.startswith("```"):
                 lines = raw_text.splitlines()
-                if lines[0].startswith("```"):
-                    lines = lines[1:]
-                if lines[-1].startswith("```"):
-                    lines = lines[:-1]
+                if lines[0].startswith("```"): lines = lines[1:]
+                if lines[-1].startswith("```"): lines = lines[:-1]
                 raw_text = "\n".join(lines).strip()
-                
-            parsed_json = json.loads(raw_text)
-            for ticker, analysis in parsed_json.items():
-                clean_ticker = ticker.strip().upper().replace("[", "").replace("]", "")
-                tag = f"[{clean_ticker}]"
-                analyses[tag] = f"🧠 <b>تحليل AI لسهم {clean_ticker}:</b> {analysis.strip()}"
+            parsed = json.loads(raw_text)
+            for ticker, analysis in parsed.items():
+                clean = ticker.strip().upper().replace("[", "").replace("]", "")
+                analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis.strip()}"
         else:
-            print(f"Gemini batch API returned status {r.status_code}: {r.text}")
+            print(f"Gemini returned status {r.status_code}: {r.text}")
     except Exception as e:
         print("Error in Gemini batch AI news analysis:", e)
-        
     return analyses
+
+def fetch_all_data_tv(tickers, strings):
+    parsed = {}
+    egx30 = {"close": 0.0, "open": 0.0, "chgPct": 0.0}
+    url = "https://scanner.tradingview.com/egypt/scan"
+    tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30"]
+    payload = {
+        "symbols": {"tickers": tv_tickers},
+        "columns": ["close", "open", "Recommend.All"]
+    }
+    try:
+        r = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=15)
+        data = r.json()
+        for item in data.get("data", []):
+            sym = item["s"].replace("EGX:", "")
+            c = safe_round(item["d"][0])
+            o = safe_round(item["d"][1])
+            rec_val = item["d"][2]
+            
+            # Calculate percentage change based on open price
+            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            
+            rec_str = ""
+            if rec_val is not None:
+                if rec_val >= 0.5: rec_str = f"🚀 {strings['strong_buy']}"
+                elif rec_val >= 0.1: rec_str = f"📈 {strings['buy']}"
+                elif rec_val <= -0.5: rec_str = f"📉 {strings['strong_sell']}"
+                elif rec_val <= -0.1: rec_str = f"🔻 {strings['sell']}"
+                else: rec_str = "⏸️ محايد"
+                
+            if sym == "EGX30":
+                egx30 = {"close": c, "open": o, "chgPct": chg}
+            else:
+                parsed[sym] = {"close": c, "open": o, "chgPct": chg, "rec": rec_str}
+    except Exception as e:
+        print("Error fetching TV prices:", e)
+        reply_telegram(f"⚠️ <b>تنبيه:</b> فشل الاتصال بخادم TradingView لجلب الأسعار.\n<code>{str(e)[:200]}</code>")
+        for t in tickers:
+            parsed[t] = {"close": 0.0, "open": 0.0, "chgPct": 0.0, "rec": ""}
+    return parsed, egx30
+
+def fetch_forex_gold():
+    usdegp = {"close": 0.0, "chgPct": 0.0, "open": 0.0}
+    xauusd = {"close": 0.0, "chgPct": 0.0, "open": 0.0}
+    
+    try:
+        r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
+            "symbols": {"tickers": ["FX_IDC:USDEGP"]},
+            "columns": ["close", "open"]
+        }, timeout=10).json()
+        for item in r_fx.get("data", []):
+            c = safe_round(item["d"][0])
+            o = safe_round(item["d"][1])
+            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            usdegp = {"close": c, "chgPct": chg, "open": o}
+    except Exception as e:
+        print("Error fetching FX:", e)
+        
+    try:
+        r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
+            "symbols": {"tickers": ["TVC:GOLD"]},
+            "columns": ["close", "open"]
+        }, timeout=10).json()
+        for item in r_gold.get("data", []):
+            c = safe_round(item["d"][0])
+            o = safe_round(item["d"][1])
+            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            xauusd = {"close": c, "chgPct": chg, "open": o}
+    except Exception as e:
+        print("Error fetching Gold:", e)
+        
+    return usdegp, xauusd
 
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
     if not os.path.exists(STRINGS_PATH):
-        print("Strings file missing, skipping report generation.")
+        print("Strings file missing.")
         return
-
+        
     with open(STRINGS_PATH, "r", encoding="utf-8") as f:
         s = json.load(f)
-
-    company_websites = {
-        "TMGH": "https://www.tmg-holding.com",
-        "FWRY": "https://fawry.com",
-        "EGAL": "http://www.egyptalum.com.eg",
-        "ETEL": "https://ir.te.eg",
-        "EFID": "https://www.edita.com.eg",
-        "ADIB": "https://www.adib.eg",
-        "ORHD": "https://www.orascomdevelopment.com",
-        "EFIH": "https://www.efinanceinvestment.com",
-        "OCDI": "https://sodic.com",
-        "RACC": "https://rayacc.com",
-        "ORAS": "https://orascom.com",
-        "PHDC": "https://www.palmhillsdevelopments.com",
-        "SKPC": "http://www.sidpec.com",
-        "MCQE": "http://www.qenacement.com",
-        "FAITA": "https://www.faisalbank.com.eg",
-        "FAIT": "https://www.faisalbank.com.eg",
-        "ISPH": "https://ibnsina-pharma.com",
-        "JUFO": "https://www.juhayna.com",
-        "AMOC": "http://www.amoc-eg.com",
-        "MASR": "https://madinetmasr.com",
-        "ORWE": "https://www.orientalweavers.com",
-        "RMDA": "https://www.rameda.com",
-        "OLFI": "https://www.obourland.com",
-        "ARCC": "https://www.arabiancement.com",
-        "IFAP": "http://www.iac-eg.com",
-        "MTIE": "http://www.mti-egypt.com",
-        "SAUD": "https://www.albaraka.com.eg",
-        "ATQA": "http://misrnationalsteel.com",
-        "CIRA": "https://cira.com.eg",
-        "EGAS": "http://www.egyptgas.com.eg",
-        "MPCO": "http://www.manspoultry.com",
-        "ACGC": "http://www.acgc-egypt.com",
-        "ETRS": "https://www.egytrans.com",
-        "LCSW": "https://www.lecico.com",
-        "ICFC": "http://www.icf-eg.com"
-    }
-
-    # 1. Fetch stock prices
-    portfolio_list = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
-    watchlist_list = [
-        "RACC", "FWRY", "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
-        "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
-        "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW",
-        "ICFC"
-    ]
-    all_tickers = portfolio_list + watchlist_list
+        
+    # Get Prices & FX/Gold
+    parsed_stocks, egx30 = fetch_all_data_tv(ALL_TICKERS, s)
+    usdegp, xauusd = fetch_forex_gold()
     
-    parsed_stocks = {}
-    egx30 = {"close": 0, "chgPct": 0, "open": 0}
-
-    def fetch_all_data_tv(tickers, s_dict):
-        url = "https://scanner.tradingview.com/egypt/scan"
-        tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30"]
-        payload = {
-            "symbols": {"tickers": tv_tickers},
-            "columns": ["close", "open", "Recommend.All"]
-        }
-        headers = {"Content-Type": "application/json"}
-        try:
-            r = requests.post(url, json=payload, headers=headers, timeout=10)
-            data = r.json()
-            for item in data.get("data", []):
-                sym = item["s"].replace("EGX:", "")
-                c = safe_round(item["d"][0]) if item["d"][0] is not None else 0
-                o = safe_round(item["d"][1]) if item["d"][1] is not None else 0
-                rec_val = item["d"][2]
-                
-                chg_pct = round(((c - o) / o) * 100, 2) if o and o > 0 else 0.0
-                
-                rec_str = ""
-                if rec_val is not None:
-                    if rec_val >= 0.5:
-                        rec_str = f"🚀 {s_dict['strong_buy']}"
-                    elif rec_val >= 0.1:
-                        rec_str = f"📈 {s_dict['buy']}"
-                    elif rec_val <= -0.5:
-                        rec_str = f"📉 {s_dict['strong_sell']}"
-                    elif rec_val <= -0.1:
-                        rec_str = f"🔻 {s_dict['sell']}"
-                    else:
-                        rec_str = "⏸️ محايد"
-
-                if sym == "EGX30":
-                    egx30["close"] = c
-                    egx30["open"] = o
-                    egx30["chgPct"] = chg_pct
-                else:
-                    parsed_stocks[sym] = {"close": c, "open": o, "chgPct": chg_pct, "rec": rec_str}
-        except Exception as e:
-            print("Error fetching TV prices:", e)
-            reply_telegram(f"⚠️ <b>تنبيه:</b> فشل الاتصال بخادم TradingView لجلب الأسعار.\n<code>{str(e)[:200]}</code>")
-            for t in tickers:
-                parsed_stocks[t] = {"close": 0, "open": 0, "chgPct": 0, "rec": ""}
-
-    fetch_all_data_tv(all_tickers, s)
-
-    # 2. Fetch Forex (USD/EGP)
-    try:
-        r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
-            "symbols": {"tickers": ["FX_IDC:USDEGP"], "query": {"types": []}},
-            "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name"]
-        }).json()
-    except Exception as e:
-        print("Error fetching FX:", e)
-        r_fx = {}
-
-    # 3. Fetch Gold
-    try:
-        r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
-            "symbols": {"tickers": ["TVC:GOLD"], "query": {"types": []}},
-            "columns": ["close", "change", "change_abs", "open", "high", "low", "volume", "name"]
-        }).json()
-    except Exception as e:
-        print("Error fetching Gold:", e)
-        r_gold = {}
-
-    # Parse Forex & Gold
-    usdegp = {"close": 0, "chgPct": 0, "open": 0}
-    for item in r_fx.get("data", []):
-        d = item["d"]
-        c_fx = safe_round(d[0])
-        o_fx = safe_round(d[3])
-        chg_fx = round(((c_fx - o_fx) / o_fx) * 100, 2) if o_fx and o_fx > 0 else 0.0
-        usdegp = {"close": c_fx, "chgPct": chg_fx, "open": o_fx}
-
-    xauusd = {"close": 0, "chgPct": 0, "open": 0}
-    for item in r_gold.get("data", []):
-        d = item["d"]
-        c_au = safe_round(d[0])
-        o_au = safe_round(d[3])
-        chg_au = round(((c_au - o_au) / o_au) * 100, 2) if o_au and o_au > 0 else 0.0
-        xauusd = {"close": c_au, "chgPct": chg_au, "open": o_au}
-
-    # Sort stocks descending by change percentage
+    # Sort lists
+    sorted_port = sorted([k for k in PORTFOLIO if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
+    sorted_watch = sorted([k for k in WATCHLIST if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     
-    sorted_portfolio = sorted([k for k in portfolio_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
-    sorted_watchlist = sorted([k for k in watchlist_list if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
-
-    # Parse News from Live RSS feeds
+    # Process News
     news_blocks = []
     try:
-        live_news = get_filtered_market_news(portfolio_list, watchlist_list)
-        
-        # Group news by tag
+        live_news = get_filtered_market_news(PORTFOLIO, WATCHLIST)
         grouped = {}
         for item in live_news:
-            tag = item["tag"]
-            if tag not in grouped:
-                grouped[tag] = []
-            grouped[tag].append(item)
+            grouped.setdefault(item["tag"], []).append(item)
             
-        # Define tag priority function based on user requirement:
-        # Priority 0: Invested stocks (portfolio_list)
-        # Priority 1: Watchlist stocks (watchlist_list)
-        # Priority 2: General news ([البورصة])
-        def get_tag_priority(t):
+        def priority(t):
             ticker = t.replace("[", "").replace("]", "")
-            if ticker in portfolio_list:
-                return 0
-            elif ticker in watchlist_list:
-                return 1
-            else:
-                return 2
-                
-        # Sort groups: prioritized stock groups first, then watchlist groups, then general [البورصة] last.
-        sorted_tags = sorted(grouped.keys(), key=lambda t: (get_tag_priority(t), t))
-        
-        # Get AI analysis mapping in a single batch request
-        ai_analyses = batch_analyze_news_with_gemini(grouped, portfolio_list, watchlist_list, s)
+            if ticker in PORTFOLIO: return 0
+            if ticker in WATCHLIST: return 1
+            return 2
+            
+        sorted_tags = sorted(grouped.keys(), key=lambda t: (priority(t), t))
+        ai_analyses = batch_analyze_news_with_gemini(grouped, PORTFOLIO, WATCHLIST)
         
         for tag in sorted_tags:
             items_in_tag = grouped[tag]
-            group_text = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
+            block = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
             for item in items_in_tag[:3]:
-                title = item["title"]
-                link = item["link"]
-                source = item["source"]
-                group_text += f"{s['rlm']}• {title} ({source}) <a href='{link}'>[رابط مباشر]</a>\n"
-            
-            # Append AI analysis if available for this tag
+                block += f"{s['rlm']}• {item['title']} ({item['source']}) <a href='{item['link']}'>[رابط مباشر]</a>\n"
             if tag in ai_analyses:
-                group_text += f"{s['rlm']}{ai_analyses[tag]}\n"
-                
-            news_blocks.append(group_text.strip())
-            
+                block += f"{s['rlm']}{ai_analyses[tag]}\n"
+            news_blocks.append(block.strip())
     except Exception as e:
-        print("Error getting live news:", e)
+        print("Error fetching news:", e)
         
-    # Graceful fallback to news.txt if no live news matched
     if not news_blocks and os.path.exists(NEWS_PATH):
         with open(NEWS_PATH, "r", encoding="utf-8") as nf:
             content = nf.read().strip()
             if content:
-                blocks = content.split("\n\n")
-                for block in blocks:
+                for block in content.split("\n\n"):
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
-                        desc = lines[0].strip()
-                        link = lines[1].strip()
-                        news_blocks.append(f"{s['rlm']}{desc}\n{s['rlm']}{s['e_link']} <a href='{link}'>{s['e_link']} رابط الخبر</a>")
+                        news_blocks.append(f"{s['rlm']}{lines[0].strip()}\n{s['rlm']}{s['e_link']} <a href='{lines[1].strip()}'>{s['e_link']} رابط الخبر</a>")
 
-    # Group news blocks into chunks under 3500 characters
-    news_message_chunks = []
-    current_chunk = []
-    current_len = 0
+    news_chunks = []
+    current = []
+    length = 0
     for block in news_blocks:
-        block_len = len(block) + 2  # plus "\n\n" separator
-        if current_len + block_len > 3500:
-            if current_chunk:
-                news_message_chunks.append("\n\n".join(current_chunk))
-            current_chunk = [block]
-            current_len = block_len
+        b_len = len(block) + 2
+        if length + b_len > 3500:
+            if current:
+                news_chunks.append("\n\n".join(current))
+            current = [block]
+            length = b_len
         else:
-            current_chunk.append(block)
-            current_len += block_len
-    if current_chunk:
-        news_message_chunks.append("\n\n".join(current_chunk))
-
-    # DateTime formatting (Egypt Cairo Timezone UTC+3)
+            current.append(block)
+            length += b_len
+    if current:
+        news_chunks.append("\n\n".join(current))
+        
+    # Time Calculations (Egypt Cairo Timezone UTC+3)
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
     today = now.strftime("%Y/%m/%d")
@@ -665,216 +641,82 @@ def send_report():
     minute = now.strftime("%M")
     period = s["am"] if now.strftime("%p") == "AM" else s["pm"]
     time_display = f"{hour:02d}:{minute} {period}"
-
-    # Format Telegram message
-    total_minutes = now.hour * 60 + now.minute
-    market_status_text = ""
-    portfolio_header = s.get('portfolio_title', 'أسهم مستثمر بها')
-    watchlist_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
     
-    if total_minutes < 10 * 60:  # Before 10:00 AM Cairo Time
-        market_status_text = "⚠️ <b>السوق مغلق حالياً (يفتح 10:00 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
-        portfolio_header = f"📊 {portfolio_header} (إغلاق الجلسة السابقة)"
-        watchlist_header = f"📊 {watchlist_header} (إغلاق الجلسة السابقة)"
-    elif 10 * 60 <= total_minutes <= 14 * 60 + 30:  # 10:00 AM to 2:30 PM (Active trading)
-        portfolio_header = f"💼 {portfolio_header} (حركة لحظية)"
-        watchlist_header = f"📋 {watchlist_header} (حركة لحظية)"
-    else:  # After 2:30 PM
-        market_status_text = "🔒 <b>انتهت جلسة تداول اليوم (السوق مغلق)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
-        portfolio_header = f"📈 {portfolio_header} (إغلاق جلسة اليوم)"
-        watchlist_header = f"📈 {watchlist_header} (إغلاق جلسة اليوم)"
-
-    tg_msg_portfolio = f"{s['rlm']}<b>{s['report_title']}</b>\n"
-    tg_msg_portfolio += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
-    tg_msg_portfolio += f"{s['rlm']}{s['line']}\n"
-    if market_status_text:
-        tg_msg_portfolio += f"{s['rlm']}{market_status_text}"
+    total_minutes = now.hour * 60 + now.minute
+    status_text = ""
+    port_header = s.get('portfolio_title', 'أسهم مستثمر بها')
+    watch_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
+    
+    if total_minutes < 10 * 60:
+        status_text = "⚠️ <b>السوق مغلق حالياً (يفتح 10:00 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
+        port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
+        watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
+    elif 10 * 60 <= total_minutes <= 14 * 60 + 30:
+        port_header = f"💼 {port_header} (حركة لحظية)"
+        watch_header = f"📋 {watch_header} (حركة لحظية)"
     else:
-        tg_msg_portfolio += "\n"
-
-    # Portfolio block
-    tg_msg_portfolio += f"{s['rlm']}<b>{portfolio_header}:</b>\n"
-    for k in sorted_portfolio:
+        status_text = "🔒 <b>انتهت جلسة تداول اليوم (السوق مغلق)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
+        port_header = f"📈 {port_header} (إغلاق جلسة اليوم)"
+        watch_header = f"📈 {watch_header} (إغلاق جلسة اليوم)"
+        
+    msg_portfolio = f"{s['rlm']}<b>{s['report_title']}</b>\n"
+    msg_portfolio += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
+    msg_portfolio += f"{s['rlm']}{s['line']}\n"
+    if status_text:
+        msg_portfolio += f"{s['rlm']}{status_text}"
+    else:
+        msg_portfolio += "\n"
+        
+    msg_portfolio += f"{s['rlm']}<b>{port_header}:</b>\n"
+    for k in sorted_port:
         item = parsed_stocks[k]
-        chg_val = item["chgPct"]
-        chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
-        dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        ticker_link = company_websites.get(k, "#")
+        val = item["chgPct"]
+        chg_str = f"+{val}%" if val > 0 else (f"{val}%" if val < 0 else "0.0%")
+        dir_emoji = s["e_green"] if val > 0 else (s["e_red"] if val < 0 else s["e_white"])
+        ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
-        tg_msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
-
-    # Watchlist block
-    tg_msg_watchlist = f"{s['rlm']}<b>{watchlist_header}:</b>\n"
-    for k in sorted_watchlist:
+        msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        
+    msg_watchlist = f"{s['rlm']}<b>{watch_header}:</b>\n"
+    for k in sorted_watch:
         item = parsed_stocks[k]
-        chg_val = item["chgPct"]
-        chg_str = f"+{chg_val}%" if chg_val > 0 else (f"{chg_val}%" if chg_val < 0 else "0.0%")
-        dir_emoji = s["e_green"] if chg_val >= 0 else s["e_red"]
-        ticker_link = company_websites.get(k, "#")
+        val = item["chgPct"]
+        chg_str = f"+{val}%" if val > 0 else (f"{val}%" if val < 0 else "0.0%")
+        dir_emoji = s["e_green"] if val > 0 else (s["e_red"] if val < 0 else s["e_white"])
+        ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
-        tg_msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
-
-
-
-    # Indices block
-    egx30_dir = s["e_green"] if egx30["chgPct"] >= 0 else s["e_red"]
-    usdegp_dir = s["e_green"] if usdegp["chgPct"] >= 0 else s["e_red"]
-    xauusd_dir = s["e_green"] if xauusd["chgPct"] >= 0 else s["e_red"]
-
+        msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
+        
+    egx30_dir = s["e_green"] if egx30["chgPct"] > 0 else (s["e_red"] if egx30["chgPct"] < 0 else s["e_white"])
+    usdegp_dir = s["e_green"] if usdegp["chgPct"] > 0 else (s["e_red"] if usdegp["chgPct"] < 0 else s["e_white"])
+    xauusd_dir = s["e_green"] if xauusd["chgPct"] > 0 else (s["e_red"] if xauusd["chgPct"] < 0 else s["e_white"])
+    
     egx30_chg = f"+{egx30['chgPct']}%" if egx30['chgPct'] > 0 else (f"{egx30['chgPct']}%" if egx30['chgPct'] < 0 else "0.0%")
     usdegp_chg = f"+{usdegp['chgPct']}%" if usdegp['chgPct'] > 0 else (f"{usdegp['chgPct']}%" if usdegp['chgPct'] < 0 else "0.0%")
     xauusd_chg = f"+{xauusd['chgPct']}%" if xauusd['chgPct'] > 0 else (f"{xauusd['chgPct']}%" if xauusd['chgPct'] < 0 else "0.0%")
-
-    tg_msg_watchlist += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
-    tg_msg_watchlist += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
-    tg_msg_watchlist += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
-    tg_msg_watchlist += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
-
-    # Check length and split if necessary to avoid Telegram's 4096 character limit
+    
+    msg_watchlist += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
+    msg_watchlist += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
+    msg_watchlist += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
+    msg_watchlist += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
+    
+    # Send messages
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
-    # Send Portfolio first
-    payload1 = {
-        "chat_id": CHAT_ID,
-        "text": tg_msg_portfolio,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
     try:
-        r_tg1 = requests.post(url, json=payload1)
-        print("Telegram Part 1 (Portfolio) Response:", r_tg1.status_code)
-        if r_tg1.status_code != 200:
-            print("Telegram part 1 error body:", r_tg1.text)
+        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_portfolio, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
+        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_watchlist, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
     except Exception as e:
-        print("Telegram Part 1 error:", e)
-
-    # Send Watchlist next
-    payload2 = {
-        "chat_id": CHAT_ID,
-        "text": tg_msg_watchlist,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
-    try:
-        r_tg2 = requests.post(url, json=payload2)
-        print("Telegram Part 2 (Watchlist) Response:", r_tg2.status_code)
-        if r_tg2.status_code != 200:
-            print("Telegram part 2 error body:", r_tg2.text)
-    except Exception as e:
-        print("Telegram Part 2 error:", e)
-
-    # Send News chunks
-    if news_message_chunks:
-        for i, chunk in enumerate(news_message_chunks):
-            # Prepend header only on the first chunk
+        print("Error sending stock report parts:", e)
+        
+    if news_chunks:
+        for i, chunk in enumerate(news_chunks):
             if i == 0:
                 chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
-                
-            payload_news = {
-                "chat_id": CHAT_ID,
-                "text": chunk,
-                "parse_mode": "HTML",
-                "disable_web_page_preview": True
-            }
             try:
-                r_news = requests.post(url, json=payload_news)
-                print(f"Telegram News Part {i+1} Response:", r_news.status_code)
-                if r_news.status_code != 200:
-                    print(f"Telegram news part {i+1} error body:", r_news.text)
+                requests.post(url, json={"chat_id": CHAT_ID, "text": chunk, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
             except Exception as e:
-                print(f"Telegram News Part {i+1} error:", e)
-
-
-
-def trigger_next_runner():
-    print("Dispatching next runner to maintain perpetual cloud loop...")
-    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/actions/workflows/run_report.yml/dispatches"
-    headers = {
-        "Authorization": f"Bearer {GH_PAT}",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "PerpetualRunner"
-    }
-    payload = {"ref": "main", "inputs": {"force": "false"}}
-    try:
-        r_disp = requests.post(url, headers=headers, json=payload)
-        print("Next runner dispatch status:", r_disp.status_code)
-    except Exception as e:
-        print("Error dispatching next runner:", e)
-
-def reply_telegram(text):
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "HTML"
-    }
-    try:
-        requests.post(url, json=payload)
-    except Exception as e:
-        print("Error sending reply:", e)
-
-def update_github_news(new_content):
-    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/news.txt"
-    headers = {
-        "Authorization": f"Bearer {GH_PAT}",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "TelegramBot"
-    }
-    # Get current SHA
-    r_get = requests.get(url, headers=headers)
-    sha = ""
-    if r_get.status_code == 200:
-        sha = r_get.json().get("sha", "")
-        
-    content_b64 = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
-    payload = {
-        "message": "Update news.txt via Telegram Bot",
-        "content": content_b64
-    }
-    if sha:
-        payload["sha"] = sha
-        
-    r_put = requests.put(url, headers=headers, json=payload)
-    return r_put.status_code in [200, 201]
-
-def ask_ai(question):
-    # Try Claude first
-    if CLAUDE_API_KEY:
-        url = "https://api.anthropic.com/v1/messages"
-        headers = {
-            "x-api-key": CLAUDE_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        }
-        payload = {
-            "model": "claude-3-5-sonnet-20241022",
-            "max_tokens": 1000,
-            "messages": [{"role": "user", "content": question}]
-        }
-        try:
-            r = requests.post(url, headers=headers, json=payload)
-            if r.status_code == 200:
-                return r.json()["content"][0]["text"]
-        except Exception as e:
-            print("Claude API error:", e)
-
-    # Fallback to Gemini
-    if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
-        headers = {"content-type": "application/json"}
-        payload = {
-            "contents": [{"parts": [{"text": question}]}]
-        }
-        try:
-            r = requests.post(url, headers=headers, json=payload)
-            if r.status_code == 200:
-                return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-            else:
-                return f"خطأ من خوادم Gemini (رمز الخطأ {r.status_code}):\n<code>{r.text}</code>"
-        except Exception as e:
-            return f"فشل الاتصال بخدمة Gemini: {str(e)}"
-            
-    return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي السحابية."
+                print(f"Error sending news chunk {i+1}:", e)
 
 def handle_telegram_command(text):
     text_lower = text.lower()
@@ -898,7 +740,6 @@ def handle_telegram_command(text):
             reply_telegram("⚠️ يرجى كتابة نص الخبر بعد الأمر. مثال:\n<code>/add_news خبر جديد هنا</code>")
             return
             
-        # Append news content locally
         local_content = ""
         if os.path.exists(NEWS_PATH):
             with open(NEWS_PATH, "r", encoding="utf-8") as nf:
@@ -906,13 +747,10 @@ def handle_telegram_command(text):
                 
         updated_content = news_content if not local_content else f"{local_content}\n\n{news_content}"
         
-        # Write local
         with open(NEWS_PATH, "w", encoding="utf-8") as nf:
             nf.write(updated_content)
             
-        # Update on GitHub
-        success = update_github_news(updated_content)
-        if success:
+        if update_github_news(updated_content):
             reply_telegram("✅ تمت إضافة الخبر وتحديث الملف على GitHub بنجاح!")
         else:
             reply_telegram("❌ فشل تحديث الخبر على GitHub. يرجى التحقق من الاتصال.")
@@ -923,34 +761,16 @@ def handle_telegram_command(text):
             reply_telegram("⚠️ يرجى كتابة السؤال بعد الأمر. مثال:\n<code>/ask ما توقعاتك لسهم طلعت مصطفى؟</code>")
             return
         reply_telegram("🔄 جاري التفكير والتحليل...")
-        answer = ask_ai(question)
-        reply_telegram(answer)
+        reply_telegram(ask_ai(question))
         
     else:
-        # Default fallback: treat as ask prompt
         reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
-        answer = ask_ai(text)
-        reply_telegram(answer)
-
-def wait_for_market_open():
-    egypt_tz = timezone(timedelta(hours=3))
-    now = datetime.now(egypt_tz)
-    
-    # Target time is 08:45:00
-    target_time = now.replace(hour=8, minute=45, second=0, microsecond=0)
-    
-    if now < target_time:
-        seconds_to_wait = (target_time - now).total_seconds()
-        print(f"[{now.strftime('%H:%M:%S')}] Early Wake active. Waiting {seconds_to_wait:.1f} seconds until market open (08:45 AM)...")
-        
-        start_time = time.time()
-        while (time.time() - start_time) < seconds_to_wait:
-            poll_telegram_messages()
-            time.sleep(5)
-        print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Market is now open! Proceeding to report generation.")
+        reply_telegram(ask_ai(text))
 
 def poll_telegram_messages():
     global offset
+    if not BOT_TOKEN:
+        return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     params = {"offset": offset, "timeout": 5}
     try:
@@ -961,16 +781,27 @@ def poll_telegram_messages():
                 offset = update["update_id"] + 1
                 msg = update.get("message", {})
                 chat_id = str(msg.get("chat", {}).get("id", ""))
-                
-                # Verify sender is the authorized user
                 if chat_id != CHAT_ID:
                     continue
-                    
                 text = msg.get("text", "").strip()
                 if text:
                     handle_telegram_command(text)
     except Exception as e:
         print("Polling error:", e)
+
+def wait_for_market_open():
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    target_time = now.replace(hour=8, minute=45, second=0, microsecond=0)
+    
+    if now < target_time:
+        seconds_to_wait = (target_time - now).total_seconds()
+        print(f"[{now.strftime('%H:%M:%S')}] Early Wake active. Waiting {seconds_to_wait:.1f} seconds until market open (08:45 AM)...")
+        start_time = time.time()
+        while (time.time() - start_time) < seconds_to_wait:
+            poll_telegram_messages()
+            time.sleep(5)
+        print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Market open! Starting run.")
 
 def sleep_until_next_15min_mark():
     egypt_tz = timezone(timedelta(hours=3))
@@ -979,7 +810,6 @@ def sleep_until_next_15min_mark():
     second = now.second
     microsecond = now.microsecond
     
-    # Calculate next 15-minute boundary (:00, :15, :30, :45)
     next_minute = ((minute // 15) + 1) * 15
     if next_minute == 60:
         seconds_to_wait = (60 - minute) * 60 - second
@@ -990,67 +820,57 @@ def sleep_until_next_15min_mark():
     if seconds_to_wait <= 0:
         seconds_to_wait = 900
         
-    print(f"[{now.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until next clock mark (polling active)...")
-    
-    # Poll Telegram every 5 seconds during the sleep period
+    print(f"[{now.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until next clock mark...")
     start_time = time.time()
     while (time.time() - start_time) < seconds_to_wait:
         poll_telegram_messages()
         time.sleep(5)
 
 if __name__ == "__main__":
-    # Get Cairo timezone
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
     
-    # Check FORCE_RUN flag
+    # Check weekday (Egypt stock market runs Sunday to Thursday)
+    # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+    if now.weekday() in [4, 5]:
+        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Exiting.")
+        sys.exit(0)
+        
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     if force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN is enabled. Sending an immediate report.")
+        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Sending immediate report.")
         send_report()
         
-        # Automatically restart the normal continuous loop so the chain is not broken
+        # Trigger next if market is still open
         if now.hour < 15 or (now.hour == 15 and now.minute < 30):
-            print(f"[{now.strftime('%H:%M:%S')}] Market is open. Triggering next runner to resume continuous background loop.")
+            print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
             trigger_next_runner()
-            
-        exit(0)
-        
-    # Check weekday (0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
-    # Sunday to Thursday is [6, 0, 1, 2, 3]
-    day = now.weekday()
-    if day in [4, 5]: # Friday or Saturday
-        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday), exiting to conserve actions minutes.")
-        exit(0)
+        sys.exit(0)
         
     wait_for_market_open()
-        
-    # Run perpetual loop aligned with clock marks (:00, :15, :30, :45)
+    
     TOTAL_CYCLES = 15
     for i in range(TOTAL_CYCLES):
         loop_now = datetime.now(egypt_tz)
         print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
         
-        # Check active hour range: 08:45 to 15:30 Cairo time
         current_time_minutes = loop_now.hour * 60 + loop_now.minute
         if current_time_minutes > 15 * 60 + 30:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Time is past 3:30 PM. Sending closing report and terminating.")
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Past 3:30 PM. Sending closing report.")
             send_report()
             reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
-            exit(0)
+            sys.exit(0)
             
         if 8 * 60 + 45 <= current_time_minutes <= 15 * 60 + 30:
             send_report()
         else:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Outside automated report hours (9:00 AM - 3:30 PM), skipping.")
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
             
-        # Before the runner finishes, trigger the next runner if it is still before 3:00 PM Cairo time
         if i == TOTAL_CYCLES - 2:
             if loop_now.hour < 15:
                 trigger_next_runner()
             else:
-                print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later, stopping perpetual loop generation.")
-
-        # Don't sleep after the last cycle to avoid wasting GitHub Actions minutes
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later. Stopping chain.")
+                
         if i < TOTAL_CYCLES - 1:
             sleep_until_next_15min_mark()
