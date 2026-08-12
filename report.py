@@ -486,6 +486,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             for ticker, analysis in parsed.items():
                 clean = ticker.strip().upper().replace("[", "").replace("]", "")
                 analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis.strip()}"
+            print("Gemini AI Analysis successfully generated for:", list(analyses.keys()))
         else:
             print(f"Gemini returned status {r.status_code}: {r.text}")
     except Exception as e:
