@@ -479,37 +479,6 @@ def send_report():
         "ICFC": "http://www.icf-eg.com"
     }
 
-    def fetch_mubasher_price(ticker):
-        url = f"https://english.mubasher.info/markets/EGX/stocks/{ticker}"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        try:
-            r = requests.get(url, headers=headers, timeout=5)
-            price_match = re.search(r'market-summary__last-price[^>]*>\s*([\d\.,]+)', r.text)
-            pct_match = re.search(r'market-summary__change-percentage[^>]*>\s*([\-\+\d\.,]+)%', r.text)
-            open_match = re.search(r'Open</span>\s*<span class="market-summary__block-number">([\d\.,]+)</span>', r.text)
-            
-            price = float(price_match.group(1).replace(',', '')) if price_match else 0
-            chg_pct = float(pct_match.group(1).replace(',', '')) if pct_match else 0
-            open_p = float(open_match.group(1).replace(',', '')) if open_match else 0
-            return ticker, {"close": price, "chgPct": chg_pct, "open": open_p, "rec": ""}
-        except Exception as e:
-            return ticker, {"close": 0, "chgPct": 0, "open": 0, "rec": ""}
-
-    def fetch_mubasher_egx30():
-        url = "https://english.mubasher.info/markets/EGX/indices/EGX30"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        try:
-            r = requests.get(url, headers=headers, timeout=5)
-            price_match = re.search(r'market-summary__last-price[^>]*>\s*([\d\.,]+)', r.text)
-            pct_match = re.search(r'market-summary__change-percentage[^>]*>\s*([\-\+\d\.,]+)%', r.text)
-            open_match = re.search(r'Open</span>\s*<span class="market-summary__block-number">([\d\.,]+)</span>', r.text)
-            price = float(price_match.group(1).replace(',', '')) if price_match else 0
-            chg_pct = float(pct_match.group(1).replace(',', '')) if pct_match else 0
-            open_p = float(open_match.group(1).replace(',', '')) if open_match else 0
-            return {"close": price, "chgPct": chg_pct, "open": open_p}
-        except Exception as e:
-            return {"close": 0, "chgPct": 0, "open": 0}
-
     # 1. Fetch stock prices
     portfolio_list = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
     watchlist_list = [
@@ -521,49 +490,52 @@ def send_report():
     all_tickers = portfolio_list + watchlist_list
     
     parsed_stocks = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(fetch_mubasher_price, t) for t in all_tickers]
-        for f in concurrent.futures.as_completed(futures):
-            ticker, data = f.result()
-            parsed_stocks[ticker] = data
+    egx30 = {"close": 0, "chgPct": 0, "open": 0}
 
-    def fetch_tv_recommendations(tickers, s):
+    def fetch_all_data_tv(tickers, s_dict):
         url = "https://scanner.tradingview.com/egypt/scan"
+        tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30"]
         payload = {
-            "symbols": {"tickers": [f"EGX:{t}" for t in tickers]},
-            "columns": ["name", "Recommend.All"]
+            "symbols": {"tickers": tv_tickers},
+            "columns": ["close", "open", "Recommend.All"]
         }
         headers = {"Content-Type": "application/json"}
-        rec_map = {}
         try:
-            r = requests.post(url, json=payload, headers=headers, timeout=5)
+            r = requests.post(url, json=payload, headers=headers, timeout=10)
             data = r.json()
             for item in data.get("data", []):
-                t = item["d"][0]
-                rec_val = item["d"][1]
+                sym = item["s"].replace("EGX:", "")
+                c = safe_round(item["d"][0]) if item["d"][0] is not None else 0
+                o = safe_round(item["d"][1]) if item["d"][1] is not None else 0
+                rec_val = item["d"][2]
+                
+                chg_pct = round(((c - o) / o) * 100, 2) if o and o > 0 else 0.0
+                
                 rec_str = ""
                 if rec_val is not None:
                     if rec_val >= 0.5:
-                        rec_str = f"🚀 {s['strong_buy']}"
+                        rec_str = f"🚀 {s_dict['strong_buy']}"
                     elif rec_val >= 0.1:
-                        rec_str = f"📈 {s['buy']}"
+                        rec_str = f"📈 {s_dict['buy']}"
                     elif rec_val <= -0.5:
-                        rec_str = f"📉 {s['strong_sell']}"
+                        rec_str = f"📉 {s_dict['strong_sell']}"
                     elif rec_val <= -0.1:
-                        rec_str = f"🔻 {s['sell']}"
+                        rec_str = f"🔻 {s_dict['sell']}"
                     else:
                         rec_str = "⏸️ محايد"
-                rec_map[t] = rec_str
+
+                if sym == "EGX30":
+                    egx30["close"] = c
+                    egx30["open"] = o
+                    egx30["chgPct"] = chg_pct
+                else:
+                    parsed_stocks[sym] = {"close": c, "open": o, "chgPct": chg_pct, "rec": rec_str}
         except Exception as e:
-            print("Error fetching TV recommendations:", e)
-        return rec_map
+            print("Error fetching TV prices:", e)
+            for t in tickers:
+                parsed_stocks[t] = {"close": 0, "open": 0, "chgPct": 0, "rec": ""}
 
-    tv_recs = fetch_tv_recommendations(all_tickers, s)
-    for ticker in all_tickers:
-        if ticker in parsed_stocks:
-            parsed_stocks[ticker]["rec"] = tv_recs.get(ticker, "")
-
-    egx30 = fetch_mubasher_egx30()
+    fetch_all_data_tv(all_tickers, s)
 
     # 2. Fetch Forex (USD/EGP)
     try:
