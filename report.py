@@ -3,18 +3,24 @@ import os
 import time
 import requests
 import base64
-import urllib.request
 import urllib.parse
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
 import re
 import concurrent.futures
+import urllib3
+try:
+    import feedparser
+except ImportError:
+    feedparser = None
+    print("Warning: feedparser is not installed.")
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from datetime import datetime, timezone, timedelta
 
 # Get secrets from environment variables
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-GH_PAT = "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg"
+GH_PAT = os.getenv("GH_PAT", "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -52,7 +58,6 @@ def fetch_rss_news():
     }
     
     # Add Google News Search (representing 100+ sources)
-    import urllib.parse
     gnews_query = 'البورصة المصرية OR أسهم مصر OR اقتصاد مصر OR "طلعت مصطفى" OR "فوري" OR "سوديك" OR "إيديتا" OR "أبوظبي الإسلامي" OR "مصر للألومنيوم" OR "المصرية للاتصالات" OR "إي فاينانس" OR "أوراسكوم"'
     encoded_query = urllib.parse.quote(gnews_query)
     feeds["أخبار جوجل"] = f"https://news.google.com/rss/search?q={encoded_query}&hl=ar&gl=EG&ceid=EG:ar"
@@ -63,14 +68,6 @@ def fetch_rss_news():
     
     news_items = []
     
-    # We will import feedparser locally to avoid issues if not available,
-    # but run_report.yml installs it.
-    try:
-        import feedparser
-    except ImportError:
-        feedparser = None
-        print("Warning: feedparser is not installed. RSS parsing may fail.")
-
     for source_name, url in feeds.items():
         try:
             r = requests.get(url, headers=headers, timeout=10, verify=False)
@@ -288,7 +285,7 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
         "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
         "ARCC": ["العربية للأسمنت", "العربيه للأسمنت", "ARCC"],
-        "FAIT": ["فيصل الإسلامي", "فيصل الاسلامي", "FAIT"],
+        "FAIT": ["بنك فيصل", "FAIT"],
         "IFAP": ["الدولية للمحاصيل", "الدوليه للمحاصيل", "IFAP"],
         "MTIE": ["إم إم جروب", "ام ام جروب", "MTIE"],
         "SAUD": ["البركة", "بنك البركة", "SAUD"],
@@ -532,6 +529,7 @@ def send_report():
                     parsed_stocks[sym] = {"close": c, "open": o, "chgPct": chg_pct, "rec": rec_str}
         except Exception as e:
             print("Error fetching TV prices:", e)
+            reply_telegram(f"⚠️ <b>تنبيه:</b> فشل الاتصال بخادم TradingView لجلب الأسعار.\n<code>{str(e)[:200]}</code>")
             for t in tickers:
                 parsed_stocks[t] = {"close": 0, "open": 0, "chgPct": 0, "rec": ""}
 
@@ -561,20 +559,18 @@ def send_report():
     usdegp = {"close": 0, "chgPct": 0, "open": 0}
     for item in r_fx.get("data", []):
         d = item["d"]
-        usdegp = {
-            "close": safe_round(d[0]),
-            "chgPct": safe_round(d[1]),
-            "open": safe_round(d[3])
-        }
+        c_fx = safe_round(d[0])
+        o_fx = safe_round(d[3])
+        chg_fx = round(((c_fx - o_fx) / o_fx) * 100, 2) if o_fx and o_fx > 0 else 0.0
+        usdegp = {"close": c_fx, "chgPct": chg_fx, "open": o_fx}
 
     xauusd = {"close": 0, "chgPct": 0, "open": 0}
     for item in r_gold.get("data", []):
         d = item["d"]
-        xauusd = {
-            "close": safe_round(d[0]),
-            "chgPct": safe_round(d[1]),
-            "open": safe_round(d[3])
-        }
+        c_au = safe_round(d[0])
+        o_au = safe_round(d[3])
+        chg_au = round(((c_au - o_au) / o_au) * 100, 2) if o_au and o_au > 0 else 0.0
+        xauusd = {"close": c_au, "chgPct": chg_au, "open": o_au}
 
     # Sort stocks descending by change percentage
     
@@ -864,7 +860,7 @@ def ask_ai(question):
 
     # Fallback to Gemini
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
         headers = {"content-type": "application/json"}
         payload = {
             "contents": [{"parts": [{"text": question}]}]
@@ -1038,7 +1034,9 @@ if __name__ == "__main__":
         # Check active hour range: 08:45 to 15:30 Cairo time
         current_time_minutes = loop_now.hour * 60 + loop_now.minute
         if current_time_minutes > 15 * 60 + 30:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Time is past 3:30 PM, terminating run to conserve minutes.")
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Time is past 3:30 PM. Sending closing report and terminating.")
+            send_report()
+            reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
             exit(0)
             
         if 8 * 60 + 45 <= current_time_minutes <= 15 * 60 + 30:
@@ -1052,5 +1050,7 @@ if __name__ == "__main__":
                 trigger_next_runner()
             else:
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later, stopping perpetual loop generation.")
-                
-        sleep_until_next_15min_mark()
+
+        # Don't sleep after the last cycle to avoid wasting GitHub Actions minutes
+        if i < TOTAL_CYCLES - 1:
+            sleep_until_next_15min_mark()
