@@ -582,7 +582,7 @@ def fetch_all_data_tv(tickers, strings):
     tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30", "EGX:EGX70EWI", "EGX:EGX100EWI"]
     payload = {
         "symbols": {"tickers": tv_tickers},
-        "columns": ["close", "open", "Perf.D", "Recommend.All"]  # Perf.D = التغيير اليومي الصحيح
+        "columns": ["close", "open", "change", "Recommend.All"]
     }
     try:
         r = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=15)
@@ -592,11 +592,11 @@ def fetch_all_data_tv(tickers, strings):
             sym = item["s"].replace("EGX:", "")
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            perf_d = item["d"][2]   # نسبة التغيير اليومي الصحيحة من TradingView
+            change_val = item["d"][2]   # نسبة التغيير اليومي من TradingView
             rec_val = item["d"][3]
             
-            # استخدام Perf.D مباشرة (نسبة التغيير من إغلاق أمس)
-            chg = safe_round(perf_d) if perf_d is not None else 0.0
+            # استخدام change مباشرة
+            chg = safe_round(change_val)
             
             rec_str = ""
             if rec_val is not None:
@@ -623,15 +623,15 @@ def fetch_forex_gold():
     try:
         r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
             "symbols": {"tickers": ["FX_IDC:USDEGP"]},
-            "columns": ["close", "open", "Perf.D"]
+            "columns": ["close", "open", "change"]
         }, timeout=10)
         r_fx.raise_for_status()
         r_fx = r_fx.json()
         for item in r_fx.get("data", []):
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            perf_d = item["d"][2]
-            chg = safe_round(perf_d) if perf_d is not None else (round(((c - o) / o) * 100, 2) if o > 0 else 0.0)
+            chg_val = item["d"][2]
+            chg = safe_round(chg_val)
             usdegp = {"close": c, "chgPct": chg, "open": o}
     except Exception as e:
         print("Error fetching FX:", e)
@@ -639,15 +639,15 @@ def fetch_forex_gold():
     try:
         r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
             "symbols": {"tickers": ["TVC:GOLD"]},
-            "columns": ["close", "open", "Perf.D"]
+            "columns": ["close", "open", "change"]
         }, timeout=10)
         r_gold.raise_for_status()
         r_gold = r_gold.json()
         for item in r_gold.get("data", []):
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            perf_d = item["d"][2]
-            chg = safe_round(perf_d) if perf_d is not None else (round(((c - o) / o) * 100, 2) if o > 0 else 0.0)
+            chg_val = item["d"][2]
+            chg = safe_round(chg_val)
             xauusd = {"close": c, "chgPct": chg, "open": o}
     except Exception as e:
         print("Error fetching Gold:", e)
