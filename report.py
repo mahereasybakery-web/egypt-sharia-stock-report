@@ -495,9 +495,13 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
 
 def fetch_all_data_tv(tickers, strings):
     parsed = {}
-    egx30 = {"close": 0.0, "open": 0.0, "chgPct": 0.0}
+    indices = {
+        "EGX30": {"close": 0.0, "open": 0.0, "chgPct": 0.0},
+        "EGX70EWI": {"close": 0.0, "open": 0.0, "chgPct": 0.0},
+        "EGX100EWI": {"close": 0.0, "open": 0.0, "chgPct": 0.0}
+    }
     url = "https://scanner.tradingview.com/egypt/scan"
-    tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30"]
+    tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30", "EGX:EGX70EWI", "EGX:EGX100EWI"]
     payload = {
         "symbols": {"tickers": tv_tickers},
         "columns": ["close", "open", "Recommend.All"]
@@ -522,8 +526,8 @@ def fetch_all_data_tv(tickers, strings):
                 elif rec_val <= -0.1: rec_str = f"🔻 {strings['sell']}"
                 else: rec_str = "⏸️ محايد"
                 
-            if sym == "EGX30":
-                egx30 = {"close": c, "open": o, "chgPct": chg}
+            if sym in indices:
+                indices[sym] = {"close": c, "open": o, "chgPct": chg}
             else:
                 parsed[sym] = {"close": c, "open": o, "chgPct": chg, "rec": rec_str}
     except Exception as e:
@@ -531,7 +535,7 @@ def fetch_all_data_tv(tickers, strings):
         reply_telegram(f"⚠️ <b>تنبيه:</b> فشل الاتصال بخادم TradingView لجلب الأسعار.\n<code>{str(e)[:200]}</code>")
         for t in tickers:
             parsed[t] = {"close": 0.0, "open": 0.0, "chgPct": 0.0, "rec": ""}
-    return parsed, egx30
+    return parsed, indices
 
 def fetch_forex_gold():
     usdegp = {"close": 0.0, "chgPct": 0.0, "open": 0.0}
@@ -565,6 +569,29 @@ def fetch_forex_gold():
         
     return usdegp, xauusd
 
+def fetch_egx33_shariah():
+    """Fetch EGX33 Shariah index from TradingView symbol page (not available in Scanner API)."""
+    shariah = {"close": 0.0, "open": 0.0, "chgPct": 0.0}
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        r = requests.get("https://www.tradingview.com/symbols/EGX-SHARIAH/", headers=headers, timeout=15)
+        text = r.text
+        
+        close_m = re.search(r'"close":"([\d.]+)"', text)
+        open_m = re.search(r'"open":"([\d.]+)"', text)
+        
+        if close_m and open_m:
+            c = safe_round(float(close_m.group(1)))
+            o = safe_round(float(open_m.group(1)))
+            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            shariah = {"close": c, "open": o, "chgPct": chg}
+            print(f"EGX33 Shariah fetched: close={c}, open={o}, chg={chg}%")
+        else:
+            print("EGX33 Shariah: Could not parse price data from TradingView page.")
+    except Exception as e:
+        print(f"Error fetching EGX33 Shariah: {e}")
+    return shariah
+
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
     if not os.path.exists(STRINGS_PATH):
@@ -574,8 +601,12 @@ def send_report():
     with open(STRINGS_PATH, "r", encoding="utf-8") as f:
         s = json.load(f)
         
-    # Get Prices & FX/Gold
-    parsed_stocks, egx30 = fetch_all_data_tv(ALL_TICKERS, s)
+    # Get Prices, Indices & FX/Gold
+    parsed_stocks, indices = fetch_all_data_tv(ALL_TICKERS, s)
+    egx30 = indices.get("EGX30", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx70ewi = indices.get("EGX70EWI", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx100ewi = indices.get("EGX100EWI", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx33 = fetch_egx33_shariah()
     usdegp, xauusd = fetch_forex_gold()
     
     # Sort lists
@@ -688,19 +719,26 @@ def send_report():
         ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
         msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}\n"
-        
-    egx30_dir = s["e_green"] if egx30["chgPct"] > 0 else (s["e_red"] if egx30["chgPct"] < 0 else s["e_white"])
-    usdegp_dir = s["e_green"] if usdegp["chgPct"] > 0 else (s["e_red"] if usdegp["chgPct"] < 0 else s["e_white"])
-    xauusd_dir = s["e_green"] if xauusd["chgPct"] > 0 else (s["e_red"] if xauusd["chgPct"] < 0 else s["e_white"])
     
-    egx30_chg = f"+{egx30['chgPct']}%" if egx30['chgPct'] > 0 else (f"{egx30['chgPct']}%" if egx30['chgPct'] < 0 else "0.0%")
-    usdegp_chg = f"+{usdegp['chgPct']}%" if usdegp['chgPct'] > 0 else (f"{usdegp['chgPct']}%" if usdegp['chgPct'] < 0 else "0.0%")
-    xauusd_chg = f"+{xauusd['chgPct']}%" if xauusd['chgPct'] > 0 else (f"{xauusd['chgPct']}%" if xauusd['chgPct'] < 0 else "0.0%")
+    # === Build Indices & Currencies Section (separate message) ===
+    def fmt_chg(val):
+        if val > 0: return f"+{val}%"
+        elif val < 0: return f"{val}%"
+        return "0.0%"
     
-    msg_watchlist += f"\n{s['rlm']}<b>{s['e_blue']} {s['indices_currencies']}:</b>\n"
-    msg_watchlist += f"{s['rlm']}{egx30_dir} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({egx30_chg})\n"
-    msg_watchlist += f"{s['rlm']}{usdegp_dir} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({usdegp_chg})\n"
-    msg_watchlist += f"{s['rlm']}{xauusd_dir} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({xauusd_chg})\n\n"
+    def dir_e(val):
+        if val > 0: return s["e_green"]
+        elif val < 0: return s["e_red"]
+        return s["e_white"]
+    
+    msg_indices = f"{s['rlm']}<b>📊 المؤشرات:</b>\n"
+    msg_indices += f"{s['rlm']}{dir_e(egx30['chgPct'])} <b>EGX30</b>:{s['rlm']} {egx30['open']} {s['e_arrow']} <b>{egx30['close']}</b> ({fmt_chg(egx30['chgPct'])})\n"
+    msg_indices += f"{s['rlm']}{dir_e(egx33['chgPct'])} <b>EGX33 الشريعة</b>:{s['rlm']} {egx33['open']} {s['e_arrow']} <b>{egx33['close']}</b> ({fmt_chg(egx33['chgPct'])})\n"
+    msg_indices += f"{s['rlm']}{dir_e(egx70ewi['chgPct'])} <b>EGX70 EWI</b>:{s['rlm']} {egx70ewi['open']} {s['e_arrow']} <b>{egx70ewi['close']}</b> ({fmt_chg(egx70ewi['chgPct'])})\n"
+    msg_indices += f"{s['rlm']}{dir_e(egx100ewi['chgPct'])} <b>EGX100 EWI</b>:{s['rlm']} {egx100ewi['open']} {s['e_arrow']} <b>{egx100ewi['close']}</b> ({fmt_chg(egx100ewi['chgPct'])})\n"
+    msg_indices += f"\n{s['rlm']}<b>💱 العملات والمعادن:</b>\n"
+    msg_indices += f"{s['rlm']}{dir_e(usdegp['chgPct'])} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({fmt_chg(usdegp['chgPct'])})\n"
+    msg_indices += f"{s['rlm']}{dir_e(xauusd['chgPct'])} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({fmt_chg(xauusd['chgPct'])})\n"
     
     # Send messages
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -708,6 +746,7 @@ def send_report():
     try:
         requests.post(url, json={"chat_id": CHAT_ID, "text": msg_portfolio, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
         requests.post(url, json={"chat_id": CHAT_ID, "text": msg_watchlist, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
+        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_indices, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
     except Exception as e:
         print("Error sending stock report parts:", e)
         
