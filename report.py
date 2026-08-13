@@ -28,6 +28,7 @@ CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_PAT = os.getenv("GH_PAT")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = "gemini-1.5-pro"
 
 if not GH_PAT:
     if os.getenv("GITHUB_ACTIONS") == "true":
@@ -145,6 +146,11 @@ def safe_round(val, decimals=2):
         return round(float(val), decimals)
     except (ValueError, TypeError):
         return 0.0
+
+def escape_html(text):
+    if not text:
+        return ""
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 def reply_telegram(text):
     """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400، ودعم تقسيم الرسائل الطويلة."""
@@ -651,7 +657,9 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
                     clean = m.group(1).upper()
                     analysis = m.group(2).strip()
                     if analysis:
-                        analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis}"
+                        # ✅ إصلاح: ترميز النص قبل وضعه في وسوم HTML لمنع فشل الإرسال
+                        analysis_esc = escape_html(analysis)
+                        analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis_esc}"
                 print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
                 break
             else:
@@ -878,7 +886,10 @@ def send_report():
             items_in_tag = grouped[tag]
             block = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
             for item in items_in_tag[:3]:
-                block += f"{s['rlm']}• {item['title']} ({item['source']}) <a href='{item['link']}'>[رابط مباشر]</a>\n"
+                # ✅ إصلاح: ترميز العنوان والمصدر لمنع أخطاء التنسيق في تليجرام عند وجود رموز مثل & أو <
+                title_esc = escape_html(item["title"])
+                source_esc = escape_html(item["source"])
+                block += f"{s['rlm']}• {title_esc} ({source_esc}) <a href='{item['link']}'>[رابط مباشر]</a>\n"
                 sent_links.add(item["link"])
             if tag in ai_analyses:
                 block += f"{s['rlm']}{ai_analyses[tag]}\n"
