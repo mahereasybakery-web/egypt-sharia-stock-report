@@ -7,7 +7,7 @@ import re
 import urllib.parse
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
-import concurrent.futures
+# concurrent.futures removed — not used in this codebase
 import urllib3
 from datetime import datetime, timezone, timedelta
 import requests
@@ -37,6 +37,9 @@ if not GH_PAT:
 STRINGS_PATH = "strings.json"
 NEWS_PATH = "news.txt"
 offset = 0
+
+# تسجيل وقت بدء التشغيل لتجاهل الرسائل القديمة
+_startup_epoch = 0  # سيُحدَّث في __main__
 
 # Tickers definition
 PORTFOLIO = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
@@ -170,10 +173,14 @@ def update_github_news(new_content):
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "TelegramBot"
     }
-    r_get = requests.get(url, headers=headers, timeout=10)
+    # ✅ إصلاح: GET محاط بـ try/except لتفادي crash عند انقطاع الشبكة
     sha = ""
-    if r_get.status_code == 200:
-        sha = r_get.json().get("sha", "")
+    try:
+        r_get = requests.get(url, headers=headers, timeout=10)
+        if r_get.status_code == 200:
+            sha = r_get.json().get("sha", "")
+    except Exception as e:
+        print(f"Warning: Could not fetch SHA for news.txt: {e}")
         
     content_b64 = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
     payload = {
@@ -182,9 +189,12 @@ def update_github_news(new_content):
     }
     if sha:
         payload["sha"] = sha
-        
-    r_put = requests.put(url, headers=headers, json=payload, timeout=10)
-    return r_put.status_code in [200, 201]
+    try:
+        r_put = requests.put(url, headers=headers, json=payload, timeout=10)
+        return r_put.status_code in [200, 201]
+    except Exception as e:
+        print(f"Error updating news.txt on GitHub: {e}")
+        return False
 
 def ask_ai(question):
     # Try Claude first
@@ -272,8 +282,13 @@ def fetch_rss_news():
 
             limit = 30 if source_name == "أخبار جوجل" else 15
             for entry in items[:limit]:
-                title = entry.title if feedparser and 'title' in entry else entry.get("title", "")
-                link = entry.link if feedparser and 'link' in entry else entry.get("link", "")
+                # ✅ إصلاح: فحص نوع entry بدل الاعتماد على وجود feedparser فقط
+                if hasattr(entry, 'title'):
+                    title = getattr(entry, 'title', '')
+                    link = getattr(entry, 'link', '')
+                else:
+                    title = entry.get("title", "")
+                    link = entry.get("link", "")
                 if title and link:
                     link = link.replace(" ", "%20")
                     item_source = source_name
@@ -345,12 +360,14 @@ def fetch_egx_beta_news():
         objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
         for heading, content in objects + objects_unescaped:
             if heading and heading != "null":
+                # ✅ إصلاح: استخدام json.loads لفك \uXXXX بأمان بدلاً من unicode_escape
                 try:
-                    heading = heading.encode('utf-8').decode('unicode_escape')
-                except:
+                    heading = json.loads(f'"{ heading }"')
+                except Exception:
                     pass
+                # ✅ إصلاح: إضافة [] للـ tag ليتطابق مع باقي الكود
                 items.append({
-                    "tag": "EGX",
+                    "tag": "[EGX]",
                     "title": heading,
                     "link": "https://beta.egx.com.eg/",
                     "source": "بورصة مصر (Beta)"
@@ -488,7 +505,8 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             parsed = json.loads(raw_text)
             for ticker, analysis in parsed.items():
                 clean = ticker.strip().upper().replace("[", "").replace("]", "")
-                analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis.strip()}"
+                # ✅ إصلاح: str() لتفادي AttributeError إذا أعاد Gemini رقماً
+                analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {str(analysis).strip()}"
             print("Gemini AI Analysis successfully generated for:", list(analyses.keys()))
         else:
             print(f"Gemini returned status {r.status_code}: {r.text}")
@@ -606,6 +624,8 @@ def fetch_egx33_shariah():
 def send_report():
     print(f"[{datetime.now()}] Generating and sending report...")
     if not os.path.exists(STRINGS_PATH):
+        # ✅ إصلاح: إرسال تنبيه Telegram بدلاً من الخروج الصامت
+        reply_telegram("⚠️ <b>خطأ حرجي:</b> ملف strings.json غير موجود في المستودع! لن يُرسَل أي تقرير.")
         print("Strings file missing.")
         return
         
@@ -660,6 +680,9 @@ def send_report():
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
                         news_blocks.append(f"{s['rlm']}{lines[0].strip()}\n{s['rlm']}{s['e_link']} <a href='{lines[1].strip()}'>{s['e_link']} رابط الخبر</a>")
+                    elif len(lines) == 1 and lines[0].strip():
+                        # ✅ إصلاح: عرض الأخبار بسطر واحد (بدون رابط) بدلاً من تجاهلها
+                        news_blocks.append(f"{s['rlm']}📌 {lines[0].strip()}")
 
     news_chunks = []
     current = []
@@ -681,10 +704,11 @@ def send_report():
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
     today = now.strftime("%Y/%m/%d")
-    hour = int(now.strftime("%I"))
+    # ✅ إصلاح: لا نعتمد على %p (يختلف بحسب locale الـ server)
+    hour_12 = now.hour % 12 or 12
     minute = now.strftime("%M")
-    period = s["am"] if now.strftime("%p") == "AM" else s["pm"]
-    time_display = f"{hour:02d}:{minute} {period}"
+    period = s["am"] if now.hour < 12 else s["pm"]
+    time_display = f"{hour_12:02d}:{minute} {period}"
     
     total_minutes = now.hour * 60 + now.minute
     status_text = ""
@@ -754,12 +778,29 @@ def send_report():
     # Send messages
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     
-    try:
-        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_portfolio, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
-        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_watchlist, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
-        requests.post(url, json={"chat_id": CHAT_ID, "text": msg_indices, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
-    except Exception as e:
-        print("Error sending stock report parts:", e)
+    def _send_tg(msg_text, label="message"):
+        """ترسل رسالة Telegram مع فحص status_code لاكتشاف أخطاء HTML المكسور."""
+        try:
+            r = requests.post(url, json={
+                "chat_id": CHAT_ID, "text": msg_text,
+                "parse_mode": "HTML", "disable_web_page_preview": True
+            }, timeout=15)
+            # ✅ إصلاح: كشف أخطاء HTTP 400 (HTML مكسور) بدلاً من تجاهلها
+            if r.status_code != 200:
+                print(f"Telegram {label} error {r.status_code}: {r.text[:300]}")
+                # إعادة المحاولة بدون HTML إذا كانت 400
+                if r.status_code == 400:
+                    requests.post(url, json={
+                        "chat_id": CHAT_ID,
+                        "text": re.sub(r'<[^>]+>', '', msg_text),
+                        "disable_web_page_preview": True
+                    }, timeout=15)
+        except Exception as e:
+            print(f"Error sending Telegram {label}: {e}")
+    
+    _send_tg(msg_portfolio, "portfolio")
+    _send_tg(msg_watchlist, "watchlist")
+    _send_tg(msg_indices, "indices")
         
     if news_chunks:
         for i, chunk in enumerate(news_chunks):
@@ -824,7 +865,7 @@ def poll_telegram_messages():
     if not BOT_TOKEN:
         return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
-    params = {"offset": offset, "timeout": 5}
+    params = {"offset": offset, "timeout": 8}  # ✅ رُفع من 5 إلى 8 ثوانٍ
     try:
         r = requests.get(url, params=params, timeout=10)
         if r.status_code == 200:
@@ -834,6 +875,10 @@ def poll_telegram_messages():
                 msg = update.get("message", {})
                 chat_id = str(msg.get("chat", {}).get("id", ""))
                 if chat_id != CHAT_ID:
+                    continue
+                # ✅ إصلاح: تجاهل الرسائل الأقدم من وقت بدء التشغيل
+                msg_date = msg.get("date", 0)
+                if msg_date < _startup_epoch:
                     continue
                 text = msg.get("text", "").strip()
                 if text:
@@ -881,6 +926,9 @@ def sleep_until_next_15min_mark():
 if __name__ == "__main__":
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
+    # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة
+    import time as _time_module
+    _startup_epoch = int(_time_module.time())
     
     # Check weekday (Egypt stock market runs Sunday to Thursday)
     # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
@@ -893,10 +941,12 @@ if __name__ == "__main__":
         print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Sending immediate report.")
         send_report()
         
-        # Trigger next if market is still open
-        if now.hour < 15 or (now.hour == 15 and now.minute < 30):
+        # ✅ إصلاح: أوقف runner قبل 14:45 فقط (وليس حتى 15:30)
+        if now.hour * 60 + now.minute < 14 * 60 + 45:
             print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
             trigger_next_runner()
+        else:
+            print(f"[{now.strftime('%H:%M:%S')}] Near/past market close. Not chaining next runner.")
         sys.exit(0)
         
     wait_for_market_open()
@@ -913,7 +963,8 @@ if __name__ == "__main__":
             reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
             sys.exit(0)
             
-        if 8 * 60 + 45 <= current_time_minutes <= 15 * 60 + 30:
+        # ✅ إصلاح: البورصة تُغلق 14:30 وليس 15:30
+        if 8 * 60 + 45 <= current_time_minutes <= 14 * 60 + 30:
             send_report()
         else:
             print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
