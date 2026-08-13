@@ -28,7 +28,7 @@ CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_PAT = os.getenv("GH_PAT")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-1.5-pro"
+GEMINI_MODEL = "gemini-2.5-flash"
 
 if not GH_PAT:
     if os.getenv("GITHUB_ACTIONS") == "true":
@@ -300,7 +300,7 @@ def ask_ai(question):
 
     # Fallback to Gemini AI (with model fallback to bypass 503/404 errors)
     if GEMINI_API_KEY:
-        for model_name in ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+        for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
             headers = {"content-type": "application/json"}
             payload = {
@@ -634,7 +634,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     analyses = {}
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
-    for model_name in ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+    for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         body = {
             "contents": [{"parts": [{"text": prompt}]}],
@@ -678,6 +678,10 @@ def fetch_all_data_tv(tickers, strings):
     }
     url = "https://scanner.tradingview.com/egypt/scan"
     tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30", "EGX:EGX70EWI", "EGX:EGX100EWI"]
+    payload = {
+        "symbols": {"tickers": tv_tickers},
+        "columns": ["close", "open", "change", "Recommend.All"]
+    }
     headers = {
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
