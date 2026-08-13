@@ -30,8 +30,11 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GH_PAT:
-    print("FATAL: GH_PAT secret not set. Exiting.")
-    sys.exit(1)
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        print("FATAL: GH_PAT secret not set in GitHub Actions. Exiting.")
+        sys.exit(1)
+    else:
+        print("Warning: GH_PAT not set. Loop chaining and news updates to GitHub will be disabled.")
 
 # ✅ إضافة: فحص BOT_TOKEN وCHAT_ID مبكراً بدل الفشل الصامت لاحقاً
 if not BOT_TOKEN or not CHAT_ID:
@@ -96,9 +99,9 @@ COMPANY_WEBSITES = {
 
 # Stock keywords for news filtering
 STOCK_KEYWORDS = {
-    "TMGH": ["طلعت مصطفى", "طلعت مصطفي", "TMGH"],
+    "TMGH": ["طلعت مصطفى", "TMGH"],
     "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "ADIB"],
-    "EFID": ["إيديتا", "ايديتا", "EFID"],
+    "EFID": ["إيديتا", "ايديتا", "Edita", "EFID"],
     "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
     "FWRY": ["فوري", "FWRY"],
     "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
@@ -703,7 +706,8 @@ def send_report():
     
     # Sort lists
     sorted_port = sorted([k for k in PORTFOLIO if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
-    sorted_watch = sorted([k for k in WATCHLIST if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
+    # ترشيح الأسهم في قائمة المراقبة بحيث لا تظهر الأسهم المستثمر بها (المحفظة) مرتين
+    sorted_watch = sorted([k for k in WATCHLIST if k in parsed_stocks and k not in PORTFOLIO], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     
     # Process and group News (both Live and Manual)
     news_blocks = []
