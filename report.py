@@ -346,6 +346,7 @@ def fetch_rss_news():
             r = requests.get(url, headers=headers, timeout=10, verify=False)
             if r.status_code != 200:
                 continue
+            r.encoding = 'utf-8' # enforce utf-8
                 
             if feedparser:
                 feed = feedparser.parse(r.content)
@@ -408,18 +409,36 @@ def fetch_corporate_websites_news():
     for ticker, url in corporate_urls.items():
         try:
             r = requests.get(url, headers=headers, timeout=10, verify=False)
+            if r.status_code != 200:
+                continue
+            r.encoding = 'utf-8' # enforce utf-8
             html = r.text
             links = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
             found = 0
             for l_url, l_text in links:
                 l_text_clean = re.sub(r'<[^>]+>', '', l_text).strip()
                 l_text_clean = re.sub(r'\s+', ' ', l_text_clean)
+                
+                # ✅ إصلاح: تخطي روابط الأقسام والقوائم الرئيسية لمنع اختطاف التغذية الإخبارية
+                parent_url_clean = url.rstrip('/')
+                full_link = l_url if l_url.startswith("http") else urljoin(url, l_url)
+                full_link_clean = full_link.rstrip('/')
+                
+                if full_link_clean == parent_url_clean or full_link_clean == parent_url_clean + '/ar' or full_link_clean == parent_url_clean + '/en':
+                    continue
+                if l_text_clean in [
+                    "البيانات الصحفية", "البيانات الصحفيه", "Press Releases", "Press Release",
+                    "الأخبار", "الاخبار", "News", "الإفصاحات", "الافصاحات", "Disclosures",
+                    "بيانات صحفية", "بيانات صحفيه", "مجلس الإدارة", "مجلس الادارة", "عن الشركة",
+                    "عن الشركه", "About Us", "الصفحة الرئيسية", "الرئيسية", "Home"
+                ]:
+                    continue
+                    
                 if len(l_text_clean) > 15 and (
                     any(x in l_text_clean for x in ["إفصاح", "بيان", "صحفي", "نتائج", "أرباح", "مجلس", "إدارة", "شراكة", "توقيع", "استحواذ", "تعاون", "افتتاح", "زيادة", "مالية"]) or
                     any(y in l_url.lower() for y in ["press", "release", "news", "disclosure", "pdf"]) or
                     any(z in l_text_clean.lower() for z in ["press", "release", "disclosure", "financial", "result"])
                 ):
-                    full_link = l_url if l_url.startswith("http") else urljoin(url, l_url)
                     results.append({
                         "tag": f"[{ticker}]",
                         "title": l_text_clean,
@@ -446,6 +465,7 @@ def fetch_egx_beta_news():
     items = []
     try:
         r = requests.get(url, headers=headers, timeout=10)
+        r.encoding = 'utf-8' # enforce utf-8
         objects = re.findall(r'\\"headingArabic\\":\\"(.*?)\\".*?\\"contentArabic\\":\\"(.*?)\\"', r.text)
         objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
         for heading, content in objects + objects_unescaped:
@@ -479,8 +499,8 @@ def is_whole_word_match(word, text):
         return False
     word = word.lower().strip()
     text = text.lower()
-    escaped_word = re.escape(word)
-    # ✅ إصلاح: استخدام \W بدلاً من المجموعة السابقة لأن المجموعة السابقة كانت تستبعد علامات الترقيم العربية (مثل الفاصلة ،) مما يؤدي لتجاهل الأخبار
+    # ✅ إصلاح: السماح بمسافات متعددة بين الكلمات في العبارة المفتاحية
+    escaped_word = re.escape(word).replace(r'\ ', r'\s+')
     pattern = r"(?:^|\W)(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|\W)"
     return re.search(pattern, text) is not None
 
@@ -650,12 +670,12 @@ def fetch_all_data_tv(tickers, strings):
     }
     url = "https://scanner.tradingview.com/egypt/scan"
     tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30", "EGX:EGX70EWI", "EGX:EGX100EWI"]
-    payload = {
-        "symbols": {"tickers": tv_tickers},
-        "columns": ["close", "open", "change", "Recommend.All"]
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
     try:
-        r = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=15)
+        r = requests.post(url, json=payload, headers=headers, timeout=15)
         r.raise_for_status()  # رفع استثناء عند أي خطأ HTTP (4xx, 5xx)
         data = r.json()
         for item in data.get("data", []):
@@ -690,11 +710,12 @@ def fetch_forex_gold():
     usdegp = {"close": 0.0, "chgPct": 0.0, "open": 0.0}
     xauusd = {"close": 0.0, "chgPct": 0.0, "open": 0.0}
     
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
         r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
             "symbols": {"tickers": ["FX_IDC:USDEGP"]},
             "columns": ["close", "open", "change"]
-        }, timeout=10)
+        }, headers=headers, timeout=10)
         r_fx.raise_for_status()
         r_fx = r_fx.json()
         for item in r_fx.get("data", []):
@@ -710,7 +731,7 @@ def fetch_forex_gold():
         r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
             "symbols": {"tickers": ["TVC:GOLD"]},
             "columns": ["close", "open", "change"]
-        }, timeout=10)
+        }, headers=headers, timeout=10)
         r_gold.raise_for_status()
         r_gold = r_gold.json()
         for item in r_gold.get("data", []):
@@ -1040,7 +1061,7 @@ def handle_telegram_command(text):
             f"🧠 <b>المحرك الذكي:</b> {GEMINI_MODEL}\n"
             "⚙️ <b>العملية:</b> قيد المراقبة المستمرة لأخبار السوق."
         )
-        reply_telegram(status_msg, "HTML")
+        reply_telegram(status_msg)
         
     else:
         reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
@@ -1112,9 +1133,8 @@ def sleep_until_next_15min_mark():
 if __name__ == "__main__":
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
-    # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة
-    # ✅ إصلاح: استخدام time.time() مباشرة بدون alias هش لـ _time_module
-    _startup_epoch = int(time.time())
+    # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة مع هامش أمان 5 دقائق لتلافي فجوة الانتقال بين الـ runners
+    _startup_epoch = int(time.time()) - 300
     
     # Check weekday (Egypt stock market runs Sunday to Thursday)
     # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
@@ -1172,6 +1192,6 @@ if __name__ == "__main__":
         error_details = traceback.format_exc()
         short_error = error_details[-500:] if len(error_details) > 500 else error_details
         error_msg = f"⚠️ <b>تنبيه من الخادم:</b>\nحدث خطأ برمجي أدى لتوقف البوت:\n<pre>{short_error}</pre>"
-        reply_telegram(error_msg, "HTML")
+        reply_telegram(error_msg)
         print(f"CRITICAL ERROR: {e}")
         sys.exit(1)
