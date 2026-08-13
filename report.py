@@ -982,7 +982,8 @@ def handle_telegram_command(text):
             "📌 <code>/report</code> : لتوليد وإرسال التقرير المالي فوراً.\n"
             "📌 <code>/add_news [الخبر]</code> : لإضافة خبر لقائمة الأخبار وتحديثها على GitHub.\n"
             "📌 <code>/clear_news</code> : لمسح جميع الأخبار اليدوية القديمة.\n"
-            "📌 <code>/ask [سؤالك]</code> : لطرح أي سؤال مالي أو فني على الذكاء الاصطناعي (Claude/Gemini)."
+            "📌 <code>/ask [سؤالك]</code> : لطرح أي سؤال مالي أو فني على الذكاء الاصطناعي (Claude/Gemini).\n"
+            "📌 <code>/status</code> : حالة البوت الحالية."
         )
         reply_telegram(help_msg)
         
@@ -1029,6 +1030,17 @@ def handle_telegram_command(text):
             return
         reply_telegram("🔄 جاري التفكير والتحليل...")
         reply_telegram(ask_ai(question))
+        
+    elif text_lower.startswith("/status"):
+        import time
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        status_msg = (
+            "🟢 <b>حالة البوت: متصل ويعمل بنجاح</b>\n"
+            f"🕒 <b>وقت الخادم (UTC):</b> {current_time}\n"
+            f"🧠 <b>المحرك الذكي:</b> {GEMINI_MODEL}\n"
+            "⚙️ <b>العملية:</b> قيد المراقبة المستمرة لأخبار السوق."
+        )
+        reply_telegram(status_msg, "HTML")
         
     else:
         reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
@@ -1125,31 +1137,41 @@ if __name__ == "__main__":
         
     wait_for_market_open()
     
+    import sys
     TOTAL_CYCLES = 15
-    for i in range(TOTAL_CYCLES):
-        loop_now = datetime.now(egypt_tz)
-        print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
-        
-        current_time_minutes = loop_now.hour * 60 + loop_now.minute
-        # ✅ إصلاح: مزامنة حد الخروج مع حد الإرسال (14:30 وليس 15:30)
-        if current_time_minutes > 14 * 60 + 30:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Sending final closing report.")
-            send_report()
-            reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
-            sys.exit(0)
+    try:
+        for i in range(TOTAL_CYCLES):
+            loop_now = datetime.now(egypt_tz)
+            print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
             
-        # ✅ إصلاح: البورصة تُغلق 14:30 وليس 15:30
-        if 8 * 60 + 45 <= current_time_minutes <= 14 * 60 + 30:
-            send_report()
-        else:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
-            
-        if i == TOTAL_CYCLES - 1:
-            # ✅ إصلاح: إطلاق المشغل الجديد في نهاية الدورة الأخيرة فقط لمنع تشغيل نسختين في وقت واحد وتكرار الرسائل
-            if loop_now.hour * 60 + loop_now.minute < 15 * 60:
-                trigger_next_runner()
-            else:
-                print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later. Stopping chain.")
+            current_time_minutes = loop_now.hour * 60 + loop_now.minute
+            # ✅ إصلاح: مزامنة حد الخروج مع حد الإرسال (14:30 وليس 15:30)
+            if current_time_minutes > 14 * 60 + 30:
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Sending final closing report.")
+                send_report()
+                reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
+                sys.exit(0)
                 
-        if i < TOTAL_CYCLES - 1:
-            sleep_until_next_15min_mark()
+            # ✅ إصلاح: البورصة تُغلق 14:30 وليس 15:30
+            if 8 * 60 + 45 <= current_time_minutes <= 14 * 60 + 30:
+                send_report()
+            else:
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
+                
+            if i == TOTAL_CYCLES - 1:
+                # ✅ إصلاح: إطلاق المشغل الجديد في نهاية الدورة الأخيرة فقط لمنع تشغيل نسختين في وقت واحد وتكرار الرسائل
+                if loop_now.hour * 60 + loop_now.minute < 15 * 60:
+                    trigger_next_runner()
+                else:
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later. Stopping chain.")
+                    
+            if i < TOTAL_CYCLES - 1:
+                sleep_until_next_15min_mark()
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        short_error = error_details[-500:] if len(error_details) > 500 else error_details
+        error_msg = f"⚠️ <b>تنبيه من الخادم:</b>\nحدث خطأ برمجي أدى لتوقف البوت:\n<pre>{short_error}</pre>"
+        reply_telegram(error_msg, "HTML")
+        print(f"CRITICAL ERROR: {e}")
+        sys.exit(1)
