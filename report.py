@@ -22,13 +22,16 @@ except ImportError:
     feedparser = None
     print("Warning: feedparser is not installed globally.")
 
-# Environment secrets and fallbacks
+# Environment secrets — all loaded from GitHub Secrets (no hardcoded fallbacks)
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-env_pat = os.getenv("GH_PAT")
-GH_PAT = env_pat if env_pat else "ghp_5P9P4zw" + "PIPoG7ygM9xtuYAYkEvNR4n3eaFrg"
+GH_PAT = os.getenv("GH_PAT")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GH_PAT:
+    print("FATAL: GH_PAT secret not set. Exiting.")
+    sys.exit(1)
 
 # Configuration paths
 STRINGS_PATH = "strings.json"
@@ -204,9 +207,9 @@ def ask_ai(question):
         except Exception as e:
             print("Claude API error:", e)
 
-    # Fallback to Gemini 3.5 Flash
+    # Fallback to Gemini Flash
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}"
         headers = {"content-type": "application/json"}
         payload = {
             "contents": [{"parts": [{"text": question}]}]
@@ -306,7 +309,7 @@ def fetch_corporate_websites_news():
     results = []
     for ticker, url in corporate_urls.items():
         try:
-            r = requests.get(url, headers=headers, timeout=5, verify=False)
+            r = requests.get(url, headers=headers, timeout=10, verify=False)
             html = r.text
             links = re.findall(r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, re.IGNORECASE | re.DOTALL)
             found = 0
@@ -439,7 +442,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         tag = f"[{k}]"
         if tag in grouped_news:
             target_tags.append(tag)
-    target_tags = target_tags[:10]
+    target_tags = target_tags[:15]  # زيادة الحد من 10 إلى 15 سهماً
     
     if not target_tags:
         return {}
@@ -462,7 +465,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             prompt += f"- {item['title']} (المصدر: {item['source']})\n"
         prompt += "\n"
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}"
     body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -504,19 +507,21 @@ def fetch_all_data_tv(tickers, strings):
     tv_tickers = [f"EGX:{t}" for t in tickers] + ["EGX:EGX30", "EGX:EGX70EWI", "EGX:EGX100EWI"]
     payload = {
         "symbols": {"tickers": tv_tickers},
-        "columns": ["close", "open", "Recommend.All"]
+        "columns": ["close", "open", "Perf.D", "Recommend.All"]  # Perf.D = التغيير اليومي الصحيح
     }
     try:
         r = requests.post(url, json=payload, headers={"Content-Type": "application/json"}, timeout=15)
+        r.raise_for_status()  # رفع استثناء عند أي خطأ HTTP (4xx, 5xx)
         data = r.json()
         for item in data.get("data", []):
             sym = item["s"].replace("EGX:", "")
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            rec_val = item["d"][2]
+            perf_d = item["d"][2]   # نسبة التغيير اليومي الصحيحة من TradingView
+            rec_val = item["d"][3]
             
-            # Calculate percentage change based on open price
-            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            # استخدام Perf.D مباشرة (نسبة التغيير من إغلاق أمس)
+            chg = safe_round(perf_d) if perf_d is not None else 0.0
             
             rec_str = ""
             if rec_val is not None:
@@ -525,7 +530,6 @@ def fetch_all_data_tv(tickers, strings):
                 elif rec_val <= -0.5: rec_str = f"📉 {strings['strong_sell']}"
                 elif rec_val <= -0.1: rec_str = f"🔻 {strings['sell']}"
                 else: rec_str = "⏸️ محايد"
-                
             if sym in indices:
                 indices[sym] = {"close": c, "open": o, "chgPct": chg}
             else:
@@ -544,12 +548,15 @@ def fetch_forex_gold():
     try:
         r_fx = requests.post("https://scanner.tradingview.com/forex/scan", json={
             "symbols": {"tickers": ["FX_IDC:USDEGP"]},
-            "columns": ["close", "open"]
-        }, timeout=10).json()
+            "columns": ["close", "open", "Perf.D"]
+        }, timeout=10)
+        r_fx.raise_for_status()
+        r_fx = r_fx.json()
         for item in r_fx.get("data", []):
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            perf_d = item["d"][2]
+            chg = safe_round(perf_d) if perf_d is not None else (round(((c - o) / o) * 100, 2) if o > 0 else 0.0)
             usdegp = {"close": c, "chgPct": chg, "open": o}
     except Exception as e:
         print("Error fetching FX:", e)
@@ -557,12 +564,15 @@ def fetch_forex_gold():
     try:
         r_gold = requests.post("https://scanner.tradingview.com/cfd/scan", json={
             "symbols": {"tickers": ["TVC:GOLD"]},
-            "columns": ["close", "open"]
-        }, timeout=10).json()
+            "columns": ["close", "open", "Perf.D"]
+        }, timeout=10)
+        r_gold.raise_for_status()
+        r_gold = r_gold.json()
         for item in r_gold.get("data", []):
             c = safe_round(item["d"][0])
             o = safe_round(item["d"][1])
-            chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
+            perf_d = item["d"][2]
+            chg = safe_round(perf_d) if perf_d is not None else (round(((c - o) / o) * 100, 2) if o > 0 else 0.0)
             xauusd = {"close": c, "chgPct": chg, "open": o}
     except Exception as e:
         print("Error fetching Gold:", e)
@@ -588,6 +598,7 @@ def fetch_egx33_shariah():
             print(f"EGX33 Shariah fetched: close={c}, open={o}, chg={chg}%")
         else:
             print("EGX33 Shariah: Could not parse price data from TradingView page.")
+            reply_telegram("⚠️ <b>تنبيه:</b> فشل جلب بيانات مؤشر EGX33 الشريعة. قد يكون هيكل صفحة TradingView تغيّر.")
     except Exception as e:
         print(f"Error fetching EGX33 Shariah: {e}")
     return shariah
@@ -655,7 +666,7 @@ def send_report():
     length = 0
     for block in news_blocks:
         b_len = len(block) + 2
-        if length + b_len > 3500:
+        if length + b_len > 3800:  # زيادة الحد من 3500 إلى 3800 (Telegram يدعم 4096)
             if current:
                 news_chunks.append("\n\n".join(current))
             current = [block]
@@ -680,11 +691,11 @@ def send_report():
     port_header = s.get('portfolio_title', 'أسهم مستثمر بها')
     watch_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
     
-    if total_minutes < 10 * 60:
-        status_text = "⚠️ <b>السوق مغلق حالياً (يفتح 10:00 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
+    if total_minutes < 8 * 60 + 45:
+        status_text = "⚠️ <b>السوق لم يفتح بعد (يفتح 08:45 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
         port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
         watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
-    elif 10 * 60 <= total_minutes <= 14 * 60 + 30:
+    elif 8 * 60 + 45 <= total_minutes <= 15 * 60 + 30:
         port_header = f"💼 {port_header} (حركة لحظية)"
         watch_header = f"📋 {watch_header} (حركة لحظية)"
     else:
@@ -908,7 +919,8 @@ if __name__ == "__main__":
             print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
             
         if i == TOTAL_CYCLES - 2:
-            if loop_now.hour < 15:
+            # إطلاق runner جديد فقط إذا كان الوقت قبل 3:00 م (15:00)
+            if loop_now.hour * 60 + loop_now.minute < 15 * 60:
                 trigger_next_runner()
             else:
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later. Stopping chain.")
