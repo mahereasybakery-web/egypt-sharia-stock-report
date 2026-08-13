@@ -33,6 +33,11 @@ if not GH_PAT:
     print("FATAL: GH_PAT secret not set. Exiting.")
     sys.exit(1)
 
+# ✅ إضافة: فحص BOT_TOKEN وCHAT_ID مبكراً بدل الفشل الصامت لاحقاً
+if not BOT_TOKEN or not CHAT_ID:
+    print("FATAL: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set. Exiting.")
+    sys.exit(1)
+
 # Configuration paths
 STRINGS_PATH = "strings.json"
 NEWS_PATH = "news.txt"
@@ -109,7 +114,7 @@ STOCK_KEYWORDS = {
     "ISPH": ["ابن سينا", "ISPH"],
     "JUFO": ["جهينة", "جهينه", "JUFO"],
     "AMOC": ["أموك", "اموك", "الأسكندرية للزيوت المعدنية", "AMOC"],
-    "MASR": ["مدينة مصر", "مدينة نصر", "MASR"],
+    "MASR": ["مدينة مصر", "ماديناتي", "MASR"],  # حذف 'مدينة نصر' لتجنب false positives
     "ORWE": ["النساجون الشرقيون", "النساجون", "ORWE"],
     "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
     "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
@@ -137,6 +142,7 @@ def safe_round(val, decimals=2):
         return 0.0
 
 def reply_telegram(text):
+    """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400."""
     if not BOT_TOKEN or not CHAT_ID:
         return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -147,7 +153,16 @@ def reply_telegram(text):
         "disable_web_page_preview": True
     }
     try:
-        requests.post(url, json=payload, timeout=10)
+        r = requests.post(url, json=payload, timeout=10)
+        # ✅ إصلاح: فحص status_code وإعادة محاولة بدون HTML عند 400
+        if r.status_code == 400:
+            requests.post(url, json={
+                "chat_id": CHAT_ID,
+                "text": re.sub(r'<[^>]+>', '', text),
+                "disable_web_page_preview": True
+            }, timeout=10)
+        elif r.status_code != 200:
+            print(f"Telegram reply error {r.status_code}: {r.text[:200]}")
     except Exception as e:
         print("Error sending telegram message:", e)
 
@@ -360,9 +375,9 @@ def fetch_egx_beta_news():
         objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
         for heading, content in objects + objects_unescaped:
             if heading and heading != "null":
-                # ✅ إصلاح: استخدام json.loads لفك \uXXXX بأمان بدلاً من unicode_escape
+                # ✅ إصلاح: json.loads بدون مسافات زائدة
                 try:
-                    heading = json.loads(f'"{ heading }"')
+                    heading = json.loads(f'"{heading}"')
                 except Exception:
                     pass
                 # ✅ إصلاح: إضافة [] للـ tag ليتطابق مع باقي الكود
@@ -411,7 +426,13 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         print("Error getting corporate news:", e)
         
     all_news = fetch_rss_news()
-    all_news.extend(fetch_egx_beta_news())
+    
+    # ✅ إصلاح: EGX Beta تُضاف مباشرة لـ filtered للحفاظ على tag=[EGX] بدل تجاهله
+    egx_beta_items = fetch_egx_beta_news()
+    for item in egx_beta_items:
+        if item["link"] not in seen_links:
+            seen_links.add(item["link"])
+            filtered.append(item)
     
     for item in all_news:
         title = item["title"]
@@ -719,11 +740,11 @@ def send_report():
         status_text = "⚠️ <b>السوق لم يفتح بعد (يفتح 08:45 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
         port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
         watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
-    elif 8 * 60 + 45 <= total_minutes <= 15 * 60 + 30:
+    elif 8 * 60 + 45 <= total_minutes <= 14 * 60 + 30:  # ✅ إصلاح: السوق يُغلق 14:30
         port_header = f"💼 {port_header} (حركة لحظية)"
         watch_header = f"📋 {watch_header} (حركة لحظية)"
     else:
-        status_text = "🔒 <b>انتهت جلسة تداول اليوم (السوق مغلق)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
+        status_text = "🔒 <b>انتهت جلسة تداول اليوم (إغلاق 14:30)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
         port_header = f"📈 {port_header} (إغلاق جلسة اليوم)"
         watch_header = f"📈 {watch_header} (إغلاق جلسة اليوم)"
         
@@ -806,10 +827,8 @@ def send_report():
         for i, chunk in enumerate(news_chunks):
             if i == 0:
                 chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
-            try:
-                requests.post(url, json={"chat_id": CHAT_ID, "text": chunk, "parse_mode": "HTML", "disable_web_page_preview": True}, timeout=15)
-            except Exception as e:
-                print(f"Error sending news chunk {i+1}:", e)
+            # ✅ إصلاح: استخدام _send_tg بدل requests.post مباشرة
+            _send_tg(chunk, f"news chunk {i+1}")
 
 def handle_telegram_command(text):
     text_lower = text.lower()
@@ -927,8 +946,8 @@ if __name__ == "__main__":
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
     # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة
-    import time as _time_module
-    _startup_epoch = int(_time_module.time())
+    # ✅ إصلاح: استخدام time.time() مباشرة بدون alias هش لـ _time_module
+    _startup_epoch = int(time.time())
     
     # Check weekday (Egypt stock market runs Sunday to Thursday)
     # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
@@ -957,8 +976,9 @@ if __name__ == "__main__":
         print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
         
         current_time_minutes = loop_now.hour * 60 + loop_now.minute
-        if current_time_minutes > 15 * 60 + 30:
-            print(f"[{loop_now.strftime('%H:%M:%S')}] Past 3:30 PM. Sending closing report.")
+        # ✅ إصلاح: مزامنة حد الخروج مع حد الإرسال (14:30 وليس 15:30)
+        if current_time_minutes > 14 * 60 + 30:
+            print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Sending final closing report.")
             send_report()
             reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
             sys.exit(0)
