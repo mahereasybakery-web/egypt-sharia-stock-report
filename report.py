@@ -705,10 +705,50 @@ def send_report():
     sorted_port = sorted([k for k in PORTFOLIO if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     sorted_watch = sorted([k for k in WATCHLIST if k in parsed_stocks], key=lambda x: parsed_stocks[x]["chgPct"], reverse=True)
     
-    # Process News
+    # Process and group News (both Live and Manual)
     news_blocks = []
+    live_news = []
+    
+    # 1. Fetch live news from corporate sites and RSS feeds
     try:
         live_news = get_filtered_market_news(PORTFOLIO, WATCHLIST)
+    except Exception as e:
+        print("Error fetching live news:", e)
+        
+    # 2. Load manual news and classify under stock tags to group them with live news
+    if os.path.exists(NEWS_PATH):
+        try:
+            with open(NEWS_PATH, "r", encoding="utf-8") as nf:
+                content = nf.read().strip()
+                if content:
+                    for block in content.split("\n\n"):
+                        lines = block.strip().split("\n")
+                        if lines and lines[0].strip():
+                            title = lines[0].strip()
+                            link = lines[1].strip() if len(lines) >= 2 else "https://github.com/mahereasybakery-web/egypt-sharia-stock-report"
+                            
+                            # Match manual news to stock keywords
+                            matched_stock = None
+                            for ticker, keywords in STOCK_KEYWORDS.items():
+                                for kw in keywords:
+                                    if is_whole_word_match(kw, title):
+                                        matched_stock = ticker
+                                        break
+                                if matched_stock:
+                                    break
+                                    
+                            tag = f"[{matched_stock}]" if matched_stock else "[عام]"
+                            live_news.append({
+                                "tag": tag,
+                                "title": title,
+                                "link": link,
+                                "source": "تحديث خاص"
+                            })
+        except Exception as e:
+            print("Error loading manual news:", e)
+            
+    # 3. Group and analyze news blocks
+    try:
         grouped = {}
         for item in live_news:
             grouped.setdefault(item["tag"], []).append(item)
@@ -731,22 +771,7 @@ def send_report():
                 block += f"{s['rlm']}{ai_analyses[tag]}\n"
             news_blocks.append(block.strip())
     except Exception as e:
-        print("Error fetching news:", e)
-        
-    # ✅ إصلاح: دمج الأخبار المضافة يدوياً دائماً وعرضها في مقدمة قسم الأخبار
-    manual_news = []
-    if os.path.exists(NEWS_PATH):
-        with open(NEWS_PATH, "r", encoding="utf-8") as nf:
-            content = nf.read().strip()
-            if content:
-                for block in content.split("\n\n"):
-                    lines = block.strip().split("\n")
-                    if len(lines) >= 2:
-                        manual_news.append(f"{s['rlm']}📌 {lines[0].strip()}\n{s['rlm']}{s['e_link']} <a href='{lines[1].strip()}'>{s['e_link']} رابط الخبر</a>")
-                    elif len(lines) == 1 and lines[0].strip():
-                        manual_news.append(f"{s['rlm']}📌 {lines[0].strip()}")
-                        
-    news_blocks = manual_news + news_blocks
+        print("Error grouping and analyzing news:", e)
 
     news_chunks = []
     current = []
