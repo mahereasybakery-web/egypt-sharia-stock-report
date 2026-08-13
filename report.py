@@ -142,9 +142,27 @@ def safe_round(val, decimals=2):
         return 0.0
 
 def reply_telegram(text):
-    """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400."""
+    """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400، ودعم تقسيم الرسائل الطويلة."""
     if not BOT_TOKEN or not CHAT_ID:
         return
+    
+    # تقسيم الرسائل التي تتعدى 3800 حرف تلقائياً لضمان عدم تعطل الإرسال
+    if len(text) > 3800:
+        lines = text.split("\n")
+        chunk = []
+        chunk_len = 0
+        for line in lines:
+            if chunk_len + len(line) + 1 > 3800:
+                reply_telegram("\n".join(chunk))
+                chunk = [line]
+                chunk_len = len(line)
+            else:
+                chunk.append(line)
+                chunk_len += len(line) + 1
+        if chunk:
+            reply_telegram("\n".join(chunk))
+        return
+
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": CHAT_ID,
@@ -153,14 +171,14 @@ def reply_telegram(text):
         "disable_web_page_preview": True
     }
     try:
-        r = requests.post(url, json=payload, timeout=10)
-        # ✅ إصلاح: فحص status_code وإعادة محاولة بدون HTML عند 400
+        r = requests.post(url, json=payload, timeout=15)
         if r.status_code == 400:
+            # محاولة الإرسال بدون HTML في حال وجود وسوم مكسورة
             requests.post(url, json={
                 "chat_id": CHAT_ID,
                 "text": re.sub(r'<[^>]+>', '', text),
                 "disable_web_page_preview": True
-            }, timeout=10)
+            }, timeout=15)
         elif r.status_code != 200:
             print(f"Telegram reply error {r.status_code}: {r.text[:200]}")
     except Exception as e:
@@ -365,6 +383,13 @@ def fetch_corporate_websites_news():
             print(f"Skipping corporate site {ticker}: {e}")
     return results
 
+def decode_unicode_escapes(s):
+    """فك تسلسلات Unicode بأمان تام ودون حساسية للأقواس أو علامات الاقتباس."""
+    try:
+        return re.sub(r'\\u([0-9a-fA-F]{4})', lambda m: chr(int(m.group(1), 16)), s)
+    except Exception:
+        return s
+
 def fetch_egx_beta_news():
     url = "https://beta.egx.com.eg/"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -375,15 +400,11 @@ def fetch_egx_beta_news():
         objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
         for heading, content in objects + objects_unescaped:
             if heading and heading != "null":
-                # ✅ إصلاح: json.loads بدون مسافات زائدة
-                try:
-                    heading = json.loads(f'"{heading}"')
-                except Exception:
-                    pass
-                # ✅ إصلاح: إضافة [] للـ tag ليتطابق مع باقي الكود
+                # ✅ إصلاح: فك Unicode escapes بأمان تام وحذف backslashes الزائدة
+                heading = decode_unicode_escapes(heading).replace('\\"', '"').replace('\\\\', '\\')
                 items.append({
                     "tag": "[EGX]",
-                    "title": heading,
+                    "title": heading.strip(),
                     "link": "https://beta.egx.com.eg/",
                     "source": "بورصة مصر (Beta)"
                 })
@@ -400,14 +421,15 @@ def fetch_egx_beta_news():
     return unique
 
 def is_whole_word_match(word, text):
+    """مطابقة الكلمات المفتاحية بشكل دقيق مع دعم السوابق العربية وتجنب التداخلات مثل (فوري vs فورية)."""
     if not word or not text:
         return False
     word = word.lower().strip()
     text = text.lower()
-    if word == "وي":
-        pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?وي(?:$|[^\w\u0600-\u06FF])"
-        return re.search(pattern, text) is not None
-    return word in text
+    escaped_word = re.escape(word)
+    # مطابقة حدود الكلمة مع مراعاة السوابق العربية (الـ، بالـ، فالـ، والـ...)
+    pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|[^\w\u0600-\u06FF])"
+    return re.search(pattern, text) is not None
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
@@ -427,11 +449,25 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         
     all_news = fetch_rss_news()
     
-    # ✅ إصلاح: EGX Beta تُضاف مباشرة لـ filtered للحفاظ على tag=[EGX] بدل تجاهله
+    # ✅ إصلاح: فلترة وتصنيف أخبار EGX Beta وربطها بالأسهم إذا تطابقت مع STOCK_KEYWORDS
     egx_beta_items = fetch_egx_beta_news()
     for item in egx_beta_items:
         if item["link"] not in seen_links:
             seen_links.add(item["link"])
+            
+            matched_stock = None
+            for ticker, keywords in STOCK_KEYWORDS.items():
+                if ticker not in portfolio_list and ticker not in watchlist_list:
+                    continue
+                for kw in keywords:
+                    if is_whole_word_match(kw, item["title"]):
+                        matched_stock = ticker
+                        break
+                if matched_stock:
+                    break
+            
+            if matched_stock:
+                item["tag"] = f"[{matched_stock}]"
             filtered.append(item)
     
     for item in all_news:
@@ -636,8 +672,8 @@ def fetch_egx33_shariah():
             shariah = {"close": c, "open": o, "chgPct": chg}
             print(f"EGX33 Shariah fetched: close={c}, open={o}, chg={chg}%")
         else:
-            print("EGX33 Shariah: Could not parse price data from TradingView page.")
-            reply_telegram("⚠️ <b>تنبيه:</b> فشل جلب بيانات مؤشر EGX33 الشريعة. قد يكون هيكل صفحة TradingView تغيّر.")
+            # ✅ إصلاح: إزالة التنبيه المتكرر لـ Telegram لتجنب إزعاج المستخدم كل 15 دقيقة
+            print("EGX33 Shariah: Could not parse price data from TradingView page. (Scraping fail)")
     except Exception as e:
         print(f"Error fetching EGX33 Shariah: {e}")
     return shariah
@@ -693,17 +729,20 @@ def send_report():
     except Exception as e:
         print("Error fetching news:", e)
         
-    if not news_blocks and os.path.exists(NEWS_PATH):
+    # ✅ إصلاح: دمج الأخبار المضافة يدوياً دائماً وعرضها في مقدمة قسم الأخبار
+    manual_news = []
+    if os.path.exists(NEWS_PATH):
         with open(NEWS_PATH, "r", encoding="utf-8") as nf:
             content = nf.read().strip()
             if content:
                 for block in content.split("\n\n"):
                     lines = block.strip().split("\n")
                     if len(lines) >= 2:
-                        news_blocks.append(f"{s['rlm']}{lines[0].strip()}\n{s['rlm']}{s['e_link']} <a href='{lines[1].strip()}'>{s['e_link']} رابط الخبر</a>")
+                        manual_news.append(f"{s['rlm']}📌 {lines[0].strip()}\n{s['rlm']}{s['e_link']} <a href='{lines[1].strip()}'>{s['e_link']} رابط الخبر</a>")
                     elif len(lines) == 1 and lines[0].strip():
-                        # ✅ إصلاح: عرض الأخبار بسطر واحد (بدون رابط) بدلاً من تجاهلها
-                        news_blocks.append(f"{s['rlm']}📌 {lines[0].strip()}")
+                        manual_news.append(f"{s['rlm']}📌 {lines[0].strip()}")
+                        
+    news_blocks = manual_news + news_blocks
 
     news_chunks = []
     current = []
@@ -796,39 +835,16 @@ def send_report():
     msg_indices += f"{s['rlm']}{dir_e(usdegp['chgPct'])} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({fmt_chg(usdegp['chgPct'])})\n"
     msg_indices += f"{s['rlm']}{dir_e(xauusd['chgPct'])} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({fmt_chg(xauusd['chgPct'])})\n"
     
-    # Send messages
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    
-    def _send_tg(msg_text, label="message"):
-        """ترسل رسالة Telegram مع فحص status_code لاكتشاف أخطاء HTML المكسور."""
-        try:
-            r = requests.post(url, json={
-                "chat_id": CHAT_ID, "text": msg_text,
-                "parse_mode": "HTML", "disable_web_page_preview": True
-            }, timeout=15)
-            # ✅ إصلاح: كشف أخطاء HTTP 400 (HTML مكسور) بدلاً من تجاهلها
-            if r.status_code != 200:
-                print(f"Telegram {label} error {r.status_code}: {r.text[:300]}")
-                # إعادة المحاولة بدون HTML إذا كانت 400
-                if r.status_code == 400:
-                    requests.post(url, json={
-                        "chat_id": CHAT_ID,
-                        "text": re.sub(r'<[^>]+>', '', msg_text),
-                        "disable_web_page_preview": True
-                    }, timeout=15)
-        except Exception as e:
-            print(f"Error sending Telegram {label}: {e}")
-    
-    _send_tg(msg_portfolio, "portfolio")
-    _send_tg(msg_watchlist, "watchlist")
-    _send_tg(msg_indices, "indices")
+    # ✅ إصلاح: استخدام دالة reply_telegram الموحدة والمؤمنة ضد الطول الزائد والمشاكل البرمجية
+    reply_telegram(msg_portfolio)
+    reply_telegram(msg_watchlist)
+    reply_telegram(msg_indices)
         
     if news_chunks:
         for i, chunk in enumerate(news_chunks):
             if i == 0:
                 chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
-            # ✅ إصلاح: استخدام _send_tg بدل requests.post مباشرة
-            _send_tg(chunk, f"news chunk {i+1}")
+            reply_telegram(chunk)
 
 def handle_telegram_command(text):
     text_lower = text.lower()
