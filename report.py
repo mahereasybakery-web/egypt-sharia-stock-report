@@ -250,21 +250,23 @@ def ask_ai(question):
         except Exception as e:
             print("Claude API error:", e)
 
-    # Fallback to Gemini Flash
+    # Fallback to Gemini Flash (with model fallback to bypass 503/404 errors)
     if GEMINI_API_KEY:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
-        headers = {"content-type": "application/json"}
-        payload = {
-            "contents": [{"parts": [{"text": question}]}]
-        }
-        try:
-            r = requests.post(url, headers=headers, json=payload, timeout=30)
-            if r.status_code == 200:
-                return r.json()["candidates"][0]["content"]["parts"][0]["text"]
-            else:
-                return f"خطأ من خوادم Gemini (رمز الخطأ {r.status_code}):\n<code>{r.text}</code>"
-        except Exception as e:
-            return f"فشل الاتصال بخدمة Gemini: {str(e)}"
+        for model_name in ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+            headers = {"content-type": "application/json"}
+            payload = {
+                "contents": [{"parts": [{"text": question}]}]
+            }
+            try:
+                r = requests.post(url, headers=headers, json=payload, timeout=30)
+                if r.status_code == 200:
+                    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                else:
+                    print(f"Gemini {model_name} ask_ai returned status {r.status_code}")
+            except Exception as e:
+                print(f"Gemini {model_name} ask_ai error: {e}")
+        return "عذراً، خوادم الذكاء الاصطناعي لـ Gemini تواجه ضغطاً حالياً. يرجى المحاولة لاحقاً."
             
     return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي."
 
@@ -539,36 +541,38 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             prompt += f"- {item['title']} (المصدر: {item['source']})\n"
         prompt += "\n"
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={GEMINI_API_KEY}"
-    body = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "responseMimeType": "application/json",
-            "temperature": 0.2
-        }
-    }
-    
     analyses = {}
-    try:
-        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=45)
-        if r.status_code == 200:
-            res_json = r.json()
-            raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
-            if raw_text.startswith("```"):
-                lines = raw_text.splitlines()
-                if lines[0].startswith("```"): lines = lines[1:]
-                if lines[-1].startswith("```"): lines = lines[:-1]
-                raw_text = "\n".join(lines).strip()
-            parsed = json.loads(raw_text)
-            for ticker, analysis in parsed.items():
-                clean = ticker.strip().upper().replace("[", "").replace("]", "")
-                # ✅ إصلاح: str() لتفادي AttributeError إذا أعاد Gemini رقماً
-                analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {str(analysis).strip()}"
-            print("Gemini AI Analysis successfully generated for:", list(analyses.keys()))
-        else:
-            print(f"Gemini returned status {r.status_code}: {r.text}")
-    except Exception as e:
-        print("Error in Gemini batch AI news analysis:", e)
+    # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
+    for model_name in ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+        body = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "temperature": 0.2
+            }
+        }
+        try:
+            r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=45)
+            if r.status_code == 200:
+                res_json = r.json()
+                raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if raw_text.startswith("```"):
+                    lines = raw_text.splitlines()
+                    if lines[0].startswith("```"): lines = lines[1:]
+                    if lines[-1].startswith("```"): lines = lines[:-1]
+                    raw_text = "\n".join(lines).strip()
+                parsed = json.loads(raw_text)
+                for ticker, analysis in parsed.items():
+                    clean = ticker.strip().upper().replace("[", "").replace("]", "")
+                    analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {str(analysis).strip()}"
+                print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
+                break
+            else:
+                print(f"Gemini {model_name} returned status {r.status_code}: {r.text[:300]}")
+        except Exception as e:
+            print(f"Error in Gemini {model_name} batch AI news analysis: {e}")
+            
     return analyses
 
 def fetch_all_data_tv(tickers, strings):
