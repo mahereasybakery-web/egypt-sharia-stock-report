@@ -7,7 +7,7 @@ import re
 import urllib.parse
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
-# concurrent.futures removed — not used in this codebase
+import hashlib
 import urllib3
 from datetime import datetime, timezone, timedelta
 import requests
@@ -140,6 +140,8 @@ def safe_round(val, decimals=2):
     if val is None:
         return 0.0
     try:
+        if isinstance(val, str):
+            val = val.replace(",", "")
         return round(float(val), decimals)
     except (ValueError, TypeError):
         return 0.0
@@ -232,6 +234,43 @@ def update_github_news(new_content):
         print(f"Error updating news.txt on GitHub: {e}")
         return False
 
+def get_github_state():
+    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/state.json"
+    headers = {
+        "Authorization": f"Bearer {GH_PAT}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "TelegramBot"
+    }
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code == 200:
+            content = base64.b64decode(r.json()["content"]).decode("utf-8")
+            return json.loads(content), r.json().get("sha", "")
+    except Exception as e:
+        print(f"Error loading state.json: {e}")
+    return {"sent_links": [], "date": ""}, ""
+
+def update_github_state(state_data, sha):
+    url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/state.json"
+    headers = {
+        "Authorization": f"Bearer {GH_PAT}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "TelegramBot"
+    }
+    content_b64 = base64.b64encode(json.dumps(state_data).encode("utf-8")).decode("utf-8")
+    payload = {
+        "message": "Update state.json",
+        "content": content_b64
+    }
+    if sha:
+        payload["sha"] = sha
+    try:
+        r = requests.put(url, headers=headers, json=payload, timeout=10)
+        return r.status_code in [200, 201]
+    except Exception as e:
+        print(f"Error updating state.json: {e}")
+        return False
+
 def ask_ai(question):
     # Try Claude first
     if CLAUDE_API_KEY:
@@ -253,9 +292,9 @@ def ask_ai(question):
         except Exception as e:
             print("Claude API error:", e)
 
-    # Fallback to Gemini Flash (with model fallback to bypass 503/404 errors)
+    # Fallback to Gemini AI (with model fallback to bypass 503/404 errors)
     if GEMINI_API_KEY:
-        for model_name in ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+        for model_name in ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
             headers = {"content-type": "application/json"}
             payload = {
@@ -264,7 +303,13 @@ def ask_ai(question):
             try:
                 r = requests.post(url, headers=headers, json=payload, timeout=30)
                 if r.status_code == 200:
-                    return r.json()["candidates"][0]["content"]["parts"][0]["text"]
+                    res_json = r.json()
+                    candidates = res_json.get("candidates", [])
+                    if candidates and "content" in candidates[0] and candidates[0]["content"].get("parts"):
+                        return candidates[0]["content"]["parts"][0]["text"]
+                    else:
+                        print(f"Gemini {model_name} response blocked or empty in ask_ai. Response: {res_json}")
+                        continue
                 else:
                     print(f"Gemini {model_name} ask_ai returned status {r.status_code}")
             except Exception as e:
@@ -422,6 +467,9 @@ def fetch_egx_beta_news():
         uid = f"{item['tag']}_{item['title']}"
         if uid not in seen:
             seen.add(uid)
+            # ✅ إصلاح: توليد رابط فريد وهمي ومستقر لمنع خوارزمية الفلترة من حذف الأخبار المتعددة بسبب تطابق الرابط، ولمنع التكرار عبر الـ runners
+            stable_hash = hashlib.md5(uid.encode("utf-8")).hexdigest()[:10]
+            item["link"] = f"https://beta.egx.com.eg/?news={stable_hash}"
             unique.append(item)
     return unique
 
@@ -432,8 +480,8 @@ def is_whole_word_match(word, text):
     word = word.lower().strip()
     text = text.lower()
     escaped_word = re.escape(word)
-    # مطابقة حدود الكلمة مع مراعاة السوابق العربية (الـ، بالـ، فالـ، والـ...)
-    pattern = r"(?:^|[^\w\u0600-\u06FF])(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|[^\w\u0600-\u06FF])"
+    # ✅ إصلاح: استخدام \W بدلاً من المجموعة السابقة لأن المجموعة السابقة كانت تستبعد علامات الترقيم العربية (مثل الفاصلة ،) مما يؤدي لتجاهل الأخبار
+    pattern = r"(?:^|\W)(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|\W)"
     return re.search(pattern, text) is not None
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
@@ -471,9 +519,19 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
                 if matched_stock:
                     break
             
-            if matched_stock:
-                item["tag"] = f"[{matched_stock}]"
-            filtered.append(item)
+            is_market = False
+            if not matched_stock:
+                for mkw in ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]:
+                    if is_whole_word_match(mkw, item["title"]):
+                        is_market = True
+                        break
+            
+            if matched_stock or is_market:
+                if matched_stock:
+                    item["tag"] = f"[{matched_stock}]"
+                else:
+                    item["tag"] = "[البورصة]"
+                filtered.append(item)
     
     for item in all_news:
         title = item["title"]
@@ -550,7 +608,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     analyses = {}
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
-    for model_name in ["gemini-3.5-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
+    for model_name in ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-2.5-flash-lite"]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         body = {
             "contents": [{"parts": [{"text": prompt}]}],
@@ -562,13 +620,17 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=45)
             if r.status_code == 200:
                 res_json = r.json()
-                raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
-                # ✅ إصلاح: استخدام مفسر نصوص مرن بدلاً من JSON لتفادي أخطاء تنسيق الـ JSON الحساسة
-                for line in raw_text.splitlines():
-                    m = re.match(r'\[([A-Z0-9]+)\]:\s*(.*)', line.strip())
-                    if m:
-                        clean = m.group(1).upper()
-                        analysis = m.group(2).strip()
+                candidates = res_json.get("candidates", [])
+                if not candidates or "content" not in candidates[0] or not candidates[0]["content"].get("parts"):
+                    print(f"Gemini {model_name} response blocked or empty. Response: {res_json}")
+                    continue
+                raw_text = candidates[0]["content"]["parts"][0]["text"].strip()
+                # ✅ إصلاح: استخدام re.finditer بدلاً من splitlines لدعم التحليلات متعددة الأسطر (Multi-line)
+                matches = re.finditer(r'\[([A-Z0-9]+)\][^\w]*((?:(?!\[[A-Z0-9]+\]).)*)', raw_text, re.DOTALL)
+                for m in matches:
+                    clean = m.group(1).upper()
+                    analysis = m.group(2).strip()
+                    if analysis:
                         analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis}"
                 print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
                 break
@@ -670,12 +732,12 @@ def fetch_egx33_shariah():
         r = requests.get("https://www.tradingview.com/symbols/EGX-SHARIAH/", headers=headers, timeout=15)
         text = r.text
         
-        close_m = re.search(r'"close":"([\d.]+)"', text)
-        open_m = re.search(r'"open":"([\d.]+)"', text)
+        close_m = re.search(r'"close"\s*:\s*"?([\d.,]+)"?', text)
+        open_m = re.search(r'"open"\s*:\s*"?([\d.,]+)"?', text)
         
         if close_m and open_m:
-            c = safe_round(float(close_m.group(1)))
-            o = safe_round(float(open_m.group(1)))
+            c = safe_round(close_m.group(1))
+            o = safe_round(open_m.group(1))
             chg = round(((c - o) / o) * 100, 2) if o > 0 else 0.0
             shariah = {"close": c, "open": o, "chgPct": chg}
             print(f"EGX33 Shariah fetched: close={c}, open={o}, chg={chg}%")
@@ -713,6 +775,7 @@ def send_report():
     # Process and group News (both Live and Manual)
     news_blocks = []
     live_news = []
+    manual_news = []
     
     # 1. Fetch live news from corporate sites and RSS feeds
     try:
@@ -730,7 +793,9 @@ def send_report():
                         lines = block.strip().split("\n")
                         if lines and lines[0].strip():
                             title = lines[0].strip()
-                            link = lines[1].strip() if len(lines) >= 2 else "https://github.com/mahereasybakery-web/egypt-sharia-stock-report"
+                            # ✅ إصلاح: توليد رابط وهمي فريد وثابت للأخبار اليدوية التي لا تحتوي على رابط لمنع ضياعها في الفلترة
+                            fallback_hash = hashlib.md5(title.encode('utf-8')).hexdigest()[:10]
+                            link = lines[1].strip() if len(lines) >= 2 else f"manual://{fallback_hash}"
                             
                             # Match manual news to stock keywords
                             matched_stock = None
@@ -755,9 +820,26 @@ def send_report():
     # 3. Group and analyze news blocks
     try:
         grouped = {}
-        for item in live_news:
-            grouped.setdefault(item["tag"], []).append(item)
+        unique_live_news = []
+        seen_titles = set()
+        
+        # ✅ إصلاح: منع تكرار الأخبار التي أُرسلت في تقارير سابقة لنفس اليوم (حتى عبر الـ Runners المختلفة)
+        state_data, state_sha = get_github_state()
+        egypt_tz_local = timezone(timedelta(hours=3))
+        today_str = datetime.now(egypt_tz_local).strftime("%Y-%m-%d")
+        
+        # تصفير الأخبار إذا بدأ يوم جديد
+        if state_data.get("date") != today_str:
+            state_data = {"sent_links": [], "date": today_str}
             
+        sent_links = set(state_data.get("sent_links", []))
+        
+        for item in live_news:
+            if item["title"] not in seen_titles and item["link"] not in sent_links:
+                seen_titles.add(item["title"])
+                unique_live_news.append(item)
+                grouped.setdefault(item["tag"], []).append(item)
+                
         def priority(t):
             ticker = t.replace("[", "").replace("]", "")
             if ticker in PORTFOLIO: return 0
@@ -765,16 +847,27 @@ def send_report():
             return 2
             
         sorted_tags = sorted(grouped.keys(), key=lambda t: (priority(t), t))
-        ai_analyses = batch_analyze_news_with_gemini(grouped, PORTFOLIO, WATCHLIST)
+        
+        # Analyze ONLY new items via AI
+        ai_analyses = {}
+        if grouped:
+            ai_analyses = batch_analyze_news_with_gemini(grouped, PORTFOLIO, WATCHLIST)
         
         for tag in sorted_tags:
             items_in_tag = grouped[tag]
             block = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
             for item in items_in_tag[:3]:
                 block += f"{s['rlm']}• {item['title']} ({item['source']}) <a href='{item['link']}'>[رابط مباشر]</a>\n"
+                sent_links.add(item["link"])
             if tag in ai_analyses:
                 block += f"{s['rlm']}{ai_analyses[tag]}\n"
             news_blocks.append(block.strip())
+            
+        # تحديث حالة الروابط المرسلة على GitHub
+        if unique_live_news:
+            state_data["sent_links"] = list(sent_links)
+            update_github_state(state_data, state_sha)
+            
     except Exception as e:
         print("Error grouping and analyzing news:", e)
 
@@ -888,6 +981,7 @@ def handle_telegram_command(text):
             "إليك الأوامر المتاحة:\n"
             "📌 <code>/report</code> : لتوليد وإرسال التقرير المالي فوراً.\n"
             "📌 <code>/add_news [الخبر]</code> : لإضافة خبر لقائمة الأخبار وتحديثها على GitHub.\n"
+            "📌 <code>/clear_news</code> : لمسح جميع الأخبار اليدوية القديمة.\n"
             "📌 <code>/ask [سؤالك]</code> : لطرح أي سؤال مالي أو فني على الذكاء الاصطناعي (Claude/Gemini)."
         )
         reply_telegram(help_msg)
@@ -916,6 +1010,17 @@ def handle_telegram_command(text):
             reply_telegram("✅ تمت إضافة الخبر وتحديث الملف على GitHub بنجاح!")
         else:
             reply_telegram("❌ فشل تحديث الخبر على GitHub. يرجى التحقق من الاتصال.")
+            
+    elif text_lower.startswith("/clear_news"):
+        if os.path.exists(NEWS_PATH):
+            with open(NEWS_PATH, "w", encoding="utf-8") as nf:
+                nf.write("")
+            if update_github_news(""):
+                reply_telegram("✅ تم مسح جميع الأخبار اليدوية بنجاح!")
+            else:
+                reply_telegram("❌ تم مسح الأخبار محلياً لكن فشل التحديث على GitHub.")
+        else:
+            reply_telegram("⚠️ لا توجد أخبار يدوية محفوظة حالياً لتتم إزالتها.")
             
     elif text_lower.startswith("/ask"):
         question = text[len("/ask"):].strip()
@@ -1039,8 +1144,8 @@ if __name__ == "__main__":
         else:
             print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
             
-        if i == TOTAL_CYCLES - 2:
-            # إطلاق runner جديد فقط إذا كان الوقت قبل 3:00 م (15:00)
+        if i == TOTAL_CYCLES - 1:
+            # ✅ إصلاح: إطلاق المشغل الجديد في نهاية الدورة الأخيرة فقط لمنع تشغيل نسختين في وقت واحد وتكرار الرسائل
             if loop_now.hour * 60 + loop_now.minute < 15 * 60:
                 trigger_next_runner()
             else:
