@@ -781,7 +781,7 @@ def fetch_egx33_shariah():
         print(f"Error fetching EGX33 Shariah: {e}")
     return shariah
 
-def send_report():
+def send_report(force=False):
     print(f"[{datetime.now()}] Generating and sending report...")
     if not os.path.exists(STRINGS_PATH):
         # ✅ إصلاح: إرسال تنبيه Telegram بدلاً من الخروج الصامت
@@ -868,7 +868,7 @@ def send_report():
         sent_links = set(state_data.get("sent_links", []))
         
         for item in live_news:
-            if item["title"] not in seen_titles and item["link"] not in sent_links:
+            if item["title"] not in seen_titles and (force or item["link"] not in sent_links):
                 seen_titles.add(item["title"])
                 unique_live_news.append(item)
                 grouped.setdefault(item["tag"], []).append(item)
@@ -1025,7 +1025,7 @@ def handle_telegram_command(text):
         
     elif text_lower.startswith("/report"):
         reply_telegram("🔄 جاري توليد وإرسال التقرير المحدث الآن...")
-        send_report()
+        send_report(force=True)
         
     elif text_lower.startswith("/add_news"):
         news_content = text[len("/add_news"):].strip()
@@ -1160,7 +1160,7 @@ if __name__ == "__main__":
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     if force_run:
         print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Sending immediate report.")
-        send_report()
+        send_report(force=True)
         
         # ✅ إصلاح: أوقف runner قبل 14:45 فقط (وليس حتى 15:30)
         if now.hour * 60 + now.minute < 14 * 60 + 45:
