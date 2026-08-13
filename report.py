@@ -533,7 +533,11 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         "1. التقييم المالي للخبر والتأثير المتوقع على سعر ومستقبل السهم (إيجابي / سلبي / محايد).\n"
         "2. نظرة مستقبلية قصيرة للسهم.\n"
         "قاعدة هامة: التحليل يجب أن يكون نقدي ودقيق جداً، وموضوعي يعكس الواقع بحيادية تامة.\n\n"
-        "يجب أن تكون الإجابة بصيغة JSON كائن (JSON object) فقط، حيث المفاتيح هي اسم السهم (مثال: 'FWRY' أو 'ETEL') والقيم هي نص التحليل المالي والتقييم مباشرة بدون أي نصوص برمجية أو علامات ماركداون إضافية.\n\n"
+        "يجب أن تكون الإجابة بالتنسيق التالي لكل سهم (كل سهم في سطر منفصل وبدون أي نصوص برمجية أو علامات ماركداون إضافية):\n"
+        "[اسم السهم]: نص التحليل المالي والتقييم مباشرة.\n"
+        "مثال:\n"
+        "[FWRY]: التقييم إيجابي. من المتوقع نمو السعر بسبب زيادة الأرباح.\n"
+        "[ETEL]: التقييم محايد. استقرار في الأداء المالي مع نظرة مستقبلية مستقرة.\n\n"
         "الأسهم والأخبار المتاحة:\n"
     )
     
@@ -551,7 +555,6 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         body = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {
-                "responseMimeType": "application/json",
                 "temperature": 0.2
             }
         }
@@ -560,15 +563,13 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             if r.status_code == 200:
                 res_json = r.json()
                 raw_text = res_json["candidates"][0]["content"]["parts"][0]["text"].strip()
-                if raw_text.startswith("```"):
-                    lines = raw_text.splitlines()
-                    if lines[0].startswith("```"): lines = lines[1:]
-                    if lines[-1].startswith("```"): lines = lines[:-1]
-                    raw_text = "\n".join(lines).strip()
-                parsed = json.loads(raw_text)
-                for ticker, analysis in parsed.items():
-                    clean = ticker.strip().upper().replace("[", "").replace("]", "")
-                    analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {str(analysis).strip()}"
+                # ✅ إصلاح: استخدام مفسر نصوص مرن بدلاً من JSON لتفادي أخطاء تنسيق الـ JSON الحساسة
+                for line in raw_text.splitlines():
+                    m = re.match(r'\[([A-Z0-9]+)\]:\s*(.*)', line.strip())
+                    if m:
+                        clean = m.group(1).upper()
+                        analysis = m.group(2).strip()
+                        analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis}"
                 print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
                 break
             else:
