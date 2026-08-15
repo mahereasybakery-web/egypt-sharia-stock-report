@@ -1151,23 +1151,27 @@ if __name__ == "__main__":
     # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة مع هامش أمان 5 دقائق لتلافي فجوة الانتقال بين الـ runners
     _startup_epoch = int(time.time()) - 300
     
+    force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
+    
     # Check weekday (Egypt stock market runs Sunday to Thursday)
     # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
-    if now.weekday() in [4, 5]:
+    if now.weekday() in [4, 5] and not force_run:
         print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Exiting.")
         sys.exit(0)
         
-    force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     if force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Sending immediate report.")
+        print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Processing commands and sending immediate report.")
+        # ✅ إصلاح: قراءة رسائل التليجرام أولاً لمعالجة أوامر مثل /status قبل إنهاء التشغيل القسري
+        poll_telegram_messages()
+        time.sleep(2)
         send_report(force=True)
         
-        # ✅ إصلاح: أوقف runner قبل 14:45 فقط (وليس حتى 15:30)
-        if now.hour * 60 + now.minute < 14 * 60 + 45:
+        # ✅ إصلاح: أوقف runner قبل 14:45 فقط وعلى مدار أيام الأسبوع وليس عطلة نهاية الأسبوع
+        if now.weekday() not in [4, 5] and now.hour * 60 + now.minute < 14 * 60 + 45:
             print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
             trigger_next_runner()
         else:
-            print(f"[{now.strftime('%H:%M:%S')}] Near/past market close. Not chaining next runner.")
+            print(f"[{now.strftime('%H:%M:%S')}] Near/past market close or weekend. Not chaining next runner.")
         sys.exit(0)
         
     wait_for_market_open()
