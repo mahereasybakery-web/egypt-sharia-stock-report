@@ -890,10 +890,11 @@ def send_report(force=False):
             items_in_tag = grouped[tag]
             block = f"{s['rlm']}🔥 <b>{tag}</b>:\n"
             for item in items_in_tag[:3]:
-                # ✅ إصلاح: ترميز العنوان والمصدر لمنع أخطاء التنسيق في تليجرام عند وجود رموز مثل & أو <
+                # ✅ إصلاح: ترميز العنوان والمصدر والرابط لمنع أخطاء التنسيق في تليجرام عند وجود رموز مثل & أو <
                 title_esc = escape_html(item["title"])
                 source_esc = escape_html(item["source"])
-                block += f"{s['rlm']}• {title_esc} ({source_esc}) <a href='{item['link']}'>[رابط مباشر]</a>\n"
+                link_esc = escape_html(item["link"])
+                block += f"{s['rlm']}• {title_esc} ({source_esc}) <a href='{link_esc}'>[رابط مباشر]</a>\n"
                 sent_links.add(item["link"])
             if tag in ai_analyses:
                 block += f"{s['rlm']}{ai_analyses[tag]}\n"
