@@ -28,7 +28,7 @@ CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_PAT = os.getenv("GH_PAT")
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.5-flash"
 
 if not GH_PAT:
     if os.getenv("GITHUB_ACTIONS") == "true":
@@ -300,7 +300,7 @@ def ask_ai(question):
 
     # Fallback to Gemini AI (with model fallback to bypass 503/404 errors)
     if GEMINI_API_KEY:
-        for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+        for model_name in ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.6-flash"]:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
             headers = {"content-type": "application/json"}
             payload = {
@@ -634,7 +634,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     analyses = {}
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
-    for model_name in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+    for model_name in ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.6-flash"]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         body = {
             "contents": [{"parts": [{"text": prompt}]}],
