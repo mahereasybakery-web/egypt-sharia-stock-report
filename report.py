@@ -378,7 +378,19 @@ def fetch_rss_news():
 
             limit = 30 if source_name == "أخبار جوجل" else 15
             for entry in items[:limit]:
-                # ✅ إصلاح: فحص نوع entry بدل الاعتماد على وجود feedparser فقط
+                # ✅ فحص تاريخ النشر: نقبل فقط الأخبار المنشورة اليوم (بتوقيت القاهرة)
+                is_today = True
+                if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                    try:
+                        pub_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+                        egypt_tz = timezone(timedelta(hours=3))
+                        if pub_dt.astimezone(egypt_tz).date() != datetime.now(egypt_tz).date():
+                            is_today = False
+                    except Exception:
+                        pass
+                if not is_today:
+                    continue
+                    
                 if hasattr(entry, 'title'):
                     title = getattr(entry, 'title', '')
                     link = getattr(entry, 'link', '')
@@ -630,8 +642,9 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         "أنت خبير مالي ومحلل أسهم محترف في البورصة المصرية.\n"
         "مهمتك هي تحليل الأخبار لكل سهم وتقديم تقييم مالي وتوقعات مستقبلية مختصرة جداً.\n"
         "لكل سهم من الأسهم التالية، قم بتحليل الأخبار المرفقة وقدم تحليلاً باللغة العربية الفصحى (بين 30 إلى 50 كلمة لكل سهم) يشمل:\n"
-        "1. التقييم المالي للخبر والتأثير المتوقع على سعر ومستقبل السهم (إيجابي / سلبي / محايد).\n"
+        "1. التقييم المالي المشترك للأخبار والتأثير المتوقع على سعر ومستقبل السهم (إيجابي / سلبي / محايد).\n"
         "2. نظرة مستقبلية قصيرة للسهم.\n"
+        "قاعدة هامة: إذا ورد أكثر من خبر عن نفس السهم، قم بتحليلها معاً في تقييم واحد يوضح التأثير المشترك والمتوقع لها مجتمعة على أداء ومستقبل السهم.\n"
         "قاعدة هامة: التحليل يجب أن يكون نقدي ودقيق جداً، وموضوعي يعكس الواقع بحيادية تامة.\n\n"
         "يجب أن تكون الإجابة بالتنسيق التالي لكل سهم (كل سهم في سطر منفصل وبدون أي نصوص برمجية أو علامات ماركداون إضافية):\n"
         "[اسم السهم]: نص التحليل المالي والتقييم مباشرة.\n"
@@ -884,7 +897,7 @@ def send_report(force=False):
         sent_links = set(state_data.get("sent_links", []))
         
         for item in live_news:
-            if item["title"] not in seen_titles and (force or item["link"] not in sent_links):
+            if item["title"] not in seen_titles:
                 seen_titles.add(item["title"])
                 unique_live_news.append(item)
                 grouped.setdefault(item["tag"], []).append(item)
