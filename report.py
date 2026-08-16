@@ -939,17 +939,24 @@ def send_report(force=False):
     port_header = s.get('portfolio_title', 'أسهم مستثمر بها')
     watch_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
     
-    if total_minutes < 8 * 60 + 45:
+    is_weekend = now.weekday() in [4, 5]
+    
+    if is_weekend:
+        status_text = "🛑 <b>البورصة متوقفة حالياً (عطلة نهاية الأسبوع)</b>\n📊 <b>الأسعار والتغيرات أدناه هي أسعار إغلاق آخر يوم عمل في البورصة للأسبوع السابق (جلسة الخميس).</b>\n\n"
+        port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
+        watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
+    elif total_minutes < 8 * 60 + 45:
         status_text = "⚠️ <b>السوق لم يفتح بعد (يفتح 08:45 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
         port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
         watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
-    elif 8 * 60 + 45 <= total_minutes <= 14 * 60 + 30:  # ✅ إصلاح: السوق يُغلق 14:30
-        port_header = f"💼 {port_header} (حركة لحظية)"
-        watch_header = f"📋 {watch_header} (حركة لحظية)"
-    else:
+    elif total_minutes > 14 * 60 + 30:
         status_text = "🔒 <b>انتهت جلسة تداول اليوم (إغلاق 14:30)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
         port_header = f"📈 {port_header} (إغلاق جلسة اليوم)"
         watch_header = f"📈 {watch_header} (إغلاق جلسة اليوم)"
+    else:
+        status_text = ""
+        port_header = f"💼 {port_header} (حركة لحظية)"
+        watch_header = f"📋 {watch_header} (حركة لحظية)"
         
     msg_portfolio = f"{s['rlm']}<b>{s['report_title']}</b>\n"
     msg_portfolio += f"{s['rlm']}<b>{s['date']}: {today} | {time_display}</b>\n"
