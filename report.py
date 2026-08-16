@@ -337,10 +337,16 @@ def fetch_rss_news():
         "الوطن": "https://www.elwatannews.com/home/rss/economy",
         "المصري اليوم": "https://www.almasryalyoum.com/rss/sections/2/feed",
         "صدى البلد": "https://www.elbalad.news/rss.aspx?id=12",
-        "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4"
+        "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4",
+        "جريدة المال": "https://almalnews.com/feed/"
     }
     
-    gnews_query = 'البورصة المصرية OR أسهم مصر OR اقتصاد مصر OR "طلعت مصطفى" OR "فوري" OR "سوديك" OR "إيديتا" OR "أبوظبي الإسلامي" OR "مصر للألومنيوم" OR "المصرية للاتصالات" OR "إي فاينانس" OR "أوراسكوم"'
+    # ✅ إصلاح: بناء استعلام أخبار جوجل ديناميكياً ليشمل جميع الـ 37 شركة لضمان جلب أخبارها بالكامل
+    gnews_keywords = ["البورصة المصرية", "أسهم مصر", "اقتصاد مصر"]
+    for ticker in ALL_TICKERS:
+        if ticker in STOCK_KEYWORDS and STOCK_KEYWORDS[ticker]:
+            gnews_keywords.append(f'"{STOCK_KEYWORDS[ticker][0]}"')
+    gnews_query = " OR ".join(gnews_keywords)
     encoded_query = urllib.parse.quote(gnews_query)
     feeds["أخبار جوجل"] = f"https://news.google.com/rss/search?q={encoded_query}&hl=ar&gl=EG&ceid=EG:ar"
     
@@ -499,16 +505,26 @@ def fetch_egx_beta_news():
             unique.append(item)
     return unique
 
+def normalize_arabic(text):
+    """تهيئة النص العربي بتوحيد الألف، والياء/الألف المقصورة، والتاء المربوطة/الهاء لضمان مطابقة الكلمات المكتوبة بطرق مختلفة."""
+    if not text:
+        return ""
+    text = text.strip()
+    text = re.sub(r"[أإآا]", "ا", text)
+    text = re.sub(r"[يى]", "ي", text)
+    text = re.sub(r"[ةه]", "ه", text)
+    return text
+
 def is_whole_word_match(word, text):
-    """مطابقة الكلمات المفتاحية بشكل دقيق مع دعم السوابق العربية وتجنب التداخلات مثل (فوري vs فورية)."""
+    """مطابقة الكلمات المفتاحية بشكل دقيق مع دعم السوابق العربية وتوحيد الحروف لزيادة دقة البحث وجلب الأخبار بالكامل."""
     if not word or not text:
         return False
-    word = word.lower().strip()
-    text = text.lower()
+    norm_word = normalize_arabic(word.lower())
+    norm_text = normalize_arabic(text.lower())
     # ✅ إصلاح: السماح بمسافات متعددة بين الكلمات في العبارة المفتاحية
-    escaped_word = re.escape(word).replace(r'\ ', r'\s+')
+    escaped_word = re.escape(norm_word).replace(r'\ ', r'\s+')
     pattern = r"(?:^|\W)(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|\W)"
-    return re.search(pattern, text) is not None
+    return re.search(pattern, norm_text) is not None
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
