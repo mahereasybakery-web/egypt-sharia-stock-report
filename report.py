@@ -1046,6 +1046,91 @@ def send_report(force=False):
                 chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
             reply_telegram(chunk)
 
+def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
+    # Construct details of today's market movements
+    market_details = "--- أداء الأسهم اليوم ---\n"
+    for ticker, info in stocks_data.items():
+        market_details += f"- سهم {ticker}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+        
+    market_details += "\n--- أداء المؤشرات والعملات اليوم ---\n"
+    for idx, info in indices_data.items():
+        market_details += f"- مؤشر {idx}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+    for key, info in fx_gold_data.items():
+        market_details += f"- {key}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+        
+    market_details += "\n--- أخبار الشركات اليوم ---\n"
+    for tag, items in grouped_news.items():
+        market_details += f"=== {tag} ===\n"
+        for item in items:
+            market_details += f"- {item['title']} (المصدر: {item['source']})\n"
+            
+    prompt = (
+        "أنت خبير مالي ومحلل اقتصاد كلي واستراتيجي أسهم محترف في البورصة المصرية.\n"
+        "مهمتك هي إعداد تقرير 'ملخص حركة اليوم وتوقعات الغد' لجلسة البورصة المصرية بعد الإغلاق.\n"
+        "التقرير يجب أن يكون باللغة العربية الفصحى وبتنسيق HTML مناسب للإرسال على تليجرام، ويحتوي على الأقسام التالية:\n\n"
+        "1. 📝 **ملخص عام للجلسة والقطاعات:** تحليل عام لأداء السوق والمؤشرات والسيولة اليوم.\n"
+        "2. 📊 **أداء المؤشرات والعملات والمعادن:** تحليل حركة مؤشر EGX30 ومؤشر الشريعة EGX33 وسعر الدولار والذهب وأسباب تغيرها.\n"
+        "3. 🔍 **تحليل تفصيلي للأسهم النشطة:** لكل سهم من الأسهم التي شهدت أخباراً هامة أو تحركات سعرية ملحوظة (تغير أكبر من 1% أو -1%):\n"
+        "   - حركة السهم اليوم وتغيره.\n"
+        "   - الأسباب المباشرة أو المتوقعة لهذا التغير (ربطاً بالأخبار المرفقة أو اتجاهات السوق).\n"
+        "   - توقعات حركة السهم لجلسة الغد.\n"
+        "4. 🔮 **رؤية وتوقعات جلسة الغد:** توقع عام لحركة المؤشرات والسوق في الجلسة القادمة ونقاط الدعم والمقاومة المتوقعة.\n\n"
+        "شروط هامة:\n"
+        "- استخدم لغة مالية رصينة وموضوعية وحيادية تماماً.\n"
+        "- استخدم وسوم HTML المسموحة في تليجرام فقط للتنسيق (مثل <b>, <i>, <code>, <pre>, <u>).\n"
+        "- لا تستخدم علامات الماركداون (مثل ** أو `) في الإجابة، اعتمد بالكامل على وسوم HTML للتنسيق.\n"
+        "- يجب أن يكون التحليل دقيقاً ومربوطاً بالأرقام المرفقة.\n\n"
+        f"بيانات السوق والأخبار المتاحة لجلسة اليوم:\n{market_details}"
+    )
+    return ask_ai(prompt)
+
+def send_daily_summary():
+    print(f"[{datetime.now()}] Generating and sending daily summary report...")
+    if not os.path.exists(STRINGS_PATH):
+        reply_telegram("⚠️ <b>خطأ حرجي:</b> ملف strings.json غير موجود في المستودع!")
+        return
+        
+    with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+        s = json.load(f)
+        
+    parsed_stocks, indices = fetch_all_data_tv(ALL_TICKERS, s)
+    egx30 = indices.get("EGX30", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx70ewi = indices.get("EGX70EWI", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx100ewi = indices.get("EGX100EWI", {"close": 0.0, "open": 0.0, "chgPct": 0.0})
+    egx33 = fetch_egx33_shariah()
+    usdegp, xauusd = fetch_forex_gold()
+    
+    live_news = []
+    try:
+        live_news = get_filtered_market_news(PORTFOLIO, WATCHLIST)
+    except Exception as e:
+        print("Error fetching live news for daily summary:", e)
+        
+    grouped = {}
+    seen_titles = set()
+    for item in live_news:
+        if item["title"] not in seen_titles:
+            seen_titles.add(item["title"])
+            grouped.setdefault(item["tag"], []).append(item)
+            
+    stocks_data = parsed_stocks
+    indices_data = {
+        "EGX30": egx30,
+        "EGX33 الشريعة": egx33,
+        "EGX70 EWI": egx70ewi,
+        "EGX100 EWI": egx100ewi
+    }
+    fx_gold_data = {
+        "USD/EGP": usdegp,
+        "GOLD": xauusd
+    }
+    
+    reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الختامي وتوقعات الغد...")
+    summary_text = generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped, s)
+    
+    header = f"📌 <b>ملخص حركة اليوم وتوقعات الغد لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>\n\n"
+    reply_telegram(header + summary_text)
+
 def handle_telegram_command(text):
     text_lower = text.lower()
     if text_lower.startswith("/start") or text_lower.startswith("/help"):
@@ -1053,6 +1138,7 @@ def handle_telegram_command(text):
             "<b>🤖 أهلاً بك في مساعد أسهم الشريعة الذكي!</b>\n\n"
             "إليك الأوامر المتاحة:\n"
             "📌 <code>/report</code> : لتوليد وإرسال التقرير المالي فوراً.\n"
+            "📌 <code>/summary</code> : لتوليد وإرسال ملخص حركة اليوم وتوقعات الغد.\n"
             "📌 <code>/add_news [الخبر]</code> : لإضافة خبر لقائمة الأخبار وتحديثها على GitHub.\n"
             "📌 <code>/clear_news</code> : لمسح جميع الأخبار اليدوية القديمة.\n"
             "📌 <code>/ask [سؤالك]</code> : لطرح أي سؤال مالي أو فني على الذكاء الاصطناعي (Claude/Gemini).\n"
@@ -1063,6 +1149,9 @@ def handle_telegram_command(text):
     elif text_lower.startswith("/report"):
         reply_telegram("🔄 جاري توليد وإرسال التقرير المحدث الآن...")
         send_report(force=True)
+        
+    elif text_lower.startswith("/summary"):
+        send_daily_summary()
         
     elif text_lower.startswith("/add_news"):
         news_content = text[len("/add_news"):].strip()
@@ -1226,6 +1315,27 @@ if __name__ == "__main__":
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Sending final closing report.")
                 send_report()
                 reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
+                
+                # ✅ إضافة: الانتظار حتى الساعة 3:00 مساءً لإرسال التقرير التحليلي الإضافي (الملخص الختامي)
+                state_data, state_sha = get_github_state()
+                if not state_data.get("summary_sent", False):
+                    now_egypt = datetime.now(egypt_tz)
+                    target_summary_time = now_egypt.replace(hour=15, minute=0, second=0, microsecond=0)
+                    if now_egypt < target_summary_time:
+                        seconds_to_wait = (target_summary_time - now_egypt).total_seconds()
+                        print(f"[{now_egypt.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until 3:00 PM for Daily Summary...")
+                        start_time = time.time()
+                        while (time.time() - start_time) < seconds_to_wait:
+                            poll_telegram_messages()
+                            time.sleep(5)
+                    
+                    send_daily_summary()
+                    
+                    # تحديث الحالة على جيت هاب لمنع تكرار الإرسال
+                    state_data, state_sha = get_github_state()
+                    state_data["summary_sent"] = True
+                    update_github_state(state_data, state_sha)
+                    
                 sys.exit(0)
                 
             # ✅ إصلاح: البورصة تُغلق 14:30 وليس 15:30
