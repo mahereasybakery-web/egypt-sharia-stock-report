@@ -1045,6 +1045,19 @@ def send_report(force=False):
             if i == 0:
                 chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
             reply_telegram(chunk)
+            
+    # ✅ إضافة: مسح الأخبار اليدوية القديمة تلقائياً من الملف على GitHub بعد إرسالها بنجاح لمنع تكرار إرسالها غداً
+    if os.path.exists(NEWS_PATH):
+        try:
+            with open(NEWS_PATH, "r", encoding="utf-8") as f:
+                has_content = bool(f.read().strip())
+            if has_content:
+                with open(NEWS_PATH, "w", encoding="utf-8") as f:
+                    f.write("")
+                update_github_news("")
+                print("Manual news cleared automatically after sending report.")
+        except Exception as e:
+            print("Error clearing manual news:", e)
 
 def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
     # Construct details of today's market movements
