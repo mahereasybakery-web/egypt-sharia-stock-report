@@ -1159,11 +1159,11 @@ def handle_telegram_command(text):
         )
         reply_telegram(help_msg)
         
-    elif text_lower.startswith("/report"):
+    elif text_lower.startswith("/report") or text_lower.startswith("/تقرير"):
         reply_telegram("🔄 جاري توليد وإرسال التقرير المحدث الآن...")
         send_report(force=True)
         
-    elif text_lower.startswith("/summary"):
+    elif text_lower.startswith("/summary") or text_lower.startswith("/summry") or text_lower.startswith("/sumary") or text_lower.startswith("/ملخص"):
         send_daily_summary()
         
     elif text_lower.startswith("/add_news"):
@@ -1187,7 +1187,7 @@ def handle_telegram_command(text):
         else:
             reply_telegram("❌ فشل تحديث الخبر على GitHub. يرجى التحقق من الاتصال.")
             
-    elif text_lower.startswith("/clear_news"):
+    elif text_lower.startswith("/clear_news") or text_lower.startswith("/مسح"):
         if os.path.exists(NEWS_PATH):
             with open(NEWS_PATH, "w", encoding="utf-8") as nf:
                 nf.write("")
@@ -1198,15 +1198,15 @@ def handle_telegram_command(text):
         else:
             reply_telegram("⚠️ لا توجد أخبار يدوية محفوظة حالياً لتتم إزالتها.")
             
-    elif text_lower.startswith("/ask"):
-        question = text[len("/ask"):].strip()
+    elif text_lower.startswith("/ask") or text_lower.startswith("/اسأل"):
+        question = text[len("/ask"):].strip() if text_lower.startswith("/ask") else text[len("/اسأل"):].strip()
         if not question:
             reply_telegram("⚠️ يرجى كتابة السؤال بعد الأمر. مثال:\n<code>/ask ما توقعاتك لسهم طلعت مصطفى؟</code>")
             return
         reply_telegram("🔄 جاري التفكير والتحليل...")
         reply_telegram(ask_ai(question))
         
-    elif text_lower.startswith("/status"):
+    elif text_lower.startswith("/status") or text_lower.startswith("/حالة") or text_lower.startswith("/حاله"):
         import time
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         status_msg = (
