@@ -968,20 +968,28 @@ def send_report(force=False):
     port_header = s.get('portfolio_title', 'أسهم مستثمر بها')
     watch_header = s.get('watchlist_title', 'أسهم شرعية أخرى للمتابعة')
     
-    is_weekend = now.weekday() in [4, 5]
+    # Calculate last trading close date and time
+    last_close_date = None
+    last_close_time = "02:30 مساءً"
+    weekday = now.weekday()
     
-    if is_weekend:
-        status_text = "🛑 <b>البورصة متوقفة حالياً (عطلة نهاية الأسبوع)</b>\n📊 <b>الأسعار والتغيرات أدناه هي أسعار إغلاق آخر يوم عمل في البورصة للأسبوع السابق (جلسة الخميس).</b>\n\n"
-        port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
-        watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
-    elif total_minutes < 8 * 60 + 45:
-        status_text = "⚠️ <b>السوق لم يفتح بعد (يفتح 08:45 ص)</b>\n📊 <b>الأسعار والتغيرات أدناه هي إغلاق الجلسة السابقة.</b>\n\n"
-        port_header = f"📊 {port_header} (إغلاق الجلسة السابقة)"
-        watch_header = f"📊 {watch_header} (إغلاق الجلسة السابقة)"
-    elif total_minutes > 14 * 60 + 30:
-        status_text = "🔒 <b>انتهت جلسة تداول اليوم (إغلاق 14:30)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم.</b>\n\n"
-        port_header = f"📈 {port_header} (إغلاق جلسة اليوم)"
-        watch_header = f"📈 {watch_header} (إغلاق جلسة اليوم)"
+    if weekday in [4, 5]: # Friday, Saturday (Weekend)
+        days_to_subtract = 1 if weekday == 4 else 2
+        last_close_date = (now - timedelta(days=days_to_subtract)).strftime("%Y/%m/%d")
+        status_text = f"🛑 <b>البورصة متوقفة حالياً (عطلة نهاية الأسبوع)</b>\n📊 <b>الأسعار أدناه هي إغلاق آخر جلسة عمل (جلسة {last_close_date}) الساعة {last_close_time}.</b>\n\n"
+        port_header = f"📊 {port_header} (إغلاق جلسة {last_close_date})"
+        watch_header = f"📊 {watch_header} (إغلاق جلسة {last_close_date})"
+    elif total_minutes < 8 * 60 + 45: # Before market opens today (trading day)
+        days_to_subtract = 3 if weekday == 6 else 1 # If Sunday, last was Thursday, else yesterday
+        last_close_date = (now - timedelta(days=days_to_subtract)).strftime("%Y/%m/%d")
+        status_text = f"⚠️ <b>السوق لم يفتح بعد (يفتح 08:45 صباحاً)</b>\n📊 <b>الأسعار أدناه هي إغلاق آخر جلسة عمل (جلسة {last_close_date}) الساعة {last_close_time}.</b>\n\n"
+        port_header = f"📊 {port_header} (إغلاق جلسة {last_close_date})"
+        watch_header = f"📊 {watch_header} (إغلاق جلسة {last_close_date})"
+    elif total_minutes >= 14 * 60 + 30: # After market closed today (trading day)
+        last_close_date = today
+        status_text = f"🔒 <b>انتهت جلسة تداول اليوم (إغلاق 02:30 مساءً)</b>\n📈 <b>الأسعار أدناه هي أسعار الإغلاق النهائية لليوم (جلسة {last_close_date}).</b>\n\n"
+        port_header = f"📈 {port_header} (إغلاق جلسة اليوم {last_close_date})"
+        watch_header = f"📈 {watch_header} (إغلاق جلسة اليوم {last_close_date})"
     else:
         status_text = ""
         port_header = f"💼 {port_header} (حركة لحظية)"
