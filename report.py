@@ -490,17 +490,33 @@ def fetch_egx_beta_news():
     try:
         r = requests.get(url, headers=headers, timeout=10)
         r.encoding = 'utf-8' # enforce utf-8
-        objects = re.findall(r'\\"headingArabic\\":\\"(.*?)\\".*?\\"contentArabic\\":\\"(.*?)\\"', r.text)
-        objects_unescaped = re.findall(r'"headingArabic":"(.*?)".*?"contentArabic":"(.*?)"', r.text)
-        for heading, content in objects + objects_unescaped:
+        
+        # Escaped matches: \"code\":343607,...\"headingArabic\":\"...\"
+        escaped_matches = re.finditer(r'\\"code\\"\s*:\s*(\d+),.*?\\"headingArabic\\"\s*:\s*\\"(.*?)\\"', r.text)
+        for m in escaped_matches:
+            code = m.group(1)
+            heading = m.group(2)
             if heading and heading != "null":
-                # ✅ إصلاح: فك Unicode escapes بأمان تام وحذف backslashes الزائدة
                 heading = decode_unicode_escapes(heading).replace('\\"', '"').replace('\\\\', '\\')
                 items.append({
                     "tag": "[EGX]",
                     "title": heading.strip(),
-                    "link": "https://beta.egx.com.eg/",
-                    "source": "بورصة مصر (Beta)"
+                    "code": code,
+                    "source": "بورصة مصر"
+                })
+                
+        # Unescaped matches: "code":343607,..."headingArabic":"..."
+        unescaped_matches = re.finditer(r'"code"\s*:\s*(\d+),.*?"headingArabic"\s*:\s*"(.*?)"', r.text)
+        for m in unescaped_matches:
+            code = m.group(1)
+            heading = m.group(2)
+            if heading and heading != "null":
+                heading = decode_unicode_escapes(heading).replace('\\"', '"').replace('\\\\', '\\')
+                items.append({
+                    "tag": "[EGX]",
+                    "title": heading.strip(),
+                    "code": code,
+                    "source": "بورصة مصر"
                 })
     except Exception as e:
         print("Error fetching EGX Beta news:", e)
@@ -511,9 +527,12 @@ def fetch_egx_beta_news():
         uid = f"{item['tag']}_{item['title']}"
         if uid not in seen:
             seen.add(uid)
-            # ✅ إصلاح: توليد رابط فريد وهمي ومستقر لمنع خوارزمية الفلترة من حذف الأخبار المتعددة بسبب تطابق الرابط، ولمنع التكرار عبر الـ runners
-            stable_hash = hashlib.md5(uid.encode("utf-8")).hexdigest()[:10]
-            item["link"] = f"https://beta.egx.com.eg/?news={stable_hash}"
+            code = item.get("code")
+            if code:
+                item["link"] = f"https://www.egx.com.eg/ar/news-details?id={code}"
+            else:
+                stable_hash = hashlib.md5(uid.encode("utf-8")).hexdigest()[:10]
+                item["link"] = f"https://beta.egx.com.eg/?news={stable_hash}"
             unique.append(item)
     return unique
 
