@@ -1422,7 +1422,11 @@ if __name__ == "__main__":
         # إذا تم التشغيل القسري بعد إغلاق السوق (بعد 14:30)، نرسل الملخص الختامي أيضاً
         if now.hour * 60 + now.minute >= 14 * 60 + 30:
             print("Past 2:30 PM, sending daily summary during force run...")
-            send_daily_summary()
+            success = send_daily_summary()
+            if success:
+                state_data, state_sha = get_github_state()
+                state_data["summary_sent"] = True
+                update_github_state(state_data, state_sha)
         
         # ✅ إصلاح: أوقف runner قبل 14:45 فقط وعلى مدار أيام الأسبوع وليس عطلة نهاية الأسبوع
         if now.weekday() not in [4, 5] and now.hour * 60 + now.minute < 14 * 60 + 45:
