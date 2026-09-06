@@ -288,38 +288,51 @@ def ask_ai(question):
         }
         payload = {
             "model": "claude-3-5-sonnet-20241022",
-            "max_tokens": 1000,
+            "max_tokens": 1500,
             "messages": [{"role": "user", "content": question}]
         }
         try:
-            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            r = requests.post(url, headers=headers, json=payload, timeout=60)
             if r.status_code == 200:
                 return r.json()["content"][0]["text"]
+            else:
+                print(f"Claude API returned status {r.status_code}: {r.text[:200]}")
         except Exception as e:
             print("Claude API error:", e)
 
-    # Fallback to Gemini AI (with model fallback to bypass 503/404 errors)
+    # Fallback to Gemini AI (with model fallback to bypass 503/404/429 errors)
     if GEMINI_API_KEY:
-        for model_name in ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.6-flash"]:
+        gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+        for model_name in gemini_models:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
             headers = {"content-type": "application/json"}
             payload = {
-                "contents": [{"parts": [{"text": question}]}]
+                "contents": [{"parts": [{"text": question}]}],
+                "generationConfig": {
+                    "temperature": 0.3
+                }
             }
-            try:
-                r = requests.post(url, headers=headers, json=payload, timeout=30)
-                if r.status_code == 200:
-                    res_json = r.json()
-                    candidates = res_json.get("candidates", [])
-                    if candidates and "content" in candidates[0] and candidates[0]["content"].get("parts"):
-                        return candidates[0]["content"]["parts"][0]["text"]
-                    else:
-                        print(f"Gemini {model_name} response blocked or empty in ask_ai. Response: {res_json}")
+            for attempt in range(2):
+                try:
+                    r = requests.post(url, headers=headers, json=payload, timeout=75)
+                    if r.status_code == 200:
+                        res_json = r.json()
+                        candidates = res_json.get("candidates", [])
+                        if candidates and "content" in candidates[0] and candidates[0]["content"].get("parts"):
+                            return candidates[0]["content"]["parts"][0]["text"]
+                        else:
+                            print(f"Gemini {model_name} response blocked or empty in ask_ai. Response: {res_json}")
+                            break
+                    elif r.status_code == 429:
+                        print(f"Gemini {model_name} rate limit (429), attempt {attempt+1}. Backing off 5s...")
+                        time.sleep(5)
                         continue
-                else:
-                    print(f"Gemini {model_name} ask_ai returned status {r.status_code}")
-            except Exception as e:
-                print(f"Gemini {model_name} ask_ai error: {e}")
+                    else:
+                        print(f"Gemini {model_name} ask_ai returned status {r.status_code}")
+                        break
+                except Exception as e:
+                    print(f"Gemini {model_name} ask_ai error: {e}")
+                    break
         return "عذراً، خوادم الذكاء الاصطناعي لـ Gemini تواجه ضغطاً حالياً. يرجى المحاولة لاحقاً."
             
     return "يرجى ضبط مفاتيح المطورين (CLAUDE_API_KEY أو GEMINI_API_KEY) لتفعيل محادثات الذكاء الاصطناعي."
@@ -529,10 +542,9 @@ def fetch_egx_beta_news():
             seen.add(uid)
             code = item.get("code")
             if code:
-                item["link"] = f"https://www.egx.com.eg/ar/news-details?id={code}"
+                item["link"] = f"https://beta.egx.com.eg/ar/news/{code}"
             else:
-                stable_hash = hashlib.md5(uid.encode("utf-8")).hexdigest()[:10]
-                item["link"] = f"https://beta.egx.com.eg/?news={stable_hash}"
+                item["link"] = "https://beta.egx.com.eg/ar/media-center?tab=disclosure"
             unique.append(item)
     return unique
 
@@ -682,7 +694,8 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     analyses = {}
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
-    for model_name in ["gemini-3.5-flash", "gemini-3.5-pro", "gemini-3.6-flash"]:
+    gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    for model_name in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         body = {
             "contents": [{"parts": [{"text": prompt}]}],
@@ -690,30 +703,39 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
                 "temperature": 0.2
             }
         }
-        try:
-            r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=45)
-            if r.status_code == 200:
-                res_json = r.json()
-                candidates = res_json.get("candidates", [])
-                if not candidates or "content" not in candidates[0] or not candidates[0]["content"].get("parts"):
-                    print(f"Gemini {model_name} response blocked or empty. Response: {res_json}")
+        success = False
+        for attempt in range(2):
+            try:
+                r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=60)
+                if r.status_code == 200:
+                    res_json = r.json()
+                    candidates = res_json.get("candidates", [])
+                    if not candidates or "content" not in candidates[0] or not candidates[0]["content"].get("parts"):
+                        print(f"Gemini {model_name} response blocked or empty. Response: {res_json}")
+                        break
+                    raw_text = candidates[0]["content"]["parts"][0]["text"].strip()
+                    matches = re.finditer(r'\[([A-Z0-9]+)\][^\w]*((?:(?!\[[A-Z0-9]+\]).)*)', raw_text, re.DOTALL)
+                    for m in matches:
+                        clean = m.group(1).upper()
+                        analysis = m.group(2).strip()
+                        if analysis:
+                            analysis_esc = escape_html(analysis)
+                            analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis_esc}"
+                    print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
+                    success = True
+                    break
+                elif r.status_code == 429:
+                    print(f"Gemini {model_name} news analysis rate limit (429), attempt {attempt+1}. Backing off 4s...")
+                    time.sleep(4)
                     continue
-                raw_text = candidates[0]["content"]["parts"][0]["text"].strip()
-                # ✅ إصلاح: استخدام re.finditer بدلاً من splitlines لدعم التحليلات متعددة الأسطر (Multi-line)
-                matches = re.finditer(r'\[([A-Z0-9]+)\][^\w]*((?:(?!\[[A-Z0-9]+\]).)*)', raw_text, re.DOTALL)
-                for m in matches:
-                    clean = m.group(1).upper()
-                    analysis = m.group(2).strip()
-                    if analysis:
-                        # ✅ إصلاح: ترميز النص قبل وضعه في وسوم HTML لمنع فشل الإرسال
-                        analysis_esc = escape_html(analysis)
-                        analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis_esc}"
-                print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
+                else:
+                    print(f"Gemini {model_name} returned status {r.status_code}: {r.text[:300]}")
+                    break
+            except Exception as e:
+                print(f"Error in Gemini {model_name} batch AI news analysis: {e}")
                 break
-            else:
-                print(f"Gemini {model_name} returned status {r.status_code}: {r.text[:300]}")
-        except Exception as e:
-            print(f"Error in Gemini {model_name} batch AI news analysis: {e}")
+        if success:
+            break
             
     return analyses
 
@@ -1124,11 +1146,70 @@ def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_n
     )
     return ask_ai(prompt)
 
+def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
+    res = "<b>📝 ملخص أداء جلسة اليوم وأهم التحركات:</b>\n"
+    
+    # 1. Indices & Currencies
+    res += "\n<b>📊 المؤشرات والعملات:</b>\n"
+    for k, v in indices_data.items():
+        chg_icon = "🟢" if v["chgPct"] > 0 else ("🔴" if v["chgPct"] < 0 else "⚪")
+        res += f"{chg_icon} <b>{k}:</b> إغلاق {v['close']} ({v['chgPct']:+.2f}%)\n"
+    for k, v in fx_gold_data.items():
+        chg_icon = "🟢" if v["chgPct"] > 0 else ("🔴" if v["chgPct"] < 0 else "⚪")
+        res += f"{chg_icon} <b>{k}:</b> {v['close']} ({v['chgPct']:+.2f}%)\n"
+        
+    # 2. Top Movers in Portfolio & Watchlist
+    gainers = []
+    losers = []
+    for ticker, info in stocks_data.items():
+        if info["chgPct"] > 0.3:
+            gainers.append((ticker, info["close"], info["chgPct"]))
+        elif info["chgPct"] < -0.3:
+            losers.append((ticker, info["close"], info["chgPct"]))
+            
+    gainers.sort(key=lambda x: x[2], reverse=True)
+    losers.sort(key=lambda x: x[2])
+    
+    if gainers:
+        res += "\n<b>🚀 أبرز الأسهم الصاعدة اليوم:</b>\n"
+        for t, c, chg in gainers[:5]:
+            res += f"• <b>{t}:</b> {c} جنيه (🟢 <b>{chg:+.2f}%</b>)\n"
+            
+    if losers:
+        res += "\n<b>🔻 أبرز الأسهم المتراجعة (جني أرباح/تصحيح):</b>\n"
+        for t, c, chg in losers[:5]:
+            res += f"• <b>{t}:</b> {c} جنيه (🔴 <b>{chg:+.2f}%</b>)\n"
+            
+    # 3. Key News
+    if grouped_news:
+        res += "\n<b>📰 أهم إفصاحات وأخبار الشركات اليوم:</b>\n"
+        count = 0
+        for tag, items in grouped_news.items():
+            if count >= 6:
+                break
+            for item in items[:2]:
+                res += f"• <b>{tag}</b>: {item['title']}\n"
+                count += 1
+                if count >= 6:
+                    break
+                    
+    # 4. Market Projection
+    egx30_chg = indices_data.get("EGX30", {}).get("chgPct", 0)
+    res += "\n<b>🔮 رؤية وتوقعات الغد:</b>\n"
+    if egx30_chg > 0.5:
+        res += "استمرار الزخم الشرائي والسيولة المؤسسية يدعم مواصلة الصعود واختبار مستويات مقاومة جديدة مع الحفاظ على الحذر عند القمم السعرية."
+    elif egx30_chg < -0.5:
+        res += "حركة تصحيحية وجني أرباح صحي لتخفيف المؤشرات، يُتوقع ظهور قوى شرائية ارتدادية عند مستويات الدعم الرئيسية للأسهم القيادية."
+    else:
+        res += "حركة عرضية متوازنة بين قوى الشراء وجني الأرباح، مع ترقب مستويات سيولة جديدة لتحديد اتجاه كسر المسار العرضي."
+        
+    return res
+
 def send_daily_summary():
     print(f"[{datetime.now()}] Generating and sending daily summary report...")
     if not os.path.exists(STRINGS_PATH):
         reply_telegram("⚠️ <b>خطأ حرجي:</b> ملف strings.json غير موجود في المستودع!")
-        return
+        return False
         
     with open(STRINGS_PATH, "r", encoding="utf-8") as f:
         s = json.load(f)
@@ -1168,8 +1249,14 @@ def send_daily_summary():
     reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الختامي وتوقعات الغد...")
     summary_text = generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped, s)
     
+    # Fallback to rule-based summary if AI failed or returned error string
+    if not summary_text or "عذراً" in summary_text or len(summary_text.strip()) < 50:
+        print("AI summary empty or failed. Generating rich rule-based financial summary fallback...")
+        summary_text = generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped, s)
+        
     header = f"📌 <b>ملخص حركة اليوم وتوقعات الغد لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>\n\n"
     reply_telegram(header + summary_text)
+    return True
 
 def handle_telegram_command(text):
     text_lower = text.lower()
@@ -1332,6 +1419,11 @@ if __name__ == "__main__":
         time.sleep(2)
         send_report(force=True)
         
+        # إذا تم التشغيل القسري بعد إغلاق السوق (بعد 14:30)، نرسل الملخص الختامي أيضاً
+        if now.hour * 60 + now.minute >= 14 * 60 + 30:
+            print("Past 2:30 PM, sending daily summary during force run...")
+            send_daily_summary()
+        
         # ✅ إصلاح: أوقف runner قبل 14:45 فقط وعلى مدار أيام الأسبوع وليس عطلة نهاية الأسبوع
         if now.weekday() not in [4, 5] and now.hour * 60 + now.minute < 14 * 60 + 45:
             print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
@@ -1369,12 +1461,11 @@ if __name__ == "__main__":
                             poll_telegram_messages()
                             time.sleep(5)
                     
-                    send_daily_summary()
-                    
-                    # تحديث الحالة على جيت هاب لمنع تكرار الإرسال
-                    state_data, state_sha = get_github_state()
-                    state_data["summary_sent"] = True
-                    update_github_state(state_data, state_sha)
+                    success = send_daily_summary()
+                    if success:
+                        state_data, state_sha = get_github_state()
+                        state_data["summary_sent"] = True
+                        update_github_state(state_data, state_sha)
                     
                 sys.exit(0)
                 
