@@ -540,11 +540,7 @@ def fetch_egx_beta_news():
         uid = f"{item['tag']}_{item['title']}"
         if uid not in seen:
             seen.add(uid)
-            code = item.get("code")
-            if code:
-                item["link"] = f"https://beta.egx.com.eg/ar/news/{code}"
-            else:
-                item["link"] = "https://beta.egx.com.eg/ar/media-center?tab=disclosure"
+            item["link"] = "https://beta.egx.com.eg/ar/media-center?tab=disclosure"
             unique.append(item)
     return unique
 
@@ -614,8 +610,10 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             if matched_stock or is_market:
                 if matched_stock:
                     item["tag"] = f"[{matched_stock}]"
+                    item["link"] = f"https://www.mubasher.info/markets/EGX/stocks/{matched_stock}/news"
                 else:
                     item["tag"] = "[البورصة]"
+                    item["link"] = "https://beta.egx.com.eg/ar/media-center?tab=disclosure"
                 filtered.append(item)
     
     for item in all_news:
