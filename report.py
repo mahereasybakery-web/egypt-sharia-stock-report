@@ -302,7 +302,7 @@ def ask_ai(question):
 
     # Fallback to Gemini AI (with model fallback to bypass 503/404/429 errors)
     if GEMINI_API_KEY:
-        gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+        gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-pro-latest"]
         for model_name in gemini_models:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
             headers = {"content-type": "application/json"}
@@ -326,6 +326,10 @@ def ask_ai(question):
                     elif r.status_code == 429:
                         print(f"Gemini {model_name} rate limit (429), attempt {attempt+1}. Backing off 5s...")
                         time.sleep(5)
+                        continue
+                    elif r.status_code == 503:
+                        print(f"Gemini {model_name} overloaded (503), attempt {attempt+1}. Backing off 3s...")
+                        time.sleep(3)
                         continue
                     else:
                         print(f"Gemini {model_name} ask_ai returned status {r.status_code}")
@@ -669,17 +673,16 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     prompt = (
         "أنت خبير مالي ومحلل أسهم محترف في البورصة المصرية.\n"
-        "مهمتك هي تحليل الأخبار لكل سهم وتقديم تقييم مالي وتوقعات مستقبلية مختصرة جداً.\n"
-        "لكل سهم من الأسهم التالية، قم بتحليل الأخبار المرفقة وقدم تحليلاً باللغة العربية الفصحى (بين 30 إلى 50 كلمة لكل سهم) يشمل:\n"
-        "1. التقييم المالي المشترك للأخبار والتأثير المتوقع على سعر ومستقبل السهم (إيجابي / سلبي / محايد).\n"
-        "2. نظرة مستقبلية قصيرة للسهم.\n"
+        "مهمتك: تقديم تحليل مالي وفني واضح ودقيق ومفيد لكل سهم وردت عنه أخبار:\n"
+        "1. تقييم تأثير الخبر على السهم (إيجابي / سلبي / محايد) وشرح السبب المالي أو التشغيلي المباشر وراء هذا التأثير بوضوح.\n"
+        "2. الرؤية الفنية والاتجاه المتوقع مع أهم مستويات الدعم والمقاومة القريبة للسهم.\n"
         "قاعدة هامة: إذا ورد أكثر من خبر عن نفس السهم، قم بتحليلها معاً في تقييم واحد يوضح التأثير المشترك والمتوقع لها مجتمعة على أداء ومستقبل السهم.\n"
-        "قاعدة هامة: التحليل يجب أن يكون نقدي ودقيق جداً، وموضوعي يعكس الواقع بحيادية تامة.\n\n"
+        "قاعدة هامة: التحليل يجب أن يكون نقدي ودقيق جداً وواضح العبارة للمستثمر، وموضوعي يعكس الواقع بحيادية تامة.\n\n"
         "يجب أن تكون الإجابة بالتنسيق التالي لكل سهم (كل سهم في سطر منفصل وبدون أي نصوص برمجية أو علامات ماركداون إضافية):\n"
-        "[اسم السهم]: نص التحليل المالي والتقييم مباشرة.\n"
+        "[اسم السهم]: نص التحليل المالي والتقييم ومستويات الدعم والمقاومة مباشرة.\n"
         "مثال:\n"
-        "[FWRY]: التقييم إيجابي. من المتوقع نمو السعر بسبب زيادة الأرباح.\n"
-        "[ETEL]: التقييم محايد. استقرار في الأداء المالي مع نظرة مستقبلية مستقرة.\n\n"
+        "[FWRY]: التقييم إيجابي. نمو الإيرادات والربحية يدعم استمرار المسار الصاعد، الدعم الحالي 7.80 والمقاومة 8.50 جنيه.\n"
+        "[ETEL]: التقييم محايد مائل للإيجابية. استقرار التدفقات النقدية مع ترقب توزيعات الأرباح، الدعم 38.5 والمقاومة 42.0 جنيه.\n\n"
         "الأسهم والأخبار المتاحة:\n"
     )
     
@@ -692,7 +695,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         
     analyses = {}
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
-    gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-pro-latest"]
     for model_name in gemini_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         body = {
@@ -725,6 +728,10 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
                 elif r.status_code == 429:
                     print(f"Gemini {model_name} news analysis rate limit (429), attempt {attempt+1}. Backing off 4s...")
                     time.sleep(4)
+                    continue
+                elif r.status_code == 503:
+                    print(f"Gemini {model_name} overloaded (503), attempt {attempt+1}. Backing off 3s...")
+                    time.sleep(3)
                     continue
                 else:
                     print(f"Gemini {model_name} returned status {r.status_code}: {r.text[:300]}")
@@ -1108,38 +1115,48 @@ def send_report(force=False):
 
 def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
     # Construct details of today's market movements
-    market_details = "--- أداء الأسهم اليوم ---\n"
-    for ticker, info in stocks_data.items():
-        market_details += f"- سهم {ticker}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+    market_details = "--- أداء أسهم المحفظة الأساسية ---\n"
+    for ticker in PORTFOLIO:
+        if ticker in stocks_data:
+            info = stocks_data[ticker]
+            market_details += f"- سهم {ticker}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']:+.2f}%\n"
+            
+    market_details += "\n--- أبرز أسهم قائمة المتابعة الشريعية ---\n"
+    for ticker in WATCHLIST:
+        if ticker in stocks_data and ticker not in PORTFOLIO:
+            info = stocks_data[ticker]
+            if abs(info['chgPct']) >= 0.5:
+                market_details += f"- سهم {ticker}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']:+.2f}%\n"
         
     market_details += "\n--- أداء المؤشرات والعملات اليوم ---\n"
     for idx, info in indices_data.items():
-        market_details += f"- مؤشر {idx}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+        market_details += f"- مؤشر {idx}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']:+.2f}%\n"
     for key, info in fx_gold_data.items():
-        market_details += f"- {key}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']}%\n"
+        market_details += f"- {key}: الافتتاح: {info['open']}، الإغلاق: {info['close']}، التغير: {info['chgPct']:+.2f}%\n"
         
-    market_details += "\n--- أخبار الشركات اليوم ---\n"
+    market_details += "\n--- أخبار وإفصاحات الشركات اليوم ---\n"
     for tag, items in grouped_news.items():
         market_details += f"=== {tag} ===\n"
         for item in items:
             market_details += f"- {item['title']} (المصدر: {item['source']})\n"
             
     prompt = (
-        "أنت خبير مالي ومحلل اقتصاد كلي واستراتيجي أسهم محترف في البورصة المصرية.\n"
-        "مهمتك هي إعداد تقرير 'ملخص حركة اليوم وتوقعات الغد' لجلسة البورصة المصرية بعد الإغلاق.\n"
-        "التقرير يجب أن يكون باللغة العربية الفصحى وبتنسيق HTML مناسب للإرسال على تليجرام، ويحتوي على الأقسام التالية:\n\n"
-        "1. 📝 **ملخص عام للجلسة والقطاعات:** تحليل عام لأداء السوق والمؤشرات والسيولة اليوم.\n"
-        "2. 📊 **أداء المؤشرات والعملات والمعادن:** تحليل حركة مؤشر EGX30 ومؤشر الشريعة EGX33 وسعر الدولار والذهب وأسباب تغيرها.\n"
-        "3. 🔍 **تحليل تفصيلي للأسهم النشطة:** لكل سهم من الأسهم التي شهدت أخباراً هامة أو تحركات سعرية ملحوظة (تغير أكبر من 1% أو -1%):\n"
-        "   - حركة السهم اليوم وتغيره.\n"
-        "   - الأسباب المباشرة أو المتوقعة لهذا التغير (ربطاً بالأخبار المرفقة أو اتجاهات السوق).\n"
-        "   - توقعات حركة السهم لجلسة الغد.\n"
-        "4. 🔮 **رؤية وتوقعات جلسة الغد:** توقع عام لحركة المؤشرات والسوق في الجلسة القادمة ونقاط الدعم والمقاومة المتوقعة.\n\n"
-        "شروط هامة:\n"
-        "- استخدم لغة مالية رصينة وموضوعية وحيادية تماماً.\n"
-        "- استخدم وسوم HTML المسموحة في تليجرام فقط للتنسيق (مثل <b>, <i>, <code>, <pre>, <u>).\n"
-        "- لا تستخدم علامات الماركداون (مثل ** أو `) في الإجابة، اعتمد بالكامل على وسوم HTML للتنسيق.\n"
-        "- يجب أن يكون التحليل دقيقاً ومربوطاً بالأرقام المرفقة.\n\n"
+        "أنت كبير المحللين الماليين واستراتيجي التداول في البورصة المصرية.\n"
+        "مهمتك هي إعداد تقرير 'ملخص حركة اليوم وتوقعات الغد' لجلسة البورصة بعد الإغلاق، ليكون تقريراً تحليلياً متكاملاً وواضحاً وشاملاً للمستثمر.\n"
+        "التقرير يجب أن يكون باللغة العربية الفصحى وبتنسيق HTML أنيق للإرسال على تليجرام، ويحتوي على الأقسام التالية:\n\n"
+        "1. 📝 <b>قراءة عامة للجلسة وسلوك السيولة:</b> تحليل دقيق لطبيعة الجلسة اليوم (هل كانت تجميع أم جني أرباح أم شراء مؤسسي، وما اتجاه السيولة العام).\n"
+        "2. 📊 <b>حركة المؤشرات الرئيسية والعملات:</b> تحليل أداء مؤشر الشريعة EGX33 ومؤشر EGX30 وحركة الدولار والذهب، وتأثير ذلك على السوق.\n"
+        "3. 💼 <b>تحليل مفصل لأسهم المحفظة الأساسية:</b> (أهم قسم في التقرير) قدم تحليلاً فاحصاً ومفصلاً لأسهم المحفظة وخاصة الأسهم النشطة اليوم (مثل TMGH, ADIB, ETEL, FWRY... إلخ):\n"
+        "   - ما الذي حدث للسهم ولماذا تحرك بهذا الشكل (ربطاً بالأخبار أو حركة السيولة وجني الأرباح)؟\n"
+        "   - مستويات الدعم والمقاومة الفنية الحالية.\n"
+        "   - التوصية والرؤية الفنية لجلسة الغد (احتفاظ / جني أرباح / تجميع).\n"
+        "4. 🚀 <b>أبرز الفرص والأسهم النشطة بالسوق:</b> رصد سريع للأسهم الرابحة وأسباب صعودها وأبرز الأسهم المتراجعة.\n"
+        "5. 🔮 <b>سيناريو وتوقعات جلسة الغد:</b> سيناريو حركة المؤشرات لجلسة الغد، ومستويات الدعم والمقاومة الحرجة للمؤشر العام.\n\n"
+        "شروط التنسيق والجودة:\n"
+        "- اكتب بلغة مالية واضحة، سهلة الفهم، شارحة ومباشرة.\n"
+        "- استخدم وسوم HTML المسموحة في تليجرام فقط للتنسيق (مثل <b>, <i>, <code>, <u>).\n"
+        "- لا تستخدم علامات الماركداون (مثل ** أو `) إطلاقاً، اعتمد بالكامل على وسوم HTML.\n"
+        "- اجعل التقرير غنياً بالمعلومات والتحليل المعمق المفيد عملياً للمستثمر.\n\n"
         f"بيانات السوق والأخبار المتاحة لجلسة اليوم:\n{market_details}"
     )
     return ask_ai(prompt)
@@ -1156,7 +1173,26 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
         chg_icon = "🟢" if v["chgPct"] > 0 else ("🔴" if v["chgPct"] < 0 else "⚪")
         res += f"{chg_icon} <b>{k}:</b> {v['close']} ({v['chgPct']:+.2f}%)\n"
         
-    # 2. Top Movers in Portfolio & Watchlist
+    # 2. Portfolio Performance & Technical Stance
+    res += "\n<b>💼 أداء وتحليل أسهم المحفظة الأساسية:</b>\n"
+    for t in PORTFOLIO:
+        if t in stocks_data:
+            info = stocks_data[t]
+            chg = info["chgPct"]
+            if chg > 1.0:
+                stance = "زخم صاعد واختراق مستويات مقاومة"
+            elif chg > 0.0:
+                stance = "أداء إيجابي متماسك بدعم قوى شرائية"
+            elif chg == 0.0:
+                stance = "حركة عرضية متوازنة بانتظار سيولة جديدة"
+            elif chg > -1.0:
+                stance = "تصحيح طفيف وطبيعي ضمن النطاق العرضي"
+            else:
+                stance = "جني أرباح وتراجع، مع ترقب مناطق الدعم للارتداد"
+            icon = "🟢" if chg > 0 else ("🔴" if chg < 0 else "⚪")
+            res += f"{icon} <b>{t}:</b> {info['close']} ج (<b>{chg:+.2f}%</b>) — {stance}\n"
+
+    # 3. Top Movers in Market
     gainers = []
     losers = []
     for ticker, info in stocks_data.items():
