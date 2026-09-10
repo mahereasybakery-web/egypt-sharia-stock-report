@@ -1113,7 +1113,93 @@ def send_report(force=False):
         except Exception as e:
             print("Error clearing manual news:", e)
 
-def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
+def get_session_context(dt=None):
+    if dt is None:
+        dt = datetime.now(timezone(timedelta(hours=3)))
+    weekday = dt.weekday()
+    # 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+    if weekday == 3:  # Thursday (End of trading week in Egypt)
+        return {
+            "day_name": "الخميس",
+            "is_thursday": True,
+            "next_session_title": "خريطة الجلسة القادمة (الأحد - افتتاح الأسبوع)",
+            "next_session_name": "الجلسة القادمة (الأحد - افتتاح الأسبوع)",
+            "closing_title": "ملخص حركة اليوم وخريطة الجلسة القادمة (الأحد - افتتاح الأسبوع)",
+            "closing_greeting": "🔒 <b>تم إغلاق تداولات الأسبوع بنجاح. نلقاكم يوم الأحد القادم بإذن الله مع افتتاح أسبوع تداول جديد.</b>",
+            "prompt_day_context": (
+                "تنبيه جوهري بالغ الأهمية: اليوم هو الخميس (ختام تداولات الأسبوع في البورصة المصرية)، "
+                "وغداً الجمعة والسبت عطلة نهاية الأسبوع الرسمية (السوق مغلق). "
+                "يُحظر تماماً ذكر عبارة 'جلسة الغد' أو 'توقعات الغد' أو الإشارة إلى أن غداً يوم تداول! "
+                "بدلاً من ذلك، اكتب عن 'الجلسة القادمة (الأحد - افتتاح الأسبوع الجديد)' وقدّم تقييماً ختامياً للأسبوع وتطلعات افتتاح الأسبوع القادم يوم الأحد."
+            ),
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات الجلسة القادمة (الأحد - افتتاح الأسبوع):</b>",
+            "rule_projection_header": "🔮 رؤية وخريطة افتتاح الأسبوع القادم (جلسة الأحد):"
+        }
+    elif weekday == 6:  # Sunday
+        return {
+            "day_name": "الأحد",
+            "is_thursday": False,
+            "next_session_title": "توقعات جلسة الغد (الإثنين)",
+            "next_session_name": "جلسة الغد (الإثنين)",
+            "closing_title": "ملخص حركة اليوم وتوقعات جلسة الغد (الإثنين)",
+            "closing_greeting": "🔒 <b>تم إرسال تقرير الإقفال لجلسة اليوم. نلقاكم غداً (الإثنين) بإذن الله.</b>",
+            "prompt_day_context": "الجلسة القادمة هي جلسة الغد (الإثنين).",
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات جلسة الغد (الإثنين):</b>",
+            "rule_projection_header": "🔮 رؤية وتوقعات جلسة الغد (الإثنين):"
+        }
+    elif weekday == 0:  # Monday
+        return {
+            "day_name": "الإثنين",
+            "is_thursday": False,
+            "next_session_title": "توقعات جلسة الغد (الثلاثاء)",
+            "next_session_name": "جلسة الغد (الثلاثاء)",
+            "closing_title": "ملخص حركة اليوم وتوقعات جلسة الغد (الثلاثاء)",
+            "closing_greeting": "🔒 <b>تم إرسال تقرير الإقفال لجلسة اليوم. نلقاكم غداً (الثلاثاء) بإذن الله.</b>",
+            "prompt_day_context": "الجلسة القادمة هي جلسة الغد (الثلاثاء).",
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات جلسة الغد (الثلاثاء):</b>",
+            "rule_projection_header": "🔮 رؤية وتوقعات جلسة الغد (الثلاثاء):"
+        }
+    elif weekday == 1:  # Tuesday
+        return {
+            "day_name": "الثلاثاء",
+            "is_thursday": False,
+            "next_session_title": "توقعات جلسة الغد (الأربعاء)",
+            "next_session_name": "جلسة الغد (الأربعاء)",
+            "closing_title": "ملخص حركة اليوم وتوقعات جلسة الغد (الأربعاء)",
+            "closing_greeting": "🔒 <b>تم إرسال تقرير الإقفال لجلسة اليوم. نلقاكم غداً (الأربعاء) بإذن الله.</b>",
+            "prompt_day_context": "الجلسة القادمة هي جلسة الغد (الأربعاء).",
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات جلسة الغد (الأربعاء):</b>",
+            "rule_projection_header": "🔮 رؤية وتوقعات جلسة الغد (الأربعاء):"
+        }
+    elif weekday == 2:  # Wednesday
+        return {
+            "day_name": "الأربعاء",
+            "is_thursday": False,
+            "next_session_title": "توقعات جلسة الغد (الخميس - ختام الأسبوع)",
+            "next_session_name": "جلسة الغد (الخميس - ختام الأسبوع)",
+            "closing_title": "ملخص حركة اليوم وتوقعات جلسة الغد (الخميس - ختام الأسبوع)",
+            "closing_greeting": "🔒 <b>تم إرسال تقرير الإقفال لجلسة اليوم. نلقاكم غداً (الخميس) بإذن الله.</b>",
+            "prompt_day_context": "الجلسة القادمة هي جلسة الغد (الخميس - ختام تداولات الأسبوع).",
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات جلسة الغد (الخميس - ختام الأسبوع):</b>",
+            "rule_projection_header": "🔮 رؤية وتوقعات جلسة الغد (الخميس - ختام الأسبوع):"
+        }
+    else:  # Weekend (Friday=4, Saturday=5)
+        return {
+            "day_name": "الجمعة" if weekday == 4 else "السبت",
+            "is_thursday": False,
+            "next_session_title": "توقعات جلسة الأحد القادمة",
+            "next_session_name": "جلسة الأحد القادمة",
+            "closing_title": "ملخص جلسة البورصة وتوقعات جلسة الأحد",
+            "closing_greeting": "🔒 <b>البورصة في عطلة نهاية الأسبوع. نلقاكم يوم الأحد القادم بإذن الله.</b>",
+            "prompt_day_context": "البورصة في عطلة نهاية الأسبوع، والجلسة القادمة هي جلسة الأحد القادم.",
+            "projection_header": "5. 🔮 <b>سيناريو وتوقعات جلسة الأحد القادمة:</b>",
+            "rule_projection_header": "🔮 رؤية وتوقعات جلسة الأحد القادمة:"
+        }
+
+def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_news, strings, ctx=None):
+    if ctx is None:
+        ctx = get_session_context()
+        
     # Construct details of today's market movements
     market_details = "--- أداء أسهم المحفظة الأساسية ---\n"
     for ticker in PORTFOLIO:
@@ -1141,17 +1227,18 @@ def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_n
             market_details += f"- {item['title']} (المصدر: {item['source']})\n"
             
     prompt = (
-        "أنت كبير المحللين الماليين واستراتيجي التداول في البورصة المصرية.\n"
-        "مهمتك هي إعداد تقرير 'ملخص حركة اليوم وتوقعات الغد' لجلسة البورصة بعد الإغلاق، ليكون تقريراً تحليلياً متكاملاً وواضحاً وشاملاً للمستثمر.\n"
+        f"أنت كبير المحللين الماليين واستراتيجي التداول في البورصة المصرية.\n"
+        f"مهمتك هي إعداد تقرير '{ctx['closing_title']}' لجلسة البورصة بعد الإغلاق، ليكون تقريراً تحليلياً متكاملاً وواضحاً وشاملاً للمستثمر.\n"
+        f"{ctx['prompt_day_context']}\n\n"
         "التقرير يجب أن يكون باللغة العربية الفصحى وبتنسيق HTML أنيق للإرسال على تليجرام، ويحتوي على الأقسام التالية:\n\n"
         "1. 📝 <b>قراءة عامة للجلسة وسلوك السيولة:</b> تحليل دقيق لطبيعة الجلسة اليوم (هل كانت تجميع أم جني أرباح أم شراء مؤسسي، وما اتجاه السيولة العام).\n"
         "2. 📊 <b>حركة المؤشرات الرئيسية والعملات:</b> تحليل أداء مؤشر الشريعة EGX33 ومؤشر EGX30 وحركة الدولار والذهب، وتأثير ذلك على السوق.\n"
         "3. 💼 <b>تحليل مفصل لأسهم المحفظة الأساسية:</b> (أهم قسم في التقرير) قدم تحليلاً فاحصاً ومفصلاً لأسهم المحفظة وخاصة الأسهم النشطة اليوم (مثل TMGH, ADIB, ETEL, FWRY... إلخ):\n"
         "   - ما الذي حدث للسهم ولماذا تحرك بهذا الشكل (ربطاً بالأخبار أو حركة السيولة وجني الأرباح)؟\n"
         "   - مستويات الدعم والمقاومة الفنية الحالية.\n"
-        "   - التوصية والرؤية الفنية لجلسة الغد (احتفاظ / جني أرباح / تجميع).\n"
+        f"   - التوصية والرؤية الفنية لـ {ctx['next_session_name']} (احتفاظ / جني أرباح / تجميع).\n"
         "4. 🚀 <b>أبرز الفرص والأسهم النشطة بالسوق:</b> رصد سريع للأسهم الرابحة وأسباب صعودها وأبرز الأسهم المتراجعة.\n"
-        "5. 🔮 <b>سيناريو وتوقعات جلسة الغد:</b> سيناريو حركة المؤشرات لجلسة الغد، ومستويات الدعم والمقاومة الحرجة للمؤشر العام.\n\n"
+        f"{ctx['projection_header']} سيناريو حركة المؤشرات، ومستويات الدعم والمقاومة الحرجة للمؤشر العام.\n\n"
         "شروط التنسيق والجودة:\n"
         "- اكتب بلغة مالية واضحة، سهلة الفهم، شارحة ومباشرة.\n"
         "- استخدم وسوم HTML المسموحة في تليجرام فقط للتنسيق (مثل <b>, <i>, <code>, <u>).\n"
@@ -1161,7 +1248,10 @@ def generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped_n
     )
     return ask_ai(prompt)
 
-def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped_news, strings):
+def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped_news, strings, ctx=None):
+    if ctx is None:
+        ctx = get_session_context()
+        
     res = "<b>📝 ملخص أداء جلسة اليوم وأهم التحركات:</b>\n"
     
     # 1. Indices & Currencies
@@ -1229,7 +1319,7 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
                     
     # 4. Market Projection
     egx30_chg = indices_data.get("EGX30", {}).get("chgPct", 0)
-    res += "\n<b>🔮 رؤية وتوقعات الغد:</b>\n"
+    res += f"\n<b>{ctx['rule_projection_header']}</b>\n"
     if egx30_chg > 0.5:
         res += "استمرار الزخم الشرائي والسيولة المؤسسية يدعم مواصلة الصعود واختبار مستويات مقاومة جديدة مع الحفاظ على الحذر عند القمم السعرية."
     elif egx30_chg < -0.5:
@@ -1240,7 +1330,8 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
     return res
 
 def send_daily_summary():
-    print(f"[{datetime.now()}] Generating and sending daily summary report...")
+    ctx = get_session_context()
+    print(f"[{datetime.now()}] Generating and sending daily summary report ({ctx['closing_title']})...")
     if not os.path.exists(STRINGS_PATH):
         reply_telegram("⚠️ <b>خطأ حرجي:</b> ملف strings.json غير موجود في المستودع!")
         return False
@@ -1280,15 +1371,15 @@ def send_daily_summary():
         "GOLD": xauusd
     }
     
-    reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الختامي وتوقعات الغد...")
-    summary_text = generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped, s)
+    reply_telegram(f"🔄 جاري إعداد ملخص حركة اليوم والتحليل الختامي و{ctx['next_session_title']}...")
+    summary_text = generate_daily_summary_ai(stocks_data, indices_data, fx_gold_data, grouped, s, ctx)
     
     # Fallback to rule-based summary if AI failed or returned error string
     if not summary_text or "عذراً" in summary_text or len(summary_text.strip()) < 50:
         print("AI summary empty or failed. Generating rich rule-based financial summary fallback...")
-        summary_text = generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped, s)
+        summary_text = generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, grouped, s, ctx)
         
-    header = f"📌 <b>ملخص حركة اليوم وتوقعات الغد لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>\n\n"
+    header = f"📌 <b>{ctx['closing_title']} {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>\n\n"
     reply_telegram(header + summary_text)
     return True
 
@@ -1435,16 +1526,32 @@ def sleep_until_next_15min_mark():
 if __name__ == "__main__":
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
+    today_str = now.strftime("%Y-%m-%d")
     # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة مع هامش أمان 5 دقائق لتلافي فجوة الانتقال بين الـ runners
     _startup_epoch = int(time.time()) - 300
     
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     
-    # Check weekday (Egypt stock market runs Sunday to Thursday)
-    # Python weekday(): 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+    # 1. Check weekday (Egypt stock market runs Sunday to Thursday: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
     if now.weekday() in [4, 5] and not force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Exiting.")
+        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Market closed. Exiting.")
         sys.exit(0)
+        
+    # 2. Check time of day: If 3:00 PM (15:00) or later, all trading and closing reports for today are finished!
+    # Any delayed/queued runner starting after 15:00 must exit immediately without sending anything.
+    if (now.hour * 60 + now.minute >= 15 * 60) and not force_run:
+        print(f"[{now.strftime('%H:%M:%S')}] Past 03:00 PM Cairo time. All sessions and reports completed for today ({today_str}). Exiting cleanly.")
+        sys.exit(0)
+        
+    # 3. Check state: If today's daily summary has already been sent, today's work is 100% finished!
+    if not force_run:
+        try:
+            state_data, _ = get_github_state()
+            if state_data.get("date") == today_str and state_data.get("summary_sent", False):
+                print(f"[{now.strftime('%H:%M:%S')}] Daily closing summary was already sent today ({today_str}). Exiting cleanly.")
+                sys.exit(0)
+        except Exception as e:
+            print(f"Warning checking initial state: {e}")
         
     if force_run:
         print(f"[{now.strftime('%H:%M:%S')}] FORCE_RUN enabled. Processing commands and sending immediate report.")
@@ -1459,11 +1566,12 @@ if __name__ == "__main__":
             success = send_daily_summary()
             if success:
                 state_data, state_sha = get_github_state()
+                state_data["date"] = today_str
                 state_data["summary_sent"] = True
                 update_github_state(state_data, state_sha)
         
-        # ✅ إصلاح: أوقف runner قبل 14:45 فقط وعلى مدار أيام الأسبوع وليس عطلة نهاية الأسبوع
-        if now.weekday() not in [4, 5] and now.hour * 60 + now.minute < 14 * 60 + 45:
+        # ✅ إصلاح: أوقف runner بعد 14:30 وعلى مدار أيام الأسبوع أو عطلة نهاية الأسبوع
+        if now.weekday() not in [4, 5] and now.hour * 60 + now.minute < 14 * 60 + 30:
             print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
             trigger_next_runner()
         else:
@@ -1480,45 +1588,56 @@ if __name__ == "__main__":
             print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
             
             current_time_minutes = loop_now.hour * 60 + loop_now.minute
-            # ✅ إصلاح: مزامنة حد الخروج مع حد الإرسال (14:30 وليس 15:30)
+            
+            # إذا انتهت جلسة التداول (بعد 14:30 / 02:30 ظهراً):
             if current_time_minutes > 14 * 60 + 30:
-                print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Sending final closing report.")
-                send_report()
-                reply_telegram("🔒 <b>تم إرسال تقرير الإقفال النهائي لجلسة اليوم. نراكم غداً بإذن الله.</b>")
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Handling session close & summary.")
                 
-                # ✅ إضافة: الانتظار حتى الساعة 3:00 مساءً لإرسال التقرير التحليلي الإضافي (الملخص الختامي)
+                # التحقق أولاً: إذا كان التقرير الختامي قد أُرسل اليوم بالفعل، نخرج فوراً دون أي إرسال متكرر
                 state_data, state_sha = get_github_state()
-                if not state_data.get("summary_sent", False):
-                    now_egypt = datetime.now(egypt_tz)
-                    target_summary_time = now_egypt.replace(hour=15, minute=0, second=0, microsecond=0)
-                    if now_egypt < target_summary_time:
-                        seconds_to_wait = (target_summary_time - now_egypt).total_seconds()
-                        print(f"[{now_egypt.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until 3:00 PM for Daily Summary...")
-                        start_time = time.time()
-                        while (time.time() - start_time) < seconds_to_wait:
-                            poll_telegram_messages()
-                            time.sleep(5)
-                    
-                    success = send_daily_summary()
-                    if success:
-                        state_data, state_sha = get_github_state()
-                        state_data["summary_sent"] = True
-                        update_github_state(state_data, state_sha)
-                    
+                if state_data.get("date") == today_str and state_data.get("summary_sent", False):
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Daily summary already sent today. Exiting cleanly.")
+                    sys.exit(0)
+                
+                # إرسال تقرير الإقفال لأسعار الجلسة
+                send_report()
+                
+                ctx = get_session_context(loop_now)
+                reply_telegram(ctx["closing_greeting"])
+                
+                # الانتظار حتى الساعة 3:00 مساءً لإرسال التقرير التحليلي الإضافي (الملخص الختامي)
+                now_egypt = datetime.now(egypt_tz)
+                target_summary_time = now_egypt.replace(hour=15, minute=0, second=0, microsecond=0)
+                if now_egypt < target_summary_time:
+                    seconds_to_wait = (target_summary_time - now_egypt).total_seconds()
+                    print(f"[{now_egypt.strftime('%H:%M:%S')}] Waiting {seconds_to_wait:.1f} seconds until 3:00 PM for Daily Summary...")
+                    start_time = time.time()
+                    while (time.time() - start_time) < seconds_to_wait:
+                        poll_telegram_messages()
+                        time.sleep(5)
+                
+                success = send_daily_summary()
+                if success:
+                    state_data, state_sha = get_github_state()
+                    state_data["date"] = today_str
+                    state_data["summary_sent"] = True
+                    update_github_state(state_data, state_sha)
+                
+                print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Daily summary sent. Terminating runner for the day.")
                 sys.exit(0)
                 
-            # ✅ إصلاح: البورصة تُغلق 14:30 وليس 15:30
+            # خلال ساعات الجلسة (من 08:45 صباحاً حتى 14:30 ظهراً)
             if 8 * 60 + 45 <= current_time_minutes <= 14 * 60 + 30:
                 send_report()
             else:
-                print(f"[{loop_now.strftime('%H:%M:%S')}] Outside market hours, skipping report.")
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Outside active market hours, skipping report.")
                 
             if i == TOTAL_CYCLES - 1:
-                # ✅ إصلاح: إطلاق المشغل الجديد في نهاية الدورة الأخيرة فقط لمنع تشغيل نسختين في وقت واحد وتكرار الرسائل
-                if loop_now.hour * 60 + loop_now.minute < 15 * 60:
+                # إطلاق المشغل الجديد فقط إذا كان السوق لا يزال مفتوحاً (قبل 14:30)
+                if loop_now.hour * 60 + loop_now.minute < 14 * 60 + 30:
                     trigger_next_runner()
                 else:
-                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 3:00 PM or later. Stopping chain.")
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 2:30 PM or later. Stopping chain.")
                     
             if i < TOTAL_CYCLES - 1:
                 sleep_until_next_15min_mark()
