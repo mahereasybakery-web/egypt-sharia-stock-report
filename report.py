@@ -938,7 +938,7 @@ def send_report(force=False):
         
         # تصفير الأخبار إذا بدأ يوم جديد
         if state_data.get("date") != today_str:
-            state_data = {"sent_links": [], "date": today_str}
+            state_data = {"sent_links": [], "date": today_str, "summary_sent": False}
             
         sent_links = set(state_data.get("sent_links", []))
         
