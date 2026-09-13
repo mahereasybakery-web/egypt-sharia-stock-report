@@ -375,18 +375,18 @@ def fetch_rss_news():
         "إنتربرايز": "https://enterprise.press/ar/feed",
         "أموال الغد": "https://amwalalghad.com/feed",
         "سي إن بي سي عربية": "https://www.cnbcarabia.com/rss",
+        "زاوية مصر": "https://www.zawya.com/ar/rss/egypt/",
         "الشروق اقتصاد": "https://www.shorouknews.com/rss/economy",
         "المصري اليوم اقتصاد": "https://www.almasryalyoum.com/rss/sections/2/feed"
     }
     
-    # ✅ إصلاح: بناء استعلام أخبار جوجل ديناميكياً ليشمل جميع الـ 37 شركة لضمان جلب أخبارها بالكامل
-    gnews_keywords = ["البورصة المصرية", "أسهم مصر", "اقتصاد مصر"]
-    for ticker in ALL_TICKERS:
-        if ticker in STOCK_KEYWORDS and STOCK_KEYWORDS[ticker]:
-            gnews_keywords.append(f'"{STOCK_KEYWORDS[ticker][0]}"')
-    gnews_query = " OR ".join(gnews_keywords)
-    encoded_query = urllib.parse.quote(gnews_query)
-    feeds["أخبار جوجل"] = f"https://news.google.com/rss/search?q={encoded_query}&hl=ar&gl=EG&ceid=EG:ar"
+    # ✅ استعلام أخبار جوجل العام للسوق
+    q_market = '"البورصة المصرية" OR "سوق المال" OR "أسهم مصر" OR "EGX30"'
+    feeds["أخبار جوجل - البورصة"] = f"https://news.google.com/rss/search?q={urllib.parse.quote(q_market)}&hl=ar&gl=EG&ceid=EG:ar"
+    
+    # ✅ استعلام أخبار جوجل المخصص لشركات المحفظة والمتابعة الرئيسية
+    q_portfolio = '"طلعت مصطفى" OR "سهم فوري" OR "المصرية للاتصالات" OR "إيديتا" OR "أبوظبي الإسلامي" OR "سوديك" OR "إي فاينانس" OR "مصر للألومنيوم"'
+    feeds["أخبار جوجل - أسهم المحفظة"] = f"https://news.google.com/rss/search?q={urllib.parse.quote(q_portfolio)}&hl=ar&gl=EG&ceid=EG:ar"
     
     headers = {"User-Agent": "Mozilla/5.0"}
     news_items = []
@@ -414,19 +414,24 @@ def fetch_rss_news():
                         l = link_elem.attrib.get("href", "").strip()
                     items.append({"title": t, "link": l})
 
-            limit = 30 if source_name == "أخبار جوجل" else 15
+            limit = 40 if "جوجل" in source_name else 25
             for entry in items[:limit]:
-                # ✅ فحص تاريخ النشر: نقبل فقط الأخبار المنشورة اليوم (بتوقيت القاهرة)
-                is_today = True
+                # ✅ فحص تاريخ النشر: نافذة مرنة تشمل آخر 72 ساعة في العطلة وبداية الأسبوع، و36 ساعة في باقي الأيام
+                is_recent = True
                 if hasattr(entry, 'published_parsed') and entry.published_parsed:
                     try:
                         pub_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
                         egypt_tz = timezone(timedelta(hours=3))
-                        if pub_dt.astimezone(egypt_tz).date() != datetime.now(egypt_tz).date():
-                            is_today = False
+                        pub_egypt = pub_dt.astimezone(egypt_tz)
+                        now_egypt = datetime.now(egypt_tz)
+                        # 72 ساعة إذا كان اليوم أحد/جمعة/سبت أو صباح الإثنين، و36 ساعة لباقي الأوقات
+                        max_hours = 72 if now_egypt.weekday() in [4, 5, 6] or (now_egypt.weekday() == 0 and now_egypt.hour < 12) else 36
+                        age_hours = (now_egypt - pub_egypt).total_seconds() / 3600.0
+                        if age_hours > max_hours or age_hours < -2:
+                            is_recent = False
                     except Exception:
                         pass
-                if not is_today:
+                if not is_recent:
                     continue
                     
                 if hasattr(entry, 'title'):
@@ -438,7 +443,7 @@ def fetch_rss_news():
                 if title and link:
                     link = link.replace(" ", "%20")
                     item_source = source_name
-                    if source_name == "أخبار جوجل":
+                    if "جوجل" in source_name:
                         parts = title.rsplit(" - ", 1)
                         if len(parts) == 2:
                             title = parts[0].strip()
@@ -813,6 +818,68 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
             
     return analyses
 
+def generate_market_ai_pulse(parsed_stocks, egx30, egx33, egx70ewi, sorted_port, sorted_watch):
+    """توليد تحليل فني وسوقي لحظي مستقل عبر الذكاء الاصطناعي لتقديم رؤية استراتيجية واضحة للمستثمر حتى في غياب الأخبار الصحفية."""
+    if not GEMINI_API_KEY and not CLAUDE_API_KEY:
+        return ""
+        
+    try:
+        # اختيار أبرز الأسهم: أهم 3 أسهم من المحفظة + أعلى سهمين حركةً وتغيراً في السوق
+        key_stocks = sorted_port[:3]
+        movers = [s for s in (sorted_port + sorted_watch) if s not in key_stocks]
+        movers.sort(key=lambda x: abs(parsed_stocks.get(x, {}).get("chgPct", 0)), reverse=True)
+        selected_tickers = key_stocks + movers[:2]
+        
+        stock_details = []
+        for t in selected_tickers:
+            d = parsed_stocks.get(t, {})
+            chg = d.get('chgPct', 0)
+            chg_str = f"+{chg}%" if chg > 0 else f"{chg}%"
+            stock_details.append(f"• {t}: السعر {d.get('close', 0)} ج.م (التغير {chg_str}) | المؤشرات الفنية: {d.get('rec', 'محايد')}")
+            
+        prompt = (
+            "أنت كبير استراتيجيي التداول والمحلل المالي الأول للبورصة المصرية.\n"
+            "بناءً على شاشة الأسعار اللحظية التالية لجلسة اليوم:\n"
+            f"- مؤشر EGX30: {egx30.get('close')} ({egx30.get('chgPct')}%), مؤشر الشريعة EGX33: {egx33.get('close')} ({egx33.get('chgPct')}%), مؤشر السبعيني EGX70: {egx70ewi.get('close')} ({egx70ewi.get('chgPct')}%)\n"
+            f"- أبرز أسهم المحفظة والأسهم الأكثر حركة اليوم:\n" + "\n".join(stock_details) + "\n\n"
+            "المطلوب: تقديم تقرير تحليلي مكثف وواضح للمستثمر في 3 فقرات مركزة بالتنسيق التالي حصراً وبدون مقدمات:\n"
+            "⚡ <b>نبض الجلسة والسيولة:</b> قراءة موجزة لاتجاه السيولة وسلوك المؤشرات العامة.\n"
+            "🎯 <b>نظرة فنية على الأسهم النشطة:</b> تحليل فني مباشر لأبرز سهمين (مستويات الدعم والمقاومة اللحظية، وتوصية فنية محددة).\n"
+            "💡 <b>بوصلة المستثمر:</b> نصيحة استراتيجية واضحة للتعامل مع بقية الجلسة أو الجلسة القادمة.\n\n"
+            "تنبيه: اكتب النص بأسلوب اقتصادي فخم ومباشر بدون مقدمات وبدون أي كود برمجي أو وسوم غير <b>."
+        )
+        
+        if GEMINI_API_KEY:
+            gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-pro-latest"]
+            for model_name in gemini_models:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
+                body = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "temperature": 0.25
+                    }
+                }
+                for attempt in range(2):
+                    try:
+                        r = requests.post(url, json=body, headers={"Content-Type": "application/json"}, timeout=35)
+                        if r.status_code == 200:
+                            res_json = r.json()
+                            candidates = res_json.get("candidates", [])
+                            if candidates and "content" in candidates[0] and candidates[0]["content"].get("parts"):
+                                raw_text = candidates[0]["content"]["parts"][0]["text"].strip()
+                                return f"🧠 <b>تحليل الذكاء الاصطناعي لنبض الجلسة:</b>\n\n{raw_text}"
+                        elif r.status_code in [429, 503]:
+                            time.sleep(2)
+                            continue
+                        else:
+                            break
+                    except Exception as e:
+                        print(f"Error calling Gemini {model_name} for market pulse: {e}")
+                        break
+    except Exception as e:
+        print("Error in generate_market_ai_pulse:", e)
+    return ""
+
 def fetch_all_data_tv(tickers, strings):
     parsed = {}
     indices = {
@@ -1165,6 +1232,11 @@ def send_report(force=False):
     reply_telegram(msg_portfolio)
     reply_telegram(msg_watchlist)
     reply_telegram(msg_indices)
+    
+    # ✅ إضافة: إرسال النبض الفني والسوقي للذكاء الاصطناعي (AI Market Pulse) لضمان تحليل فني دسم في كل تقرير
+    ai_market_pulse = generate_market_ai_pulse(parsed_stocks, egx30, egx33, egx70ewi, sorted_port, sorted_watch)
+    if ai_market_pulse:
+        reply_telegram(ai_market_pulse)
         
     if news_chunks:
         for i, chunk in enumerate(news_chunks):
