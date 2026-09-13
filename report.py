@@ -100,13 +100,13 @@ COMPANY_WEBSITES = {
 
 # Stock keywords for news filtering
 STOCK_KEYWORDS = {
-    "TMGH": ["طلعت مصطفى", "TMGH"],
-    "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "ADIB"],
+    "TMGH": ["طلعت مصطفى", "مجموعة طلعت مصطفى", "TMGH"],
+    "ADIB": ["أبوظبي الإسلامي", "أبو ظبي الإسلامي", "مصرف أبوظبي الإسلامي", "ADIB"],
     "EFID": ["إيديتا", "ايديتا", "Edita", "EFID"],
-    "RACC": ["راية مراكز", "راية لخدمات", "RACC"],
-    "FWRY": ["فوري", "FWRY"],
+    "RACC": ["راية مراكز", "راية لخدمات الاتصالات", "RACC"],
+    "FWRY": ["شركة فوري", "منصة فوري", "فوري لتكنولوجيا", "فوري للمدفوعات", "سهم فوري", "خدمات فوري", "تطبيق فوري", "Fawry", "FWRY", "فوري"],
     "EGAL": ["مصر للألومنيوم", "مصر للالومنيوم", "EGAL"],
-    "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "وي", "ETEL"],
+    "ETEL": ["المصرية للاتصالات", "المصريه للاتصالات", "شركة وي", "ETEL"],
     "ORHD": ["أوراسكوم للتنمية", "اوراسكوم للتنمية", "ORHD"],
     "EFIH": ["إي فاينانس", "اي فاينانس", "EFIH"],
     "OCDI": ["سوديك", "سودك", "OCDI"],
@@ -115,27 +115,52 @@ STOCK_KEYWORDS = {
     "SKPC": ["سيدي كرير", "سيدبك", "SKPC"],
     "MCQE": ["أسمنت قنا", "اسمنت قنا", "MCQE"],
     "FAITA": ["فيصل الإسلامي", "فيصل الاسلامي", "FAITA"],
-    "ISPH": ["ابن سينا", "ISPH"],
-    "JUFO": ["جهينة", "جهينه", "JUFO"],
+    "ISPH": ["ابن سينا فارما", "ابن سينا للأدوية", "ابن سينا", "ISPH"],
+    "JUFO": ["جهينة للصناعات", "شركة جهينة", "جهينه", "JUFO"],
     "AMOC": ["أموك", "اموك", "الأسكندرية للزيوت المعدنية", "AMOC"],
-    "MASR": ["مدينة مصر", "ماديناتي", "MASR"],  # حذف 'مدينة نصر' لتجنب false positives
+    "MASR": ["مدينة مصر للإسكان", "شركة مدينة مصر", "مدينة مصر", "MASR"],
     "ORWE": ["النساجون الشرقيون", "النساجون", "ORWE"],
-    "RMDA": ["العاشر من رمضان", "راميدا", "RMDA"],
+    "RMDA": ["العاشر من رمضان للأدوية", "راميدا", "RMDA"],
     "OLFI": ["عبور لاند", "عبورلاند", "OLFI"],
     "ARCC": ["العربية للأسمنت", "العربيه للأسمنت", "ARCC"],
     "FAIT": ["بنك فيصل", "FAIT"],
     "IFAP": ["الدولية للمحاصيل", "الدوليه للمحاصيل", "IFAP"],
     "MTIE": ["إم إم جروب", "ام ام جروب", "MTIE"],
-    "SAUD": ["البركة", "بنك البركة", "SAUD"],
-    "ATQA": ["عتاقة", "عتاقه", "مصر الوطنية للصلب", "ATQA"],
-    "CIRA": ["القاهرة للاستثمار", "سيرا", "CIRA"],
+    "SAUD": ["بنك البركة", "البركة مصر", "SAUD"],
+    "ATQA": ["شركة عتاقة", "مصر الوطنية للصلب", "حديد عتاقة", "عتاقة", "عتاقه", "ATQA"],
+    "CIRA": ["القاهرة للاستثمار", "سيرا للتعليم", "سيرا", "CIRA"],
     "EGAS": ["غاز مصر", "EGAS"],
     "MPCO": ["المنصورة للدواجن", "المنصوره للدواجن", "MPCO"],
     "ACGC": ["عربية لحليج الأقطان", "حليج الأقطان", "ACGC"],
     "ETRS": ["إيجيترانس", "ايجيترانس", "المصرية لخدمات النقل", "ETRS"],
-    "LCSW": ["ليسيكو", "LCSW"],
+    "LCSW": ["ليسيكو مصر", "ليسيكو", "LCSW"],
     "ICFC": ["الدولية للأسمدة", "الدوليه للأسمده", "ICFC"]
 }
+
+# ✅ كلمات مستبعدة خاصة بكل سهم لمنع الالتباس اللغوي والمشاهير
+NEGATIVE_KEYWORDS = {
+    "FWRY": [
+        "كفوري", "وائل كفوري", "بشكل فوري", "تحقيق فوري", "إجراء فوري", "تدخل فوري",
+        "حظر فوري", "إخلاء فوري", "إفراج فوري", "وقف فوري", "إنهاء فوري", "حل فوري",
+        "رد فوري", "علاج فوري", "استجابة فورية", "معالجة فورية", "قرارا فوريا", "تدخلا فوريا",
+        "إغلاق فوري", "تنفيذ فوري"
+    ],
+    "MASR": ["مدينة نصر", "نصر أكتوبر"],
+    "SAUD": ["البركة فيكم", "على بركة الله", "حلت البركة"],
+    "ISPH": ["مستشفى ابن سينا", "الفيلسوف ابن سينا", "العالم ابن سينا"],
+    "JUFO": ["قبيلة جهينة"],
+    "RACC": ["رفع راية", "راية بيضاء", "راية الاستسلام", "راية التوحيد"],
+    "ETEL": ["ويجز", "ويليام", "تويتر"]
+}
+
+# ✅ قائمة استبعاد عامة للأخبار غير الاقتصادية (فنون، مشاهير، حفلات، رياضة، حوادث، جرائم)
+GLOBAL_EXCLUDE_KEYWORDS = [
+    "مغني", "مطرب", "مطربة", "فنان", "فنانة", "أغنية", "أغاني", "كليب", "ألبوم", 
+    "حفل غنائي", "مهرجان سينمائي", "مسلسل", "فيلم", "دراما", "سينما", "ممثلة", "ممثل",
+    "كرة قدم", "مباراة", "دوري", "كأس", "منتخب", "الزمالك", "الأهلي", "رياضة", "لاعب", "مدرب",
+    "حادث سير", "جريمة", "مقتل", "انتحار", "إصابة شخص", "العثور على جثة", "تصادم قطار", 
+    "النيابة العامة تأمر بحبس", "سرقة", "مشاجرة", "مصرع شخص", "سقوط من علو"
+]
 
 def safe_round(val, decimals=2):
     if val is None:
@@ -344,18 +369,14 @@ def ask_ai(question):
 def fetch_rss_news():
     feeds = {
         "جريدة البورصة": "https://alborsaanews.com/feed",
-        "حبي جرنال": "https://hapijournal.com/feed",
+        "جريدة المال": "https://almalnews.com/feed/",
+        "حابي جرنال": "https://hapijournal.com/feed",
         "إيكونومي بلس": "https://economyplusme.com/feed",
         "إنتربرايز": "https://enterprise.press/ar/feed",
-        "اليوم السابع": "https://www.youm7.com/rss/SectionRSS?SectionID=9",
         "أموال الغد": "https://amwalalghad.com/feed",
-        "جريدة الشروق": "https://www.shorouknews.com/rss/economy",
         "سي إن بي سي عربية": "https://www.cnbcarabia.com/rss",
-        "الوطن": "https://www.elwatannews.com/home/rss/economy",
-        "المصري اليوم": "https://www.almasryalyoum.com/rss/sections/2/feed",
-        "صدى البلد": "https://www.elbalad.news/rss.aspx?id=12",
-        "بوابة فيتو": "https://www.vetogate.com/rss.aspx?id=4",
-        "جريدة المال": "https://almalnews.com/feed/"
+        "الشروق اقتصاد": "https://www.shorouknews.com/rss/economy",
+        "المصري اليوم اقتصاد": "https://www.almasryalyoum.com/rss/sections/2/feed"
     }
     
     # ✅ إصلاح: بناء استعلام أخبار جوجل ديناميكياً ليشمل جميع الـ 37 شركة لضمان جلب أخبارها بالكامل
@@ -559,15 +580,38 @@ def normalize_arabic(text):
     return text
 
 def is_whole_word_match(word, text):
-    """مطابقة الكلمات المفتاحية بشكل دقيق مع دعم السوابق العربية وتوحيد الحروف لزيادة دقة البحث وجلب الأخبار بالكامل."""
+    """مطابقة الكلمات المفتاحية بشكل دقيق مع دعم السوابق العربية المشروعة فقط وتوحيد الحروف لمنع التشابه الخاطئ."""
     if not word or not text:
         return False
     norm_word = normalize_arabic(word.lower())
     norm_text = normalize_arabic(text.lower())
     # ✅ إصلاح: السماح بمسافات متعددة بين الكلمات في العبارة المفتاحية
     escaped_word = re.escape(norm_word).replace(r'\ ', r'\s+')
-    pattern = r"(?:^|\W)(?:و|ف|ب|ك|ل|لل|ال|وال|فال|بال|كال)?" + escaped_word + r"(?:$|\W)"
+    # حذف سوابق 'ك' و 'كال' لمنع مطابقة كلمات وأسماء مثل 'كفوري' مع 'فوري' أو 'كاموك' مع 'أموك'
+    pattern = r"(?:^|\W)(?:و|ف|ب|ل|لل|ال|وال|فال|بال)?" + escaped_word + r"(?:$|\W)"
     return re.search(pattern, norm_text) is not None
+
+def is_globally_excluded_news(title):
+    """فحص الأخبار ضد قائمة الاستبعاد العامة (فنون، مشاهير، حفلات، رياضة، حوادث، جرائم)."""
+    if not title:
+        return False
+    norm_title = normalize_arabic(title.lower())
+    for kw in GLOBAL_EXCLUDE_KEYWORDS:
+        norm_kw = normalize_arabic(kw.lower())
+        if norm_kw in norm_title:
+            return True
+    return False
+
+def matches_negative_keyword(ticker, title):
+    """فحص الأخبار ضد قائمة الاستبعاد الخاصة بالسهم لمنع الالتباس اللغوي والمشاهير."""
+    if not title or ticker not in NEGATIVE_KEYWORDS:
+        return False
+    norm_title = normalize_arabic(title.lower())
+    for kw in NEGATIVE_KEYWORDS[ticker]:
+        norm_kw = normalize_arabic(kw.lower())
+        if norm_kw in norm_title:
+            return True
+    return False
 
 def get_filtered_market_news(portfolio_list, watchlist_list):
     filtered = []
@@ -590,6 +634,9 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
     # ✅ إصلاح: فلترة وتصنيف أخبار EGX Beta وربطها بالأسهم إذا تطابقت مع STOCK_KEYWORDS
     egx_beta_items = fetch_egx_beta_news()
     for item in egx_beta_items:
+        title = item["title"]
+        if is_globally_excluded_news(title):
+            continue
         if item["link"] not in seen_links:
             seen_links.add(item["link"])
             
@@ -597,8 +644,10 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             for ticker, keywords in STOCK_KEYWORDS.items():
                 if ticker not in portfolio_list and ticker not in watchlist_list:
                     continue
+                if matches_negative_keyword(ticker, title):
+                    continue
                 for kw in keywords:
-                    if is_whole_word_match(kw, item["title"]):
+                    if is_whole_word_match(kw, title):
                         matched_stock = ticker
                         break
                 if matched_stock:
@@ -607,7 +656,7 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
             is_market = False
             if not matched_stock:
                 for mkw in ["البورصة", "البورصه", "EGX30", "EGX", "سوق المال", "الأسهم المصرية"]:
-                    if is_whole_word_match(mkw, item["title"]):
+                    if is_whole_word_match(mkw, title):
                         is_market = True
                         break
             
@@ -626,10 +675,14 @@ def get_filtered_market_news(portfolio_list, watchlist_list):
         source = item["source"]
         if link in seen_links:
             continue
+        if is_globally_excluded_news(title):
+            continue
             
         matched_stock = None
         for ticker, keywords in STOCK_KEYWORDS.items():
             if ticker not in portfolio_list and ticker not in watchlist_list:
+                continue
+            if matches_negative_keyword(ticker, title):
                 continue
             for kw in keywords:
                 if is_whole_word_match(kw, title):
@@ -672,13 +725,16 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         return {}
         
     prompt = (
-        "أنت خبير مالي ومحلل أسهم محترف في البورصة المصرية.\n"
-        "مهمتك: تقديم تحليل مالي وفني واضح ودقيق ومفيد لكل سهم وردت عنه أخبار:\n"
-        "1. تقييم تأثير الخبر على السهم (إيجابي / سلبي / محايد) وشرح السبب المالي أو التشغيلي المباشر وراء هذا التأثير بوضوح.\n"
+        "أنت خبير مالي ومحلل أسهم ومحكم جودة ومصداقية في البورصة المصرية.\n"
+        "مهمتك فحص الأخبار الواردة لكل سهم وتقديم تحليل مالي وتقييم موضوعي مباشر:\n\n"
+        "⚠️ قاعدة صارمة جداً (بوابة الاستبعاد الفوري):\n"
+        "- إذا كان الخبر المرفق لا يخص إطلاقاً الشركة المساهمة المقيدة في البورصة المصرية ونشاطها المؤسسي (مثل: تشابه أسماء مع مشاهير أو فنانين أو مغنين أو لاعبي كرة، أو استخدام لغوي مجازي كظرف مثل 'بشكل فوري' أو 'حل فوري'، أو أخبار جرائم/حوادث/فن/رياضة لا علاقة لها بالشركة إطلاقاً)، فيجب عليك الرد فوراً بالتنسيق التالي حصراً وبدون أي كلمة أخرى:\n"
+        "[اسم السهم]: IRRELEVANT\n\n"
+        "إذا كان الخبر متعلقاً بالشركة بالفعل، فقدم تحليلاً بالتنسيق:\n"
+        "1. تقييم تأثير الخبر على السهم (إيجابي / سلبي / محايد) وشرح السبب المالي أو التشغيلي المباشر.\n"
         "2. الرؤية الفنية والاتجاه المتوقع مع أهم مستويات الدعم والمقاومة القريبة للسهم.\n"
-        "قاعدة هامة: إذا ورد أكثر من خبر عن نفس السهم، قم بتحليلها معاً في تقييم واحد يوضح التأثير المشترك والمتوقع لها مجتمعة على أداء ومستقبل السهم.\n"
-        "قاعدة هامة: التحليل يجب أن يكون نقدي ودقيق جداً وواضح العبارة للمستثمر، وموضوعي يعكس الواقع بحيادية تامة.\n\n"
-        "يجب أن تكون الإجابة بالتنسيق التالي لكل سهم (كل سهم في سطر منفصل وبدون أي نصوص برمجية أو علامات ماركداون إضافية):\n"
+        "قاعدة هامة: إذا ورد أكثر من خبر عن نفس السهم، قم بتحليلها معاً في تقييم واحد يوضح التأثير المشترك والمتوقع لها مجتمعة على أداء ومستقبل السهم.\n\n"
+        "يجب أن تكون الإجابة بالتنسيق التالي لكل سهم (كل سهم في سطر منفصل وبدون أي نصوص برمجية):\n"
         "[اسم السهم]: نص التحليل المالي والتقييم ومستويات الدعم والمقاومة مباشرة.\n"
         "مثال:\n"
         "[FWRY]: التقييم إيجابي. نمو الإيرادات والربحية يدعم استمرار المسار الصاعد، الدعم الحالي 7.80 والمقاومة 8.50 جنيه.\n"
@@ -694,6 +750,7 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
         prompt += "\n"
         
     analyses = {}
+    discarded_tags = set()
     # ✅ إصلاح: تجربة عدة نماذج بالتوالي كآلية تراجع (Fallback) لتفادي أخطاء 503/404
     gemini_models = ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-flash-latest", "gemini-pro-latest"]
     for model_name in gemini_models:
@@ -720,9 +777,16 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
                         clean = m.group(1).upper()
                         analysis = m.group(2).strip()
                         if analysis:
-                            analysis_esc = escape_html(analysis)
-                            analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis_esc}"
+                            upper_an = analysis.upper()
+                            if "IRRELEVANT" in upper_an or "لا علاقة" in analysis or "غير متعلق" in analysis or "لا يمت" in analysis or "تشابه اسماء" in analysis:
+                                print(f"⚠️ AI Discard Gate: Discarding irrelevant news for [{clean}]: {analysis}")
+                                discarded_tags.add(f"[{clean}]")
+                            else:
+                                analysis_esc = escape_html(analysis)
+                                analyses[f"[{clean}]"] = f"🧠 <b>تحليل AI لسهم {clean}:</b> {analysis_esc}"
                     print(f"Gemini AI Analysis successfully generated using {model_name} for:", list(analyses.keys()))
+                    if discarded_tags:
+                        print("AI Discarded irrelevant tags:", list(discarded_tags))
                     success = True
                     break
                 elif r.status_code == 429:
@@ -741,6 +805,11 @@ def batch_analyze_news_with_gemini(grouped_news, portfolio_list, watchlist_list)
                 break
         if success:
             break
+            
+    # ✅ حذف الأسهم غير المتعلقة كلياً من قائمة الأخبار المجمعة حتى لا ترسل لتليجرام
+    for d_tag in discarded_tags:
+        if d_tag in grouped_news:
+            del grouped_news[d_tag]
             
     return analyses
 
@@ -960,6 +1029,9 @@ def send_report(force=False):
         ai_analyses = {}
         if grouped:
             ai_analyses = batch_analyze_news_with_gemini(grouped, PORTFOLIO, WATCHLIST)
+        
+        # ✅ تصفية التاجات المستبعدة بواسطة بوابة الذكاء الاصطناعي (AI Discard Gate)
+        sorted_tags = [t for t in sorted_tags if t in grouped]
         
         for tag in sorted_tags:
             items_in_tag = grouped[tag]
