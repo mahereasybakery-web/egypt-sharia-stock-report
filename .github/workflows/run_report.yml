@@ -2,20 +2,9 @@ name: Send Sharia Stock Report
 
 on:
   schedule:
-    # 08:17 Cairo (05:17 UTC) – Early wake, waits for market open at 08:45
-    - cron: '17 5 * * 0,1,2,3,4'
-    # 08:47 Cairo (05:47 UTC) – Pre-market opening guarantee
-    - cron: '47 5 * * 0,1,2,3,4'
-    # 09:47 Cairo (06:47 UTC) – Main trading opening guarantee (opens 10:00 AM)
-    - cron: '47 6 * * 0,1,2,3,4'
-    # 10:47 Cairo (07:47 UTC) – Mid-morning safety net
-    - cron: '47 7 * * 0,1,2,3,4'
-    # 11:47 Cairo (08:47 UTC) – Mid-day safety net
-    - cron: '47 8 * * 0,1,2,3,4'
-    # 12:47 Cairo (09:47 UTC) – Early afternoon safety net
-    - cron: '47 9 * * 0,1,2,3,4'
-    # 13:47 Cairo (10:47 UTC) – Pre-close session safety net (session closes 14:30)
-    - cron: '47 10 * * 0,1,2,3,4'
+    # Resilient cron grid: every 15 minutes on odd minutes (12, 27, 42, 57) from 05:00 to 12:00 UTC (08:00 to 15:00 Cairo)
+    # Using non-round minutes completely avoids GitHub Actions top-of-hour congestion and queue drops
+    - cron: '12,27,42,57 5-12 * * 0,1,2,3,4'
   workflow_dispatch:
     inputs:
       force:
