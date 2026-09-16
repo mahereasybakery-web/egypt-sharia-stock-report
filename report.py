@@ -222,7 +222,7 @@ DEFAULT_KEYBOARD = {
     "keyboard": [
         [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
         [{"text": "⚡ بيان مفصل RSI"}, {"text": "📌 ملخص حركة اليوم"}],
-        [{"text": "⚙️ حالة النظام"}, {"text": "❓ مساعدة والأوامر"}]
+        [{"text": "🧠 استشارة المحلل الذكي"}, {"text": "⚙️ حالة النظام"}]
     ],
     "resize_keyboard": True,
     "is_persistent": True
@@ -239,6 +239,7 @@ PORTFOLIO_INLINE_KEYBOARD = {
             {"text": "📌 ملخص الجلسة", "callback_data": "btn_summary"}
         ],
         [
+            {"text": "🧠 استشارة المحلل الذكي", "callback_data": "btn_ask_help"},
             {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
         ]
     ]
@@ -2052,6 +2053,163 @@ def send_detailed_rsi_report():
     reply_telegram(msg, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
     return True
 
+def detect_stocks_in_query(query):
+    """اكتشاف الأسهم المذكورة في نص السؤال بدقة عالية بناءً على الأكواد والأسماء الشائعة."""
+    q_lower = query.lower()
+    detected = []
+    for ticker, kws in STOCK_KEYWORDS.items():
+        for kw in kws:
+            if kw.lower() in q_lower:
+                is_neg = any(neg in query for neg in NEGATIVE_KEYWORDS.get(ticker, []))
+                if not is_neg:
+                    if ticker not in detected:
+                        detected.append(ticker)
+                    break
+    for ticker in ALL_TICKERS:
+        pattern = r'\b' + ticker.lower() + r'\b'
+        if re.search(pattern, q_lower) and ticker not in detected:
+            detected.append(ticker)
+    return detected
+
+def is_portfolio_query(query):
+    """التحقق مما إذا كان السؤال يستفسر عن محفظة المستخدم وأسهمه الخاصة."""
+    q_lower = query.lower()
+    portfolio_kws = [
+        "محفظت", "محفظه", "أسهمي", "اسهمي", "أرباحي", "ارباحي",
+        "خسائري", "خسائر", "حيازتي", "حيازه", "شاري", "شريت", "متوسط سعري"
+    ]
+    return any(kw in q_lower for kw in portfolio_kws)
+
+def format_ai_response_for_telegram(text):
+    """تنسيق وتجهيز مخرجات الذكاء الاصطناعي لظهورها بأبهى حلة على تليجرام بدعم HTML وRTL."""
+    if not text:
+        return text
+    # تحويل Markdown العناوين إلى وسم <b>
+    text = re.sub(r'^#{1,6}\s*(.+)$', r'<b>\1</b>', text, flags=re.MULTILINE)
+    # تحويل الخط العريض **كلمة** إلى <b>كلمة</b>
+    text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+    # تحويل النقاط النجمية إلى رموز نقطية أنيقة
+    text = re.sub(r'^\s*[\*\-]\s+', r'• ', text, flags=re.MULTILINE)
+    return text.strip()
+
+def ask_financial_advisor(question):
+    """مستشار مالي ومحلل فني مؤسسي ذكي يعتمد على بيانات السوق والأسهم اللحظية الحقيقية ومحفظة المستخدم."""
+    detected_tickers = detect_stocks_in_query(question)
+    wants_portfolio = is_portfolio_query(question)
+    
+    s = {}
+    if os.path.exists(STRINGS_PATH):
+        try:
+            with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                s = json.load(f)
+        except Exception:
+            pass
+
+    user_holdings = {}
+    if wants_portfolio:
+        try:
+            state_data, _ = get_github_state()
+            user_holdings = state_data.get("holdings", {})
+        except Exception:
+            user_holdings = {}
+
+    tickers_to_fetch = set(detected_tickers)
+    if wants_portfolio and user_holdings:
+        for ht in user_holdings.keys():
+            tickers_to_fetch.add(ht)
+            
+    if not tickers_to_fetch:
+        tickers_to_fetch = set(ALL_TICKERS)
+
+    market_data, indices = fetch_all_data_tv(list(tickers_to_fetch), s)
+    usdegp, gold = fetch_forex_gold()
+
+    context_lines = []
+    
+    egx30 = indices.get("EGX30", {})
+    egx70 = indices.get("EGX70EWI", {})
+    context_lines.append("=== مؤشرات السوق والعملات اللحظية الحية ===")
+    if egx30.get('close'):
+        context_lines.append(f"- مؤشر EGX30: {egx30.get('close', 0.0):,.2f} نقطة ({egx30.get('chgPct', 0.0):+.2f}%)")
+    if egx70.get('close'):
+        context_lines.append(f"- مؤشر EGX70 EWI: {egx70.get('close', 0.0):,.2f} نقطة ({egx70.get('chgPct', 0.0):+.2f}%)")
+    if usdegp.get('close'):
+        context_lines.append(f"- الدولار/جنيه (USD/EGP): {usdegp.get('close'):.2f} ج.م ({usdegp.get('chgPct', 0.0):+.2f}%)")
+    if gold.get('close'):
+        context_lines.append(f"- أوقية الذهب (XAU/USD): ${gold.get('close'):,.2f} ({gold.get('chgPct', 0.0):+.2f}%)")
+
+    if detected_tickers:
+        context_lines.append("\n=== البيانات الفنية اللحظية للأسهم المعنية بالسؤال ===")
+        stocks_display = detected_tickers
+    elif wants_portfolio and user_holdings:
+        context_lines.append("\n=== البيانات اللحظية لأسهم محفظة المستثمر ===")
+        stocks_display = list(user_holdings.keys())
+    else:
+        context_lines.append("\n=== نظرة عامة على أبرز أسهم السوق الشرعية اليوم ===")
+        sorted_by_chg = sorted(market_data.items(), key=lambda x: x[1].get('chgPct', 0.0), reverse=True)
+        stocks_display = [t for t, _ in sorted_by_chg[:10]]
+
+    for t in stocks_display:
+        d = market_data.get(t, {})
+        if not d or d.get('close', 0.0) == 0.0:
+            continue
+        c_name = COMPANY_NAMES_AR.get(t, t)
+        close = d.get('close', 0.0)
+        chg = d.get('chgPct', 0.0)
+        rsi = d.get('rsi')
+        rec = d.get('rec', 'محايد')
+        sma20 = d.get('sma20')
+        sma50 = d.get('sma50')
+        vol = d.get('volume', 0)
+        avg_vol = d.get('avg_vol', 0)
+        vol_spike = d.get('vol_spike', False)
+        
+        info = f"- سهم {c_name} ({t}): السعر الحالي = {close:.2f} ج.م | التغير = {chg:+.2f}%"
+        if rsi is not None:
+            info += f" | RSI(14) = {rsi:.1f}"
+            if rsi >= 70:
+                info += " (⚠️ تشبع شرائي - منطقة جني أرباح محتملة)"
+            elif rsi <= 30:
+                info += " (💎 تشبع بيعي مفرط - منطقة ارتداد محتملة)"
+        if sma20 and sma50:
+            info += f" | المتوسطات: SMA20={sma20:.2f}, SMA50={sma50:.2f}"
+        info += f" | إشارة التحليل الفني: {rec}"
+        if vol_spike:
+            info += f" | ⚡ طفرة سيولة استثنائية (تداول {vol:,.0f} سهم مقارنة بمتوسط {avg_vol:,.0f})"
+        context_lines.append(info)
+
+    if wants_portfolio and user_holdings:
+        pnl_data = calculate_portfolio_pnl(user_holdings, market_data)
+        if pnl_data:
+            context_lines.append("\n=== الحساب اللحظي لمحفظة المستثمر ===")
+            context_lines.append(f"- تكلفة الشراء الإجمالية: {pnl_data.get('total_cost', 0):,.2f} ج.م")
+            context_lines.append(f"- التقييم السوقي اللحظي: {pnl_data.get('total_val', 0):,.2f} ج.م")
+            context_lines.append(f"- صافي الربح/الخسارة: {pnl_data.get('total_pnl', 0):+,.2f} ج.م ({pnl_data.get('total_pnl_pct', 0):+.2f}%)")
+            for item in pnl_data.get("details", []):
+                t_sym = item["ticker"]
+                t_name = COMPANY_NAMES_AR.get(t_sym, t_sym)
+                context_lines.append(f"  • {t_name} ({t_sym}): كمية {item['qty']:,.0f} سهم | سعر الشراء {item['buy_p']:.2f} | الحالي {item['curr_p']:.2f} | العائد: {item['pnl_pct']:+.2f}%")
+
+    prompt = (
+        f"أنت كبير المحللين الماليين ومدير محافظ استثمارية معتمد خبير في البورصة المصرية (EGX) والأسهم المتوافقة مع الشريعة الإسلامية.\n"
+        f"سؤال المستثمر: \"{question}\"\n\n"
+        f"فيما يلي البيانات اللحظية الحقيقية والموثوقة المأخوذة مباشرة من البورصة المصرية (TradingView) في هذه اللحظة:\n"
+        f"{chr(10).join(context_lines)}\n\n"
+        f"التعليمات الإلزامية:\n"
+        f"1. التزم بالبيانات والأرقام المذكورة أعلاه بدقة، ولا تذكر أي أرقام أو أسعار خيالية أو قديمة إطلاقاً.\n"
+        f"2. أسلوب الرد: احترافي، مؤسسي، مباشر، حاسم، بدون إطالة أو تكرار أو حشو.\n"
+        f"3. إذا كان السؤال عن سهم محدد، نظّم إجابتك بدقة في 4 محاور رئيسية مستخدماً التنسيق التالي بدقة:\n"
+        f"   🎯 **الرأي الفني المباشر:** تقييم قاطع وواضح لحالة السهم الفنية والاتجاه.\n"
+        f"   📊 **المعطيات الفنية اللحظية:** تحليل السعر الحالي، نسبة التغير، مؤشر RSI وموقعه من التشبعات، وعلاقته بمتوسطات 20 و50 يوماً وحجم السيولة.\n"
+        f"   ⚖️ **مستويات الدعم والمقاومة:** تحديد نقطتي الدعم والمقاومة الأقرب مع مستوى وقف الخسارة المقترح.\n"
+        f"   💡 **القرار الاستثماري المقترح:** نصيحة تداول محددة بناءً على وضع السهم وحجم المخاطرة (شراء تدريجي، احتفاظ، تخفيف/جني أرباح، مراقبة).\n"
+        f"4. إذا كان السؤال عن المحفظة، وجّه المستثمر إلى الأسهم الرابحة لجني جزء من أرباحها، والأسهم التي تتطلب حماية رأس المال أو وقف الخسارة.\n"
+        f"5. اكتب الرد باللغة العربية مع استخدام علامات التنسيق الواضحة والإيموجي المعبر."
+    )
+    
+    raw_res = ask_ai(prompt)
+    return format_ai_response_for_telegram(raw_res)
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
@@ -2064,10 +2222,10 @@ def handle_telegram_command(text):
             "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
             "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص الجلسة والتحليل الفني وتوقعات الغد.\n"
             "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7.\n"
+            "🧠 <b>[🧠 استشارة المحلل الذكي]</b> أو <code>/ask</code> : استشارة المحلل المالي المؤسسي ببيانات السوق والأسعار اللحظية وRSI ومحفظتك.\n"
             "➕ <code>/set_holding [السهم] [الكمية] [سعر_الشراء]</code> : لتعديل أو تسجيل أسهم محفظتك.\n"
             "⚖️ <code>/compare [سهم1] [سهم2]</code> : مقارنة فنية واستثمارية مباشرة بالذكاء الاصطناعي.\n"
-            "🎯 <code>/alert [السهم] [> أو <] [السعر]</code> : ضبط تنبيه سعري فوري.\n"
-            "🧠 <code>/ask [سؤالك]</code> : استشارة المحلل المالي الذكي (Claude/Gemini)."
+            "🎯 <code>/alert [السهم] [> أو <] [السعر]</code> : ضبط تنبيه سعري فوري."
         )
         reply_telegram(help_msg, reply_markup=DEFAULT_KEYBOARD)
         
@@ -2196,13 +2354,36 @@ def handle_telegram_command(text):
         else:
             reply_telegram("⚠️ لا توجد أخبار يدوية محفوظة حالياً لتتم إزالتها.")
             
-    elif text_lower.startswith("/ask") or text_lower.startswith("/اسأل"):
-        question = text[len("/ask"):].strip() if text_lower.startswith("/ask") else text[len("/اسأل"):].strip()
+    elif text_lower.startswith("/ask") or text_lower.startswith("/اسأل") or "استشارة المحلل" in text_clean:
+        question = ""
+        if text_lower.startswith("/ask"):
+            question = text[len("/ask"):].strip()
+        elif text_lower.startswith("/اسأل"):
+            question = text[len("/اسأل"):].strip()
+        elif "استشارة المحلل" in text_clean:
+            question = ""
+            
         if not question:
-            reply_telegram("⚠️ يرجى كتابة السؤال بعد الأمر. مثال:\n<code>/ask ما توقعاتك لسهم طلعت مصطفى؟</code>")
+            help_ask_msg = (
+                "🧠 <b>المحلل المالي والاستثماري الذكي للبورصة المصرية</b>\n\n"
+                "أهلاً بك! يمكنك سؤالي عن أي سهم، أو استشارة بشأن محفظتك، أو استكشاف اتجاه السوق، وسأجيبك فوراً بالاعتماد على <b>البيانات اللحظية الحية للبورصة (TradingView)</b> ومؤشرات RSI والمتوسطات ومحفظتك!\n\n"
+                "💡 <b>أمثلة أسئلة يمكنك نسخها أو النقر عليها:</b>\n"
+                "• <code>/ask ما تحليلك الفني لسهم طلعت مصطفى ومستويات الدعم والمقاومة؟</code>\n"
+                "• <code>/ask هل سهم فوري مناسب للشراء حالياً أم في مرحلة جني أرباح؟</code>\n"
+                "• <code>/ask ما رأيك في سهم سوديك وهل دخل منطقة تشبع شرائي؟</code>\n"
+                "• <code>/ask حلل وضع محفظتي الحالية وما أفضل فرصة للتعزيز؟</code>\n"
+                "• <code>/ask كيف ترى اتجاه السوق والمؤشر الرئيسي EGX30 اليوم؟</code>\n\n"
+                "✍️ <i>فقط اكتب:</i> <code>/ask [سؤالك هنا]</code>"
+            )
+            reply_telegram(help_ask_msg, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
             return
-        reply_telegram("🔄 جاري التفكير والتحليل...")
-        reply_telegram(ask_ai(question))
+            
+        reply_telegram("🔄 جاري جمع البيانات اللحظية وإعداد التحليل المؤسسي الذكي...")
+        try:
+            analysis = ask_financial_advisor(question)
+            reply_telegram(analysis, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ حدث خطأ أثناء التحليل: {e}")
         
     elif text_lower.startswith("/status") or "حالة النظام" in text_clean or "حاله النظام" in text_clean or "حالة" in text_clean or "حاله" in text_clean:
         import time
@@ -2216,8 +2397,12 @@ def handle_telegram_command(text):
         reply_telegram(status_msg, reply_markup=DEFAULT_KEYBOARD)
         
     else:
-        reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
-        reply_telegram(ask_ai(text))
+        reply_telegram("🔄 جاري جمع البيانات اللحظية وإعداد التحليل المؤسسي الذكي...")
+        try:
+            analysis = ask_financial_advisor(text)
+            reply_telegram(analysis, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ حدث خطأ أثناء التحليل: {e}")
 
 def poll_telegram_messages():
     global offset
@@ -2256,6 +2441,8 @@ def poll_telegram_messages():
                             handle_telegram_command("/rsi")
                         elif cb_data == "btn_summary":
                             handle_telegram_command("/summary")
+                        elif cb_data == "btn_ask_help":
+                            handle_telegram_command("/ask")
                         elif cb_data == "btn_status":
                             handle_telegram_command("/status")
                     continue
