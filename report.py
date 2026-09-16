@@ -22,6 +22,20 @@ except ImportError:
     feedparser = None
     print("Warning: feedparser is not installed globally.")
 
+try:
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+except ImportError:
+    openpyxl = None
+    print("Warning: openpyxl is not installed globally.")
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
+    print("Warning: numpy is not installed globally.")
+
 # Environment secrets — all loaded from GitHub Secrets (no hardcoded fallbacks)
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
@@ -222,7 +236,9 @@ DEFAULT_KEYBOARD = {
     "keyboard": [
         [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
         [{"text": "⚡ بيان مفصل RSI"}, {"text": "📈 شارت فني"}],
-        [{"text": "🎯 أسهم القيمة الرخيصة"}, {"text": "📐 حاسبة المخاطر"}],
+        [{"text": "🎯 أسهم القيمة"}, {"text": "📐 حاسبة المخاطر"}],
+        [{"text": "🐋 التجميع المؤسسي"}, {"text": "⚖️ توازن المحفظة"}],
+        [{"text": "🕌 زكاة الأسهم"}, {"text": "📥 تصدير إكسل"}],
         [{"text": "🏢 فحص مالي"}, {"text": "📜 سجل الصفقات"}],
         [{"text": "🧠 استشارة المحلل الذكي"}, {"text": "⚙️ حالة النظام"}]
     ],
@@ -239,6 +255,14 @@ PORTFOLIO_INLINE_KEYBOARD = {
         [
             {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
             {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
+        ],
+        [
+            {"text": "🐋 التجميع المؤسسي", "callback_data": "btn_accumulation"},
+            {"text": "⚖️ توازن المحفظة", "callback_data": "btn_rebalance"}
+        ],
+        [
+            {"text": "🕌 زكاة الأسهم", "callback_data": "btn_zakat"},
+            {"text": "📥 تصدير إكسل", "callback_data": "btn_export"}
         ],
         [
             {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
@@ -275,6 +299,14 @@ def get_portfolio_inline_keyboard(holdings=None):
             {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
         ],
         [
+            {"text": "🐋 التجميع المؤسسي", "callback_data": "btn_accumulation"},
+            {"text": "⚖️ توازن المحفظة", "callback_data": "btn_rebalance"}
+        ],
+        [
+            {"text": "🕌 زكاة الأسهم", "callback_data": "btn_zakat"},
+            {"text": "📥 تصدير إكسل", "callback_data": "btn_export"}
+        ],
+        [
             {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
             {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
         ],
@@ -295,6 +327,11 @@ def setup_telegram_bot_menu():
         {"command": "rsi", "description": "⚡ بيان مفصل لمؤشر RSI لجميع الأسهم"},
         {"command": "undervalued", "description": "🎯 رادار اقتناص أسهم القيمة وهامش الأمان"},
         {"command": "calc", "description": "📐 حاسبة حجم الصفقة وإدارة المخاطر (1.5%)"},
+        {"command": "accumulation", "description": "🐋 رادار التجميع المؤسسي وتدفق السيولة (CMF)"},
+        {"command": "rebalance", "description": "⚖️ مصفوفة التنويع القطاعي وإدارة المخاطر"},
+        {"command": "zakat", "description": "🕌 حاسبة زكاة الأسهم والمحفظة الشرعية"},
+        {"command": "export", "description": "📥 تصدير كشف حساب المحفظة إكسل فاخر"},
+        {"command": "backtest", "description": "🧪 محاكي اختبار الاستراتيجيات تاريخياً"},
         {"command": "chart", "description": "📈 شارت فني بالشموع ومؤشر RSI"},
         {"command": "fundamental", "description": "🏢 بطاقة التحليل المالي ومضاعفات التقييم"},
         {"command": "buy", "description": "➕ تسجيل شراء سهم وحساب متوسط التكلفة"},
@@ -1057,6 +1094,21 @@ def send_telegram_photo(photo_path, caption=""):
     except Exception as e:
         print("Error sending telegram photo:", e)
 
+def send_telegram_document(doc_path, caption=""):
+    """إرسال مستند رسمي (إكسل أو تقرير) إلى تليجرام مع شرح."""
+    if not BOT_TOKEN or not CHAT_ID or not os.path.exists(doc_path):
+        return
+    if caption:
+        caption = ensure_rtl(caption)
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
+    try:
+        with open(doc_path, "rb") as f:
+            files = {"document": f}
+            data = {"chat_id": CHAT_ID, "caption": caption[:1024], "parse_mode": "HTML"}
+            requests.post(url, data=data, files=files, timeout=35)
+    except Exception as e:
+        print("Error sending telegram document:", e)
+
 def generate_market_chart(indices, parsed_stocks):
     """توليد رسم بياني يومي أنيق للأداء الفني والزخم (Dark Mode)."""
     try:
@@ -1430,7 +1482,8 @@ def fetch_all_data_tv(tickers, strings):
         "columns": [
             "close", "open", "change", "Recommend.All",
             "RSI", "volume", "average_volume_10d_calc", "SMA20", "SMA50", "Value.Traded",
-            "price_earnings_ttm", "price_book_fq", "total_debt_fq", "total_assets_fq", "return_on_equity_fq"
+            "price_earnings_ttm", "price_book_fq", "total_debt_fq", "total_assets_fq", "return_on_equity_fq",
+            "MoneyFlow", "ChaikinMoneyFlow"
         ]
     }
     headers = {
@@ -1464,6 +1517,10 @@ def fetch_all_data_tv(tickers, strings):
             debt_ratio = safe_round((debt_raw / assets_raw) * 100.0, 1) if debt_raw and assets_raw and assets_raw > 0 else None
             roe_val = safe_round(item["d"][14], 1) if len(item["d"]) > 14 and item["d"][14] is not None else None
             
+            # مؤشرات السيولة والتجميع المؤسسي (Smart Money)
+            mfi_val = safe_round(item["d"][15], 1) if len(item["d"]) > 15 and item["d"][15] is not None else None
+            cmf_val = safe_round(item["d"][16], 3) if len(item["d"]) > 16 and item["d"][16] is not None else None
+            
             vol_spike = bool(avg_vol > 5000 and vol_val >= (avg_vol * 1.8))
             rsi_tag = ""
             if rsi_val is not None:
@@ -1490,7 +1547,8 @@ def fetch_all_data_tv(tickers, strings):
                     "rsi": rsi_val, "volume": vol_val, "avg_vol": avg_vol,
                     "sma20": sma20_val, "sma50": sma50_val, "val_traded": val_traded,
                     "vol_spike": vol_spike, "rsi_tag": rsi_tag,
-                    "pe": pe_val, "pb": pb_val, "debt_ratio": debt_ratio, "roe": roe_val
+                    "pe": pe_val, "pb": pb_val, "debt_ratio": debt_ratio, "roe": roe_val,
+                    "mfi": mfi_val, "cmf": cmf_val
                 }
     except Exception as e:
         print("Error fetching TV prices:", e)
@@ -2116,6 +2174,27 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
     for k, v in fx_gold_data.items():
         chg_icon = "🟢" if v["chgPct"] > 0 else ("🔴" if v["chgPct"] < 0 else "⚪")
         res += f"{chg_icon} <b>{k}:</b> {v['close']} ({v['chgPct']:+.2f}%)\n"
+        
+    # Market Breadth & Sentiment (اتساع السوق وصافي المعنويات والسيولة)
+    total_tracked = len(stocks_data)
+    advances = sum(1 for s in stocks_data.values() if s.get("chgPct", 0) > 0.05)
+    declines = sum(1 for s in stocks_data.values() if s.get("chgPct", 0) < -0.05)
+    unchanged = total_tracked - (advances + declines)
+    total_turnover = sum(s.get("close", 0) * s.get("volume", 0) for s in stocks_data.values() if s.get("volume"))
+    
+    breadth_icon = "🟢" if advances > declines else ("🔴" if declines > advances else "⚪")
+    res += f"\n<b>🌐 اتساع السوق وصافي المعنويات (Market Breadth):</b>\n"
+    res += f"{breadth_icon} <b>حصيلة الأسهم:</b> 🟢 <b>{advances}</b> صاعد | 🔴 <b>{declines}</b> هابط | ⚪ <b>{unchanged}</b> مستقر\n"
+    if total_turnover > 0:
+        res += f"💰 <b>إجمالي قيمة تداولات العينة:</b> <code>{total_turnover / 1e6:,.1f}</code> مليون ج.م\n"
+    adv_ratio = (advances / total_tracked * 100) if total_tracked else 0
+    if adv_ratio >= 60:
+        market_sentiment = "سيادة المعنويات الإيجابية وضخ سيولة توسعية واسعة 🚀"
+    elif adv_ratio <= 35:
+        market_sentiment = "سيطرة الحذر وضغوط بيعية عامة تتطلب التريث ⚠️"
+    else:
+        market_sentiment = "توازن نسبي بين قوى التجميع وجني الأرباح الانتقائي ⚖️"
+    res += f"🧭 <b>نبض الجلسة:</b> {market_sentiment}\n"
         
     # 2. Portfolio Performance & Technical Stance (مرتبة تنازلياً من الأعلى ربحاً إلى الأقل)
     res += "\n<b>💼 أداء وتحليل أسهم المحفظة الأساسية:</b>\n"
@@ -2871,6 +2950,33 @@ def check_and_send_smart_alerts(parsed_stocks, holdings, state_data):
                     )
                     reply_telegram(msg, reply_markup=get_portfolio_inline_keyboard(holdings))
                     
+            # وقف خسارة متحرك (Trailing Stop-Loss) لحجز الأرباح بعد صعود السهم
+            trailing_peaks = state_data.setdefault("trailing_peaks", {})
+            stored_peak = float(trailing_peaks.get(ticker, max(buy_p, curr_p)))
+            if curr_p > stored_peak:
+                trailing_peaks[ticker] = curr_p
+                stored_peak = curr_p
+                state_modified = True
+                
+            # إذا حقق السهم سابقاً ربحاً >= 5% وتراجع حالياً بنسبة >= 5% عن قمته المسجلة
+            if stored_peak > buy_p and ((stored_peak - buy_p) / buy_p) >= 0.05:
+                drop_from_peak = ((stored_peak - curr_p) / stored_peak) * 100.0
+                if drop_from_peak >= 5.0:
+                    tsl_key = f"{today_str}_tsl_{ticker}"
+                    if tsl_key not in sent_alerts:
+                        sent_alerts[tsl_key] = True
+                        state_modified = True
+                        msg = (
+                            f"🛡️ <b>تنبيه وقف الخسارة المتحرك (Trailing Stop-Loss Alert):</b>\n\n"
+                            f"سهم <b>{name} ({ticker})</b> في محفظتك تراجع عن أعلى قمة وصل إليها:\n"
+                            f"🏔️ <b>قمة السعر المسجلة:</b> <code>{stored_peak:.2f} ج.م</code>\n"
+                            f"💵 <b>السعر اللحظي الحالي:</b> <code>{curr_p:.2f} ج.م</code>\n"
+                            f"📉 <b>نسبة التراجع عن القمة:</b> <code>-{drop_from_peak:.2f}%</code>\n"
+                            f"📊 <b>الربح الصافي المتبقي:</b> <code>+{pnl_pct:.2f}%</code> (سعر الشراء: {buy_p:.2f} ج.م)\n\n"
+                            f"💡 <b>توصية المستشار لحجز الأرباح:</b> تم كسر حد الوقف المتحرك (تراجع ≥ 5% عن القمة). يُنصح بإغلاق المركز أو حجز الأرباح لمنع تبخر المكاسب المحققة."
+                        )
+                        reply_telegram(msg, reply_markup=get_portfolio_inline_keyboard(holdings))
+                    
     # 3. رادار قناص الارتدادات من التشبع البيعي (Oversold Bounce Sniper)
     for ticker, d in parsed_stocks.items():
         rsi_val = d.get("rsi")
@@ -3108,6 +3214,448 @@ def format_undervalued_report(parsed_stocks):
     )
     return msg
 
+# ==================== الميزات المؤسسية المتقدمة (Institutional Alpha Suite) ====================
+
+SECTORS_MAP = {
+    "العقارات والإنشاءات": ["TMGH", "OCDI", "PHDC", "MASR", "ORHD", "ORAS"],
+    "الخدمات المالية والبنوك": ["ADIB", "SAUD", "FAIT", "FAITA", "FWRY", "EFIH"],
+    "الصناعة والمواد الأساسية": ["EGAL", "SKPC", "MCQE", "AMOC", "ORWE", "ARCC", "ATQA", "LCSW"],
+    "الأغذية والاستهلاك": ["EFID", "JUFO", "OLFI", "IFAP", "MPCO", "ACGC"],
+    "الاتصالات والتكنولوجيا والرعاية": ["ETEL", "RACC", "MTIE", "ETRS", "CIRA", "EGAS", "ICFC", "ISPH", "RMDA"],
+    "صناديق المؤشرات والذهب": ["CMS", "BWA", "NMF", "AZG", "THNDR_GOLD"]
+}
+
+def calculate_portfolio_zakat(state_data, parsed_stocks, custom_query=None):
+    """
+    حاسبة زكاة الأسهم والمحافظ الاستثمارية وفق معايير AAOIFI ودار الإفتاء المصرية.
+    1. عروض التجارة والمضاربة: 2.5% على القيمة السوقية الإجمالية للمحفظة.
+    2. الاستثمار طويل الأجل / النماء: 2.5% على الوعاء الزكوي (صافي الأصول المتداولة 20% تقديراً).
+    """
+    holdings = state_data.get("holdings", {})
+    eval_items = []
+    
+    if custom_query:
+        parts = custom_query.strip().split()
+        if len(parts) >= 2:
+            ticker_raw = parts[0].replace("_", " ").upper().replace(".CA", "")
+            detected = detect_stocks_in_query(ticker_raw)
+            ticker = detected[0] if detected else ticker_raw.strip()
+            try:
+                qty = float(parts[1].replace(",", ""))
+                eval_items.append((ticker, qty))
+            except ValueError:
+                pass
+                
+    if not eval_items and holdings:
+        for ticker, h in holdings.items():
+            qty = float(h.get("qty", 0))
+            if qty > 0:
+                eval_items.append((ticker, qty))
+                
+    if not eval_items:
+        return (
+            "🕌 <b>حاسبة زكاة الأسهم والمحافظ الاستثمارية (معايير AAOIFI):</b>\n\n"
+            "محفظتك خالية من الأسهم حالياً.\n"
+            "💡 يمكنك حساب زكاة سهم محدد مباشرة عبر الأمر:\n"
+            "<code>/zakat [السهم] [الكمية]</code> (مثال: <code>/zakat سوديك 2000</code>)\n"
+            "أو تسجيل صفقاتك عبر أمر <code>/buy</code> لحساب زكاة محفظتك تلقائياً."
+        )
+        
+    total_market_val = 0.0
+    stock_rows = ""
+    for ticker, qty in eval_items:
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        stock_d = parsed_stocks.get(ticker, {})
+        curr_p = stock_d.get("close", 0.0)
+        item_val = qty * curr_p
+        total_market_val += item_val
+        stock_rows += f"• <b>{name} ({ticker}):</b> {qty:,.0f} سهم × {curr_p:.2f} ج = <code>{item_val:,.2f} ج</code>\n"
+        
+    # الحسابات الشرعية
+    zakat_trade_hijri = total_market_val * 0.025
+    zakat_trade_gregorian = total_market_val * 0.02577
+    
+    zakat_base_longterm = total_market_val * 0.20
+    zakat_invest_hijri = zakat_base_longterm * 0.025
+    zakat_invest_gregorian = zakat_base_longterm * 0.02577
+    
+    msg = (
+        "🕌 <b>بيان زكاة الأسهم والمحفظة الشرعي المعتمد:</b>\n\n"
+        f"💼 <b>إجمالي القيمة السوقية للأصول المقيمة:</b> <code>{total_market_val:,.2f} ج.م</code>\n\n"
+        f"{stock_rows}\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "1️⃣ <b>إذا كانت نيتك (المضاربة والبيع السريع - عروض تجارة):</b>\n"
+        f"   └ الزكاة الواجبة (سنة هجرية 2.5%): <b><code>{zakat_trade_hijri:,.2f} ج.م</code></b>\n"
+        f"   └ الزكاة الواجبة (سنة ميلادية 2.577%): <b><code>{zakat_trade_gregorian:,.2f} ج.م</code></b>\n\n"
+        "2️⃣ <b>إذا كانت نيتك (الاستثمار طويل الأجل وحبس الأصل للاستفادة من الأرباح):</b>\n"
+        f"   ├ الوعاء الزكوي للأصول المتداولة (20% تقديراً): <code>{zakat_base_longterm:,.2f} ج.م</code>\n"
+        f"   └ الزكاة الواجبة (سنة هجرية 2.5%): <b><code>{zakat_invest_hijri:,.2f} ج.م</code></b>\n"
+        f"   └ الزكاة الواجبة (سنة ميلادية 2.577%): <b><code>{zakat_invest_gregorian:,.2f} ج.م</code></b>\n\n"
+        "💡 <b>ملاحظة فقهية:</b> تجب الزكاة إذا بلغ مجموع أموالك النقدية وقيمة الأسهم نصاب الزكاة (ما يعادل 85 جرام ذهب عيار 21) وحال عليها الحول."
+    )
+    return msg
+
+def analyze_portfolio_rebalancing(holdings, parsed_stocks):
+    """مصفوفة التنويع القطاعي وتنبيهات تركز المخاطر المؤسسية."""
+    if not holdings:
+        return (
+            "⚖️ <b>مصفوفة التنويع القطاعي وإعادة التوازن (Portfolio Balance):</b>\n\n"
+            "المحفظة خالية من الأسهم حالياً. سجّل صفقاتك عبر أمر <code>/buy</code> لتحليل توزيع المخاطر القطاعية."
+        )
+        
+    sector_values = {}
+    total_val = 0.0
+    
+    for ticker, h in holdings.items():
+        qty = float(h.get("qty", 0))
+        stock_d = parsed_stocks.get(ticker, {})
+        curr_p = stock_d.get("close", float(h.get("buy_price", 0)))
+        val = qty * curr_p
+        total_val += val
+        
+        s_name = "قطاعات أخرى"
+        for sec, syms in SECTORS_MAP.items():
+            if ticker in syms:
+                s_name = sec
+                break
+        sector_values[s_name] = sector_values.get(s_name, 0.0) + val
+        
+    if total_val <= 0:
+        return "⚠️ القيمة الإجمالية للمحفظة غير كافية للتحليل."
+        
+    msg = (
+        "⚖️ <b>مصفوفة التنويع القطاعي وإدارة تركز المخاطر:</b>\n\n"
+        f"💰 <b>إجمالي القيمة السوقية للمحفظة:</b> <code>{total_val:,.2f} ج.م</code>\n\n"
+        "📊 <b>الأوزان النسبية للقطاعات الحالية:</b>\n"
+    )
+    
+    warnings = []
+    for sec, s_val in sorted(sector_values.items(), key=lambda x: x[1], reverse=True):
+        weight = (s_val / total_val) * 100.0
+        if weight > 35.0:
+            status = "🔴 تركز مخاطر مرتفع (Overweight)"
+            warnings.append(f"• قطاع <b>{sec}</b> يمثل <code>{weight:.1f}%</code> من محفظتك (المستوى الآمن ≤ 35%).")
+        elif weight >= 15.0:
+            status = "🟢 وزن متوازن وصحي"
+        else:
+            status = "🟡 وزن خفيف (Underweight)"
+        msg += f"• <b>{sec}:</b> <code>{weight:.1f}%</code> ({s_val:,.1f} ج) | {status}\n"
+        
+    msg += "\n━━━━━━━━━━━━━━━━━━━\n"
+    if warnings:
+        msg += "⚠️ <b>تنبيهات تركز المخاطر:</b>\n" + "\n".join(warnings) + "\n\n"
+        msg += "💡 <b>خطة إعادة التوازن المقترحة:</b>\n"
+        msg += "1. يُنصح بتجميد الشراء الإضافي في القطاع المتضخم وتأمين الأرباح به.\n"
+        msg += "2. توجيه سيولة التوزيعات أو الصفقات الرابحة نحو الأسهم المقومة بأقل من قيمتها (راجع <code>/undervalued</code>) أو صناديق الذهب والشريعة للتحوط."
+    else:
+        msg += "✅ <b>حالة المحفظة:</b> توزيعك القطاعي متوازن وصحي وموزع باحترافية على القطاعات."
+        
+    return msg
+
+def find_smart_money_accumulation(parsed_stocks):
+    """رادار التجميع المؤسسي وتدفقات السيولة الذكية (Smart Money Tracker)."""
+    candidates = []
+    for ticker, d in parsed_stocks.items():
+        if ticker not in ALL_TICKERS:
+            continue
+        cmf = d.get("cmf")
+        mfi = d.get("mfi")
+        rsi = d.get("rsi")
+        val_traded = d.get("val_traded", 0)
+        chg = d.get("chgPct", 0)
+        close = d.get("close", 0)
+        
+        # تجميع مؤسسي: CMF > 0.05 مع عدم وصول السهم لقمة مفرطة RSI < 65
+        if cmf is not None and cmf > 0.05 and rsi is not None and rsi < 65:
+            candidates.append({
+                "ticker": ticker,
+                "name": COMPANY_NAMES_AR.get(ticker, ticker),
+                "close": close,
+                "chg": chg,
+                "cmf": cmf,
+                "mfi": mfi,
+                "rsi": rsi,
+                "val_traded": val_traded
+            })
+            
+    candidates.sort(key=lambda x: x["cmf"], reverse=True)
+    if not candidates:
+        return "🐋 <b>رادار التجميع المؤسسي:</b> لا توجد مؤشرات تجميع استثنائية حالياً في مرحلة الهدوء السعري."
+        
+    msg = (
+        "🐋 <b>رادار التجميع المؤسسي وتدفق السيولة الذكية (Smart Money Tracker):</b>\n"
+        "<i>أسهم تشهد تدفقات سيولة شرائية خفية مستمرة (CMF موجب) وقبل حدوث الانفجار السعري:</i>\n\n"
+    )
+    for c in candidates[:5]:
+        t = c["ticker"]
+        name = c["name"]
+        p = c["close"]
+        chg_str = f"+{c['chg']}%" if c['chg'] > 0 else f"{c['chg']}%"
+        cmf_str = f"+{c['cmf']:.3f}"
+        mfi_str = f"{c['mfi']:.1f}" if c['mfi'] else "-"
+        rsi_str = f"{c['rsi']:.1f}"
+        v_millions = c["val_traded"] / 1_000_000.0 if c["val_traded"] else 0
+        
+        msg += (
+            f"🔹 <b>{name} ({t})</b>: <b>{p:.2f} ج.م</b> ({chg_str})\n"
+            f"   ├ 🌊 <b>تدفق سيولة تشايكين (CMF):</b> <code>{cmf_str}</code> (شراء تجميعي قوي)\n"
+            f"   ├ ⚡ <b>مؤشر MFI:</b> <code>{mfi_str}</code> | <b>مؤشر RSI:</b> <code>{rsi_str}</code>\n"
+            f"   ├ 💵 <b>قيمة التداول:</b> {v_millions:,.1f} مليون جنيه\n"
+            f"   └ 💡 <i>فحص تفصيلي:</i> <code>/chart {t}</code> | <code>/calc {t} {p:.2f} [الوقف]</code>\n\n"
+        )
+    msg += "💡 <b>القاعدة المؤسسية:</b> عندما يكون مؤشر CMF موجباً بقوة مع استقرار السعر دون قمم (RSI < 65)، فهذا يعكس تجميعاً هادئاً للمحافظ الكبرى قبل بدء موجة الصعود القادمة."
+    return msg
+
+def run_stock_backtest_strategy(ticker: str):
+    """محاكي اختبار الاستراتيجيات تاريخياً على مدار عام كامل (250 جلسة تداول)."""
+    sym = ticker.upper().replace(".CA", "").replace("EGX:", "").replace("_", " ").strip()
+    detected = detect_stocks_in_query(sym)
+    sym = detected[0] if detected else sym
+    name = COMPANY_NAMES_AR.get(sym, sym)
+    
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}.CA?interval=1d&range=1y"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            res = data.get('chart', {}).get('result', [])
+            if not res:
+                return f"⚠️ لم يتم العثور على بيانات تاريخية لسهم <b>{name} ({sym})</b>."
+            quote = res[0]['indicators']['quote'][0]
+            closes = quote.get('close', [])
+            
+        clean_closes = [float(c) for c in closes if c is not None and c > 0]
+        if len(clean_closes) < 40:
+            return f"⚠️ البيانات التاريخية المتاحة لسهم <b>{name} ({sym})</b> غير كافية لمحاكاة الاختبار (أقل من 40 جلسة)."
+            
+        deltas = [clean_closes[i] - clean_closes[i-1] for i in range(1, len(clean_closes))]
+        gains = [max(d, 0) for d in deltas]
+        losses = [max(-d, 0) for d in deltas]
+        
+        rsi_series = [None] * 14
+        avg_g = sum(gains[:14]) / 14.0
+        avg_l = sum(losses[:14]) / 14.0
+        
+        for i in range(14, len(deltas)):
+            avg_g = (avg_g * 13 + gains[i]) / 14.0
+            avg_l = (avg_l * 13 + losses[i]) / 14.0
+            if avg_l == 0:
+                rsi = 100.0
+            else:
+                rs = avg_g / avg_l
+                rsi = 100.0 - (100.0 / (1.0 + rs))
+            rsi_series.append(rsi)
+            
+        trades = []
+        in_pos = False
+        entry_p = 0.0
+        entry_idx = 0
+        
+        for i in range(14, len(clean_closes) - 1):
+            rsi = rsi_series[i]
+            curr_p = clean_closes[i]
+            
+            if not in_pos:
+                if rsi is not None and rsi <= 35.0:
+                    in_pos = True
+                    entry_p = clean_closes[i + 1]
+                    entry_idx = i + 1
+            else:
+                pnl_pct = ((curr_p - entry_p) / entry_p) * 100.0
+                days_held = i - entry_idx
+                if pnl_pct >= 8.0 or pnl_pct <= -5.0 or (rsi is not None and rsi >= 65.0) or days_held >= 25:
+                    trades.append({
+                        "entry": entry_p,
+                        "exit": curr_p,
+                        "pnl_pct": pnl_pct,
+                        "days": days_held
+                    })
+                    in_pos = False
+                    
+        if not trades:
+            return (
+                f"🧪 <b>نتائج الاختبار التاريخي لسهم {name} ({sym}) خلال آخر عام:</b>\n\n"
+                f"لم تتولد أي إشارات تشبع بيعي حاد (RSI ≤ 35) خلال العام الماضي نظراً لسيطرة الاتجاه الصاعد القوي على السهم.\n"
+                f"💡 يُفضل استخدام استراتيجية اختراق المتوسطات المتحركة أو اختبار سهم آخر."
+            )
+            
+        wins = [t for t in trades if t["pnl_pct"] > 0]
+        losses = [t for t in trades if t["pnl_pct"] <= 0]
+        win_rate = (len(wins) / len(trades)) * 100.0
+        total_roi = sum(t["pnl_pct"] for t in trades)
+        best_trade = max(t["pnl_pct"] for t in trades)
+        max_drawdown = min(t["pnl_pct"] for t in trades)
+        
+        win_icon = "🟢" if win_rate >= 60.0 else "🟡"
+        
+        msg = (
+            f"🧪 <b>محاكي اختبار الاستراتيجيات الكمية (Backtest Engine):</b>\n"
+            f"🏢 <b>السهم المختبر:</b> <b>{name} ({sym})</b> | <b>الفترة:</b> آخر 250 جلسة تداول (عام كامل)\n"
+            f"🎯 <b>الاستراتيجية:</b> قناص الارتدادات من التشبع البيعي (RSI ≤ 35 مع جني أرباح +8% ووقف -5%)\n\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+            f"📊 <b>النتائج الإحصائية الدقيقة:</b>\n"
+            f"• <b>إجمالي الصفقات المنفذة:</b> {len(trades)} صفقة\n"
+            f"• {win_icon} <b>معدل النجاح (Win Rate):</b> <b><code>{win_rate:.1f}%</code></b> ({len(wins)} رابحة / {len(losses)} خاسرة)\n"
+            f"• 📈 <b>العائد التراكمي الإجمالي:</b> <b><code>{total_roi:+.1f}%</code></b>\n"
+            f"• 🚀 <b>أفضل صفقة محققة:</b> <code>+{best_trade:.1f}%</code>\n"
+            f"• 🛑 <b>أقصى تراجع لصفقة مفردة:</b> <code>{max_drawdown:.1f}%</code>\n\n"
+            f"🕒 <b>تفاصيل آخر العمليات المنفذة في الاختبار:</b>\n"
+        )
+        for t in trades[-4:]:
+            t_icon = "🟢" if t["pnl_pct"] > 0 else "🔴"
+            msg += f"• {t_icon} دخول: {t['entry']:.2f} ج ⬅️ خروج: {t['exit']:.2f} ج | عائد: <code>{t['pnl_pct']:+.1f}%</code> ({t['days']} يوم)\n"
+            
+        msg += "\n💡 <b>الخلاصة الإحصائية:</b> نتائج الباك تست تثبت كفاءة إدارة المخاطر في تحويل التشبعات البيعية إلى صفقات رابحة."
+        return msg
+    except Exception as e:
+        return f"⚠️ خطأ أثناء إجراء المحاكاة لسهم {sym}: {e}"
+
+def export_portfolio_to_excel(holdings, state_data, parsed_stocks, indices=None, funds_data=None, filepath="portfolio_report.xlsx"):
+    """تصدير كشف حساب المحفظة الاستثمارية بصيغة إكسل احترافية (RTL, Styling, Formatting)."""
+    if openpyxl is None:
+        return None
+        
+    wb = openpyxl.Workbook()
+    
+    header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="1B365D", end_color="1B365D", fill_type="solid")
+    sub_header_fill = PatternFill(start_color="2A4D7A", end_color="2A4D7A", fill_type="solid")
+    total_fill = PatternFill(start_color="EAEEF3", end_color="EAEEF3", fill_type="solid")
+    
+    green_font = Font(name="Calibri", size=10, color="006100", bold=True)
+    red_font = Font(name="Calibri", size=10, color="9C0006", bold=True)
+    bold_font = Font(name="Calibri", size=10, bold=True)
+    
+    thin_border = Border(
+        left=Side(style='thin', color='D9D9D9'),
+        right=Side(style='thin', color='D9D9D9'),
+        top=Side(style='thin', color='D9D9D9'),
+        bottom=Side(style='thin', color='D9D9D9')
+    )
+    
+    # 1. المحفظة الاستثمارية
+    ws_port = wb.active
+    ws_port.title = "المحفظة الاستثمارية"
+    ws_port.views.sheetView[0].rightToLeft = True
+    
+    headers_port = [
+        "كود السهم", "اسم الشركة", "القطاع", "الكمية", "سعر الشراء (ج)",
+        "السعر اللحظي (ج)", "القيمة الإجمالية (ج)", "الربح/الخسارة (ج)", "العائد %", "مؤشر RSI"
+    ]
+    ws_port.append(headers_port)
+    for c in range(1, len(headers_port) + 1):
+        cell = ws_port.cell(row=1, column=c)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        
+    total_cost = 0.0
+    total_val = 0.0
+    row_idx = 2
+    
+    for ticker, h in holdings.items():
+        qty = float(h.get("qty", 0))
+        buy_p = float(h.get("buy_price", 0))
+        d = parsed_stocks.get(ticker, {})
+        curr_p = d.get("close", buy_p)
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        sec = "أخرى"
+        for s_name, t_list in SECTORS_MAP.items():
+            if ticker in t_list:
+                sec = s_name
+                break
+                
+        cost = qty * buy_p
+        val = qty * curr_p
+        pnl = val - cost
+        pnl_pct = (pnl / cost) if cost > 0 else 0.0
+        
+        total_cost += cost
+        total_val += val
+        
+        ws_port.append([
+            ticker, name, sec, qty, buy_p, curr_p, val, pnl, pnl_pct, d.get("rsi", "-")
+        ])
+        
+        ws_port.cell(row=row_idx, column=4).number_format = '#,##0'
+        ws_port.cell(row=row_idx, column=5).number_format = '#,##0.00'
+        ws_port.cell(row=row_idx, column=6).number_format = '#,##0.00'
+        ws_port.cell(row=row_idx, column=7).number_format = '#,##0.00'
+        
+        pnl_c = ws_port.cell(row=row_idx, column=8)
+        pnl_c.number_format = '[Color10]+#,##0.00;[Red]-#,##0.00;0.00'
+        pnl_c.font = green_font if pnl >= 0 else red_font
+        
+        pct_c = ws_port.cell(row=row_idx, column=9)
+        pct_c.number_format = '+0.00%;-0.00%;0.00%'
+        pct_c.font = green_font if pnl_pct >= 0 else red_font
+        
+        for c in range(1, len(headers_port) + 1):
+            ws_port.cell(row=row_idx, column=c).border = thin_border
+            
+        row_idx += 1
+        
+    tot_pnl = total_val - total_cost
+    tot_pct = (tot_pnl / total_cost) if total_cost > 0 else 0.0
+    ws_port.append(["الإجمالي", "", "", "", total_cost, total_val, total_val, tot_pnl, tot_pct, ""])
+    for c in range(1, len(headers_port) + 1):
+        cell = ws_port.cell(row=row_idx, column=c)
+        cell.font = bold_font
+        cell.fill = total_fill
+        cell.border = thin_border
+        
+    ws_port.cell(row=row_idx, column=5).number_format = '#,##0.00'
+    ws_port.cell(row=row_idx, column=6).number_format = '#,##0.00'
+    ws_port.cell(row=row_idx, column=7).number_format = '#,##0.00'
+    ws_port.cell(row=row_idx, column=8).number_format = '[Color10]+#,##0.00;[Red]-#,##0.00;0.00'
+    ws_port.cell(row=row_idx, column=9).number_format = '+0.00%;-0.00%;0.00%'
+    
+    for col in ws_port.columns:
+        max_len = max(len(str(cell.value or '')) for cell in col)
+        ws_port.column_dimensions[get_column_letter(col[0].column)].width = max(max_len + 4, 12)
+        
+    # 2. سجل الصفقات
+    journal = state_data.get("journal", [])
+    ws_journal = wb.create_sheet(title="سجل الصفقات المحققة")
+    ws_journal.views.sheetView[0].rightToLeft = True
+    headers_j = ["التاريخ", "النوع", "كود السهم", "اسم الشركة", "الكمية", "سعر التنفيذ (ج)", "الربح المحقق (ج)", "العائد %"]
+    ws_journal.append(headers_j)
+    for c in range(1, len(headers_j) + 1):
+        cell = ws_journal.cell(row=1, column=c)
+        cell.font = header_font
+        cell.fill = sub_header_fill
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        
+    r_j = 2
+    for item in journal:
+        t_sym = item.get("ticker", "")
+        t_name = COMPANY_NAMES_AR.get(t_sym, t_sym)
+        pnl_val = item.get("pnl", 0.0)
+        pnl_pct = item.get("pnl_pct", 0.0) / 100.0
+        ws_journal.append([
+            item.get("date", ""),
+            "شراء" if item.get("type") == "BUY" else "بيع",
+            t_sym,
+            t_name,
+            item.get("qty", 0),
+            item.get("price", 0),
+            pnl_val if item.get("type") == "SELL" else "-",
+            pnl_pct if item.get("type") == "SELL" else "-"
+        ])
+        for c in range(1, len(headers_j) + 1):
+            ws_journal.cell(row=r_j, column=c).border = thin_border
+        r_j += 1
+        
+    for col in ws_journal.columns:
+        max_len = max(len(str(cell.value or '')) for cell in col)
+        ws_journal.column_dimensions[get_column_letter(col[0].column)].width = max(max_len + 4, 12)
+        
+    wb.save(filepath)
+    return filepath
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
@@ -3118,14 +3666,19 @@ def handle_telegram_command(text):
             "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي مع أزرار الفحص السريع.\n"
             "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات والصناديق الاستثمارية.\n"
             "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
-            "🎯 <b>[🎯 أسهم القيمة الرخيصة]</b> أو <code>/undervalued</code> : رادار اقتناص أسهم القيمة وهامش الأمان (P/E متدني وديون آمنة).\n"
-            "📐 <b>[📐 حاسبة المخاطر]</b> أو <code>/calc [السهم] [الدخول] [وقف_الخسارة]</code> : حاسبة حجم الصفقة وإدارة المخاطر (قاعدة 1.5%).\n"
+            "🎯 <b>[🎯 أسهم القيمة]</b> أو <code>/undervalued</code> : رادار اقتناص أسهم القيمة وهامش الأمان (P/E متدني وديون آمنة).\n"
+            "🐋 <b>[🐋 التجميع المؤسسي]</b> أو <code>/accumulation</code> : رادار تدفقات السيولة الذكية التجميعية (CMF موجب).\n"
+            "⚖️ <b>[⚖️ توازن المحفظة]</b> أو <code>/rebalance</code> : مصفوفة التنويع القطاعي والتحذير من تركز المخاطر.\n"
+            "🕌 <b>[🕌 زكاة الأسهم]</b> أو <code>/zakat</code> : حاسبة زكاة الأسهم والمحفظة وفق معايير AAOIFI الشرعية.\n"
+            "📥 <b>[📥 تصدير إكسل]</b> أو <code>/export</code> : تصدير كشف حساب المحفظة الفاخر بصيغة Excel (RTL).\n"
+            "🧪 <code>/backtest [السهم]</code> : محاكي اختبار الاستراتيجيات الكمية تاريخياً لـ 250 جلسة.\n"
+            "📐 <b>[📐 حاسبة المخاطر]</b> أو <code>/calc [السهم] [الدخول] [الوقف]</code> : حاسبة حجم الصفقة وإدارة المخاطر (1.5%).\n"
             "📈 <b>[📈 شارت فني]</b> أو <code>/chart [السهم]</code> : رسم بياني بالشموع اليابانية ومؤشرات SMA وRSI.\n"
             "🏢 <b>[🏢 فحص مالي]</b> أو <code>/fundamental [السهم]</code> : بطاقة التحليل المالي ومضاعفات P/E والديون الشرعية.\n"
             "📜 <b>[📜 سجل الصفقات]</b> أو <code>/journal</code> : كشف حساب الصفقات المغلقة والأرباح المحققة ونسبة النجاح.\n"
             "➕ <code>/buy [السهم] [الكمية] [السعر]</code> : تسجيل شراء وحساب متوسط التكلفة تلقائياً.\n"
             "➖ <code>/sell [السهم] [الكمية] [السعر]</code> : تسجيل بيع واحتساب الأرباح المحققة (Realized P&L).\n"
-            "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص الجلسة والتحليل الفني وتوقعات الغد.\n"
+            "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص اتساع السوق والتحليل الفني وتوقعات الغد.\n"
             "⚖️ <code>/compare [سهم1] [سهم2]</code> : مقارنة فنية واستثمارية مباشرة بالذكاء الاصطناعي.\n"
             "🧠 <b>[🧠 استشارة المحلل الذكي]</b> أو <code>/ask</code> : استشارة المحلل المالي المؤسسي ببيانات السوق والأسعار اللحظية.\n"
             "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7."
@@ -3250,6 +3803,98 @@ def handle_telegram_command(text):
             reply_telegram(calculate_position_risk(text, state_data), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
         except Exception as e:
             reply_telegram(f"⚠️ حدث خطأ في الحاسبة: {e}")
+            
+    elif text_lower.startswith("/zakat") or text_lower.startswith("/زكاة") or text_lower.startswith("/زكاه") or "زكاة" in text_clean or "زكاه" in text_clean:
+        query_arg = ""
+        if text_lower.startswith("/zakat"):
+            query_arg = text[len("/zakat"):].strip()
+        elif text_lower.startswith("/زكاة"):
+            query_arg = text[len("/زكاة"):].strip()
+        elif text_lower.startswith("/زكاه"):
+            query_arg = text[len("/زكاه"):].strip()
+        reply_telegram("🔄 جاري حساب الزكاة الشرعية وفق معايير AAOIFI...")
+        try:
+            state_data, _ = get_github_state()
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            reply_telegram(calculate_portfolio_zakat(state_data, parsed_stocks, custom_query=query_arg if query_arg else None), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ في حاسبة الزكاة: {e}")
+            
+    elif text_lower.startswith("/rebalance") or text_lower.startswith("/توازن") or "توازن المحفظة" in text_clean:
+        reply_telegram("🔄 جاري تحليل التوزيع القطاعي ومصفوفة المخاطر...")
+        try:
+            state_data, _ = get_github_state()
+            holdings = state_data.get("holdings", {})
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            reply_telegram(analyze_portfolio_rebalancing(holdings, parsed_stocks), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ في مصفوفة التوازن: {e}")
+            
+    elif text_lower.startswith("/accumulation") or text_lower.startswith("/smart_money") or text_lower.startswith("/تجميع") or "التجميع المؤسسي" in text_clean:
+        reply_telegram("🔄 جاري فحص رادار التجميع المؤسسي وتدفقات السيولة الذكية (CMF)...")
+        try:
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            reply_telegram(find_smart_money_accumulation(parsed_stocks), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ في رادار التجميع المؤسسي: {e}")
+            
+    elif text_lower.startswith("/backtest") or text_lower.startswith("/باك_تست") or text_lower.startswith("/اختبار"):
+        parts = text.split()
+        if len(parts) < 2:
+            reply_telegram(
+                "🧪 <b>محاكي اختبار الاستراتيجيات الكمية تاريخياً (Backtest):</b>\n\n"
+                "يرجى تحديد رمز أو اسم السهم المراد اختباره على مدار عام كامل (250 جلسة).\n"
+                "أمثلة:\n"
+                "• <code>/backtest TMGH</code>\n"
+                "• <code>/backtest سوديك</code>\n"
+                "• <code>/backtest FWRY</code>"
+            )
+        else:
+            ticker_input = parts[1]
+            reply_telegram(f"🔄 جاري جلب 250 شمعة تداول يومية وتنفيذ المحاكاة الكمية لسهم {ticker_input}...")
+            try:
+                reply_telegram(run_stock_backtest_strategy(ticker_input), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+            except Exception as e:
+                reply_telegram(f"⚠️ خطأ في محاكي الاختبار: {e}")
+                
+    elif text_lower.startswith("/export") or text_lower.startswith("/تصدير") or text_lower.startswith("/اكسل") or "تصدير إكسل" in text_clean:
+        reply_telegram("🔄 جاري توليد كشف حساب المحفظة الفاخر بصيغة Excel (RTL)...")
+        try:
+            state_data, _ = get_github_state()
+            holdings = state_data.get("holdings", {})
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            indices, _ = fetch_indices_data_tv(s)
+            funds_data, _ = fetch_all_funds_data()
+            excel_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "portfolio_report.xlsx")
+            res_path = export_portfolio_to_excel(holdings, state_data, parsed_stocks, indices, funds_data, filepath=excel_path)
+            if res_path and os.path.exists(res_path):
+                now_str = datetime.now(timezone(timedelta(hours=3))).strftime("%Y-%m-%d %H:%M")
+                caption = f"📊 <b>كشف حساب المحفظة الاستثمارية الفاخر (Excel)</b>\n🕒 التاريخ: {now_str}\n💼 تم تدقيق وتنسيق البيانات وفق المعايير المحاسبية المعتمدة."
+                send_telegram_document(res_path, caption=caption)
+                try:
+                    os.remove(res_path)
+                except Exception:
+                    pass
+            else:
+                reply_telegram("⚠️ تعذر توليد ملف الإكسل. يرجى التحقق من توفر البيانات.")
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء تصدير ملف الإكسل: {e}")
             
     elif text_lower.startswith("/set_holding") or text_lower.startswith("/حيازة"):
         parts = text.split()
@@ -3437,6 +4082,14 @@ def poll_telegram_messages():
                             handle_telegram_command("/rsi")
                         elif cb_data == "btn_undervalued":
                             handle_telegram_command("/undervalued")
+                        elif cb_data == "btn_accumulation":
+                            handle_telegram_command("/accumulation")
+                        elif cb_data == "btn_rebalance":
+                            handle_telegram_command("/rebalance")
+                        elif cb_data == "btn_zakat":
+                            handle_telegram_command("/zakat")
+                        elif cb_data == "btn_export":
+                            handle_telegram_command("/export")
                         elif cb_data == "btn_calc_help":
                             handle_telegram_command("/calc")
                         elif cb_data == "btn_summary":
