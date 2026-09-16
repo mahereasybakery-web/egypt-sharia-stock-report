@@ -1575,7 +1575,7 @@ def send_report(force=False):
         rec_part = f" | {item['rec']}" if item.get("rec") else ""
         msg_portfolio += f"{s['rlm']}{dir_emoji} {name_ar}({ticker_html}): {item['open']} {s['e_arrow']} {item['close']} ({chg_str}){rec_part}\n"
         
-    msg_watchlist += f"{s['rlm']}<b>{watch_header}:</b>\n"
+    msg_watchlist = f"{s['rlm']}<b>{watch_header}:</b>\n"
     for k in sorted_watch:
         item = parsed_stocks[k]
         val = item["chgPct"]
