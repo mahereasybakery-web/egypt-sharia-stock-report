@@ -222,6 +222,7 @@ DEFAULT_KEYBOARD = {
     "keyboard": [
         [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
         [{"text": "⚡ بيان مفصل RSI"}, {"text": "📈 شارت فني"}],
+        [{"text": "🎯 أسهم القيمة الرخيصة"}, {"text": "📐 حاسبة المخاطر"}],
         [{"text": "🏢 فحص مالي"}, {"text": "📜 سجل الصفقات"}],
         [{"text": "🧠 استشارة المحلل الذكي"}, {"text": "⚙️ حالة النظام"}]
     ],
@@ -237,6 +238,10 @@ PORTFOLIO_INLINE_KEYBOARD = {
         ],
         [
             {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
+            {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
+        ],
+        [
+            {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
             {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
         ],
         [
@@ -267,6 +272,10 @@ def get_portfolio_inline_keyboard(holdings=None):
         ],
         [
             {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
+            {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
+        ],
+        [
+            {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
             {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
         ],
         [
@@ -282,8 +291,10 @@ def setup_telegram_bot_menu():
         return
     commands = [
         {"command": "portfolio", "description": "💼 كشف حساب المحفظة اللحظي والأرباح"},
-        {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات اللحظي"},
+        {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات والصناديق"},
         {"command": "rsi", "description": "⚡ بيان مفصل لمؤشر RSI لجميع الأسهم"},
+        {"command": "undervalued", "description": "🎯 رادار اقتناص أسهم القيمة وهامش الأمان"},
+        {"command": "calc", "description": "📐 حاسبة حجم الصفقة وإدارة المخاطر (1.5%)"},
         {"command": "chart", "description": "📈 شارت فني بالشموع ومؤشر RSI"},
         {"command": "fundamental", "description": "🏢 بطاقة التحليل المالي ومضاعفات التقييم"},
         {"command": "buy", "description": "➕ تسجيل شراء سهم وحساب متوسط التكلفة"},
@@ -1418,7 +1429,8 @@ def fetch_all_data_tv(tickers, strings):
         "symbols": {"tickers": tv_tickers},
         "columns": [
             "close", "open", "change", "Recommend.All",
-            "RSI", "volume", "average_volume_10d_calc", "SMA20", "SMA50", "Value.Traded"
+            "RSI", "volume", "average_volume_10d_calc", "SMA20", "SMA50", "Value.Traded",
+            "price_earnings_ttm", "price_book_fq", "total_debt_fq", "total_assets_fq", "return_on_equity_fq"
         ]
     }
     headers = {
@@ -1443,6 +1455,14 @@ def fetch_all_data_tv(tickers, strings):
             sma20_val = safe_round(item["d"][7], 2) if len(item["d"]) > 7 and item["d"][7] is not None else None
             sma50_val = safe_round(item["d"][8], 2) if len(item["d"]) > 8 and item["d"][8] is not None else None
             val_traded = safe_round(item["d"][9], 0) if len(item["d"]) > 9 and item["d"][9] is not None else 0
+            
+            # المؤشرات المالية ومضاعفات التقييم اللحظية
+            pe_val = safe_round(item["d"][10], 1) if len(item["d"]) > 10 and item["d"][10] is not None and item["d"][10] > 0 else None
+            pb_val = safe_round(item["d"][11], 2) if len(item["d"]) > 11 and item["d"][11] is not None and item["d"][11] > 0 else None
+            debt_raw = item["d"][12] if len(item["d"]) > 12 else None
+            assets_raw = item["d"][13] if len(item["d"]) > 13 else None
+            debt_ratio = safe_round((debt_raw / assets_raw) * 100.0, 1) if debt_raw and assets_raw and assets_raw > 0 else None
+            roe_val = safe_round(item["d"][14], 1) if len(item["d"]) > 14 and item["d"][14] is not None else None
             
             vol_spike = bool(avg_vol > 5000 and vol_val >= (avg_vol * 1.8))
             rsi_tag = ""
@@ -1469,7 +1489,8 @@ def fetch_all_data_tv(tickers, strings):
                     "close": c, "open": o, "chgPct": chg, "rec": rec_str,
                     "rsi": rsi_val, "volume": vol_val, "avg_vol": avg_vol,
                     "sma20": sma20_val, "sma50": sma50_val, "val_traded": val_traded,
-                    "vol_spike": vol_spike, "rsi_tag": rsi_tag
+                    "vol_spike": vol_spike, "rsi_tag": rsi_tag,
+                    "pe": pe_val, "pb": pb_val, "debt_ratio": debt_ratio, "roe": roe_val
                 }
     except Exception as e:
         print("Error fetching TV prices:", e)
@@ -1540,6 +1561,101 @@ def fetch_egx33_shariah():
     except Exception as e:
         print(f"Error fetching EGX33 Shariah: {e}")
     return shariah
+
+def normalize_arabic_numbers(text: str) -> str:
+    """تحويل الأرقام العربية المشرقية إلى أرقام لاتينية قياسية."""
+    if not text:
+        return ""
+    trans = str.maketrans('٠١٢٣٤٥٦٧٨٩', '0123456789')
+    return text.translate(trans)
+
+def fetch_mutual_funds_data():
+    """
+    جلب أحدث أسعار وثائق صناديق الاستثمار الإسلامية وصناديق الذهب المدرجة:
+    - CMS: صندوق مصر مؤشر شريعة إكويتي (تتبع EGX33 الشريعة)
+    - BWA: صندوق بلتون وفرة (تتبع EGX33 الشريعة)
+    - NMF: صندوق نعيم مصر للأسهم المتوافقة مع الشريعة
+    - AZG: صندوق أزيموت جولد للذهب عيار 24
+    - THNDR_GOLD: صندوق الذهب على منصة ثندر (سبائك بلتون)
+    """
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    
+    funds_config = {
+        'CMS': {
+            'name': 'مصر شريعة إكويتي (CMS)',
+            'desc': 'تتبع EGX33 الشريعة',
+            'url': 'https://snduk.com/eg/funds/misr-shariah-equity-fund',
+            'fallback_price': 22.72
+        },
+        'BWA': {
+            'name': 'بلتون وفرة (BWA)',
+            'desc': 'تتبع EGX33 الشريعة',
+            'url': 'https://snduk.com/eg/funds/beltone-wafra',
+            'fallback_price': 2.21
+        },
+        'NMF': {
+            'name': 'نعيم مصر للشريعة (NMF)',
+            'desc': 'أسهم شريعة',
+            'url': 'https://snduk.com/eg/funds/naeem-misr-sharia-fund',
+            'fallback_price': 50.19
+        },
+        'AZG': {
+            'name': 'أزيموت جولد (AZG)',
+            'desc': 'ذهب عيار 24 / ثندر',
+            'url': 'https://snduk.com/eg/funds/az-gold-fund',
+            'fallback_price': 23.96
+        },
+        'THNDR_GOLD': {
+            'name': 'سبائك جولد (Thndr)',
+            'desc': 'صندوق الذهب / ثندر',
+            'url': 'https://snduk.com/eg/funds/sabayek-fund-beltone-gold',
+            'fallback_price': 1.68
+        }
+    }
+    
+    results = {}
+    
+    for code, cfg in funds_config.items():
+        price = cfg['fallback_price']
+        change_1w = 0.0
+        change_1m = 0.0
+        
+        try:
+            req = urllib.request.Request(cfg['url'], headers=headers)
+            with urllib.request.urlopen(req, timeout=6) as resp:
+                html = resp.read().decode('utf-8', errors='ignore')
+                
+                # استخراج السعر بالجنيه المصري
+                egp_matches = re.findall(r'([٠-٩0-9]+(?:\.[٠-٩0-9]+)?)\s*(?:ج\.م|EGP|جنيه)', html)
+                if egp_matches:
+                    clean_p = float(normalize_arabic_numbers(egp_matches[0]))
+                    if clean_p > 0:
+                        price = clean_p
+                
+                # استخراج التغير الأسبوعي والشهري
+                perf_text = re.search(r'العائد خلال أسبوع:\s*([+-]?[٠-٩0-9.]+)\s*%.*?العائد خلال شهر:\s*([+-]?[٠-٩0-9.]+)\s*%', html)
+                if perf_text:
+                    change_1w = float(normalize_arabic_numbers(perf_text.group(1)))
+                    change_1m = float(normalize_arabic_numbers(perf_text.group(2)))
+                else:
+                    changes = re.findall(r'([+-]?\d+\.\d+)%', html)
+                    if len(changes) >= 2:
+                        change_1w = float(changes[0])
+                        change_1m = float(changes[1])
+                        
+        except Exception as e:
+            print(f"Notice fetching fund {code}: {e}")
+            
+        results[code] = {
+            'code': code,
+            'name': cfg['name'],
+            'desc': cfg['desc'],
+            'price': price,
+            'change_1w': change_1w,
+            'change_1m': change_1m
+        }
+        
+    return results
 
 def send_report(force=False):
     print(f"[{datetime.now()}] Generating and sending report...")
@@ -1780,6 +1896,19 @@ def send_report(force=False):
     msg_indices += f"\n{s['rlm']}<b>💱 العملات والمعادن:</b>\n"
     msg_indices += f"{s['rlm']}{dir_e(usdegp['chgPct'])} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({fmt_chg(usdegp['chgPct'])})\n"
     msg_indices += f"{s['rlm']}{dir_e(xauusd['chgPct'])} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({fmt_chg(xauusd['chgPct'])})\n"
+    
+    # === صناديق الاستثمار الإسلامية والذهب (Thndr / Funds) ===
+    try:
+        funds_data = fetch_mutual_funds_data()
+        if funds_data:
+            msg_indices += f"\n{s['rlm']}<b>🏛️ صناديق الاستثمار الإسلامية والذهب (Thndr / Funds):</b>\n"
+            for f_code, f_info in funds_data.items():
+                w_chg = f_info.get('change_1w', 0.0)
+                chg_str = f"+{w_chg:.2f}%" if w_chg > 0 else f"{w_chg:.2f}%"
+                e_dir = s["e_green"] if w_chg > 0 else (s["e_red"] if w_chg < 0 else s["e_white"])
+                msg_indices += f"{s['rlm']}{e_dir} <b>{f_info['name']}</b>: <b>{f_info['price']:.2f} ج.م</b> (أسبوعي: {chg_str}) | <i>{f_info['desc']}</i>\n"
+    except Exception as e:
+        print("Error appending mutual funds to report:", e)
     
     # ✅ إصلاح: استخدام دالة reply_telegram الموحدة والمؤمنة مع إرفاق أزرار التحكم اللحظية
     reply_telegram(msg_portfolio, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
@@ -2742,6 +2871,30 @@ def check_and_send_smart_alerts(parsed_stocks, holdings, state_data):
                     )
                     reply_telegram(msg, reply_markup=get_portfolio_inline_keyboard(holdings))
                     
+    # 3. رادار قناص الارتدادات من التشبع البيعي (Oversold Bounce Sniper)
+    for ticker, d in parsed_stocks.items():
+        rsi_val = d.get("rsi")
+        if rsi_val and rsi_val <= 30.0 and d.get("close", 0) > 0:
+            sniper_key = f"{today_str}_sniper_{ticker}"
+            if sniper_key not in sent_alerts:
+                sent_alerts[sniper_key] = True
+                state_modified = True
+                name = COMPANY_NAMES_AR.get(ticker, ticker)
+                curr_p = d["close"]
+                chg = d.get("chgPct", 0.0)
+                chg_str = f"+{chg}%" if chg > 0 else f"{chg}%"
+                msg = (
+                    f"🎯 <b>رادار قناص الارتدادات (Oversold Bounce Sniper):</b>\n\n"
+                    f"رصد سهم قيادي دخل منطقة تشبع بيعي حاد وغير مبرر:\n"
+                    f"🏢 <b>السهم:</b> <b>{name} ({ticker})</b>\n"
+                    f"💵 <b>السعر الحالي:</b> {curr_p:.2f} ج.م ({chg_str})\n"
+                    f"⚡ <b>مؤشر RSI:</b> <code>{rsi_val}</code> (تشبع بيعي مفرط ≤ 30!)\n"
+                    f"📊 <b>التوصية الفنية:</b> {d.get('rec', 'مراقبة')}\n\n"
+                    f"💡 <b>استراتيجية القناص:</b> تاريخياً تعكس هذه المستويات ارتداداً تصحيحياً سريعاً نحو متوسطات الحركة (Mean Reversion). راقب تشكل شمعة انعكاسية إيجابية وتأكيد الدعم لبدء الدخول التدريجي.\n"
+                    f"📐 <i>لحساب كمية الشراء وإدارة المخاطرة بدقة:</i> <code>/calc {ticker} {curr_p:.2f} [وقف_الخسارة]</code>"
+                )
+                reply_telegram(msg, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+                    
     return state_modified
 
 def check_and_send_pre_market_briefing(state_data):
@@ -2792,6 +2945,169 @@ def check_and_send_pre_market_briefing(state_data):
     state_data["pre_market_sent_date"] = today_str
     return True
 
+def calculate_position_risk(text, state_data=None):
+    """
+    حاسبة حجم الصفقة الذكية وإدارة المخاطر الصارمة (Position Sizing & Risk Management)
+    تطبق قاعدة المخاطرة المؤسسية الصارمة (1.5% أقصى خسارة من رأس المال).
+    """
+    parts = text.strip().split()
+    if len(parts) < 4:
+        return (
+            "📐 <b>حاسبة حجم الصفقة الذكية وإدارة المخاطر (Position Sizing):</b>\n\n"
+            "تساعدك هذه الحاسبة على تطبيق <b>قاعدة المخاطرة المؤسسية الصارمة (1.5% أقصى خسارة من رأس المال)</b> لحساب كمية الأسهم المناسبة وأهداف جني الأرباح المحسوبة رياضياً.\n\n"
+            "✍️ <b>التنسيق المطلوب:</b>\n"
+            "<code>/calc [السهم] [سعر_الدخول] [وقف_الخسارة] [رأس_المال (اختياري)]</code>\n\n"
+            "💡 <b>أمثلة:</b>\n"
+            "• <code>/calc OCDI 28.5 27.0</code> (يعتمد رأس مال افتراضي 100,000 ج أو إجمالي محفظتك)\n"
+            "• <code>/calc طلعت_مصطفى 58.0 55.5 250000</code> (مع تحديد رأس المال 250,000 ج)\n"
+            "• <code>/calc FWRY 18.2 17.1</code>"
+        )
+    
+    ticker_raw = parts[1].replace("_", " ").upper().replace("[", "").replace("]", "").replace(".CA", "").replace("EGX:", "")
+    detected = detect_stocks_in_query(ticker_raw)
+    ticker = detected[0] if detected else ticker_raw.strip()
+    name = COMPANY_NAMES_AR.get(ticker, ticker)
+    
+    try:
+        entry_price = float(parts[2].replace(",", ""))
+        stop_loss = float(parts[3].replace(",", ""))
+    except ValueError:
+        return "⚠️ يرجى التأكد من كتابة سعر الدخول ووقف الخسارة كأرقام صحيحة أو عشرية."
+        
+    if entry_price <= 0 or stop_loss <= 0:
+        return "⚠️ أسعار الدخول ووقف الخسارة يجب أن تكون أكبر من الصفر."
+        
+    if stop_loss >= entry_price:
+        return f"⚠️ سعر وقف الخسارة ({stop_loss:.2f} ج) يجب أن يكون أقل من سعر الدخول ({entry_price:.2f} ج) لصفقات الشراء!"
+        
+    # تحديد رأس المال المعتمد (100 ألف ج افتراضي أو من قيمة المحفظة)
+    capital = 100000.0
+    if len(parts) >= 5:
+        try:
+            capital = float(parts[4].replace(",", ""))
+        except ValueError:
+            pass
+    elif state_data and "holdings" in state_data:
+        # حساب القيمة الإجمالية للمحفظة إن وجدت
+        total_p_val = 0.0
+        for _, h in state_data["holdings"].items():
+            total_p_val += float(h.get("qty", 0)) * float(h.get("buy_price", 0))
+        if total_p_val >= 10000:
+            capital = total_p_val
+        
+    # الحسابات الرياضية للمخاطرة وحجم الصفقة
+    risk_per_share = entry_price - stop_loss
+    stop_loss_pct = (risk_per_share / entry_price) * 100.0
+    max_risk_amount = capital * 0.015  # قاعدة 1.5% أقصى خسارة
+    
+    optimal_shares = int(max_risk_amount / risk_per_share) if risk_per_share > 0 else 0
+    total_position_cost = optimal_shares * entry_price
+    position_pct_of_capital = (total_position_cost / capital) * 100.0 if capital > 0 else 0.0
+    
+    # أهداف جني الأرباح (Risk to Reward Ratio)
+    target_1 = entry_price + (risk_per_share * 2.0)  # 1:2 R:R
+    target_1_profit = optimal_shares * (target_1 - entry_price)
+    target_1_gain_pct = ((target_1 - entry_price) / entry_price) * 100.0
+    
+    target_2 = entry_price + (risk_per_share * 3.0)  # 1:3 R:R
+    target_2_profit = optimal_shares * (target_2 - entry_price)
+    target_2_gain_pct = ((target_2 - entry_price) / entry_price) * 100.0
+    
+    res = (
+        f"📐 <b>خطة إدارة المخاطر وحجم الصفقة لسهم {name} ({ticker}):</b>\n\n"
+        f"💼 <b>رأس المال المعتمد:</b> <code>{capital:,.0f} ج.م</code>\n"
+        f"🎯 <b>أقصى مخاطرة مسموحة للصفقة (1.5%):</b> <code>{max_risk_amount:,.2f} ج.م</code>\n\n"
+        f"💵 <b>سعر الدخول المقترح:</b> {entry_price:.2f} ج.م\n"
+        f"🛑 <b>وقف الخسارة الصارم:</b> {stop_loss:.2f} ج.م (المخاطرة: <code>-{stop_loss_pct:.2f}%</code>)\n"
+        f"⚖️ <b>المخاطرة لكل سهم:</b> {risk_per_share:.2f} ج.م\n\n"
+        f"🟢 <b>الكمية الموصى بشرائها (Optimal Sizing):</b>\n"
+        f"👉 <b><code>{optimal_shares:,}</code> سهم</b>\n"
+        f"💰 <b>إجمالي قيمة الصفقة:</b> {total_position_cost:,.2f} ج.م ({position_pct_of_capital:.1f}% من رأس المال)\n\n"
+        f"🎯 <b>أهداف جني الأرباح ونسب العائد إلى المخاطرة (R:R):</b>\n"
+        f"1️⃣ <b>الهدف الأول (نسبة 1:2):</b> <b>{target_1:.2f} ج.م</b> (+{target_1_gain_pct:.1f}%)\n"
+        f"   └ 💵 الربح المتوقع: <code>+{target_1_profit:,.2f} ج.م</code>\n"
+        f"2️⃣ <b>الهدف الثاني (نسبة 1:3):</b> <b>{target_2:.2f} ج.م</b> (+{target_2_gain_pct:.1f}%)\n"
+        f"   └ 💵 الربح المتوقع: <code>+{target_2_profit:,.2f} ج.م</code>\n\n"
+        f"💡 <b>قاعدة التداول الذهبية:</b> عند بلوغ السهم الهدف الأول ({target_1:.2f} ج)، قم بجني ربح نصف الكمية فوراً، وارفع وقف الخسارة للنصف المتبقي إلى نقطة الدخول ({entry_price:.2f} ج) لتصبح صفقة خالية تماماً من المخاطر (Risk-Free Trade)!"
+    )
+    return res
+
+def format_undervalued_report(parsed_stocks):
+    """
+    رادار اقتناص أسهم القيمة وهامش الأمان (Margin of Safety Radar)
+    يفحص الأسهم الشرعية وفق معايير وارن بافت وبنجامين جراهام (P/E منخفض، ديون متدنية، وزخم غير مشبع).
+    """
+    candidates = []
+    for ticker, d in parsed_stocks.items():
+        if ticker not in ALL_TICKERS:
+            continue
+        pe = d.get("pe")
+        pb = d.get("pb")
+        rsi = d.get("rsi", 50.0)
+        debt_ratio = d.get("debt_ratio")
+        roe = d.get("roe")
+        close = d.get("close", 0.0)
+        chg = d.get("chgPct", 0.0)
+        
+        # الفلترة: مكرر ربحية جذّاب <= 15 أو مضاعف دفترية <= 2.5 مع مؤشر RSI غير متضخم (< 65)
+        if pe is not None and pe <= 15.0 and rsi < 65.0:
+            score = pe * 0.6 + (pb if pb else 2.0) * 2.0
+            candidates.append({
+                "ticker": ticker,
+                "name": COMPANY_NAMES_AR.get(ticker, ticker),
+                "close": close,
+                "chg": chg,
+                "rsi": rsi,
+                "pe": pe,
+                "pb": pb,
+                "debt_ratio": debt_ratio,
+                "roe": roe,
+                "score": score
+            })
+            
+    candidates.sort(key=lambda x: x["score"])
+    
+    if not candidates:
+        return (
+            "🎯 <b>رادار أسهم القيمة وهامش الأمان:</b>\n\n"
+            "لا توجد أسهم حالياً مستوفية لشروط التقييم الرخيص الصارمة (P/E ≤ 15x و RSI < 65)."
+        )
+        
+    msg = (
+        "🎯 <b>رادار اقتناص أسهم القيمة وهامش الأمان (Margin of Safety):</b>\n"
+        "<i>فرص استثمارية تتداول بمضاعفات تقييم رخيصة وديون آمنة ومساحة نمو فني ممتازة:</i>\n\n"
+    )
+    
+    medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"]
+    for i, c in enumerate(candidates[:5]):
+        medal = medals[i] if i < len(medals) else "🔹"
+        name = c["name"]
+        t = c["ticker"]
+        p = c["close"]
+        chg_str = f"+{c['chg']}%" if c['chg'] > 0 else f"{c['chg']}%"
+        pe_str = f"{c['pe']:.1f}x" if c['pe'] else "غير متوفر"
+        pb_str = f"{c['pb']:.2f}x" if c['pb'] else "غير متوفر"
+        debt_str = f"{c['debt_ratio']:.1f}%" if c['debt_ratio'] is not None else "آمنة شرعياً"
+        roe_str = f"{c['roe']:.1f}%" if c['roe'] is not None else "-"
+        rsi_val = c["rsi"]
+        
+        # تصنيف هامش الأمان
+        safety = "⭐⭐⭐ ممتاز" if (c['pe'] <= 8.0 and (c['debt_ratio'] or 0) <= 20) else "⭐⭐ جيد جداً"
+        
+        msg += (
+            f"{medal} <b>{name} ({t})</b>: <b>{p:.2f} ج.م</b> ({chg_str})\n"
+            f"   ├ 📊 <b>مكرر الربحية (P/E):</b> <code>{pe_str}</code> | <b>مضاعف القيمة الدفترية (P/B):</b> <code>{pb_str}</code>\n"
+            f"   ├ 💳 <b>نسبة الديون للأصول:</b> <code>{debt_str}</code> | <b>عائد حقوق الملكية (ROE):</b> <code>{roe_str}</code>\n"
+            f"   ├ ⚡ <b>مؤشر RSI:</b> <code>{rsi_val}</code> | <b>هامش الأمان:</b> {safety}\n"
+            f"   └ 💡 <i>فحص تفصيلي:</i> <code>/fundamental {t}</code> | <code>/chart {t}</code>\n\n"
+        )
+        
+    msg += (
+        "💡 <b>قاعدة وارن بافت:</b> «السعر هو ما تدفعه، أما القيمة فهي ما تحصل عليه». "
+        "شراء أسهم ذات مضاعفات تقييم منخفضة وديون متدنية يمنح محفظتك وسادة أمان متينة ضد تقلبات السوق."
+    )
+    return msg
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
@@ -2800,8 +3116,10 @@ def handle_telegram_command(text):
             "<b>🤖 أهلاً بك في منصة تداول أسهم الشريعة المؤسسية!</b>\n\n"
             "إليك الأوامر والأزرار الذكية المتاحة:\n"
             "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي مع أزرار الفحص السريع.\n"
-            "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات الفنية.\n"
+            "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات والصناديق الاستثمارية.\n"
             "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
+            "🎯 <b>[🎯 أسهم القيمة الرخيصة]</b> أو <code>/undervalued</code> : رادار اقتناص أسهم القيمة وهامش الأمان (P/E متدني وديون آمنة).\n"
+            "📐 <b>[📐 حاسبة المخاطر]</b> أو <code>/calc [السهم] [الدخول] [وقف_الخسارة]</code> : حاسبة حجم الصفقة وإدارة المخاطر (قاعدة 1.5%).\n"
             "📈 <b>[📈 شارت فني]</b> أو <code>/chart [السهم]</code> : رسم بياني بالشموع اليابانية ومؤشرات SMA وRSI.\n"
             "🏢 <b>[🏢 فحص مالي]</b> أو <code>/fundamental [السهم]</code> : بطاقة التحليل المالي ومضاعفات P/E والديون الشرعية.\n"
             "📜 <b>[📜 سجل الصفقات]</b> أو <code>/journal</code> : كشف حساب الصفقات المغلقة والأرباح المحققة ونسبة النجاح.\n"
@@ -2913,6 +3231,25 @@ def handle_telegram_command(text):
     elif text_lower.startswith("/summary") or "ملخص" in text_clean:
         reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الفني...")
         send_daily_summary()
+        
+    elif text_lower.startswith("/undervalued") or text_lower.startswith("/فرص") or text_lower.startswith("/قيمة") or "أسهم القيمة" in text_clean or "فرص القيمة" in text_clean:
+        reply_telegram("🔄 جاري مسح الأسهم الشرعية واقتناص فرص القيمة وهامش الأمان...")
+        try:
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            reply_telegram(format_undervalued_report(parsed_stocks), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء تشغيل رادار أسهم القيمة: {e}")
+            
+    elif text_lower.startswith("/calc") or text_lower.startswith("/حاسبة") or "حاسبة المخاطر" in text_clean:
+        try:
+            state_data, _ = get_github_state()
+            reply_telegram(calculate_position_risk(text, state_data), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ حدث خطأ في الحاسبة: {e}")
             
     elif text_lower.startswith("/set_holding") or text_lower.startswith("/حيازة"):
         parts = text.split()
@@ -3098,6 +3435,10 @@ def poll_telegram_messages():
                             handle_telegram_command("/report")
                         elif cb_data == "btn_rsi":
                             handle_telegram_command("/rsi")
+                        elif cb_data == "btn_undervalued":
+                            handle_telegram_command("/undervalued")
+                        elif cb_data == "btn_calc_help":
+                            handle_telegram_command("/calc")
                         elif cb_data == "btn_summary":
                             handle_telegram_command("/summary")
                         elif cb_data == "btn_ask_help":
