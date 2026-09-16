@@ -243,40 +243,72 @@ DEFAULT_KEYBOARD = {
     "is_persistent": True
 }
 
-PORTFOLIO_HUB_KEYBOARD = {
+# 1. مركز المحفظة الرئيسي: زرين فقط لمنع أي ازدحام بالشاشة
+PORTFOLIO_MAIN_HUB_KEYBOARD = {
     "inline_keyboard": [
         [
-            {"text": "💼 كشف حساب الأرباح والخسائر", "callback_data": "btn_portfolio"},
-            {"text": "📥 تصدير كشف إكسل (RTL)", "callback_data": "btn_export"}
-        ],
-        [
-            {"text": "⚖️ مصفوفة توازن القطاعات", "callback_data": "btn_rebalance"},
-            {"text": "🕌 حاسبة زكاة الأسهم", "callback_data": "btn_zakat"}
-        ],
-        [
-            {"text": "📉 حاسبة التبريد الذكي DCA", "callback_data": "btn_dca"},
-            {"text": "💥 محاكي اختبار الضغط", "callback_data": "btn_stresstest"}
-        ],
-        [
-            {"text": "📐 حاسبة حجم الصفقة (1.5%)", "callback_data": "btn_calc_help"},
-            {"text": "📜 سجل الصفقات المحققة", "callback_data": "btn_journal"}
-        ],
-        [
-            {"text": "🔔 إدارة وتعديل تنبيهاتي", "callback_data": "btn_my_alerts"},
-            {"text": "🌐 لوحة التحكم الرقمية (Web)", "callback_data": "btn_dashboard"}
+            {"text": "📊 كشوفات وتقارير المحفظة", "callback_data": "sub_portfolio_reports"},
+            {"text": "🛠️ أدوات وحاسبات الاستثمار", "callback_data": "sub_portfolio_tools"}
         ]
     ]
 }
 
-MARKET_HUB_KEYBOARD = {
+# كشوفات وتقارير المحفظة الفرعية
+PORTFOLIO_REPORTS_KEYBOARD = {
     "inline_keyboard": [
         [
-            {"text": "📊 تقرير الأسعار والمؤشرات", "callback_data": "btn_report"},
+            {"text": "💼 كشف حساب الأرباح والخسائر P&L", "callback_data": "btn_portfolio"},
+            {"text": "📥 تصدير كشف إكسل (RTL)", "callback_data": "btn_export"}
+        ],
+        [
+            {"text": "⚖️ مصفوفة توازن وتنويع القطاعات", "callback_data": "btn_rebalance"},
+            {"text": "📜 سجل الصفقات المحققة", "callback_data": "btn_journal"}
+        ],
+        [
+            {"text": "🌐 لوحة التحكم الرقمية (Web)", "callback_data": "btn_dashboard"},
+            {"text": "🔙 رجوع لمركز المحفظة", "callback_data": "hub_portfolio"}
+        ]
+    ]
+}
+
+# أدوات وحاسبات الاستثمار الفرعية
+PORTFOLIO_TOOLS_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "🕌 حاسبة زكاة الأسهم AAOIFI", "callback_data": "btn_zakat"},
+            {"text": "📉 حاسبة التبريد الذكي DCA", "callback_data": "btn_dca"}
+        ],
+        [
+            {"text": "💥 محاكي اختبار ضغط وصدمات السوق", "callback_data": "btn_stresstest"},
+            {"text": "📐 حاسبة حجم الصفقة (1.5%)", "callback_data": "btn_calc_help"}
+        ],
+        [
+            {"text": "🔔 إدارة وتعديل تنبيهاتي", "callback_data": "btn_my_alerts"},
+            {"text": "🔙 رجوع لمركز المحفظة", "callback_data": "hub_portfolio"}
+        ]
+    ]
+}
+
+# 2. رادار السوق والتحليلات الرئيسي: زرين فقط لمنع أي ازدحام بالشاشة
+MARKET_MAIN_HUB_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "⚡ رادارات السوق والفرص اللحظية", "callback_data": "sub_market_radars"},
+            {"text": "🏢 التحليل الفني والمالي للشركات", "callback_data": "sub_market_analysis"}
+        ]
+    ]
+}
+
+# رادارات وفرص السوق الفرعية
+MARKET_RADARS_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "📊 تقرير الأسعار والمؤشرات اللحظي", "callback_data": "btn_report"},
             {"text": "⚡ بيان مفصل لمؤشر RSI", "callback_data": "btn_rsi"}
         ],
         [
             {"text": "🎯 رادار فرص أسهم القيمة", "callback_data": "btn_undervalued"},
-            {"text": "🐋 التجميع المؤسسي (CMF)", "callback_data": "btn_accumulation"}
+            {"text": "🐋 التجميع المؤسسي والسيولة CMF", "callback_data": "btn_accumulation"}
         ],
         [
             {"text": "⚡ رادار الدايفرجنس الإيجابي", "callback_data": "btn_divergence"},
@@ -284,15 +316,66 @@ MARKET_HUB_KEYBOARD = {
         ],
         [
             {"text": "🕵️ صفقات كبار الملاك والداخليين", "callback_data": "btn_insiders"},
-            {"text": "📌 ملخص الجلسة واتساع السوق", "callback_data": "btn_summary"}
+            {"text": "🔙 رجوع لرادار السوق", "callback_data": "hub_market"}
+        ]
+    ]
+}
+
+# التحليل الفني والمالي للشركات الفرعية
+MARKET_ANALYSIS_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "🎯 مصفوفة السعر العادل (3 سيناريوهات)", "callback_data": "btn_target_menu"},
+            {"text": "🏢 بطاقة الفحص المالي والمكررات", "callback_data": "btn_fundamental_help"}
         ],
         [
-            {"text": "📈 طلب شارت فني لسهم", "callback_data": "btn_chart_help"},
-            {"text": "🏢 بطاقة الفحص المالي", "callback_data": "btn_fundamental_help"}
+            {"text": "📈 طلب شارت فني لسهم بالشموع", "callback_data": "btn_chart_menu"},
+            {"text": "📌 ملخص الجلسة واتساع السوق", "callback_data": "btn_summary"}
         ],
         [
             {"text": "🧠 استشارة المحلل المالي AI", "callback_data": "btn_ask_help"},
             {"text": "⚙️ حالة اتصال النظام 24/7", "callback_data": "btn_status"}
+        ],
+        [
+            {"text": "🔙 رجوع لرادار السوق", "callback_data": "hub_market"}
+        ]
+    ]
+}
+
+# قائمة سريعة لحساب السعر العادل بنقرة زر لأشهر الأسهم
+TARGET_STOCKS_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "🎯 طلعت مصطفى (TMGH)", "callback_data": "target_TMGH"},
+            {"text": "🎯 فوري (FWRY)", "callback_data": "target_FWRY"}
+        ],
+        [
+            {"text": "🎯 سوديك (OCDI)", "callback_data": "target_OCDI"},
+            {"text": "🎯 سيدي كرير (SKPC)", "callback_data": "target_SKPC"}
+        ],
+        [
+            {"text": "🎯 موبكو (MFPC)", "callback_data": "target_MFPC"},
+            {"text": "🎯 أبو قير (ABUK)", "callback_data": "target_ABUK"}
+        ],
+        [
+            {"text": "🔙 رجوع للتحليل المالي", "callback_data": "sub_market_analysis"}
+        ]
+    ]
+}
+
+# قائمة سريعة لطلب الشارت الفني بنقرة زر
+CHART_STOCKS_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "📈 شارت طلعت مصطفى (TMGH)", "callback_data": "chart_TMGH"},
+            {"text": "📈 شارت فوري (FWRY)", "callback_data": "chart_FWRY"}
+        ],
+        [
+            {"text": "📈 شارت سوديك (OCDI)", "callback_data": "chart_OCDI"},
+            {"text": "📈 شارت سيدي كرير (SKPC)", "callback_data": "chart_SKPC"}
+        ],
+        [
+            {"text": "🔙 رجوع للتحليل المالي", "callback_data": "sub_market_analysis"}
         ]
     ]
 }
@@ -306,7 +389,9 @@ QUICK_NAV_KEYBOARD = {
     ]
 }
 
-PORTFOLIO_INLINE_KEYBOARD = PORTFOLIO_HUB_KEYBOARD
+PORTFOLIO_HUB_KEYBOARD = PORTFOLIO_MAIN_HUB_KEYBOARD
+MARKET_HUB_KEYBOARD = MARKET_MAIN_HUB_KEYBOARD
+PORTFOLIO_INLINE_KEYBOARD = PORTFOLIO_MAIN_HUB_KEYBOARD
 
 def get_portfolio_inline_keyboard(holdings=None):
     """توليد لوحة أزرار تفاعلية مقتضبة ونظيفة تتضمن فحص الأسهم وشريط تنقل سريع."""
@@ -434,6 +519,28 @@ def reply_telegram(text, reply_markup=None):
             print(f"Telegram reply error {r.status_code}: {r.text[:200]}")
     except Exception as e:
         print("Error sending telegram message:", e)
+
+def edit_telegram_message(message_id, text, reply_markup=None):
+    """تعديل الرسالة التفاعلية في مكانها فوراً دون إرسال رسائل جديدة لضمان نظافة الشاشة."""
+    if not BOT_TOKEN or not CHAT_ID or not message_id:
+        reply_telegram(text, reply_markup=reply_markup)
+        return
+    text = ensure_rtl(text)
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText"
+    payload = {
+        "chat_id": CHAT_ID,
+        "message_id": message_id,
+        "text": text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True,
+        "reply_markup": reply_markup
+    }
+    try:
+        r = requests.post(url, json=payload, timeout=10)
+        if r.status_code != 200:
+            reply_telegram(text, reply_markup=reply_markup)
+    except Exception:
+        reply_telegram(text, reply_markup=reply_markup)
 
 def trigger_next_runner():
     print("Dispatching next runner to maintain perpetual cloud loop...")
@@ -4730,7 +4837,9 @@ def poll_telegram_messages():
                 if "callback_query" in update:
                     cb = update["callback_query"]
                     cb_id = cb.get("id")
-                    chat_id = str(cb.get("message", {}).get("chat", {}).get("id", ""))
+                    cb_msg = cb.get("message", {})
+                    msg_id = cb_msg.get("message_id")
+                    chat_id = str(cb_msg.get("chat", {}).get("id", ""))
                     if chat_id == CHAT_ID:
                         cb_data = cb.get("data", "")
                         try:
@@ -4742,19 +4851,70 @@ def poll_telegram_messages():
                         except Exception:
                             pass
                             
-                        # مراكز التنقل الرئيسية
+                        # التنقل الهرمي المقتضب (زرين فقط في كل مستوى لمنع الازدحام نهائياً)
                         if cb_data == "hub_portfolio":
                             msg = (
                                 "💼 <b>مركز إدارة المحفظة والقرارات الاستثمارية:</b>\n"
-                                "<i>اختر التقرير أو الأداة المطلوبة من الأزرار التفاعلية أدناه:</i>"
+                                "<i>تم تنظيم كافة الأدوات في فئتين (زرين فقط) لتصفية الشاشة:</i>"
                             )
-                            reply_telegram(msg, reply_markup=PORTFOLIO_HUB_KEYBOARD)
+                            edit_telegram_message(msg_id, msg, reply_markup=PORTFOLIO_MAIN_HUB_KEYBOARD)
+                            
+                        elif cb_data == "sub_portfolio_reports":
+                            msg = (
+                                "📊 <b>كشوفات وتقارير المحفظة الاستثمارية:</b>\n"
+                                "<i>اختر الكشف أو التقرير المطلوب:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=PORTFOLIO_REPORTS_KEYBOARD)
+                            
+                        elif cb_data == "sub_portfolio_tools":
+                            msg = (
+                                "🛠️ <b>حاسبات وأدوات إدارة المحفظة والمخاطر:</b>\n"
+                                "<i>اختر الأداة أو الحاسبة المطلوبة:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=PORTFOLIO_TOOLS_KEYBOARD)
+                            
                         elif cb_data == "hub_market":
                             msg = (
                                 "📊 <b>رادار مسح السوق والتحليلات الفنية والمالية:</b>\n"
-                                "<i>اختر الرادار أو التحليل المطلوب من الأزرار التفاعلية أدناه:</i>"
+                                "<i>تم تنظيم كافة الرادارات في فئتين (زرين فقط) لتصفية الشاشة:</i>"
                             )
-                            reply_telegram(msg, reply_markup=MARKET_HUB_KEYBOARD)
+                            edit_telegram_message(msg_id, msg, reply_markup=MARKET_MAIN_HUB_KEYBOARD)
+                            
+                        elif cb_data == "sub_market_radars":
+                            msg = (
+                                "⚡ <b>رادارات السوق والفرص اللحظية والسيولة:</b>\n"
+                                "<i>اختر الرادار المطلوب لبث بياناته فوراً:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=MARKET_RADARS_KEYBOARD)
+                            
+                        elif cb_data == "sub_market_analysis":
+                            msg = (
+                                "🏢 <b>التحليل الفني والمالي ومصفوفة التقييم:</b>\n"
+                                "<i>اختر نوع التحليل المطلوب:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=MARKET_ANALYSIS_KEYBOARD)
+                            
+                        elif cb_data == "btn_target_menu":
+                            msg = (
+                                "🎯 <b>مصفوفة السعر العادل والسيناريوهات الثلاثة:</b>\n"
+                                "<i>اختر السهم المطلوب لحساب قيمته العادلة فوراً أو اكتب /target [السهم]:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=TARGET_STOCKS_KEYBOARD)
+                            
+                        elif cb_data == "btn_chart_menu":
+                            msg = (
+                                "📈 <b>طلب شارت فني لسهم بالشموع اليابانية ومؤشر RSI:</b>\n"
+                                "<i>اختر السهم المطلوب لرسم شارته اللحظي فوراً أو اكتب /chart [السهم]:</i>"
+                            )
+                            edit_telegram_message(msg_id, msg, reply_markup=CHART_STOCKS_KEYBOARD)
+                            
+                        elif cb_data.startswith("target_"):
+                            t = cb_data.replace("target_", "").upper()
+                            handle_telegram_command(f"/target {t}")
+                            
+                        elif cb_data.startswith("chart_"):
+                            t = cb_data.replace("chart_", "").upper()
+                            handle_telegram_command(f"/chart {t}")
                             
                         # أدوات المحفظة
                         elif cb_data == "btn_portfolio":
