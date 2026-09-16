@@ -1582,7 +1582,7 @@ def send_report(force=False):
         rsi_str = f" | RSI:{item['rsi']}" if item.get("rsi") is not None else ""
         msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{name_ar} ({ticker_html})</b>: {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
         
-    msg_watchlist += f"{s['rlm']}<b>{watch_header}:</b>\n"
+    msg_watchlist = f"{s['rlm']}<b>{watch_header}:</b>\n"
     for k in sorted_watch:
         item = parsed_stocks[k]
         val = item["chgPct"]
@@ -1626,25 +1626,37 @@ def send_report(force=False):
     reply_telegram(msg_watchlist)
     reply_telegram(msg_indices)
     
-    # ✅ إضافة: إرسال النبض الفني والسوقي للذكاء الاصطناعي (AI Market Pulse) لضمان تحليل فني دسم في كل تقرير
-    ai_market_pulse = generate_market_ai_pulse(parsed_stocks, egx30, egx33, egx70ewi, sorted_port, sorted_watch)
-    if ai_market_pulse:
-        reply_telegram(ai_market_pulse)
+    # ✅ إضافة: إرسال النبض الفني والسوقي للذكاء الاصطناعي (AI Market Pulse) بشكل آمن
+    try:
+        ai_market_pulse = generate_market_ai_pulse(parsed_stocks, egx30, egx33, egx70ewi, sorted_port, sorted_watch)
+        if ai_market_pulse:
+            reply_telegram(ai_market_pulse)
+    except Exception as e:
+        print("Error sending AI market pulse:", e)
         
-    # ✅ إضافة: رادار كبار المساهمين والصفقات الكبرى (Insider Deals & Block Trades)
-    insider_alerts = scan_insider_and_block_trades(live_news, [])
-    insider_msg = format_insider_alerts(insider_alerts)
-    if insider_msg:
-        reply_telegram(insider_msg)
+    # ✅ إضافة: رادار كبار المساهمين والصفقات الكبرى بشكل آمن
+    try:
+        insider_alerts = scan_insider_and_block_trades(live_news, [])
+        insider_msg = format_insider_alerts(insider_alerts)
+        if insider_msg:
+            reply_telegram(insider_msg)
+    except Exception as e:
+        print("Error sending insider alerts:", e)
         
     # ✅ إضافة: فحص تنبيهات الأسعار المخصصة للمستخدم
-    check_and_trigger_user_alerts(parsed_stocks, state_data, state_sha)
+    try:
+        check_and_trigger_user_alerts(parsed_stocks, state_data, state_sha)
+    except Exception as e:
+        print("Error checking user alerts:", e)
         
-    if news_chunks:
-        for i, chunk in enumerate(news_chunks):
-            if i == 0:
-                chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
-            reply_telegram(chunk)
+    try:
+        if news_chunks:
+            for i, chunk in enumerate(news_chunks):
+                if i == 0:
+                    chunk = f"{s['rlm']}<b>{s['e_rocket']} {s['latest_news_developments']}:</b>\n" + chunk
+                reply_telegram(chunk)
+    except Exception as e:
+        print("Error sending news chunks:", e)
             
     # ✅ إضافة: مسح الأخبار اليدوية القديمة تلقائياً من الملف على GitHub بعد إرسالها بنجاح لمنع تكرار إرسالها غداً
     if os.path.exists(NEWS_PATH):
@@ -2326,14 +2338,13 @@ if __name__ == "__main__":
     wait_for_market_open()
     
     import sys
-    TOTAL_CYCLES = 15
-    try:
-        for i in range(TOTAL_CYCLES):
-            loop_now = datetime.now(egypt_tz)
-            print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
-            
-            current_time_minutes = loop_now.hour * 60 + loop_now.minute
-            
+    TOTAL_CYCLES = 24
+    for i in range(TOTAL_CYCLES):
+        loop_now = datetime.now(egypt_tz)
+        print(f"=== Loop Cycle {i+1}/{TOTAL_CYCLES} | Time: {loop_now.strftime('%H:%M:%S')} ===")
+        current_time_minutes = loop_now.hour * 60 + loop_now.minute
+        
+        try:
             # إذا انتهت جلسة التداول (بعد 14:30 / 02:30 ظهراً):
             if current_time_minutes > 14 * 60 + 30:
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Handling session close & summary.")
@@ -2379,24 +2390,27 @@ if __name__ == "__main__":
             else:
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Outside active market hours, skipping report.")
                 
-            if i == TOTAL_CYCLES - 1:
-                # إطلاق المشغل الجديد فقط إذا كان السوق لا يزال مفتوحاً (قبل 14:30)
-                if loop_now.hour * 60 + loop_now.minute < 14 * 60 + 30:
-                    print(f"[{loop_now.strftime('%H:%M:%S')}] Market still active. Dispatching next runner to continue intraday session.")
-                    trigger_next_runner()
-                    sys.exit(0)
-                else:
-                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 2:30 PM or later. Transitioning to Perpetual 24/7 Cloud Relay.")
-                    enter_perpetual_sleep_and_relay()
-                    sys.exit(0)
-                    
-            if i < TOTAL_CYCLES - 1:
+        except Exception as cycle_err:
+            import traceback
+            print(f"⚠️ Error during cycle {i+1}: {cycle_err}")
+            traceback.print_exc()
+            # استمرار البوت في العمل دون إنهاء العملية والانتقال للدورة القادمة
+            time.sleep(10)
+            
+        if i == TOTAL_CYCLES - 1:
+            # إطلاق المشغل الجديد فقط إذا كان السوق لا يزال مفتوحاً (قبل 14:30)
+            if loop_now.hour * 60 + loop_now.minute < 14 * 60 + 30:
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Market still active. Dispatching next runner to continue intraday session.")
+                trigger_next_runner()
+                sys.exit(0)
+            else:
+                print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 2:30 PM or later. Transitioning to Perpetual 24/7 Cloud Relay.")
+                enter_perpetual_sleep_and_relay()
+                sys.exit(0)
+                
+        if i < TOTAL_CYCLES - 1:
+            try:
                 sleep_until_next_15min_mark()
-    except Exception as e:
-        import traceback
-        error_details = traceback.format_exc()
-        short_error = error_details[-500:] if len(error_details) > 500 else error_details
-        error_msg = f"⚠️ <b>تنبيه من الخادم:</b>\nحدث خطأ برمجي أدى لتوقف البوت:\n<pre>{short_error}</pre>"
-        reply_telegram(error_msg)
-        print(f"CRITICAL ERROR: {e}")
-        sys.exit(1)
+            except Exception as sleep_err:
+                print(f"Error in sleep_until_next_15min_mark: {sleep_err}")
+                time.sleep(60)
