@@ -1,0 +1,28 @@
+{
+  "name": "منظومة الأسهم الشرعية | EGX Sharia Portal",
+  "short_name": "أسهم الشريعة",
+  "description": "المنصة المتكاملة لمتابعة الأسهم المصرية المتوافقة مع الشريعة الإسلامية وصناديق الذهب وحاسبة الزكاة والمحفظة",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0f19",
+  "theme_color": "#0b0f19",
+  "orientation": "portrait-primary",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["finance", "business", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
