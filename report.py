@@ -98,6 +98,47 @@ COMPANY_WEBSITES = {
     "ICFC": "http://www.icf-eg.com"
 }
 
+# Arabic stock company names for clear RTL display
+COMPANY_NAMES_AR = {
+    # المحفظة (Portfolio)
+    "ETEL": "المصرية للاتصالات",
+    "TMGH": "مجموعة طلعت مصطفى",
+    "EFIH": "إي فاينانس للاستثمارات",
+    "EGAL": "مصر للألومنيوم",
+    "ADIB": "مصرف أبوظبي الإسلامي",
+    "ORHD": "أوراسكوم للتنمية مصر",
+    "OCDI": "سوديك (السادس من أكتوبر)",
+    "EFID": "إيديتا للصناعات الغذائية",
+    "FWRY": "فوري للمدفوعات الإلكترونية",
+    "RACC": "راية لخدمات مراكز الاتصالات",
+    # قائمة المتابعة (Watchlist)
+    "ORAS": "أوراسكوم كونستراكشون",
+    "PHDC": "بالم هيلز للتعمير",
+    "SKPC": "سيدي كرير للبتروكيماويات",
+    "MCQE": "مصر للأسمنت قنا",
+    "FAITA": "بنك فيصل الإسلامي (دولار)",
+    "FAIT": "بنك فيصل الإسلامي (جنيه)",
+    "ISPH": "ابن سينا فارما",
+    "JUFO": "جهينة للصناعات الغذائية",
+    "AMOC": "الإسكندرية للزيوت المعدنية (أموك)",
+    "MASR": "مدينة مصر للإسكان والتعمير",
+    "ORWE": "النساجون الشرقيون",
+    "RMDA": "العاشر من رمضان (راميدا)",
+    "OLFI": "عبور لاند للصناعات الغذائية",
+    "ARCC": "العربية للأسمنت",
+    "IFAP": "الدولية للمحاصيل الزراعية",
+    "MTIE": "إم إم جروب للصناعة والتجارة",
+    "SAUD": "بنك البركة مصر",
+    "ATQA": "مصر الوطنية للصلب (عتاقة)",
+    "CIRA": "القاهرة للاستثمار والتنمية العقارية (سيرا)",
+    "EGAS": "غاز مصر",
+    "MPCO": "المنصورة للدواجن",
+    "ACGC": "العربية لحليج الأقطان",
+    "ETRS": "المصرية لخدمات النقل (إيجيترانس)",
+    "LCSW": "ليسيكو مصر",
+    "ICFC": "الدولية للأسمدة والكيماويات"
+}
+
 # Stock keywords for news filtering
 STOCK_KEYWORDS = {
     "TMGH": ["طلعت مصطفى", "مجموعة طلعت مصطفى", "TMGH"],
@@ -218,10 +259,30 @@ def setup_telegram_bot_menu():
     except Exception as e:
         print("Warning setting bot commands menu:", e)
 
+def ensure_rtl(text):
+    """فرض اتجاه النص من اليمين لليسار (RTL) بشكل صارم على جميع أسطر رسائل تليجرام."""
+    if not text:
+        return text
+    rlm = "\u200f"
+    lines = text.split("\n")
+    rtl_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            rtl_lines.append("")
+        elif stripped.startswith(rlm):
+            rtl_lines.append(line)
+        else:
+            rtl_lines.append(rlm + line)
+    return "\n".join(rtl_lines)
+
 def reply_telegram(text, reply_markup=None):
     """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400، ودعم أزرار التحكم التفاعلية."""
     if not BOT_TOKEN or not CHAT_ID:
         return
+    
+    # فرض اتجاه النص من اليمين لليسار (RTL) دائماً
+    text = ensure_rtl(text)
     
     # تقسيم الرسائل التي تتعدى 3800 حرف تلقائياً لضمان عدم تعطل الإرسال
     if len(text) > 3800:
@@ -934,6 +995,8 @@ def send_telegram_photo(photo_path, caption=""):
     """إرسال صورة شارت فني إلى تليجرام مع شرح."""
     if not BOT_TOKEN or not CHAT_ID or not os.path.exists(photo_path):
         return
+    if caption:
+        caption = ensure_rtl(caption)
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
     try:
         with open(photo_path, "rb") as f:
@@ -1119,12 +1182,17 @@ def format_portfolio_pnl_message(pnl_data):
             "<code>/set_holding FWRY 2000 18.50</code>"
         )
     
-    msg = "💼 <b>كشف حساب المحفظة الاستثمارية اللحظي (P&L):</b>\n\n"
-    for d in pnl_data["details"]:
+    # فرز الأسهم دائماً من الأعلى ربحاً إلى الأقل ربحاً (أو الأقل خسارة)
+    sorted_details = sorted(pnl_data["details"], key=lambda x: x["pnl_pct"], reverse=True)
+    
+    msg = "💼 <b>كشف حساب المحفظة الاستثمارية اللحظي (P&L):</b>\n"
+    msg += "<i>(مرتبة تنازلياً من الأعلى ربحاً إلى الأقل)</i>\n\n"
+    for d in sorted_details:
         dir_e = "🟢" if d["pnl"] >= 0 else "🔴"
         sign = "+" if d["pnl"] >= 0 else ""
-        msg += f"{dir_e} <b>{d['ticker']}</b> ({int(d['qty']):,} سهم):\n"
-        msg += f"  • الشراء: {d['buy_p']:.2f} ج.م | السعر الحالي: <b>{d['curr_p']:.2f}</b> ج.م\n"
+        ticker_name = COMPANY_NAMES_AR.get(d['ticker'], d['ticker'])
+        msg += f"{dir_e} <b>{ticker_name} ({d['ticker']})</b> - عدد {int(d['qty']):,} سهم:\n"
+        msg += f"  • سعر الشراء: {d['buy_p']:.2f} ج.م | السعر اللحظي: <b>{d['curr_p']:.2f} ج.م</b>\n"
         msg += f"  • صافي العائد: <b>{sign}{d['pnl']:,.2f} ج.م</b> ({sign}{d['pnl_pct']:.2f}%)\n\n"
         
     tot_e = "🟢" if pnl_data["total_pnl"] >= 0 else "🔴"
@@ -1503,6 +1571,7 @@ def send_report(force=False):
         dir_emoji = s["e_green"] if val > 0 else (s["e_red"] if val < 0 else s["e_white"])
         ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
+        name_ar = COMPANY_NAMES_AR.get(k, k)
         
         extra_badges = []
         if item.get("rsi_tag"):
@@ -1511,9 +1580,9 @@ def send_report(force=False):
             extra_badges.append("🔥 سيولة")
         badge_str = f" [{ ' | '.join(extra_badges) }]" if extra_badges else ""
         rsi_str = f" | RSI:{item['rsi']}" if item.get("rsi") is not None else ""
-        msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
+        msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{name_ar} ({ticker_html})</b>: {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
         
-    msg_watchlist = f"{s['rlm']}<b>{watch_header}:</b>\n"
+    msg_watchlist += f"{s['rlm']}<b>{watch_header}:</b>\n"
     for k in sorted_watch:
         item = parsed_stocks[k]
         val = item["chgPct"]
@@ -1521,6 +1590,7 @@ def send_report(force=False):
         dir_emoji = s["e_green"] if val > 0 else (s["e_red"] if val < 0 else s["e_white"])
         ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
+        name_ar = COMPANY_NAMES_AR.get(k, k)
         
         extra_badges = []
         if item.get("rsi_tag"):
@@ -1529,7 +1599,7 @@ def send_report(force=False):
             extra_badges.append("🔥 سيولة")
         badge_str = f" [{ ' | '.join(extra_badges) }]" if extra_badges else ""
         rsi_str = f" | RSI:{item['rsi']}" if item.get("rsi") is not None else ""
-        msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{ticker_html}</b>:{s['rlm']} {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
+        msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{name_ar} ({ticker_html})</b>: {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
     
     # === Build Indices & Currencies Section (separate message) ===
     def fmt_chg(val):
@@ -1739,24 +1809,29 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
         chg_icon = "🟢" if v["chgPct"] > 0 else ("🔴" if v["chgPct"] < 0 else "⚪")
         res += f"{chg_icon} <b>{k}:</b> {v['close']} ({v['chgPct']:+.2f}%)\n"
         
-    # 2. Portfolio Performance & Technical Stance
+    # 2. Portfolio Performance & Technical Stance (مرتبة تنازلياً من الأعلى ربحاً إلى الأقل)
     res += "\n<b>💼 أداء وتحليل أسهم المحفظة الأساسية:</b>\n"
-    for t in PORTFOLIO:
-        if t in stocks_data:
-            info = stocks_data[t]
-            chg = info["chgPct"]
-            if chg > 1.0:
-                stance = "زخم صاعد واختراق مستويات مقاومة"
-            elif chg > 0.0:
-                stance = "أداء إيجابي متماسك بدعم قوى شرائية"
-            elif chg == 0.0:
-                stance = "حركة عرضية متوازنة بانتظار سيولة جديدة"
-            elif chg > -1.0:
-                stance = "تصحيح طفيف وطبيعي ضمن النطاق العرضي"
-            else:
-                stance = "جني أرباح وتراجع، مع ترقب مناطق الدعم للارتداد"
-            icon = "🟢" if chg > 0 else ("🔴" if chg < 0 else "⚪")
-            res += f"{icon} <b>{t}:</b> {info['close']} ج (<b>{chg:+.2f}%</b>) — {stance}\n"
+    sorted_portfolio_stocks = sorted(
+        [t for t in PORTFOLIO if t in stocks_data],
+        key=lambda t: stocks_data[t].get("chgPct", 0),
+        reverse=True
+    )
+    for t in sorted_portfolio_stocks:
+        info = stocks_data[t]
+        chg = info["chgPct"]
+        if chg > 1.0:
+            stance = "زخم صاعد واختراق مستويات مقاومة"
+        elif chg > 0.0:
+            stance = "أداء إيجابي متماسك بدعم قوى شرائية"
+        elif chg == 0.0:
+            stance = "حركة عرضية متوازنة بانتظار سيولة جديدة"
+        elif chg > -1.0:
+            stance = "تصحيح طفيف وطبيعي ضمن النطاق العرضي"
+        else:
+            stance = "جني أرباح وتراجع، مع ترقب مناطق الدعم للارتداد"
+        icon = "🟢" if chg > 0 else ("🔴" if chg < 0 else "⚪")
+        name_ar = COMPANY_NAMES_AR.get(t, t)
+        res += f"{icon} <b>{name_ar} ({t}):</b> {info['close']} ج (<b>{chg:+.2f}%</b>) — {stance}\n"
 
     # 3. Top Movers in Market
     gainers = []
@@ -1771,14 +1846,16 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
     losers.sort(key=lambda x: x[2])
     
     if gainers:
-        res += "\n<b>🚀 أبرز الأسهم الصاعدة اليوم:</b>\n"
+        res += "\n<b>🚀 أبرز الأسهم الصاعدة اليوم (الأعلى ربحاً):</b>\n"
         for t, c, chg in gainers[:5]:
-            res += f"• <b>{t}:</b> {c} جنيه (🟢 <b>{chg:+.2f}%</b>)\n"
+            name_ar = COMPANY_NAMES_AR.get(t, t)
+            res += f"• <b>{name_ar} ({t}):</b> {c} جنيه (🟢 <b>{chg:+.2f}%</b>)\n"
             
     if losers:
         res += "\n<b>🔻 أبرز الأسهم المتراجعة (جني أرباح/تصحيح):</b>\n"
         for t, c, chg in losers[:5]:
-            res += f"• <b>{t}:</b> {c} جنيه (🔴 <b>{chg:+.2f}%</b>)\n"
+            name_ar = COMPANY_NAMES_AR.get(t, t)
+            res += f"• <b>{name_ar} ({t}):</b> {c} جنيه (🔴 <b>{chg:+.2f}%</b>)\n"
             
     # 3. Key News
     if grouped_news:
