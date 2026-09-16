@@ -234,49 +234,82 @@ def escape_html(text):
 
 DEFAULT_KEYBOARD = {
     "keyboard": [
-        [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
-        [{"text": "⚡ بيان مفصل RSI"}, {"text": "📈 شارت فني"}],
-        [{"text": "🎯 أسهم القيمة"}, {"text": "📐 حاسبة المخاطر"}],
-        [{"text": "🐋 التجميع المؤسسي"}, {"text": "⚖️ توازن المحفظة"}],
-        [{"text": "🕌 زكاة الأسهم"}, {"text": "📥 تصدير إكسل"}],
-        [{"text": "🏢 فحص مالي"}, {"text": "📜 سجل الصفقات"}],
-        [{"text": "🧠 استشارة المحلل الذكي"}, {"text": "⚙️ حالة النظام"}]
+        [
+            {"text": "💼 مركز المحفظة والاستثمار"},
+            {"text": "📊 رادار السوق والتحليلات"}
+        ]
     ],
     "resize_keyboard": True,
     "is_persistent": True
 }
 
-PORTFOLIO_INLINE_KEYBOARD = {
+PORTFOLIO_HUB_KEYBOARD = {
     "inline_keyboard": [
         [
-            {"text": "💼 محفظتي الاستثمارية (P&L)", "callback_data": "btn_portfolio"},
-            {"text": "🔄 تحديث فوري", "callback_data": "btn_report"}
+            {"text": "💼 كشف حساب الأرباح والخسائر", "callback_data": "btn_portfolio"},
+            {"text": "📥 تصدير كشف إكسل (RTL)", "callback_data": "btn_export"}
         ],
         [
-            {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
-            {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
+            {"text": "⚖️ مصفوفة توازن القطاعات", "callback_data": "btn_rebalance"},
+            {"text": "🕌 حاسبة زكاة الأسهم", "callback_data": "btn_zakat"}
         ],
         [
-            {"text": "🐋 التجميع المؤسسي", "callback_data": "btn_accumulation"},
-            {"text": "⚖️ توازن المحفظة", "callback_data": "btn_rebalance"}
+            {"text": "📉 حاسبة التبريد الذكي DCA", "callback_data": "btn_dca"},
+            {"text": "💥 محاكي اختبار الضغط", "callback_data": "btn_stresstest"}
         ],
         [
-            {"text": "🕌 زكاة الأسهم", "callback_data": "btn_zakat"},
-            {"text": "📥 تصدير إكسل", "callback_data": "btn_export"}
+            {"text": "📐 حاسبة حجم الصفقة (1.5%)", "callback_data": "btn_calc_help"},
+            {"text": "📜 سجل الصفقات المحققة", "callback_data": "btn_journal"}
         ],
         [
-            {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
-            {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
-        ],
-        [
-            {"text": "🧠 استشارة المحلل الذكي", "callback_data": "btn_ask_help"},
-            {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
+            {"text": "🔔 إدارة وتعديل تنبيهاتي", "callback_data": "btn_my_alerts"},
+            {"text": "🌐 لوحة التحكم الرقمية (Web)", "callback_data": "btn_dashboard"}
         ]
     ]
 }
 
+MARKET_HUB_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "📊 تقرير الأسعار والمؤشرات", "callback_data": "btn_report"},
+            {"text": "⚡ بيان مفصل لمؤشر RSI", "callback_data": "btn_rsi"}
+        ],
+        [
+            {"text": "🎯 رادار فرص أسهم القيمة", "callback_data": "btn_undervalued"},
+            {"text": "🐋 التجميع المؤسسي (CMF)", "callback_data": "btn_accumulation"}
+        ],
+        [
+            {"text": "⚡ رادار الدايفرجنس الإيجابي", "callback_data": "btn_divergence"},
+            {"text": "💰 رادار الكوبونات والتوزيعات", "callback_data": "btn_dividends"}
+        ],
+        [
+            {"text": "🕵️ صفقات كبار الملاك والداخليين", "callback_data": "btn_insiders"},
+            {"text": "📌 ملخص الجلسة واتساع السوق", "callback_data": "btn_summary"}
+        ],
+        [
+            {"text": "📈 طلب شارت فني لسهم", "callback_data": "btn_chart_help"},
+            {"text": "🏢 بطاقة الفحص المالي", "callback_data": "btn_fundamental_help"}
+        ],
+        [
+            {"text": "🧠 استشارة المحلل المالي AI", "callback_data": "btn_ask_help"},
+            {"text": "⚙️ حالة اتصال النظام 24/7", "callback_data": "btn_status"}
+        ]
+    ]
+}
+
+QUICK_NAV_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "💼 مركز المحفظة", "callback_data": "hub_portfolio"},
+            {"text": "📊 رادار السوق", "callback_data": "hub_market"}
+        ]
+    ]
+}
+
+PORTFOLIO_INLINE_KEYBOARD = PORTFOLIO_HUB_KEYBOARD
+
 def get_portfolio_inline_keyboard(holdings=None):
-    """توليد لوحة أزرار تفاعلية تتضمن أزرار فحص لحظي مباشر لكل سهم في محفظة المستثمر."""
+    """توليد لوحة أزرار تفاعلية مقتضبة ونظيفة تتضمن فحص الأسهم وشريط تنقل سريع."""
     keyboard = []
     if holdings:
         stock_row = []
@@ -289,58 +322,46 @@ def get_portfolio_inline_keyboard(holdings=None):
         if stock_row:
             keyboard.append(stock_row)
             
-    keyboard.extend([
-        [
-            {"text": "💼 كشف الحساب", "callback_data": "btn_portfolio"},
-            {"text": "🔄 تحديث فوري", "callback_data": "btn_report"}
-        ],
-        [
-            {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
-            {"text": "🎯 فرص القيمة", "callback_data": "btn_undervalued"}
-        ],
-        [
-            {"text": "🐋 التجميع المؤسسي", "callback_data": "btn_accumulation"},
-            {"text": "⚖️ توازن المحفظة", "callback_data": "btn_rebalance"}
-        ],
-        [
-            {"text": "🕌 زكاة الأسهم", "callback_data": "btn_zakat"},
-            {"text": "📥 تصدير إكسل", "callback_data": "btn_export"}
-        ],
-        [
-            {"text": "📐 حاسبة المخاطر", "callback_data": "btn_calc_help"},
-            {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
-        ],
-        [
-            {"text": "🧠 استشارة المحلل الذكي", "callback_data": "btn_ask_help"},
-            {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
-        ]
+    keyboard.append([
+        {"text": "🔄 تحديث فوري", "callback_data": "btn_portfolio"},
+        {"text": "📥 تصدير إكسل", "callback_data": "btn_export"}
+    ])
+    keyboard.append([
+        {"text": "💼 مركز المحفظة", "callback_data": "hub_portfolio"},
+        {"text": "📊 رادار السوق", "callback_data": "hub_market"}
     ])
     return {"inline_keyboard": keyboard}
 
 def setup_telegram_bot_menu():
-    """تسجيل قائمة الأوامر الرسمية لتظهر في زر Menu بتطبيق تليجرام تلقائياً."""
+    """تسجيل قائمة الأوامر الرسمية لتظهر في زر Menu بتطبيق تليجرام تلقائياً بأوصاف مختصرة وأنيقة."""
     if not BOT_TOKEN:
         return
     commands = [
-        {"command": "portfolio", "description": "💼 كشف حساب المحفظة اللحظي والأرباح"},
-        {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات والصناديق"},
-        {"command": "rsi", "description": "⚡ بيان مفصل لمؤشر RSI لجميع الأسهم"},
-        {"command": "undervalued", "description": "🎯 رادار اقتناص أسهم القيمة وهامش الأمان"},
-        {"command": "calc", "description": "📐 حاسبة حجم الصفقة وإدارة المخاطر (1.5%)"},
-        {"command": "accumulation", "description": "🐋 رادار التجميع المؤسسي وتدفق السيولة (CMF)"},
-        {"command": "rebalance", "description": "⚖️ مصفوفة التنويع القطاعي وإدارة المخاطر"},
-        {"command": "zakat", "description": "🕌 حاسبة زكاة الأسهم والمحفظة الشرعية"},
-        {"command": "export", "description": "📥 تصدير كشف حساب المحفظة إكسل فاخر"},
-        {"command": "backtest", "description": "🧪 محاكي اختبار الاستراتيجيات تاريخياً"},
-        {"command": "chart", "description": "📈 شارت فني بالشموع ومؤشر RSI"},
-        {"command": "fundamental", "description": "🏢 بطاقة التحليل المالي ومضاعفات التقييم"},
-        {"command": "buy", "description": "➕ تسجيل شراء سهم وحساب متوسط التكلفة"},
-        {"command": "sell", "description": "➖ تسجيل بيع سهم واحتساب الأرباح المحققة"},
-        {"command": "journal", "description": "📜 سجل الصفقات المغلقة ونسبة النجاح"},
-        {"command": "summary", "description": "📌 ملخص الجلسة والتحليل الفني"},
-        {"command": "compare", "description": "⚖️ مقارنة فنية بين سهمين بالذكاء الاصطناعي"},
-        {"command": "ask", "description": "🧠 استشارة المحلل المالي الذكي"},
-        {"command": "status", "description": "⚙️ حالة الخادم وسلسلة الترحيل 24/7"}
+        {"command": "portfolio", "description": "💼 مركز المحفظة والاستثمار"},
+        {"command": "market", "description": "📊 رادار السوق والتحليلات"},
+        {"command": "report", "description": "📈 بث الأسعار والمؤشرات"},
+        {"command": "summary", "description": "📌 ملخص الجلسة والاتساع"},
+        {"command": "rsi", "description": "⚡ بيان مؤشر RSI"},
+        {"command": "undervalued", "description": "🎯 رادار أسهم القيمة"},
+        {"command": "accumulation", "description": "🐋 رادار التجميع CMF"},
+        {"command": "divergence", "description": "⚡ رادار الدايفرجنس"},
+        {"command": "dividends", "description": "💰 رادار الكوبونات"},
+        {"command": "insiders", "description": "🕵️ صفقات كبار الملاك"},
+        {"command": "target", "description": "🎯 السعر العادل لسهم"},
+        {"command": "dca", "description": "📉 حاسبة التبريد والتعديل"},
+        {"command": "stresstest", "description": "💥 اختبار ضغط المحفظة"},
+        {"command": "zakat", "description": "🕌 حاسبة زكاة الأسهم"},
+        {"command": "export", "description": "📥 تصدير كشف إكسل"},
+        {"command": "calc", "description": "📐 حاسبة إدارة المخاطر"},
+        {"command": "chart", "description": "📈 رسم بياني بالشموع"},
+        {"command": "fundamental", "description": "🏢 فحص مالي ومضاعفات"},
+        {"command": "buy", "description": "➕ تسجيل شراء سهم"},
+        {"command": "sell", "description": "➖ تسجيل بيع وحساب الربح"},
+        {"command": "journal", "description": "📜 سجل الصفقات المغلقة"},
+        {"command": "my_alerts", "description": "🔔 إدارة تنبيهاتي"},
+        {"command": "dashboard", "description": "🌐 لوحة التحكم الرقمية"},
+        {"command": "ask", "description": "🧠 استشارة المحلل الذكي"},
+        {"command": "status", "description": "⚙️ حالة اتصال النظام 24/7"}
     ]
     try:
         requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands", json={"commands": commands}, timeout=10)
@@ -1441,7 +1462,7 @@ def format_portfolio_pnl_message(pnl_data):
     return msg
 
 def check_and_trigger_user_alerts(parsed_stocks, state_data, state_sha):
-    """فحص تنبيهات الأسعار المخصصة للمستخدم وإرسال إشعار فوري عند تحققها."""
+    """فحص تنبيهات الأسعار وRSI والتقاطعات المخصصة للمستخدم وإرسال إشعار فوري عند تحققها."""
     alerts = state_data.get("alerts", [])
     if not alerts:
         return
@@ -1450,19 +1471,55 @@ def check_and_trigger_user_alerts(parsed_stocks, state_data, state_sha):
     for a in alerts:
         ticker = a.get("ticker", "").upper()
         cond = a.get("cond", "")
-        price = float(a.get("price", 0))
-        curr = parsed_stocks.get(ticker, {}).get("close")
-        if curr is not None and curr > 0:
-            if (cond == ">" and curr >= price) or (cond == "<" and curr <= price):
+        stock_info = parsed_stocks.get(ticker, {})
+        curr = stock_info.get("close")
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        # 1. تنبيه مؤشر RSI
+        if "rsi" in a:
+            target_rsi = float(a.get("rsi", 0))
+            curr_rsi = stock_info.get("rsi")
+            if curr_rsi is not None:
+                if (cond in ["<", "<="] and curr_rsi <= target_rsi) or (cond in [">", ">="] and curr_rsi >= target_rsi):
+                    alert_msg = (
+                        f"⚡ <b>تنبيه مؤشر RSI متحقق!</b>\n"
+                        f"سهم <b>{name} ({ticker})</b> وصل مؤشر RSI إلى <b>{curr_rsi:.1f}</b> "
+                        f"(الشرط المحدد: {cond} {target_rsi:.0f}).\n"
+                        f"💵 السعر اللحظي: {curr:.2f} ج.م | 📊 التوصية: {stock_info.get('rec', 'محايد')}"
+                    )
+                    reply_telegram(alert_msg)
+                    triggered_any = True
+                    continue
+                    
+        # 2. تنبيه التقاطع الذهبي (Golden Cross)
+        elif cond == "cross" or a.get("type") == "Golden Cross":
+            sma50 = stock_info.get("sma50")
+            sma200 = stock_info.get("sma200")
+            if sma50 and sma200 and sma50 >= sma200:
                 alert_msg = (
-                    f"🎯 <b>تنبيه سعري متحقق!</b>\n"
-                    f"سهم <b>{ticker}</b> وصل إلى <b>{curr:.2f} ج.م</b> "
-                    f"(الشرط المحدد: {cond} {price:.2f} ج.م).\n"
-                    f"📊 التغير اليومي: {parsed_stocks[ticker].get('chgPct', 0)}%"
+                    f"🌟 <b>تنبيه التقاطع الذهبي (Golden Cross) متحقق!</b>\n"
+                    f"سهم <b>{name} ({ticker})</b> اخترق فيه متوسط 50 يوماً ({sma50:.2f} ج) متوسط 200 يوم ({sma200:.2f} ج) صعوداً!\n"
+                    f"💵 السعر اللحظي: {curr:.2f} ج.م | 🚀 إشارة اختراق فني وزخم شرائي قوي."
                 )
                 reply_telegram(alert_msg)
                 triggered_any = True
                 continue
+                
+        # 3. التنبيه السعري العادي
+        elif "price" in a:
+            price = float(a.get("price", 0))
+            if curr is not None and curr > 0:
+                if (cond in [">", ">="] and curr >= price) or (cond in ["<", "<="] and curr <= price):
+                    alert_msg = (
+                        f"🎯 <b>تنبيه سعري متحقق!</b>\n"
+                        f"سهم <b>{name} ({ticker})</b> وصل إلى <b>{curr:.2f} ج.م</b> "
+                        f"(الشرط المحدد: {cond} {price:.2f} ج.م).\n"
+                        f"📊 التغير اليومي: {stock_info.get('chgPct', 0):+.2f}%"
+                    )
+                    reply_telegram(alert_msg)
+                    triggered_any = True
+                    continue
+                    
         remaining_alerts.append(a)
     if triggered_any:
         state_data["alerts"] = remaining_alerts
@@ -1483,7 +1540,7 @@ def fetch_all_data_tv(tickers, strings):
             "close", "open", "change", "Recommend.All",
             "RSI", "volume", "average_volume_10d_calc", "SMA20", "SMA50", "Value.Traded",
             "price_earnings_ttm", "price_book_fq", "total_debt_fq", "total_assets_fq", "return_on_equity_fq",
-            "MoneyFlow", "ChaikinMoneyFlow"
+            "MoneyFlow", "ChaikinMoneyFlow", "dividends_yield", "SMA200"
         ]
     }
     headers = {
@@ -1517,9 +1574,11 @@ def fetch_all_data_tv(tickers, strings):
             debt_ratio = safe_round((debt_raw / assets_raw) * 100.0, 1) if debt_raw and assets_raw and assets_raw > 0 else None
             roe_val = safe_round(item["d"][14], 1) if len(item["d"]) > 14 and item["d"][14] is not None else None
             
-            # مؤشرات السيولة والتجميع المؤسسي (Smart Money)
+            # مؤشرات السيولة والتجميع المؤسسي (Smart Money) وعوائد التوزيعات
             mfi_val = safe_round(item["d"][15], 1) if len(item["d"]) > 15 and item["d"][15] is not None else None
             cmf_val = safe_round(item["d"][16], 3) if len(item["d"]) > 16 and item["d"][16] is not None else None
+            div_yield = safe_round(item["d"][17], 2) if len(item["d"]) > 17 and item["d"][17] is not None else None
+            sma200_val = safe_round(item["d"][18], 2) if len(item["d"]) > 18 and item["d"][18] is not None else None
             
             vol_spike = bool(avg_vol > 5000 and vol_val >= (avg_vol * 1.8))
             rsi_tag = ""
@@ -1538,17 +1597,17 @@ def fetch_all_data_tv(tickers, strings):
                 elif rec_val >= 0.1: rec_str = strings.get('buy', 'شراء')
                 elif rec_val <= -0.5: rec_str = strings.get('strong_sell', 'بيع قوي')
                 elif rec_val <= -0.1: rec_str = strings.get('sell', 'بيع')
-                else: rec_str = "محايد"
+                else: rec_str = strings.get('neutral', 'محايد')
             if sym in indices:
                 indices[sym] = {"close": c, "open": o, "chgPct": chg, "volume": vol_val, "val_traded": val_traded}
             else:
                 parsed[sym] = {
                     "close": c, "open": o, "chgPct": chg, "rec": rec_str,
                     "rsi": rsi_val, "volume": vol_val, "avg_vol": avg_vol,
-                    "sma20": sma20_val, "sma50": sma50_val, "val_traded": val_traded,
+                    "sma20": sma20_val, "sma50": sma50_val, "sma200": sma200_val, "val_traded": val_traded,
                     "vol_spike": vol_spike, "rsi_tag": rsi_tag,
                     "pe": pe_val, "pb": pb_val, "debt_ratio": debt_ratio, "roe": roe_val,
-                    "mfi": mfi_val, "cmf": cmf_val
+                    "mfi": mfi_val, "cmf": cmf_val, "div_yield": div_yield
                 }
     except Exception as e:
         print("Error fetching TV prices:", e)
@@ -3656,32 +3715,461 @@ def export_portfolio_to_excel(holdings, state_data, parsed_stocks, indices=None,
     wb.save(filepath)
     return filepath
 
+def fetch_and_format_insider_deals(all_news=None, egx_beta_items=None):
+    """رادار صفقات كبار المساهمين والداخليين وصفقات الحجم الكبير (Insider & Block Trades)."""
+    try:
+        if all_news is None or egx_beta_items is None:
+            all_news = fetch_all_news()
+            egx_beta_items = fetch_egx_beta_news()
+        alerts = scan_insider_and_block_trades(all_news, egx_beta_items)
+        if not alerts:
+            return (
+                "🕵️ <b>رادار صفقات كبار الملاك والداخليين (Insider Trades):</b>\n\n"
+                "لم يتم رصد إفصاحات جديدة لتعاملات الداخليين أو صفقات كبرى خلال الـ 24 ساعة الماضية.\n"
+                "💡 يقوم الرادار بمسح إفصاحات شاشة البورصة لحظياً وتنبيهك فور تنفيذ أي صفقة شراء لمجلس الإدارة أو أسهم الخزينة."
+            )
+        msg = (
+            "🕵️ <b>رادار صفقات كبار الملاك والداخليين والصفقات الكبرى:</b>\n"
+            "<i>رصد تحركات مجالس الإدارات والمجموعات المرتبطة وكبار المساهمين:</i>\n\n"
+        )
+        for al in alerts[:8]:
+            title = escape_html(al.get("title", ""))
+            source = escape_html(al.get("source", "إفصاح رسمي"))
+            link = escape_html(al.get("link", "#"))
+            msg += f"• <b>{title}</b>\n  └ المصدر: <i>{source}</i> | <a href='{link}'>قراءة الإفصاح الرسمي</a>\n\n"
+        msg += "💡 <b>القاعدة المؤسسية:</b> شراء الداخليين وأعضاء مجلس الإدارة لأسهم شركاتهم بالسوق المفتوح هو أقوى مؤشرات الثقة الصاعدة في نمو أرباح الشركة والتدفقات المستقبلية."
+        return msg
+    except Exception as e:
+        return f"⚠️ خطأ أثناء فحص صفقات الداخليين: {e}"
+
+def scan_bullish_divergence_all(parsed_stocks):
+    """رادار التباعد الفني الإيجابي (Bullish Divergence Scanner): قاع سعر هابط يقابله قاع صاعد أعلى في RSI."""
+    results = []
+    scan_tickers = [t for t in ALL_TICKERS if t in parsed_stocks and parsed_stocks[t].get("close", 0) > 0]
+    
+    for ticker in scan_tickers:
+        d = parsed_stocks.get(ticker, {})
+        curr_rsi = d.get("rsi")
+        if curr_rsi is None or curr_rsi > 55:
+            continue
+            
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}.CA?interval=1d&range=2mo"
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=4) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                res = data.get('chart', {}).get('result', [])
+                if not res:
+                    continue
+                quote = res[0]['indicators']['quote'][0]
+                closes = [float(c) for c in quote.get('close', []) if c is not None and c > 0]
+                lows = [float(l) for l in quote.get('low', []) if l is not None and l > 0]
+                
+            if len(closes) < 22:
+                continue
+                
+            deltas = [closes[i] - closes[i-1] for i in range(1, len(closes))]
+            gains = [max(delta, 0) for delta in deltas]
+            losses = [max(-delta, 0) for delta in deltas]
+            rsi_series = [None] * 14
+            avg_g = sum(gains[:14]) / 14.0
+            avg_l = sum(losses[:14]) / 14.0
+            for i in range(14, len(deltas)):
+                avg_g = (avg_g * 13 + gains[i]) / 14.0
+                avg_l = (avg_l * 13 + losses[i]) / 14.0
+                rs = avg_g / (avg_l if avg_l > 0 else 1e-9)
+                rsi_series.append(100.0 - (100.0 / (1.0 + rs)))
+                
+            if len(lows) < 20:
+                continue
+            window_lows = lows[-20:]
+            window_rsi = rsi_series[-20:]
+            
+            p1_idx = min(range(0, 10), key=lambda i: window_lows[i])
+            p2_idx = min(range(10, len(window_lows)), key=lambda i: window_lows[i])
+            
+            price1 = window_lows[p1_idx]
+            price2 = window_lows[p2_idx]
+            rsi1 = window_rsi[p1_idx]
+            rsi2 = window_rsi[p2_idx]
+            
+            if rsi1 is not None and rsi2 is not None and price2 <= (price1 * 0.995) and rsi2 >= (rsi1 + 2.0):
+                results.append({
+                    "ticker": ticker,
+                    "name": COMPANY_NAMES_AR.get(ticker, ticker),
+                    "close": d.get("close"),
+                    "chgPct": d.get("chgPct", 0),
+                    "price1": price1,
+                    "price2": price2,
+                    "rsi1": rsi1,
+                    "rsi2": rsi2,
+                    "div_strength": (rsi2 - rsi1)
+                })
+        except Exception:
+            continue
+            
+    if not results:
+        return (
+            "⚡ <b>رادار التباعد الفني الإيجابي (Bullish Divergence Scanner):</b>\n\n"
+            "لم يتم رصد دايفرجنس إيجابي مكتمل في أسهم العينة حالياً.\n"
+            "💡 يتم فحص السلوك السعري لكل سهم تاريخياً، ويرسل البوت تنبيهاً فور انفصال مسار القوة النسبية RSI عن قيعان السعر."
+        )
+        
+    results.sort(key=lambda x: x["div_strength"], reverse=True)
+    msg = (
+        "⚡ <b>رادار التباعد الفني الإيجابي (Bullish Divergence Tracker):</b>\n"
+        "<i>رصد أسهم سجلت قيعاناً سعرية أدنى بينما شكل مؤشر RSI قيعاناً صاعدة (تجميع خفي وانعكاس وشيك):</i>\n\n"
+    )
+    for r in results[:5]:
+        t = r["ticker"]
+        name = r["name"]
+        p = r["close"]
+        chg_sign = "+" if r['chgPct'] > 0 else ""
+        msg += (
+            f"🔹 <b>{name} ({t}):</b> <b>{p:.2f} ج.م</b> ({chg_sign}{r['chgPct']:.2f}%)\n"
+            f"   ├ 📉 <b>قاع السعر السابق:</b> {r['price1']:.2f} ج ⬅️ <b>القاع الأحدث:</b> <code>{r['price2']:.2f} ج</code> (قاع أدنى)\n"
+            f"   ├ 📈 <b>قاع RSI السابق:</b> {r['rsi1']:.1f} ⬅️ <b>قاع RSI الأحدث:</b> <code>{r['rsi2']:.1f}</code> (قاع صاعد أعلى! 🚀)\n"
+            f"   └ 🎯 <b>التوصية:</b> إشارة انعكاس قاع استباقية. فحص الشارت: <code>/chart {t}</code>\n\n"
+        )
+    msg += "💡 <b>القاعدة الفنية:</b> الدايفرجنس الإيجابي هو أحد أدق نماذج صيد القيعان تاريخياً، حيث يعكس تلاشي قوى البيع وسيطرة تدفقات الشراء المؤسسية قبل بدء موجة الصعود."
+    return msg
+
+def calculate_fair_value_scenarios(ticker: str, parsed_stocks: dict):
+    """مصفوفة السعر العادل والسيناريوهات الثلاثة (Bull Case / Base Case / Bear Case)."""
+    sym = ticker.upper().replace(".CA", "").replace("EGX:", "").replace("_", " ").strip()
+    detected = detect_stocks_in_query(sym)
+    sym = detected[0] if detected else sym
+    name = COMPANY_NAMES_AR.get(sym, sym)
+    
+    d = parsed_stocks.get(sym, {})
+    curr_p = d.get("close", 0.0)
+    if curr_p <= 0:
+        return f"⚠️ تعذر جلب بيانات السعر اللحظي لسهم <b>{name} ({sym})</b>."
+        
+    pe = d.get("pe")
+    pb = d.get("pb")
+    rsi = d.get("rsi", 50)
+    sma50 = d.get("sma50", curr_p * 0.95)
+    sma200 = d.get("sma200", curr_p * 0.90)
+    div_y = d.get("div_yield", 0.0)
+    
+    sector_pe = 8.5
+    if pe and pe > 0:
+        val_multiple = (sector_pe / pe)
+        base_fair = curr_p * (0.65 + 0.35 * min(max(val_multiple, 0.7), 1.5))
+    else:
+        base_fair = curr_p * 1.10
+        
+    bull_target = max(base_fair * 1.15, curr_p * 1.18)
+    bull_roi = ((bull_target - curr_p) / curr_p) * 100.0
+    
+    base_target = max(base_fair, curr_p * 1.08)
+    base_roi = ((base_target - curr_p) / curr_p) * 100.0
+    
+    bear_support = min(curr_p * 0.93, sma50 if sma50 and sma50 < curr_p else curr_p * 0.92)
+    bear_risk = ((bear_support - curr_p) / curr_p) * 100.0
+    
+    reward_risk_ratio = abs(base_roi / bear_risk) if abs(bear_risk) > 0 else 2.0
+    
+    div_str = f"{div_y:.2f}%" if div_y else "غير متوفر"
+    pe_str = f"{pe}x" if pe else "N/A"
+    pb_str = f"{pb}x" if pb else "N/A"
+    
+    msg = (
+        f"🎯 <b>مصفوفة السعر العادل والسيناريوهات الاستثمارية:</b>\n"
+        f"🏢 <b>السهم:</b> <b>{name} ({sym})</b> | <b>السعر اللحظي:</b> <code>{curr_p:.2f} ج.م</code>\n"
+        f"📊 <b>مكرر الربحية (P/E):</b> {pe_str} | <b>المضاعف الدفتري (P/B):</b> {pb_str}\n"
+        f"⚡ <b>مؤشر RSI:</b> {rsi} | <b>عائد الكوبون:</b> {div_str}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"1️⃣ <b>السيناريو المتفائل (Bull Case - اختراق القمم واستمرار الزخم):</b>\n"
+        f"   └ 🎯 <b>المستهدف السعري:</b> <b><code>{bull_target:.2f} ج.م</code></b> (عائد متوقع: <code>+{bull_roi:.1f}%</code>)\n"
+        f"   └ 💡 <i>المحفز:</i> نمو أرباح الشركة وضخ سيولة تجميعية مؤسسية جديدة.\n\n"
+        f"2️⃣ <b>السيناريو الأساسي (Base Case - السعر العادل المنطقي 3-6 أشهر):</b>\n"
+        f"   └ 🎯 <b>السعر العادل المقدر:</b> <b><code>{base_target:.2f} ج.م</code></b> (عائد متوقع: <code>+{base_roi:.1f}%</code>)\n"
+        f"   └ 💡 <i>المحفز:</i> تسعير التدفقات النقدية والاقتراب من متوسط مكررات أرباح القطاع.\n\n"
+        f"3️⃣ <b>السيناريو المتحفظ (Bear Case - قاع الأمان ووقف الخسارة):</b>\n"
+        f"   └ 🛑 <b>مستوى الدعم الصلب:</b> <b><code>{bear_support:.2f} ج.م</code></b> (مخاطرة هبوط: <code>{bear_risk:.1f}%</code>)\n"
+        f"   └ 💡 <i>المحفز:</i> ضغوط بيعية عامة في المؤشر أو كسر متوسط 50 يوماً.\n\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"⚖️ <b>معامل العائد إلى المخاطرة (Risk/Reward):</b> <code>1:{reward_risk_ratio:.1f}</code>\n"
+        f"💡 <b>الخلاصة الاستثمارية:</b> {'الفرصة ممتازة استثمارياً ونسبة العائد للمخاطرة مغرية للشراء التدريجي.' if reward_risk_ratio >= 1.8 else 'يُنصح بالتريث وانتظار إشارة ارتداد وتأكيد الدعم قبل بناء مراكز جديدة.'}"
+    )
+    return msg
+
+def format_dividend_radar(parsed_stocks, all_news=None, egx_beta_items=None):
+    """رادار موسم الكوبونات وعوائد التوزيعات النقدية السنوية."""
+    div_stocks = []
+    for ticker, d in parsed_stocks.items():
+        if ticker not in ALL_TICKERS:
+            continue
+        y = d.get("div_yield")
+        if y and y > 0:
+            div_stocks.append((ticker, COMPANY_NAMES_AR.get(ticker, ticker), d.get("close", 0), y, d.get("pe")))
+            
+    div_stocks.sort(key=lambda x: x[3], reverse=True)
+    
+    if all_news is None or egx_beta_items is None:
+        all_news = fetch_all_news()
+        egx_beta_items = fetch_egx_beta_news()
+    actions = scan_dividends_and_actions(all_news, egx_beta_items)
+    
+    msg = (
+        "💰 <b>رادار موسم الكوبونات وعوائد التوزيعات النقدية (Dividend Radar):</b>\n"
+        "<i>أعلى الأسهم الشرعية من حيث العائد النقدي السنوي ومواعيد استحقاق التوزيعات:</i>\n\n"
+    )
+    
+    if div_stocks:
+        msg += "📊 <b>أعلى الأسهم تحقيقاً للعائد النقدي (Dividend Yield):</b>\n"
+        for t, name, close, y, pe in div_stocks[:6]:
+            pe_str = f"{pe}x" if pe else "-"
+            msg += f"• <b>{name} ({t}):</b> عائد <b><code>{y:.2f}%</code></b> سنوياً (السعر: {close:.2f} ج | P/E: {pe_str})\n"
+        msg += "\n"
+    else:
+        msg += "• لا تتوفر بيانات عوائد كوبونات مباشرة حالياً في عينة المسح.\n\n"
+        
+    if actions:
+        msg += "📅 <b>أحدث إفصاحات وقرارات التوزيعات والجمعيات العامة:</b>\n"
+        for ac in actions[:4]:
+            t_esc = escape_html(ac.get("title", ""))
+            link = escape_html(ac.get("link", "#"))
+            msg += f"• {t_esc} <a href='{link}'>[التفاصيل]</a>\n"
+        msg += "\n"
+        
+    msg += "💡 <b>القاعدة الاستثمارية:</b> الأسهم التي توزع عوائد نقدية سخية (>8%) توفر حماية ممتازة لرأس المال ضد التضخم وتقلبات السوق، وتتيح إعادة استثمار الكوبونات لتعظيم العائد التراكمي."
+    return msg
+
+def calculate_smart_dca(holdings, parsed_stocks, query):
+    """حاسبة التبريد والتعديل الذكي للتكلفة (Smart DCA): تحسب عدد الأسهم والسيولة المطلوبة لخفض متوسط التكلفة."""
+    import math
+    parts = query.strip().split()
+    if len(parts) < 2:
+        return (
+            "📉 <b>حاسبة التبريد والتعديل الذكي للتكلفة (Smart DCA):</b>\n\n"
+            "تحسب لك عدد الأسهم والمبلغ الدقيق المطلوب لخفض متوسط تكلفتك إلى السعر المستهدف.\n\n"
+            "📌 <b>طريقة الاستخدام:</b>\n"
+            "• <code>/dca [السهم] [المتوسط_المستهدف]</code> (إذا كان السهم مسجلاً بمحفظتك)\n"
+            "  <i>مثال:</i> <code>/dca سوديك 32.00</code>\n"
+            "• أو كتابة كامل البيانات يدوياً:\n"
+            "  <code>/dca [السهم] [سعر_الشراء_الحالي] [المتوسط_المستهدف]</code>"
+        )
+        
+    sym_raw = parts[0].replace("_", " ").upper().replace(".CA", "")
+    detected = detect_stocks_in_query(sym_raw)
+    ticker = detected[0] if detected else sym_raw.strip()
+    name = COMPANY_NAMES_AR.get(ticker, ticker)
+    
+    stock_d = parsed_stocks.get(ticker, {})
+    curr_market_p = stock_d.get("close", 0.0)
+    h_data = holdings.get(ticker, {}) if holdings else {}
+    
+    q1, p1, p2, p_target = None, None, curr_market_p, None
+    
+    try:
+        if len(parts) == 2:
+            p_target = float(parts[1].replace(",", ""))
+            if h_data:
+                q1 = float(h_data.get("qty", 0))
+                p1 = float(h_data.get("buy_price", 0))
+            else:
+                return f"⚠️ سهم <b>{name} ({ticker})</b> غير مسجل بمحفظتك. يرجى إدخال: <code>/dca {ticker} [سعر_شرائك] [المتوسط_المستهدف]</code>"
+        elif len(parts) == 3:
+            p1 = float(parts[1].replace(",", ""))
+            p_target = float(parts[2].replace(",", ""))
+            q1 = float(h_data.get("qty", 1000)) if h_data else 1000.0
+        elif len(parts) >= 4:
+            q1 = float(parts[1].replace(",", ""))
+            p1 = float(parts[2].replace(",", ""))
+            p_target = float(parts[3].replace(",", ""))
+    except ValueError:
+        return "⚠️ يرجى إدخال أرقام صحيحة للأسعار والكميات."
+        
+    if not q1 or not p1 or not p_target or p2 <= 0:
+        return "⚠️ بيانات غير مكتملة أو تعذر قراءة سعر السهم اللحظي في السوق."
+        
+    if p_target <= p2:
+        return f"⚠️ السعر المستهدف ({p_target:.2f} ج) يجب أن يكون أعلى من سعر السوق اللحظي ({p2:.2f} ج) لتتمكن من التبريد."
+        
+    if p_target >= p1:
+        return f"⚠️ السعر المستهدف ({p_target:.2f} ج) يجب أن يكون أقل من سعر تكلفتك الحالي ({p1:.2f} ج) ليكون تخفيضاً للتكلفة."
+        
+    q2 = math.ceil((q1 * (p1 - p_target)) / (p_target - p2))
+    required_cash = q2 * p2
+    total_shares = q1 + q2
+    new_avg = ((q1 * p1) + (q2 * p2)) / total_shares
+    
+    sec_name = "القطاع"
+    for s_name, t_list in SECTORS_MAP.items():
+        if ticker in t_list:
+            sec_name = s_name
+            break
+            
+    msg = (
+        f"📉 <b>خطة التبريد والتعديل الذكي للتكلفة (Smart DCA):</b>\n\n"
+        f"🏢 <b>السهم:</b> <b>{name} ({ticker})</b> | <b>القطاع:</b> {sec_name}\n"
+        f"📊 <b>مركزك الحالي:</b> {q1:,.0f} سهم بمتوسط <code>{p1:.2f} ج.م</code>\n"
+        f"💵 <b>سعر التبريد اللحظي بالسوق:</b> <code>{p2:.2f} ج.م</code>\n"
+        f"🎯 <b>متوسط التكلفة المستهدف:</b> <code>{p_target:.2f} ج.م</code>\n\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"🛒 <b>الكمية التعديلية المطلوبة للشراء:</b> <b><code>{q2:,.0f} سهم</code></b>\n"
+        f"💰 <b>السيولة النقدية المطلوبة للعملية:</b> <b><code>{required_cash:,.2f} ج.م</code></b>\n"
+        f"📦 <b>إجمالي أسهمك بعد التنفيذ:</b> {total_shares:,.0f} سهم\n"
+        f"✅ <b>متوسط التكلفة الجديد الفعلي:</b> <b><code>{new_avg:.2f} ج.م</code></b> (توفير: {p1 - new_avg:.2f} ج/سهم)\n\n"
+        f"💡 <b>قاعدة السلامة المالية:</b> تأكد من توفر سيولة نقدية كافية وألا يؤدي التبريد لزيادة وزن قطاع {sec_name} عن 35% من محفظتك الإجمالية."
+    )
+    return msg
+
+def run_portfolio_stress_test(holdings, parsed_stocks, fx_gold_data=None, indices=None):
+    """محاكي اختبار الضغط ومصفوفة الصدمات الاقتصادية للمحفظة (Portfolio Stress Testing)."""
+    if not holdings:
+        return "💥 <b>اختبار ضغط المحفظة:</b> محفظتك خالية حالياً من الأسهم. سجّل أسهمك أولاً عبر أمر <code>/buy</code>."
+        
+    total_val = 0.0
+    stock_weights = {}
+    
+    for ticker, h in holdings.items():
+        qty = float(h.get("qty", 0))
+        curr_p = float(parsed_stocks.get(ticker, {}).get("close", float(h.get("buy_price", 0))))
+        val = qty * curr_p
+        total_val += val
+        stock_weights[ticker] = val
+        
+    if total_val <= 0:
+        return "⚠️ القيمة السوقية للمحفظة غير كافية لمحاكاة اختبار الضغط."
+        
+    exporters = ["EGAL", "SKPC", "AMOC", "ORWE", "ORAS", "ARCC", "ATQA", "MCQE"]
+    gold_funds = ["AZG", "THNDR_GOLD"]
+    
+    shock_crash_loss = total_val * 0.075
+    crash_pnl_pct = -7.5
+    
+    exporter_val = sum(stock_weights.get(t, 0) for t in exporters)
+    gold_val = sum(stock_weights.get(t, 0) for t in gold_funds)
+    fx_gain = (exporter_val * 0.08) + (gold_val * 0.12) + ((total_val - exporter_val - gold_val) * 0.02)
+    fx_pct = (fx_gain / total_val) * 100.0
+    
+    gold_gain = (gold_val * 0.15)
+    gold_pct = (gold_gain / total_val) * 100.0
+    
+    msg = (
+        "💥 <b>محاكي اختبار الضغط وصدمات السوق (Portfolio Stress Testing):</b>\n\n"
+        f"💼 <b>إجمالي القيمة السوقية للمحفظة:</b> <code>{total_val:,.2f} ج.م</code>\n\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "1️⃣ <b>السيناريو الأول: هبوط حاد في المؤشر العام (EGX30 -7.0% Crash):</b>\n"
+        f"   └ 📉 الأثر التقديري على المحفظة: <b><code>-{shock_crash_loss:,.2f} ج.م</code></b> (<code>{crash_pnl_pct:.1f}%</code>)\n"
+        "   └ 🛡️ <i>صمام الأمان:</i> حجز الأرباح وتفعيل أمر الوقف المتحرك يحميك من 70% من هذا التراجع.\n\n"
+        "2️⃣ <b>السيناريو الثاني: تحريك سعر الصرف (انخفاض الجنيه -10% أمام الدولار):</b>\n"
+        f"   └ 📈 الأثر التقديري على المحفظة: <b><code>+{fx_gain:,.2f} ج.م</code></b> (<code>+{fx_pct:.1f}%</code>)\n"
+        f"   └ 💡 <i>السبب:</i> استفادة الشركات المصدرة بالدولار والتحوط بالذهب والقطاع العقاري.\n\n"
+        "3️⃣ <b>السيناريو الثالث: قفزة تاريخية في أسعار الذهب (+15% Gold Surge):</b>\n"
+        f"   └ 🏆 مساهمة صناديق الذهب المباشرة: <b><code>+{gold_gain:,.2f} ج.م</code></b> (<code>+{gold_pct:.1f}%</code>)\n"
+        f"   └ 💡 {'لديك تحوط ممتاز بصناديق الذهب!' if gold_val > 0 else 'محفظتك خالية من صناديق الذهب (AZG / Thndr Gold) ويُنصح بتخصيص 10% منها للتحوط.'}\n\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "💡 <b>التقييم المؤسسي الإجمالي للمناعة والمخاطر:</b>\n"
+        f"{'🟢 محفظتك شديدة المتانة وتتمتع بمصادر دخل دولارية وتحوط عالي ضد تقلبات العملة.' if exporter_val / total_val >= 0.25 else '🟡 يُنصح بتعزيز أسهم الشركات المصدرة وصناديق الذهب لتحسين صمود المحفظة أمام الصدمات.'}"
+    )
+    return msg
+
+def format_user_alerts_manager(state_data):
+    """عرض وإدارة التنبيهات السارية مع إمكانية حذف أي تنبيه بنقرة واحدة."""
+    alerts = state_data.get("alerts", [])
+    if not alerts:
+        return (
+            "🔔 <b>إدارة التنبيهات المشروطة (Alerts Manager):</b>\n\n"
+            "لا توجد أي تنبيهات نشطة مسجلة حالياً.\n\n"
+            "💡 <b>يمكنك تفعيل تنبيهات ذكية بسهولة:</b>\n"
+            "• تنبيه سعري: <code>/alert TMGH > 100</code>\n"
+            "• تنبيه RSI: <code>/alert FWRY rsi < 30</code>\n"
+            "• تنبيه تقاطع ذهبي: <code>/alert SKPC cross</code>"
+        ), None
+        
+    msg = "🔔 <b>قائمة التنبيهات الفنية والسعرية النشطة:</b>\n\n"
+    buttons = []
+    
+    for i, al in enumerate(alerts):
+        ticker = al.get("ticker", "")
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        cond = al.get("cond", "")
+        target = al.get("price") or al.get("rsi") or al.get("type", "")
+        
+        msg += f"<b>{i+1}.</b> <b>{name} ({ticker}):</b> الشرط <code>{cond} {target}</code>\n"
+        buttons.append([{"text": f"❌ حذف {name} ({cond} {target})", "callback_data": f"del_alert_{i}"}])
+        
+    buttons.append([{"text": "🗑️ مسح جميع التنبيهات", "callback_data": "clear_all_alerts"}])
+    buttons.append([{"text": "💼 كشف المحفظة", "callback_data": "btn_portfolio"}])
+    
+    return msg, {"inline_keyboard": buttons}
+
+def format_dashboard_summary(holdings, state_data, parsed_stocks, indices, funds_data):
+    """عرض رابط وملخص لوحة التحكم الرقمية التفاعلية للمحفظة والأسهم."""
+    repo_url = "https://mahereasybakery-web.github.io/egypt-sharia-stock-report/"
+    total_val = 0.0
+    for ticker, h in (holdings or {}).items():
+        qty = float(h.get("qty", 0))
+        p = float(parsed_stocks.get(ticker, {}).get("close", float(h.get("buy_price", 0))))
+        total_val += qty * p
+        
+    msg = (
+        "🌐 <b>لوحة التحكم الرقمية التفاعلية (Interactive Web Dashboard):</b>\n\n"
+        f"💼 <b>القيمة السوقية للمحفظة:</b> <code>{total_val:,.2f} ج.م</code>\n"
+        "📊 <b>المميزات المتوفرة في لوحة الويب:</b>\n"
+        "• رسم بياني دائري تفاعلي (Donut Chart) للأوزان القطاعية.\n"
+        "• شاشات أسعار وبطاقات لحظية للأسهم الـ 33 ومؤشرات RSI وCMF.\n"
+        "• شارت TradingView تفاعلي مدمج ومباشر.\n\n"
+        f"🔗 <b>رابط الدخول المباشر:</b>\n"
+        f"<a href='{repo_url}'>{repo_url}</a>"
+    )
+    return msg
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
+    
+    # 0. الفئتان الرئيسيتان لتقسيم الشاشة والحفاظ على النظافة التامة (زرين فقط أسفل الشاشة)
+    if "مركز المحفظة" in text_clean or text_clean == "💼 مركز المحفظة والاستثمار" or text_lower in ["/portfolio_hub", "/hub_portfolio"]:
+        msg = (
+            "💼 <b>مركز إدارة المحفظة والقرارات الاستثمارية:</b>\n"
+            "<i>اختر التقرير أو الأداة المطلوبة من الأزرار التفاعلية أدناه:</i>"
+        )
+        reply_telegram(msg, reply_markup=PORTFOLIO_HUB_KEYBOARD)
+        return
+        
+    elif "رادار السوق" in text_clean or text_clean == "📊 رادار السوق والتحليلات" or text_lower in ["/market_hub", "/market"]:
+        msg = (
+            "📊 <b>رادار مسح السوق والتحليلات الفنية والمالية:</b>\n"
+            "<i>اختر الرادار أو التحليل المطلوب من الأزرار التفاعلية أدناه:</i>"
+        )
+        reply_telegram(msg, reply_markup=MARKET_HUB_KEYBOARD)
+        return
+        
     if text_lower.startswith("/start") or text_lower.startswith("/help") or "مساعدة" in text_clean or "مساعده" in text_clean or "أوامر" in text_clean:
         help_msg = (
             "<b>🤖 أهلاً بك في منصة تداول أسهم الشريعة المؤسسية!</b>\n\n"
-            "إليك الأوامر والأزرار الذكية المتاحة:\n"
-            "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي مع أزرار الفحص السريع.\n"
-            "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات والصناديق الاستثمارية.\n"
-            "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
-            "🎯 <b>[🎯 أسهم القيمة]</b> أو <code>/undervalued</code> : رادار اقتناص أسهم القيمة وهامش الأمان (P/E متدني وديون آمنة).\n"
-            "🐋 <b>[🐋 التجميع المؤسسي]</b> أو <code>/accumulation</code> : رادار تدفقات السيولة الذكية التجميعية (CMF موجب).\n"
-            "⚖️ <b>[⚖️ توازن المحفظة]</b> أو <code>/rebalance</code> : مصفوفة التنويع القطاعي والتحذير من تركز المخاطر.\n"
-            "🕌 <b>[🕌 زكاة الأسهم]</b> أو <code>/zakat</code> : حاسبة زكاة الأسهم والمحفظة وفق معايير AAOIFI الشرعية.\n"
-            "📥 <b>[📥 تصدير إكسل]</b> أو <code>/export</code> : تصدير كشف حساب المحفظة الفاخر بصيغة Excel (RTL).\n"
-            "🧪 <code>/backtest [السهم]</code> : محاكي اختبار الاستراتيجيات الكمية تاريخياً لـ 250 جلسة.\n"
-            "📐 <b>[📐 حاسبة المخاطر]</b> أو <code>/calc [السهم] [الدخول] [الوقف]</code> : حاسبة حجم الصفقة وإدارة المخاطر (1.5%).\n"
-            "📈 <b>[📈 شارت فني]</b> أو <code>/chart [السهم]</code> : رسم بياني بالشموع اليابانية ومؤشرات SMA وRSI.\n"
-            "🏢 <b>[🏢 فحص مالي]</b> أو <code>/fundamental [السهم]</code> : بطاقة التحليل المالي ومضاعفات P/E والديون الشرعية.\n"
-            "📜 <b>[📜 سجل الصفقات]</b> أو <code>/journal</code> : كشف حساب الصفقات المغلقة والأرباح المحققة ونسبة النجاح.\n"
-            "➕ <code>/buy [السهم] [الكمية] [السعر]</code> : تسجيل شراء وحساب متوسط التكلفة تلقائياً.\n"
-            "➖ <code>/sell [السهم] [الكمية] [السعر]</code> : تسجيل بيع واحتساب الأرباح المحققة (Realized P&L).\n"
-            "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص اتساع السوق والتحليل الفني وتوقعات الغد.\n"
-            "⚖️ <code>/compare [سهم1] [سهم2]</code> : مقارنة فنية واستثمارية مباشرة بالذكاء الاصطناعي.\n"
-            "🧠 <b>[🧠 استشارة المحلل الذكي]</b> أو <code>/ask</code> : استشارة المحلل المالي المؤسسي ببيانات السوق والأسعار اللحظية.\n"
-            "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7."
+            "تم تنظيم كافة التقارير والأدوات في <b>مركزين رئيسيين</b> بأسفل الشاشة لتوفير أقصى وضوح لمتابعة التقارير:\n\n"
+            "💼 <b>[💼 مركز المحفظة والاستثمار]:</b>\n"
+            "• كشف الأرباح والخسائر اللحظي (P&L)\n"
+            "• تصدير كشف المحفظة إكسل فاخر (RTL)\n"
+            "• مصفوفة تنويع القطاعات وإعادة التوازن\n"
+            "• حاسبة زكاة الأسهم (معايير AAOIFI)\n"
+            "• حاسبة التبريد وتعديل التكلفة (Smart DCA)\n"
+            "• محاكي اختبار ضغط وصدمات السوق\n"
+            "• حاسبة إدارة المخاطر (قاعدة 1.5%)\n"
+            "• سجل الصفقات المغلقة ونسبة النجاح\n"
+            "• إدارة وتعديل التنبيهات المشروطة\n"
+            "• لوحة التحكم الرقمية التفاعلية (Web)\n\n"
+            "📊 <b>[📊 رادار السوق والتحليلات]:</b>\n"
+            "• تقرير الأسعار اللحظية وصناديق الذهب\n"
+            "• بيان مفصل لمؤشر القوة النسبية RSI\n"
+            "• رادار اقتناص أسهم القيمة وهامش الأمان\n"
+            "• رادار التجميع المؤسسي والسيولة CMF\n"
+            "• رادار التباعد الفني الإيجابي (الدايفرجنس)\n"
+            "• رادار موسم الكوبونات والتوزيعات النقدية\n"
+            "• رادار صفقات كبار الملاك والداخليين\n"
+            "• بطاقة السعر العادل والسيناريوهات الثلاثة\n"
+            "• محاكي اختبار الاستراتيجيات تاريخياً\n"
+            "• شارت فني بالشموع اليابانية ومؤشر RSI\n"
+            "• استشارة المحلل المالي الذكي (Gemini AI)\n\n"
+            "💡 <i>اضغط على أي من الزرين أسفل الشاشة للوصول الفوري لكافة التقارير!</i>"
         )
         reply_telegram(help_msg, reply_markup=DEFAULT_KEYBOARD)
         
@@ -3945,23 +4433,203 @@ def handle_telegram_command(text):
             
     elif text_lower.startswith("/alert") or text_lower.startswith("/تنبيه"):
         parts = text.split()
-        if len(parts) < 4 or parts[2] not in [">", "<", ">=", "<="]:
+        if len(parts) < 3:
+            reply_telegram(
+                "🎯 <b>نظام التنبيهات الذكية والمشروطة:</b>\n\n"
+                "• <b>تنبيه سعري:</b> <code>/alert TMGH > 100</code> أو <code>/alert FWRY < 18</code>\n"
+                "• <b>تنبيه مؤشر RSI:</b> <code>/alert سوديك rsi < 30</code>\n"
+                "• <b>تنبيه التقاطع الذهبي:</b> <code>/alert SKPC cross</code>\n\n"
+                "💡 <i>لعرض أو مسح تنبيهاتك الحالية:</i> <code>/my_alerts</code>"
+            )
+            return
+            
+        sym_input = parts[1].upper().replace("[", "").replace("]", "").replace(".CA", "")
+        detected = detect_stocks_in_query(sym_input)
+        ticker = detected[0] if detected else sym_input
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        state_data, state_sha = get_github_state()
+        if "alerts" not in state_data:
+            state_data["alerts"] = []
+            
+        # 1. تنبيه التقاطع الذهبي: /alert SKPC cross
+        if len(parts) == 3 and parts[2].lower() in ["cross", "تقاطع", "الذهبي"]:
+            new_al = {"ticker": ticker, "cond": "cross", "type": "Golden Cross"}
+            state_data["alerts"].append(new_al)
+            if update_github_state(state_data, state_sha):
+                reply_telegram(f"🎯 <b>تم تفعيل تنبيه التقاطع الذهبي:</b>\nسيصلك إشعار فوري عند اختراق سهم <b>{name} ({ticker})</b> لمتوسط 200 يوم صعوداً (Golden Cross).")
+            else:
+                reply_telegram("❌ فشل تسجيل التنبيه على الخادم.")
+            return
+            
+        # 2. تنبيه مؤشر RSI: /alert FWRY rsi < 30
+        if len(parts) >= 4 and parts[2].lower() == "rsi":
+            cond = parts[3]
+            if cond not in [">", "<", ">=", "<="] or len(parts) < 5:
+                reply_telegram("⚠️ التنسيق المطلوب لتنبيه RSI:\n<code>/alert [السهم] rsi [< أو >] [القيمة]</code>\nمثال:\n<code>/alert FWRY rsi < 30</code>")
+                return
+            try:
+                target_rsi = float(parts[4].replace(",", ""))
+                new_al = {"ticker": ticker, "cond": cond, "rsi": target_rsi}
+                state_data["alerts"].append(new_al)
+                if update_github_state(state_data, state_sha):
+                    reply_telegram(f"🎯 <b>تم تفعيل تنبيه مؤشر RSI:</b>\nسيصلك إشعار فوري عند وصول RSI لسهم <b>{name} ({ticker})</b> إلى <b>{cond} {target_rsi:.0f}</b>.")
+                else:
+                    reply_telegram("❌ فشل تسجيل التنبيه على الخادم.")
+            except ValueError:
+                reply_telegram("⚠️ قيمة مؤشر RSI يجب أن تكون رقماً.")
+            return
+            
+        # 3. تنبيه سعري عادي: /alert TMGH > 100
+        cond = parts[2]
+        if cond not in [">", "<", ">=", "<="]:
             reply_telegram("⚠️ التنسيق المطلوب:\n<code>/alert [السهم] [> أو <] [السعر]</code>\nمثال:\n<code>/alert FWRY > 20.00</code>")
             return
-        ticker = parts[1].upper().replace("[", "").replace("]", "")
-        cond = parts[2]
         try:
             price = float(parts[3].replace(",", ""))
-            state_data, state_sha = get_github_state()
-            if "alerts" not in state_data:
-                state_data["alerts"] = []
-            state_data["alerts"].append({"ticker": ticker, "cond": cond, "price": price})
+            new_al = {"ticker": ticker, "cond": cond, "price": price}
+            state_data["alerts"].append(new_al)
             if update_github_state(state_data, state_sha):
-                reply_telegram(f"🎯 <b>تم تفعيل التنبيه السعري:</b>\nسيصلك إشعار فوري عند وصول <b>{ticker}</b> إلى <b>{cond} {price:.2f} ج.م</b>.")
+                reply_telegram(f"🎯 <b>تم تفعيل التنبيه السعري:</b>\nسيصلك إشعار فوري عند وصول سهم <b>{name} ({ticker})</b> إلى <b>{cond} {price:.2f} ج.م</b>.")
             else:
                 reply_telegram("❌ فشل تسجيل التنبيه على الخادم.")
         except ValueError:
             reply_telegram("⚠️ السعر يجب أن يكون رقماً صحيحاً.")
+
+    elif text_lower.startswith("/my_alerts") or text_lower.startswith("/تنبيهاتي") or "إدارة وتعديل تنبيهاتي" in text_clean or "تنبيهاتي" in text_clean:
+        try:
+            state_data, _ = get_github_state()
+            alerts_msg, alerts_markup = format_user_alerts_manager(state_data)
+            reply_telegram(alerts_msg, reply_markup=alerts_markup if alerts_markup else PORTFOLIO_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء جلب قائمة التنبيهات: {e}")
+
+    elif text_lower.startswith("/insiders") or text_lower.startswith("/داخليين") or text_lower.startswith("/صفقات") or "صفقات كبار الملاك" in text_clean or "صفقات الداخليين" in text_clean:
+        reply_telegram("🔄 جاري فحص إفصاحات البورصة المصرية ورصد صفقات كبار الملاك والداخليين...")
+        try:
+            insider_report = fetch_and_format_insider_deals()
+            reply_telegram(insider_report, reply_markup=MARKET_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء جلب صفقات الداخليين: {e}")
+
+    elif text_lower.startswith("/divergence") or text_lower.startswith("/دايفرجنس") or "رادار الدايفرجنس" in text_clean or "انفراج إيجابي" in text_clean:
+        reply_telegram("🔄 جاري مسح الشارتات الفنية ورصد إشارات الدايفرجنس الإيجابي الخفي...")
+        try:
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            div_report = scan_bullish_divergence_all(parsed_stocks)
+            reply_telegram(div_report, reply_markup=MARKET_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء مسح الدايفرجنس: {e}")
+
+    elif text_lower.startswith("/target") or text_lower.startswith("/سعر_عادل") or text_lower.startswith("/هدف") or "سعر عادل" in text_clean or "مصفوفة الأهداف" in text_clean:
+        args = ""
+        if text_lower.startswith("/target"):
+            args = text[len("/target"):].strip()
+        elif text_lower.startswith("/سعر_عادل"):
+            args = text[len("/سعر_عادل"):].strip()
+        elif text_lower.startswith("/هدف"):
+            args = text[len("/هدف"):].strip()
+            
+        if not args:
+            reply_telegram(
+                "🎯 <b>مصفوفة السعر العادل والسيناريوهات الثلاثة (3-Scenario Valuation)</b>\n\n"
+                "يرجى كتابة رمز أو اسم السهم بعد الأمر. أمثلة:\n"
+                "• <code>/target TMGH</code>\n"
+                "• <code>/target سوديك</code>\n"
+                "• <code>/target فوري</code>"
+            )
+            return
+            
+        detected = detect_stocks_in_query(args)
+        ticker = detected[0] if detected else args.upper().replace(".CA", "").replace("EGX:", "").strip()
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        reply_telegram(f"🔄 جاري حساب القيمة العادلة والسيناريوهات الثلاثة لسهم <b>{name} ({ticker})</b>...")
+        try:
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv([ticker], s)
+            val_msg = calculate_fair_value_scenarios(ticker, parsed_stocks)
+            reply_telegram(val_msg, reply_markup=MARKET_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء حساب القيمة العادلة: {e}")
+
+    elif text_lower.startswith("/dividends") or text_lower.startswith("/كوبونات") or text_lower.startswith("/توزيعات") or "رادار الكوبونات" in text_clean or "رادار التوزيعات" in text_clean:
+        reply_telegram("🔄 جاري فحص عوائد التوزيعات وتواريخ الكوبونات النقدية للأسهم القيادية...")
+        try:
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            div_report = format_dividend_radar(parsed_stocks)
+            reply_telegram(div_report, reply_markup=MARKET_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء فحص الكوبونات: {e}")
+
+    elif text_lower.startswith("/dca") or text_lower.startswith("/تبريد") or "حاسبة التبريد" in text_clean:
+        query_arg = ""
+        if text_lower.startswith("/dca"):
+            query_arg = text[len("/dca"):].strip()
+        elif text_lower.startswith("/تبريد"):
+            query_arg = text[len("/تبريد"):].strip()
+            
+        try:
+            state_data, _ = get_github_state()
+            holdings = state_data.get("holdings", {})
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            dca_result = calculate_smart_dca(holdings, parsed_stocks, query_arg)
+            reply_telegram(dca_result, reply_markup=PORTFOLIO_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ في حاسبة التبريد: {e}")
+
+    elif text_lower.startswith("/stresstest") or text_lower.startswith("/ضغط") or text_lower.startswith("/صدمات") or "محاكي اختبار الضغط" in text_clean or "اختبار الضغط" in text_clean:
+        reply_telegram("🔄 جاري تنفيذ محاكاة اختبار الضغط ومصفوفة الصدمات على محفظتك...")
+        try:
+            state_data, _ = get_github_state()
+            holdings = state_data.get("holdings", {})
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            indices, _ = fetch_indices_data_tv(s)
+            stress_msg = run_portfolio_stress_test(holdings, parsed_stocks, indices=indices)
+            reply_telegram(stress_msg, reply_markup=PORTFOLIO_HUB_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء تنفيذ اختبار الضغط: {e}")
+
+    elif text_lower.startswith("/dashboard") or text_lower.startswith("/لوحة") or "لوحة التحكم الرقمية" in text_clean or "لوحة التحكم" in text_clean:
+        try:
+            state_data, _ = get_github_state()
+            holdings = state_data.get("holdings", {})
+            s = {}
+            if os.path.exists(STRINGS_PATH):
+                with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+                    s = json.load(f)
+            parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+            indices, _ = fetch_indices_data_tv(s)
+            funds_data, _ = fetch_all_funds_data()
+            dash_msg = format_dashboard_summary(holdings, state_data, parsed_stocks, indices, funds_data)
+            web_buttons = {
+                "inline_keyboard": [
+                    [{"text": "🌐 فتح لوحة التحكم على المتصفح", "url": "https://mahereasybakery-web.github.io/egypt-sharia-stock-report/"}],
+                    [{"text": "💼 مركز المحفظة", "callback_data": "hub_portfolio"}, {"text": "📊 رادار السوق", "callback_data": "hub_market"}]
+                ]
+            }
+            reply_telegram(dash_msg, reply_markup=web_buttons)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ في عرض لوحة التحكم: {e}")
         
     elif text_lower.startswith("/add_news"):
         news_content = text[len("/add_news"):].strip()
@@ -4074,8 +4742,43 @@ def poll_telegram_messages():
                         except Exception:
                             pass
                             
-                        if cb_data == "btn_portfolio":
+                        # مراكز التنقل الرئيسية
+                        if cb_data == "hub_portfolio":
+                            msg = (
+                                "💼 <b>مركز إدارة المحفظة والقرارات الاستثمارية:</b>\n"
+                                "<i>اختر التقرير أو الأداة المطلوبة من الأزرار التفاعلية أدناه:</i>"
+                            )
+                            reply_telegram(msg, reply_markup=PORTFOLIO_HUB_KEYBOARD)
+                        elif cb_data == "hub_market":
+                            msg = (
+                                "📊 <b>رادار مسح السوق والتحليلات الفنية والمالية:</b>\n"
+                                "<i>اختر الرادار أو التحليل المطلوب من الأزرار التفاعلية أدناه:</i>"
+                            )
+                            reply_telegram(msg, reply_markup=MARKET_HUB_KEYBOARD)
+                            
+                        # أدوات المحفظة
+                        elif cb_data == "btn_portfolio":
                             handle_telegram_command("/portfolio")
+                        elif cb_data == "btn_export":
+                            handle_telegram_command("/export")
+                        elif cb_data == "btn_rebalance":
+                            handle_telegram_command("/rebalance")
+                        elif cb_data == "btn_zakat":
+                            handle_telegram_command("/zakat")
+                        elif cb_data == "btn_dca":
+                            handle_telegram_command("/dca")
+                        elif cb_data == "btn_stresstest":
+                            handle_telegram_command("/stresstest")
+                        elif cb_data == "btn_calc_help":
+                            handle_telegram_command("/calc")
+                        elif cb_data == "btn_journal":
+                            handle_telegram_command("/journal")
+                        elif cb_data == "btn_my_alerts":
+                            handle_telegram_command("/my_alerts")
+                        elif cb_data == "btn_dashboard":
+                            handle_telegram_command("/dashboard")
+                            
+                        # رادارات وتحليلات السوق
                         elif cb_data == "btn_report":
                             handle_telegram_command("/report")
                         elif cb_data == "btn_rsi":
@@ -4084,20 +4787,52 @@ def poll_telegram_messages():
                             handle_telegram_command("/undervalued")
                         elif cb_data == "btn_accumulation":
                             handle_telegram_command("/accumulation")
-                        elif cb_data == "btn_rebalance":
-                            handle_telegram_command("/rebalance")
-                        elif cb_data == "btn_zakat":
-                            handle_telegram_command("/zakat")
-                        elif cb_data == "btn_export":
-                            handle_telegram_command("/export")
-                        elif cb_data == "btn_calc_help":
-                            handle_telegram_command("/calc")
+                        elif cb_data == "btn_divergence":
+                            handle_telegram_command("/divergence")
+                        elif cb_data == "btn_dividends":
+                            handle_telegram_command("/dividends")
+                        elif cb_data == "btn_insiders":
+                            handle_telegram_command("/insiders")
                         elif cb_data == "btn_summary":
                             handle_telegram_command("/summary")
+                        elif cb_data == "btn_chart_help":
+                            handle_telegram_command("/chart")
+                        elif cb_data == "btn_fundamental_help":
+                            handle_telegram_command("/fundamental")
                         elif cb_data == "btn_ask_help":
                             handle_telegram_command("/ask")
-                        elif cb_data == "btn_journal":
-                            handle_telegram_command("/journal")
+                        elif cb_data == "btn_status":
+                            handle_telegram_command("/status")
+                            
+                        # إدارة التنبيهات التفاعلية
+                        elif cb_data.startswith("del_alert_"):
+                            try:
+                                alert_idx = int(cb_data.replace("del_alert_", ""))
+                                state_data, state_sha = get_github_state()
+                                alerts = state_data.get("alerts", [])
+                                if 0 <= alert_idx < len(alerts):
+                                    deleted = alerts.pop(alert_idx)
+                                    state_data["alerts"] = alerts
+                                    if update_github_state(state_data, state_sha):
+                                        reply_telegram("✅ تم حذف التنبيه المحدد بنجاح.")
+                                        alerts_msg, alerts_markup = format_user_alerts_manager(state_data)
+                                        reply_telegram(alerts_msg, reply_markup=alerts_markup if alerts_markup else PORTFOLIO_HUB_KEYBOARD)
+                                    else:
+                                        reply_telegram("❌ تعذر تحديث قائمة التنبيهات على الخادم.")
+                            except Exception as err:
+                                reply_telegram(f"⚠️ خطأ أثناء حذف التنبيه: {err}")
+                        elif cb_data == "clear_all_alerts":
+                            try:
+                                state_data, state_sha = get_github_state()
+                                state_data["alerts"] = []
+                                if update_github_state(state_data, state_sha):
+                                    reply_telegram("✅ تم مسح كافة التنبيهات بنجاح.", reply_markup=PORTFOLIO_HUB_KEYBOARD)
+                                else:
+                                    reply_telegram("❌ تعذر حفظ التعديل على الخادم.")
+                            except Exception as err:
+                                reply_telegram(f"⚠️ خطأ أثناء مسح التنبيهات: {err}")
+                                
+                        # استشارة السهم المباشرة
                         elif cb_data.startswith("deepdive_"):
                             ticker = cb_data.replace("deepdive_", "").upper()
                             c_name = COMPANY_NAMES_AR.get(ticker, ticker)
@@ -4107,8 +4842,6 @@ def poll_telegram_messages():
                                 reply_telegram(analysis, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
                             except Exception as e:
                                 reply_telegram(f"⚠️ حدث خطأ: {e}")
-                        elif cb_data == "btn_status":
-                            handle_telegram_command("/status")
                     continue
                 
                 # 2. معالجة الرسائل النصية ونقرات الأزرار السفلية الثابتة (Reply Keyboard)
