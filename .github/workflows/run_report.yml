@@ -41,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests feedparser matplotlib
+          pip install requests feedparser matplotlib openpyxl numpy
 
       - name: Run script
         env:
