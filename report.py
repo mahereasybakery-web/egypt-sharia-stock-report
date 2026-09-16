@@ -221,8 +221,8 @@ def escape_html(text):
 DEFAULT_KEYBOARD = {
     "keyboard": [
         [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
-        [{"text": "📌 ملخص حركة اليوم"}, {"text": "⚙️ حالة النظام"}],
-        [{"text": "❓ مساعدة والأوامر"}]
+        [{"text": "⚡ بيان مفصل RSI"}, {"text": "📌 ملخص حركة اليوم"}],
+        [{"text": "⚙️ حالة النظام"}, {"text": "❓ مساعدة والأوامر"}]
     ],
     "resize_keyboard": True,
     "is_persistent": True
@@ -235,7 +235,10 @@ PORTFOLIO_INLINE_KEYBOARD = {
             {"text": "🔄 تحديث فوري", "callback_data": "btn_report"}
         ],
         [
-            {"text": "📌 ملخص الجلسة", "callback_data": "btn_summary"},
+            {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
+            {"text": "📌 ملخص الجلسة", "callback_data": "btn_summary"}
+        ],
+        [
             {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
         ]
     ]
@@ -248,6 +251,7 @@ def setup_telegram_bot_menu():
     commands = [
         {"command": "portfolio", "description": "💼 كشف حساب المحفظة اللحظي والأرباح"},
         {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات اللحظي"},
+        {"command": "rsi", "description": "⚡ بيان مفصل لمؤشر RSI لجميع الأسهم"},
         {"command": "summary", "description": "📌 ملخص الجلسة والتحليل الفني"},
         {"command": "compare", "description": "⚖️ مقارنة فنية بين سهمين بالذكاء الاصطناعي"},
         {"command": "alert", "description": "🎯 ضبط تنبيه سعري فوري"},
@@ -1958,6 +1962,96 @@ def send_daily_summary():
         
     return True
 
+def send_detailed_rsi_report():
+    """توليد وبث بيان مفصل ورادار متقدم لمؤشر القوة النسبية (RSI 14) لجميع الأسهم الشرعية."""
+    print(f"[{datetime.now()}] Generating detailed RSI report...")
+    s = {}
+    if os.path.exists(STRINGS_PATH):
+        with open(STRINGS_PATH, "r", encoding="utf-8") as f:
+            s = json.load(f)
+            
+    parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
+    
+    stock_rsi_list = []
+    for ticker in ALL_TICKERS:
+        if ticker in parsed_stocks:
+            info = parsed_stocks[ticker]
+            rsi_val = info.get("rsi")
+            if rsi_val is not None:
+                name_ar = COMPANY_NAMES_AR.get(ticker, ticker)
+                stock_rsi_list.append({
+                    "ticker": ticker,
+                    "name": name_ar,
+                    "rsi": rsi_val,
+                    "close": info.get("close", 0.0),
+                    "chg": info.get("chgPct", 0.0),
+                    "rec": info.get("rec", "")
+                })
+                
+    if not stock_rsi_list:
+        reply_telegram("⚠️ تعذر جلب بيانات مؤشر RSI حالياً من الخادم.")
+        return False
+        
+    stock_rsi_list.sort(key=lambda x: x["rsi"], reverse=True)
+    
+    now = datetime.now(timezone(timedelta(hours=3)))
+    today_str = now.strftime("%Y/%m/%d")
+    hour_12 = now.hour % 12 or 12
+    minute = now.strftime("%M")
+    period = "صباحاً" if now.hour < 12 else "مساءً"
+    time_str = f"{hour_12:02d}:{minute} {period}"
+    
+    overbought = [x for x in stock_rsi_list if x["rsi"] >= 70]
+    bullish = [x for x in stock_rsi_list if 55 <= x["rsi"] < 70]
+    neutral = [x for x in stock_rsi_list if 40 <= x["rsi"] < 55]
+    oversold = [x for x in stock_rsi_list if x["rsi"] < 40]
+    
+    msg = f"⚡ <b>البيان المفصل ورادار مؤشر القوة النسبية RSI (14)</b>\n"
+    msg += f"📅 <b>التاريخ:</b> {today_str} | {time_str}\n"
+    msg += f"📊 <b>إجمالي الأسهم المفحوصة:</b> {len(stock_rsi_list)} سهماً شرعياً\n"
+    msg += "━━━━━━━━━━━━━━━━━━━\n\n"
+    
+    msg += "<b>📌 توزيع السيولة وقوة الزخم:</b>\n"
+    msg += f"• ⚠️ <b>تشبع شرائي (RSI ≥ 70):</b> {len(overbought)} أسهم (قمم سعرية)\n"
+    msg += f"• 🟢 <b>زخم صاعد إيجابي (RSI 55-69):</b> {len(bullish)} أسهم\n"
+    msg += f"• 🟡 <b>نطاق عرضي وتجميع (RSI 40-54):</b> {len(neutral)} أسهم\n"
+    msg += f"• 💎 <b>تشبع بيعي/قيعان (RSI &lt; 40):</b> {len(oversold)} أسهم\n\n"
+    msg += "━━━━━━━━━━━━━━━━━━━\n\n"
+    
+    if overbought:
+        msg += "⚠️ <b>منطقة التشبع الشرائي (RSI ≥ 70) - [حذر من الشراء عند القمة]:</b>\n"
+        for item in overbought:
+            sign = "+" if item["chg"] > 0 else ""
+            msg += f"• <b>{item['name']}({item['ticker']}):</b> <code>RSI {item['rsi']:.1f}</code> | {item['close']} ج ({sign}{item['chg']}%) | {item['rec']}\n"
+        msg += "\n"
+        
+    if bullish:
+        msg += "🟢 <b>منطقة الزخم الصاعد الإيجابي (RSI 55 - 69.9):</b>\n"
+        for item in bullish:
+            sign = "+" if item["chg"] > 0 else ""
+            msg += f"• <b>{item['name']}({item['ticker']}):</b> <code>RSI {item['rsi']:.1f}</code> | {item['close']} ج ({sign}{item['chg']}%) | {item['rec']}\n"
+        msg += "\n"
+        
+    if neutral:
+        msg += "🟡 <b>منطقة التجميع والنطاق العرضي (RSI 40 - 54.9):</b>\n"
+        for item in neutral:
+            sign = "+" if item["chg"] > 0 else ""
+            msg += f"• <b>{item['name']}({item['ticker']}):</b> <code>RSI {item['rsi']:.1f}</code> | {item['close']} ج ({sign}{item['chg']}%) | {item['rec']}\n"
+        msg += "\n"
+        
+    if oversold:
+        msg += "💎 <b>منطقة التشبع البيعي والقيعان (RSI &lt; 40) - [فرص ارتداد]:</b>\n"
+        for item in oversold:
+            sign = "+" if item["chg"] > 0 else ""
+            msg += f"• <b>{item['name']}({item['ticker']}):</b> <code>RSI {item['rsi']:.1f}</code> | {item['close']} ج ({sign}{item['chg']}%) | {item['rec']}\n"
+        msg += "\n"
+        
+    msg += "━━━━━━━━━━━━━━━━━━━\n"
+    msg += "💡 <b>خلاصة فنية:</b> الأسهم ذات RSI أعلى من 70 هي الأكثر عرضة لجني الأرباح وتهدئة المؤشرات، بينما الأسهم قرب 30 تشير لتشبع بيعي مفرط واقتراب مناطق الارتداد."
+    
+    reply_telegram(msg, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+    return True
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
@@ -1967,6 +2061,7 @@ def handle_telegram_command(text):
             "إليك الأزرار الذكية المتاحة للضغط المباشر:\n"
             "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي (P&L).\n"
             "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات الفنية.\n"
+            "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
             "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص الجلسة والتحليل الفني وتوقعات الغد.\n"
             "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7.\n"
             "➕ <code>/set_holding [السهم] [الكمية] [سعر_الشراء]</code> : لتعديل أو تسجيل أسهم محفظتك.\n"
@@ -1990,9 +2085,13 @@ def handle_telegram_command(text):
         except Exception as e:
             reply_telegram(f"⚠️ حدث خطأ أثناء حساب المحفظة: {e}")
             
-    elif text_lower.startswith("/report") or "تقرير الأسعار" in text_clean or "تقرير الاسعار" in text_clean:
+    elif text_lower.startswith("/report") or "تقرير الأسعار" in text_clean or "تقرير الاسعار" in text_clean or "تحديث فوري" in text_clean:
         reply_telegram("🔄 جاري تحديث بيانات السوق وبث التقرير اللحظي فوراً...")
         send_report(force=True)
+        
+    elif text_lower.startswith("/rsi") or "rsi" in text_lower or "بيان مفصل" in text_clean:
+        reply_telegram("🔄 جاري إعداد البيان المفصل لمؤشر RSI لجميع الأسهم...")
+        send_detailed_rsi_report()
         
     elif text_lower.startswith("/summary") or "ملخص" in text_clean:
         reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الفني...")
@@ -2153,6 +2252,8 @@ def poll_telegram_messages():
                             handle_telegram_command("/portfolio")
                         elif cb_data == "btn_report":
                             handle_telegram_command("/report")
+                        elif cb_data == "btn_rsi":
+                            handle_telegram_command("/rsi")
                         elif cb_data == "btn_summary":
                             handle_telegram_command("/summary")
                         elif cb_data == "btn_status":
