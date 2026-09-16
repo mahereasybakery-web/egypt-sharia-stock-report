@@ -221,7 +221,8 @@ def escape_html(text):
 DEFAULT_KEYBOARD = {
     "keyboard": [
         [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
-        [{"text": "⚡ بيان مفصل RSI"}, {"text": "📌 ملخص حركة اليوم"}],
+        [{"text": "⚡ بيان مفصل RSI"}, {"text": "📈 شارت فني"}],
+        [{"text": "🏢 فحص مالي"}, {"text": "📜 سجل الصفقات"}],
         [{"text": "🧠 استشارة المحلل الذكي"}, {"text": "⚙️ حالة النظام"}]
     ],
     "resize_keyboard": True,
@@ -236,7 +237,7 @@ PORTFOLIO_INLINE_KEYBOARD = {
         ],
         [
             {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
-            {"text": "📌 ملخص الجلسة", "callback_data": "btn_summary"}
+            {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
         ],
         [
             {"text": "🧠 استشارة المحلل الذكي", "callback_data": "btn_ask_help"},
@@ -244,6 +245,36 @@ PORTFOLIO_INLINE_KEYBOARD = {
         ]
     ]
 }
+
+def get_portfolio_inline_keyboard(holdings=None):
+    """توليد لوحة أزرار تفاعلية تتضمن أزرار فحص لحظي مباشر لكل سهم في محفظة المستثمر."""
+    keyboard = []
+    if holdings:
+        stock_row = []
+        for ticker in sorted(holdings.keys()):
+            name = COMPANY_NAMES_AR.get(ticker, ticker)
+            stock_row.append({"text": f"🔍 {name}", "callback_data": f"deepdive_{ticker}"})
+            if len(stock_row) == 2:
+                keyboard.append(stock_row)
+                stock_row = []
+        if stock_row:
+            keyboard.append(stock_row)
+            
+    keyboard.extend([
+        [
+            {"text": "💼 كشف الحساب", "callback_data": "btn_portfolio"},
+            {"text": "🔄 تحديث فوري", "callback_data": "btn_report"}
+        ],
+        [
+            {"text": "⚡ بيان مفصل RSI", "callback_data": "btn_rsi"},
+            {"text": "📜 سجل الصفقات", "callback_data": "btn_journal"}
+        ],
+        [
+            {"text": "🧠 استشارة المحلل الذكي", "callback_data": "btn_ask_help"},
+            {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
+        ]
+    ])
+    return {"inline_keyboard": keyboard}
 
 def setup_telegram_bot_menu():
     """تسجيل قائمة الأوامر الرسمية لتظهر في زر Menu بتطبيق تليجرام تلقائياً."""
@@ -253,9 +284,13 @@ def setup_telegram_bot_menu():
         {"command": "portfolio", "description": "💼 كشف حساب المحفظة اللحظي والأرباح"},
         {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات اللحظي"},
         {"command": "rsi", "description": "⚡ بيان مفصل لمؤشر RSI لجميع الأسهم"},
+        {"command": "chart", "description": "📈 شارت فني بالشموع ومؤشر RSI"},
+        {"command": "fundamental", "description": "🏢 بطاقة التحليل المالي ومضاعفات التقييم"},
+        {"command": "buy", "description": "➕ تسجيل شراء سهم وحساب متوسط التكلفة"},
+        {"command": "sell", "description": "➖ تسجيل بيع سهم واحتساب الأرباح المحققة"},
+        {"command": "journal", "description": "📜 سجل الصفقات المغلقة ونسبة النجاح"},
         {"command": "summary", "description": "📌 ملخص الجلسة والتحليل الفني"},
         {"command": "compare", "description": "⚖️ مقارنة فنية بين سهمين بالذكاء الاصطناعي"},
-        {"command": "alert", "description": "🎯 ضبط تنبيه سعري فوري"},
         {"command": "ask", "description": "🧠 استشارة المحلل المالي الذكي"},
         {"command": "status", "description": "⚙️ حالة الخادم وسلسلة الترحيل 24/7"}
     ]
@@ -1069,6 +1104,140 @@ def generate_market_chart(indices, parsed_stocks):
         print("Error generating market chart:", e)
         return None
 
+def compute_rsi_series(prices, period=14):
+    """حساب متسلسلة مؤشر القوة النسبية RSI(14) بدقة رياضية متناهية."""
+    import numpy as np
+    if len(prices) < period + 1:
+        return [50.0] * len(prices)
+    deltas = np.diff(prices)
+    gains = np.where(deltas > 0, deltas, 0.0)
+    losses = np.where(deltas < 0, -deltas, 0.0)
+    avg_gain = np.mean(gains[:period])
+    avg_loss = np.mean(losses[:period])
+    rsi = [50.0] * period
+    for i in range(period, len(prices)):
+        delta = deltas[i-1]
+        gain = max(delta, 0.0)
+        loss = max(-delta, 0.0)
+        avg_gain = (avg_gain * (period - 1) + gain) / period
+        avg_loss = (avg_loss * (period - 1) + loss) / period
+        if avg_loss == 0:
+            rsi.append(100.0)
+        else:
+            rs = avg_gain / avg_loss
+            rsi.append(100.0 - (100.0 / (1.0 + rs)))
+    return rsi
+
+def generate_candlestick_chart(ticker):
+    """توليد رسم بياني يومي احترافي بنظام الشموع اليابانية ومؤشرات SMA وRSI وأحجام التداول."""
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import numpy as np
+        
+        ticker_clean = ticker.upper().replace(".CA", "").replace("EGX:", "").strip()
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker_clean}.CA?interval=1d&range=3mo"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        r = requests.get(url, headers=headers, timeout=12)
+        if r.status_code != 200:
+            return None, f"فشل جلب بيانات الشارت للسهم {ticker_clean} (رمز الخطأ {r.status_code})"
+            
+        data = r.json().get('chart', {}).get('result', [])
+        if not data:
+            return None, f"لا توجد بيانات تاريخية متاحة للسهم {ticker_clean}"
+            
+        res = data[0]
+        ts_list = res.get('timestamp', [])
+        q = res.get('indicators', {}).get('quote', [{}])[0]
+        
+        dates, opens, highs, lows, closes, volumes = [], [], [], [], [], []
+        for t, o, h, l, c, v in zip(ts_list, q.get('open', []), q.get('high', []), q.get('low', []), q.get('close', []), q.get('volume', [])):
+            if c is not None and o is not None and h is not None and l is not None:
+                dates.append(datetime.fromtimestamp(t).strftime('%d-%b'))
+                opens.append(float(o))
+                highs.append(float(h))
+                lows.append(float(l))
+                closes.append(float(c))
+                volumes.append(float(v) if v is not None else 0.0)
+                
+        n = len(closes)
+        if n < 5:
+            return None, f"بيانات التداول غير كافية لرسم الشارت ({n} شموع فقط)"
+            
+        sma20 = [float(np.mean(closes[max(0, i-19):i+1])) for i in range(n)]
+        sma50 = [float(np.mean(closes[max(0, i-49):i+1])) for i in range(n)]
+        rsi = compute_rsi_series(closes, 14)
+        
+        plt.style.use('dark_background')
+        fig, (ax_price, ax_vol, ax_rsi) = plt.subplots(
+            3, 1, figsize=(10, 8), dpi=120,
+            gridspec_kw={'height_ratios': [3, 1, 1.2]},
+            sharex=True
+        )
+        fig.patch.set_facecolor('#101216')
+        for ax in (ax_price, ax_vol, ax_rsi):
+            ax.set_facecolor('#161920')
+            ax.grid(True, color='#2a2e39', linestyle='--', alpha=0.5)
+            
+        idx = np.arange(n)
+        width = 0.6
+        for i in range(n):
+            color = '#089981' if closes[i] >= opens[i] else '#F23645'
+            ax_price.plot([idx[i], idx[i]], [lows[i], highs[i]], color=color, linewidth=1.2)
+            lower = min(opens[i], closes[i])
+            height = max(abs(closes[i] - opens[i]), 0.05)
+            ax_price.bar(idx[i], height, width, bottom=lower, color=color, edgecolor=color)
+            
+        ax_price.plot(idx, sma20, color='#FFD700', label='SMA 20', linewidth=1.5)
+        ax_price.plot(idx, sma50, color='#00E5FF', label='SMA 50', linewidth=1.5)
+        
+        c_name = COMPANY_NAMES_AR.get(ticker_clean, ticker_clean)
+        last_c = closes[-1]
+        last_rsi = rsi[-1]
+        last_sma20 = sma20[-1]
+        last_sma50 = sma50[-1]
+        
+        ax_price.set_title(f'EGX: {c_name} ({ticker_clean}) - Daily Candlesticks & Technicals', color='#FFFFFF', fontsize=13, fontweight='bold', pad=10)
+        ax_price.legend(loc='upper left', framealpha=0.4, fontsize=9)
+        ax_price.set_ylabel('Price (EGP)', color='#CCCCCC')
+        
+        # Volume
+        vol_colors = ['#089981' if closes[i] >= opens[i] else '#F23645' for i in range(n)]
+        ax_vol.bar(idx, volumes, width, color=vol_colors, alpha=0.8)
+        ax_vol.set_ylabel('Volume', color='#CCCCCC')
+        
+        # RSI
+        ax_rsi.plot(idx, rsi, color='#E040FB', linewidth=1.5)
+        ax_rsi.axhline(70, color='#F23645', linestyle='--', alpha=0.7, label='Overbought 70')
+        ax_rsi.axhline(30, color='#089981', linestyle='--', alpha=0.7, label='Oversold 30')
+        ax_rsi.fill_between(idx, 30, 70, color='#E040FB', alpha=0.08)
+        ax_rsi.set_ylabel('RSI (14)', color='#CCCCCC')
+        ax_rsi.set_ylim(10, 90)
+        
+        step = max(1, n // 8)
+        ax_rsi.set_xticks(idx[::step])
+        ax_rsi.set_xticklabels(dates[::step], rotation=30, ha='right')
+        
+        plt.tight_layout()
+        chart_file = f"chart_{ticker_clean}.png"
+        plt.savefig(chart_file, facecolor=fig.get_facecolor(), edgecolor='none')
+        plt.close()
+        
+        caption = (
+            f"📈 <b>الشارت الفني اليومي: {c_name} ({ticker_clean})</b>\n\n"
+            f"💵 <b>سعر الإغلاق:</b> {last_c:.2f} ج.م\n"
+            f"⚡ <b>مؤشر RSI (14):</b> <code>{last_rsi:.1f}</code> "
+            + ("(⚠️ تشبع شرائي)" if last_rsi >= 70 else ("(💎 تشبع بيعي)" if last_rsi <= 30 else "(منطقة متوازنة)")) + "\n"
+            f"🟡 <b>متوسط 20 يوم (SMA20):</b> {last_sma20:.2f} ج.م " + ("(السعر فوق المتوسط 🟢)" if last_c >= last_sma20 else "(السعر تحت المتوسط 🔴)") + "\n"
+            f"🔵 <b>متوسط 50 يوم (SMA50):</b> {last_sma50:.2f} ج.م " + ("(السعر فوق المتوسط 🟢)" if last_c >= last_sma50 else "(السعر تحت المتوسط 🔴)") + "\n"
+            f"🛡️ <b>أدنى قاع (3 أشهر):</b> {min(lows):.2f} ج.م | 🎯 <b>أعلى قمة:</b> {max(highs):.2f} ج.م"
+        )
+        return chart_file, caption
+    except Exception as e:
+        print("Error in generate_candlestick_chart:", e)
+        return None, f"حدث خطأ أثناء رسم الشارت: {e}"
+
 def scan_insider_and_block_trades(all_news, egx_beta_items):
     """رصد صفقات الداخليين (أعضاء مجلس الإدارة، المجموعات المرتبطة، أسهم الخزينة) والصفقات الكبرى."""
     insider_keywords = [
@@ -1640,6 +1809,13 @@ def send_report(force=False):
     except Exception as e:
         print("Error checking user alerts:", e)
         
+    # ✅ إضافة: فحص رادارات السيولة الاستثنائية وحماية أرباح المحفظة الذكية
+    try:
+        if check_and_send_smart_alerts(parsed_stocks, state_data.get("holdings", {}), state_data):
+            update_github_state(state_data, state_sha)
+    except Exception as e:
+        print("Error checking smart algorithmic alerts:", e)
+        
     try:
         if news_chunks:
             for i, chunk in enumerate(news_chunks):
@@ -2210,22 +2386,431 @@ def ask_financial_advisor(question):
     raw_res = ask_ai(prompt)
     return format_ai_response_for_telegram(raw_res)
 
+def fetch_stock_fundamentals(ticker):
+    """جلب مضاعفات التقييم والبيانات الأساسية ونسبة الديون للتحقق الشرعي من TradingView."""
+    ticker_clean = ticker.upper().replace(".CA", "").replace("EGX:", "").strip()
+    url = "https://scanner.tradingview.com/egypt/scan"
+    payload = {
+        "symbols": {"tickers": [f"EGX:{ticker_clean}"]},
+        "columns": [
+            "close", "market_cap_basic", "price_earnings_ttm", "price_book_fq",
+            "dividend_yield_recent", "earnings_per_share_diluted_ttm",
+            "total_debt", "total_assets"
+        ]
+    }
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = requests.post(url, json=payload, headers=headers, timeout=12)
+        if r.status_code == 200:
+            data = r.json().get("data", [])
+            if data:
+                d = data[0]["d"]
+                close = d[0] or 0.0
+                mcap = d[1] or 0.0
+                pe = d[2]
+                pb = d[3]
+                div_yield = d[4]
+                eps = d[5]
+                debt = d[6] or 0.0
+                assets = d[7] or 0.0
+                debt_ratio = (debt / assets * 100.0) if assets > 0 else 0.0
+                return {
+                    "ticker": ticker_clean,
+                    "close": close,
+                    "mcap": mcap,
+                    "pe": pe,
+                    "pb": pb,
+                    "div_yield": div_yield,
+                    "eps": eps,
+                    "debt": debt,
+                    "assets": assets,
+                    "debt_ratio": debt_ratio
+                }
+    except Exception as e:
+        print(f"Error fetching fundamentals for {ticker_clean}: {e}")
+    return None
+
+def format_fundamental_card(f_data):
+    """تنسيق بطاقة التقييم المالي والتحقق من المعايير الشرعية للديون."""
+    if not f_data:
+        return "⚠️ تعذر جلب البيانات المالية الأساسية لهذا السهم حالياً. يرجى التأكد من رمز السهم."
+    ticker = f_data["ticker"]
+    name = COMPANY_NAMES_AR.get(ticker, ticker)
+    close = f_data["close"]
+    mcap = f_data["mcap"]
+    mcap_str = f"{mcap / 1e9:.2f} مليار ج.م" if mcap >= 1e9 else f"{mcap / 1e6:.1f} مليون ج.م"
+    
+    pe = f_data["pe"]
+    pe_str = f"{pe:.2f}x" if pe is not None else "غير متاح"
+    if pe is not None:
+        if pe <= 10.0: pe_str += " (جاذب جداً 💎)"
+        elif pe <= 16.0: pe_str += " (عادل ومناسب 🟢)"
+        else: pe_str += " (مرتفع نسبياً ⚠️)"
+        
+    pb = f_data["pb"]
+    pb_str = f"{pb:.2f}x" if pb is not None else "غير متاح"
+    
+    eps = f_data["eps"]
+    eps_str = f"{eps:.2f} ج.م" if eps is not None else "غير متاح"
+    
+    div_y = f_data["div_yield"]
+    div_str = f"{div_y:.2f}%" if div_y is not None else "لا توجد توزيعات مسجلة"
+    
+    debt = f_data["debt"]
+    assets = f_data["assets"]
+    debt_str = f"{debt / 1e9:.2f} مليار ج.م" if debt >= 1e9 else f"{debt / 1e6:.1f} مليون ج.م"
+    assets_str = f"{assets / 1e9:.2f} مليار ج.م" if assets >= 1e9 else f"{assets / 1e6:.1f} مليون ج.م"
+    
+    debt_ratio = f_data["debt_ratio"]
+    if debt_ratio <= 30.0:
+        sharia_status = "✅ متوافق تماماً مع المعيار الشرعي للديون (< 30%)"
+    else:
+        sharia_status = f"⚠️ نسبة الديون مرتفعة ({debt_ratio:.1f}% تتجاوز سقف 30%)"
+        
+    msg = (
+        f"🏢 <b>بطاقة التحليل المالي والتقييم: {name} ({ticker})</b>\n\n"
+        f"💵 <b>سعر السهم الحالي:</b> {close:.2f} ج.م\n"
+        f"📊 <b>رأس المال السوقي:</b> {mcap_str}\n\n"
+        f"⚖️ <b>مضاعفات التقييم والأرباح:</b>\n"
+        f"• <b>مضاعف الربحية (P/E TTM):</b> <code>{pe_str}</code>\n"
+        f"• <b>مضاعف القيمة الدفترية (P/B):</b> <code>{pb_str}</code>\n"
+        f"• <b>ربحية السهم (EPS):</b> {eps_str}\n"
+        f"• <b>عائد التوزيعات النقدية:</b> {div_str}\n\n"
+        f"🕌 <b>ملاءمة المعايير الشرعية والملاءة المالية:</b>\n"
+        f"• <b>إجمالي الديون:</b> {debt_str}\n"
+        f"• <b>إجمالي الأصول:</b> {assets_str}\n"
+        f"• <b>نسبة الديون إلى الأصول:</b> <code>{debt_ratio:.1f}%</code>\n"
+        f"• <b>الحالة الشرعية:</b> {sharia_status}\n\n"
+        f"💡 <b>الرأي التقييمي:</b> "
+        + ("السهم يتداول عند مضاعفات ربحية جاذبة جداً تمنحه هامش أمان استثماري قوي." if (pe and pe <= 12) else "السهم يتداول بالقرب من قيمته العادلة، يُفضل مراقبة مناطق الدعم الفنية.")
+    )
+    return msg
+
+def handle_buy_trade(text):
+    """تسجيل شراء كمية وحساب المتوسط المرجح للتكلفة آلياً."""
+    parts = text.split()
+    if len(parts) < 4:
+        return "⚠️ <b>صيغة أمر الشراء:</b>\n<code>/buy [السهم] [الكمية] [سعر_الشراء]</code>\nمثال:\n<code>/buy OCDI 1000 28.50</code>"
+    ticker = parts[1].upper().replace("[", "").replace("]", "").replace(".CA", "").replace("EGX:", "")
+    try:
+        qty = float(parts[2].replace(",", ""))
+        price = float(parts[3].replace(",", ""))
+        if qty <= 0 or price <= 0:
+            return "⚠️ الكمية وسعر الشراء يجب أن تكون أرقاماً موجبة أكبر من الصفر."
+            
+        state_data, state_sha = get_github_state()
+        if "holdings" not in state_data:
+            state_data["holdings"] = {}
+        if "journal" not in state_data:
+            state_data["journal"] = []
+            
+        old_h = state_data["holdings"].get(ticker)
+        if old_h:
+            old_qty = float(old_h.get("qty", 0))
+            old_price = float(old_h.get("buy_price", 0))
+            new_qty = old_qty + qty
+            new_price = (old_qty * old_price + qty * price) / new_qty
+        else:
+            new_qty = qty
+            new_price = price
+            
+        state_data["holdings"][ticker] = {"qty": new_qty, "buy_price": new_price}
+        
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        state_data["journal"].append({
+            "id": len(state_data["journal"]) + 1,
+            "type": "BUY",
+            "ticker": ticker,
+            "qty": qty,
+            "price": price,
+            "date": now_str,
+            "total": qty * price
+        })
+        
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        if update_github_state(state_data, state_sha):
+            return (
+                f"✅ <b>تم تسجيل عملية الشراء بنجاح:</b>\n\n"
+                f"📥 <b>الصفقة:</b> شراء {qty:,.0f} سهم في <b>{name} ({ticker})</b> بسعر {price:.2f} ج.م\n"
+                f"💼 <b>إجمالي المركز الحالي:</b> {new_qty:,.0f} سهم\n"
+                f"⚖️ <b>متوسط سعر التكلفة الجديد:</b> <code>{new_price:.2f} ج.م</code>\n"
+                f"💰 <b>إجمالي القيمة المستثمرة في السهم:</b> {(new_qty * new_price):,.2f} ج.م\n\n"
+                f"يمكنك متابعة الأرباح اللحظية بالضغط على <b>[💼 محفظتي الاستثمارية]</b>."
+            )
+        else:
+            return "❌ فشل حفظ بيانات الشراء على الخادم، يرجى المحاولة لاحقاً."
+    except ValueError:
+        return "⚠️ يرجى التأكد من كتابة الكمية والسعر كأرقام صحيحة."
+
+def handle_sell_trade(text):
+    """تسجيل بيع كمية واحتساب الأرباح المحققة وتحديث رصيد الكاش التراكمي."""
+    parts = text.split()
+    if len(parts) < 4:
+        return "⚠️ <b>صيغة أمر البيع:</b>\n<code>/sell [السهم] [الكمية] [سعر_البيع]</code>\nمثال:\n<code>/sell OCDI 500 31.00</code>"
+    ticker = parts[1].upper().replace("[", "").replace("]", "").replace(".CA", "").replace("EGX:", "")
+    try:
+        qty = float(parts[2].replace(",", ""))
+        sell_price = float(parts[3].replace(",", ""))
+        if qty <= 0 or sell_price <= 0:
+            return "⚠️ الكمية وسعر البيع يجب أن تكون أرقاماً موجبة أكبر من الصفر."
+            
+        state_data, state_sha = get_github_state()
+        holdings = state_data.get("holdings", {})
+        if ticker not in holdings:
+            return f"⚠️ السهم <b>{ticker}</b> غير مسجل في محفظتك حالياً لتتمكن من بيعه."
+            
+        curr_holding = holdings[ticker]
+        curr_qty = float(curr_holding.get("qty", 0))
+        buy_price = float(curr_holding.get("buy_price", 0))
+        
+        if qty > curr_qty:
+            return f"⚠️ الكمية المراد بيعها ({qty:,.0f}) أكبر من الرصيد المتوفر في محفظتك ({curr_qty:,.0f} سهم)."
+            
+        pnl = (sell_price - buy_price) * qty
+        pnl_pct = ((sell_price - buy_price) / buy_price) * 100.0 if buy_price > 0 else 0.0
+        
+        state_data.setdefault("realized_pnl", 0.0)
+        state_data["realized_pnl"] += pnl
+        
+        remaining_qty = curr_qty - qty
+        if remaining_qty <= 0:
+            del state_data["holdings"][ticker]
+        else:
+            state_data["holdings"][ticker]["qty"] = remaining_qty
+            
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        state_data.setdefault("journal", []).append({
+            "id": len(state_data["journal"]) + 1,
+            "type": "SELL",
+            "ticker": ticker,
+            "qty": qty,
+            "price": sell_price,
+            "buy_price": buy_price,
+            "date": now_str,
+            "pnl": pnl,
+            "pnl_pct": pnl_pct
+        })
+        
+        name = COMPANY_NAMES_AR.get(ticker, ticker)
+        pnl_sign = "+" if pnl > 0 else ""
+        pnl_icon = "🟢" if pnl >= 0 else "🔴"
+        
+        if update_github_state(state_data, state_sha):
+            msg = (
+                f"{pnl_icon} <b>تم تنفيذ صفقة البيع واحتساب الربح المحقق:</b>\n\n"
+                f"📤 <b>الصفقة:</b> بيع {qty:,.0f} سهم من <b>{name} ({ticker})</b> بسعر {sell_price:.2f} ج.م\n"
+                f"⚖️ <b>سعر الشراء الأساسي:</b> {buy_price:.2f} ج.م\n"
+                f"💵 <b>الربح/الخسارة المحققة:</b> <code>{pnl_sign}{pnl:,.2f} ج.م</code> ({pnl_sign}{pnl_pct:.2f}%)\n"
+            )
+            if remaining_qty > 0:
+                msg += f"💼 <b>الكمية المتبقية في المحفظة:</b> {remaining_qty:,.0f} سهم\n"
+            else:
+                msg += f"🏁 <b>تم إغلاق كامل المركز في سهم {name}.</b>\n"
+            msg += f"\n🏆 <b>إجمالي الأرباح المحققة التراكمية:</b> <code>{state_data['realized_pnl']:+,.2f} ج.م</code>"
+            return msg
+        else:
+            return "❌ فشل حفظ بيانات البيع على الخادم، يرجى المحاولة لاحقاً."
+    except ValueError:
+        return "⚠️ يرجى التأكد من كتابة الكمية والسعر كأرقام صحيحة."
+
+def format_trade_journal(state_data):
+    """كشف حساب وسجل الصفقات المغلقة ومعدل الصفقات الرابحة Win Rate."""
+    journal = state_data.get("journal", [])
+    realized_pnl = state_data.get("realized_pnl", 0.0)
+    
+    if not journal:
+        return (
+            "📜 <b>سجل الصفقات والتداول الاستثماري</b>\n\n"
+            "لا توجد صفقات مسجلة حتى الآن.\n"
+            "💡 يمكنك البدء بتسجيل صفقاتك فوراً عبر الأوامر:\n"
+            "• <code>/buy [السهم] [الكمية] [سعر_الشراء]</code>\n"
+            "• <code>/sell [السهم] [الكمية] [سعر_البيع]</code>"
+        )
+        
+    sells = [t for t in journal if t.get("type") == "SELL"]
+    buys = [t for t in journal if t.get("type") == "BUY"]
+    
+    winning_trades = [t for t in sells if t.get("pnl", 0) > 0]
+    losing_trades = [t for t in sells if t.get("pnl", 0) < 0]
+    win_rate = (len(winning_trades) / len(sells) * 100.0) if sells else 0.0
+    
+    pnl_sign = "+" if realized_pnl > 0 else ""
+    pnl_icon = "🟢" if realized_pnl >= 0 else "🔴"
+    
+    msg = (
+        "📜 <b>سجل الصفقات وكشف الأرباح المحققة (Trade Journal)</b>\n\n"
+        f"📊 <b>إجمالي العمليات:</b> {len(journal)} (شراء: {len(buys)} | بيع مغلق: {len(sells)})\n"
+        f"🎯 <b>معدل الصفقات الرابحة (Win Rate):</b> <code>{win_rate:.1f}%</code> "
+        f"({len(winning_trades)} رابحة / {len(losing_trades)} خاسرة)\n"
+        f"{pnl_icon} <b>صافي الأرباح المحققة الفعلية:</b> <code>{pnl_sign}{realized_pnl:,.2f} ج.م</code>\n\n"
+        "━━━━━━━━━━━━━━━━━━━\n"
+        "🕒 <b>آخر العمليات المنفذة:</b>\n"
+    )
+    
+    for item in reversed(journal[-6:]):
+        t_sym = item["ticker"]
+        t_name = COMPANY_NAMES_AR.get(t_sym, t_sym)
+        date_str = item.get("date", "")
+        if item["type"] == "BUY":
+            msg += f"• 📥 <b>شراء {t_name}({t_sym}):</b> {item['qty']:,.0f} سهم بسعر {item['price']:.2f} ج ({date_str})\n"
+        else:
+            pnl_val = item.get('pnl', 0)
+            sign = "+" if pnl_val > 0 else ""
+            icon = "🟢" if pnl_val >= 0 else "🔴"
+            msg += f"• {icon} <b>بيع {t_name}({t_sym}):</b> {item['qty']:,.0f} سهم بسعر {item['price']:.2f} ج | ربح: <code>{sign}{pnl_val:,.1f} ج</code> ({sign}{item.get('pnl_pct', 0):.1f}%)\n"
+            
+    return msg
+
+def check_and_send_smart_alerts(parsed_stocks, holdings, state_data):
+    """رادار لحظي لفحص طفرات السيولة والاختراقات وتنبيهات حماية الأرباح أثناء الجلسة."""
+    if not BOT_TOKEN or not CHAT_ID:
+        return False
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    
+    # يعمل فقط في أيام وساعات التداول (الأحد - الخميس من 10:00 إلى 15:00)
+    if now.weekday() in [4, 5] or now.hour < 10 or now.hour >= 15:
+        return False
+        
+    today_str = now.strftime("%Y-%m-%d")
+    sent_alerts = state_data.setdefault("smart_alerts_sent", {})
+    state_modified = False
+    
+    # 1. رادار طفرات السيولة الفورية (Volume Spikes)
+    for ticker, d in parsed_stocks.items():
+        vol = d.get("volume", 0)
+        avg_vol = d.get("avg_vol", 0)
+        if avg_vol > 20000 and vol >= (avg_vol * 2.0):
+            alert_key = f"{today_str}_vol_{ticker}"
+            if alert_key not in sent_alerts:
+                sent_alerts[alert_key] = True
+                state_modified = True
+                name = COMPANY_NAMES_AR.get(ticker, ticker)
+                ratio = vol / avg_vol
+                msg = (
+                    f"⚡ <b>رادار السيولة الاستثنائية (Volume Surge):</b>\n\n"
+                    f"رصد تدفق سيولة ضخم على سهم <b>{name} ({ticker})</b>!\n"
+                    f"📊 <b>حجم التداول اللحظي:</b> {vol:,.0f} سهم ({ratio:.1f} ضعف متوسط 10 أيام!)\n"
+                    f"💵 <b>السعر الحالي:</b> {d.get('close')} ج.م (التغير {d.get('chgPct'):+.2f}%)\n"
+                    f"⚡ <b>مؤشر RSI:</b> {d.get('rsi')} | <b>التوصية الفنية:</b> {d.get('rec')}"
+                )
+                reply_telegram(msg, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+                
+    # 2. رادار حماية الأرباح وتنبيهات وقف الخسارة للمحفظة
+    if holdings:
+        for ticker, h_data in holdings.items():
+            d = parsed_stocks.get(ticker)
+            if not d or d.get("close", 0) <= 0:
+                continue
+            curr_p = d["close"]
+            buy_p = float(h_data.get("buy_price", curr_p))
+            if buy_p <= 0:
+                continue
+            pnl_pct = ((curr_p - buy_p) / buy_p) * 100.0
+            rsi_val = d.get("rsi")
+            name = COMPANY_NAMES_AR.get(ticker, ticker)
+            
+            # جني أرباح ذكي (ربح >= +10% أو RSI >= 75)
+            if pnl_pct >= 10.0 or (rsi_val and rsi_val >= 75.0):
+                tp_key = f"{today_str}_tp_{ticker}"
+                if tp_key not in sent_alerts:
+                    sent_alerts[tp_key] = True
+                    state_modified = True
+                    msg = (
+                        f"🎯 <b>تنبيه ذكي لجني الأرباح (Take-Profit Alert):</b>\n\n"
+                        f"سهم <b>{name} ({ticker})</b> في محفظتك حقق أداءً استثنائياً:\n"
+                        f"💵 <b>السعر الحالي:</b> {curr_p:.2f} ج.م (سعر الشراء: {buy_p:.2f} ج.م)\n"
+                        f"📈 <b>العائد اللحظي:</b> <code>+{pnl_pct:.2f}%</code>\n"
+                        f"⚡ <b>مؤشر RSI:</b> {rsi_val} (منطقة تشبع شرائي مفرط)\n\n"
+                        f"💡 <b>توصية المستشار:</b> يُنصح بجني ربح جزئي (بيع ثلث أو نصف الكمية) وتأمين الأرباح المتبقية بتفعيل وقف خسارة متحرك."
+                    )
+                    reply_telegram(msg, reply_markup=get_portfolio_inline_keyboard(holdings))
+                    
+            # وقف خسارة وقائي (هبوط <= -7.0% أو كسر RSI <= 28)
+            elif pnl_pct <= -7.0 or (rsi_val and rsi_val <= 28.0):
+                sl_key = f"{today_str}_sl_{ticker}"
+                if sl_key not in sent_alerts:
+                    sent_alerts[sl_key] = True
+                    state_modified = True
+                    msg = (
+                        f"⚠️ <b>تنبيه وقائي لحماية رأس المال (Stop-Loss Warning):</b>\n\n"
+                        f"سهم <b>{name} ({ticker})</b> في محفظتك يمر بموجة ضغط بيعي:\n"
+                        f"💵 <b>السعر الحالي:</b> {curr_p:.2f} ج.م (سعر الشراء: {buy_p:.2f} ج.م)\n"
+                        f"📉 <b>نسبة التراجع:</b> <code>{pnl_pct:.2f}%</code>\n"
+                        f"⚡ <b>مؤشر RSI:</b> {rsi_val} (تشبع بيعي حاد)\n\n"
+                        f"💡 <b>توصية المستشار:</b> يُرجى مراجعة نقطة وقف الخسارة الصارمة لمنع تفاقم التراجع أو انتظار إشارة ارتداد واضحة."
+                    )
+                    reply_telegram(msg, reply_markup=get_portfolio_inline_keyboard(holdings))
+                    
+    return state_modified
+
+def check_and_send_pre_market_briefing(state_data):
+    """إرسال مذكرة ما قبل افتتاح الجلسة في تمام 09:30 صباحاً في أيام التداول الرسمية."""
+    if not BOT_TOKEN or not CHAT_ID:
+        return False
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    
+    # أيام التداول في مصر: الأحد (6) إلى الخميس (3)
+    if now.weekday() in [4, 5]:
+        return False
+        
+    # نافذة الوقت: من 09:30 إلى 09:59 صباحاً
+    if not (now.hour == 9 and now.minute >= 30):
+        return False
+        
+    today_str = now.strftime("%Y-%m-%d")
+    if state_data.get("pre_market_sent_date") == today_str:
+        return False
+        
+    print(f"[{now}] Preparing Pre-Market Morning Briefing...")
+    
+    usdegp, gold = fetch_forex_gold()
+    egx33_idx = fetch_egx33_shariah()
+    
+    msg = (
+        "☀️ <b>مذكرة ما قبل افتتاح الجلسة (Pre-Market Briefing)</b>\n"
+        f"📅 <b>تاريخ اليوم:</b> {now.strftime('%Y/%m/%d')} | ⏰ <b>09:30 صباحاً</b>\n\n"
+        "🌍 <b>نبض الأسواق العالمية والماكرو:</b>\n"
+    )
+    if usdegp.get("close"):
+        msg += f"• 💵 <b>الدولار/جنيه (USD/EGP):</b> {usdegp['close']:.2f} ج.م ({usdegp.get('chgPct', 0):+.2f}%)\n"
+    if gold.get("close"):
+        msg += f"• 🪙 <b>أوقية الذهب عالمياً:</b> ${gold['close']:,.2f} ({gold.get('chgPct', 0):+.2f}%)\n"
+    if egx33_idx.get("close"):
+        msg += f"• 🕌 <b>مؤشر الشريعة EGX33:</b> {egx33_idx['close']:,.2f} نقطة\n"
+        
+    msg += (
+        "\n🎯 <b>محاور جلسة اليوم:</b>\n"
+        "1. مراقبة سيولة الافتتاح في أول 30 دقيقة (10:00 - 10:30 ص).\n"
+        "2. التركيز على الأسهم ذات RSI المتوازن والقريبة من متوسطات 20 يوماً.\n"
+        "3. ستبدأ المنصة ببث التقارير اللحظية ورادارات السيولة فور انطلاق التداول.\n\n"
+        "💡 <i>نتمنى لكم جلسة تداول موفقة ومربحة!</i>"
+    )
+    
+    reply_telegram(msg, reply_markup=DEFAULT_KEYBOARD)
+    state_data["pre_market_sent_date"] = today_str
+    return True
+
 def handle_telegram_command(text):
     text_clean = text.strip()
     text_lower = text_clean.lower()
     if text_lower.startswith("/start") or text_lower.startswith("/help") or "مساعدة" in text_clean or "مساعده" in text_clean or "أوامر" in text_clean:
         help_msg = (
             "<b>🤖 أهلاً بك في منصة تداول أسهم الشريعة المؤسسية!</b>\n\n"
-            "إليك الأزرار الذكية المتاحة للضغط المباشر:\n"
-            "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي (P&L).\n"
+            "إليك الأوامر والأزرار الذكية المتاحة:\n"
+            "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي مع أزرار الفحص السريع.\n"
             "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات الفنية.\n"
             "⚡ <b>[⚡ بيان مفصل RSI]</b> أو <code>/rsi</code> : رادار مؤشر القوة النسبية RSI والتشبعات لجميع الأسهم.\n"
+            "📈 <b>[📈 شارت فني]</b> أو <code>/chart [السهم]</code> : رسم بياني بالشموع اليابانية ومؤشرات SMA وRSI.\n"
+            "🏢 <b>[🏢 فحص مالي]</b> أو <code>/fundamental [السهم]</code> : بطاقة التحليل المالي ومضاعفات P/E والديون الشرعية.\n"
+            "📜 <b>[📜 سجل الصفقات]</b> أو <code>/journal</code> : كشف حساب الصفقات المغلقة والأرباح المحققة ونسبة النجاح.\n"
+            "➕ <code>/buy [السهم] [الكمية] [السعر]</code> : تسجيل شراء وحساب متوسط التكلفة تلقائياً.\n"
+            "➖ <code>/sell [السهم] [الكمية] [السعر]</code> : تسجيل بيع واحتساب الأرباح المحققة (Realized P&L).\n"
             "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص الجلسة والتحليل الفني وتوقعات الغد.\n"
-            "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7.\n"
-            "🧠 <b>[🧠 استشارة المحلل الذكي]</b> أو <code>/ask</code> : استشارة المحلل المالي المؤسسي ببيانات السوق والأسعار اللحظية وRSI ومحفظتك.\n"
-            "➕ <code>/set_holding [السهم] [الكمية] [سعر_الشراء]</code> : لتعديل أو تسجيل أسهم محفظتك.\n"
             "⚖️ <code>/compare [سهم1] [سهم2]</code> : مقارنة فنية واستثمارية مباشرة بالذكاء الاصطناعي.\n"
-            "🎯 <code>/alert [السهم] [> أو <] [السعر]</code> : ضبط تنبيه سعري فوري."
+            "🧠 <b>[🧠 استشارة المحلل الذكي]</b> أو <code>/ask</code> : استشارة المحلل المالي المؤسسي ببيانات السوق والأسعار اللحظية.\n"
+            "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7."
         )
         reply_telegram(help_msg, reply_markup=DEFAULT_KEYBOARD)
         
@@ -2239,9 +2824,83 @@ def handle_telegram_command(text):
                     s = json.load(f)
             parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
             pnl_data = calculate_portfolio_pnl(holdings, parsed_stocks)
-            reply_telegram(format_portfolio_pnl_message(pnl_data), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+            reply_telegram(format_portfolio_pnl_message(pnl_data), reply_markup=get_portfolio_inline_keyboard(holdings))
         except Exception as e:
             reply_telegram(f"⚠️ حدث خطأ أثناء حساب المحفظة: {e}")
+            
+    elif text_lower.startswith("/chart") or text_lower.startswith("/شارت") or "شارت فني" in text_clean:
+        args = ""
+        if text_lower.startswith("/chart"):
+            args = text[len("/chart"):].strip()
+        elif text_lower.startswith("/شارت"):
+            args = text[len("/شارت"):].strip()
+        elif "شارت فني" in text_clean:
+            args = ""
+            
+        if not args:
+            reply_telegram(
+                "📈 <b>أمر الشارت الفني بالشموع اليابانية ومؤشر RSI</b>\n\n"
+                "يرجى تحديد السهم المطلوب بعد الأمر. أمثلة:\n"
+                "• <code>/chart OCDI</code>\n"
+                "• <code>/chart طلعت مصطفى</code>\n"
+                "• <code>/chart FWRY</code>"
+            )
+            return
+            
+        detected = detect_stocks_in_query(args)
+        ticker = detected[0] if detected else args.upper().replace(".CA", "").replace("EGX:", "").strip()
+        c_name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        reply_telegram(f"🔄 جاري رسم الشارت الفني المتقدم لسهم <b>{c_name} ({ticker})</b>...")
+        chart_file, caption = generate_candlestick_chart(ticker)
+        if chart_file and os.path.exists(chart_file):
+            send_telegram_photo(chart_file, caption)
+            try:
+                os.remove(chart_file)
+            except Exception:
+                pass
+        else:
+            reply_telegram(f"⚠️ {caption}")
+            
+    elif text_lower.startswith("/fundamental") or text_lower.startswith("/مالي") or "فحص مالي" in text_clean:
+        args = ""
+        if text_lower.startswith("/fundamental"):
+            args = text[len("/fundamental"):].strip()
+        elif text_lower.startswith("/مالي"):
+            args = text[len("/مالي"):].strip()
+        elif "فحص مالي" in text_clean:
+            args = ""
+            
+        if not args:
+            reply_telegram(
+                "🏢 <b>بطاقة التحليل المالي ومضاعفات التقييم والديون</b>\n\n"
+                "يرجى كتابة رمز أو اسم السهم بعد الأمر. أمثلة:\n"
+                "• <code>/fundamental TMGH</code>\n"
+                "• <code>/fundamental سوديك</code>\n"
+                "• <code>/fundamental فوري</code>"
+            )
+            return
+            
+        detected = detect_stocks_in_query(args)
+        ticker = detected[0] if detected else args.upper().replace(".CA", "").replace("EGX:", "").strip()
+        c_name = COMPANY_NAMES_AR.get(ticker, ticker)
+        
+        reply_telegram(f"🔄 جاري استخراج البيانات المالية ومضاعفات التقييم لسهم <b>{c_name} ({ticker})</b>...")
+        f_data = fetch_stock_fundamentals(ticker)
+        reply_telegram(format_fundamental_card(f_data), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+        
+    elif text_lower.startswith("/buy") or text_lower.startswith("/شراء"):
+        reply_telegram(handle_buy_trade(text))
+        
+    elif text_lower.startswith("/sell") or text_lower.startswith("/بيع"):
+        reply_telegram(handle_sell_trade(text))
+        
+    elif text_lower.startswith("/journal") or text_lower.startswith("/history") or "سجل الصفقات" in text_clean:
+        try:
+            state_data, _ = get_github_state()
+            reply_telegram(format_trade_journal(state_data), reply_markup=DEFAULT_KEYBOARD)
+        except Exception as e:
+            reply_telegram(f"⚠️ خطأ أثناء فتح سجل الصفقات: {e}")
             
     elif text_lower.startswith("/report") or "تقرير الأسعار" in text_clean or "تقرير الاسعار" in text_clean or "تحديث فوري" in text_clean:
         reply_telegram("🔄 جاري تحديث بيانات السوق وبث التقرير اللحظي فوراً...")
@@ -2443,6 +3102,17 @@ def poll_telegram_messages():
                             handle_telegram_command("/summary")
                         elif cb_data == "btn_ask_help":
                             handle_telegram_command("/ask")
+                        elif cb_data == "btn_journal":
+                            handle_telegram_command("/journal")
+                        elif cb_data.startswith("deepdive_"):
+                            ticker = cb_data.replace("deepdive_", "").upper()
+                            c_name = COMPANY_NAMES_AR.get(ticker, ticker)
+                            reply_telegram(f"🔄 جاري تحليل سهم <b>{c_name} ({ticker})</b> عبر المحلل المؤسسي الذكي...")
+                            try:
+                                analysis = ask_financial_advisor(f"ما تحليلك الفني والاستثماري لسهم {c_name} ({ticker}) ومستويات الدعم والمقاومة والفرص اللحظية؟")
+                                reply_telegram(analysis, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
+                            except Exception as e:
+                                reply_telegram(f"⚠️ حدث خطأ: {e}")
                         elif cb_data == "btn_status":
                             handle_telegram_command("/status")
                     continue
@@ -2658,6 +3328,14 @@ if __name__ == "__main__":
                 enter_perpetual_sleep_and_relay()
                 sys.exit(0)
                 
+            # فحص إرسال مذكرة ما قبل الافتتاح الصباحية (09:30 ص)
+            try:
+                state_data, state_sha = get_github_state()
+                if check_and_send_pre_market_briefing(state_data):
+                    update_github_state(state_data, state_sha)
+            except Exception as e:
+                print("Error checking pre-market briefing:", e)
+
             # خلال ساعات الجلسة (من 08:45 صباحاً حتى 14:30 ظهراً)
             if 8 * 60 + 45 <= current_time_minutes <= 14 * 60 + 30:
                 send_report()
