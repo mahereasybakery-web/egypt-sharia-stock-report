@@ -102,41 +102,41 @@ COMPANY_WEBSITES = {
 COMPANY_NAMES_AR = {
     # المحفظة (Portfolio)
     "ETEL": "المصرية للاتصالات",
-    "TMGH": "مجموعة طلعت مصطفى",
-    "EFIH": "إي فاينانس للاستثمارات",
+    "TMGH": "طلعت مصطفى",
+    "EFIH": "إي فاينانس",
     "EGAL": "مصر للألومنيوم",
-    "ADIB": "مصرف أبوظبي الإسلامي",
-    "ORHD": "أوراسكوم للتنمية مصر",
-    "OCDI": "سوديك (السادس من أكتوبر)",
-    "EFID": "إيديتا للصناعات الغذائية",
-    "FWRY": "فوري للمدفوعات الإلكترونية",
-    "RACC": "راية لخدمات مراكز الاتصالات",
+    "ADIB": "أبوظبي الإسلامي",
+    "ORHD": "أوراسكوم للتنمية",
+    "OCDI": "سوديك",
+    "EFID": "إيديتا",
+    "FWRY": "فوري",
+    "RACC": "راية مراكز",
     # قائمة المتابعة (Watchlist)
-    "ORAS": "أوراسكوم كونستراكشون",
-    "PHDC": "بالم هيلز للتعمير",
-    "SKPC": "سيدي كرير للبتروكيماويات",
-    "MCQE": "مصر للأسمنت قنا",
-    "FAITA": "بنك فيصل الإسلامي (دولار)",
-    "FAIT": "بنك فيصل الإسلامي (جنيه)",
-    "ISPH": "ابن سينا فارما",
-    "JUFO": "جهينة للصناعات الغذائية",
-    "AMOC": "الإسكندرية للزيوت المعدنية (أموك)",
-    "MASR": "مدينة مصر للإسكان والتعمير",
-    "ORWE": "النساجون الشرقيون",
-    "RMDA": "العاشر من رمضان (راميدا)",
-    "OLFI": "عبور لاند للصناعات الغذائية",
+    "ORAS": "أوراسكوم للإنشاء",
+    "PHDC": "بالم هيلز",
+    "SKPC": "سيدي كرير",
+    "MCQE": "أسمنت قنا",
+    "FAITA": "فيصل (دولار)",
+    "FAIT": "فيصل (جنيه)",
+    "ISPH": "ابن سينا",
+    "JUFO": "جهينة",
+    "AMOC": "أموك",
+    "MASR": "مدينة مصر",
+    "ORWE": "النساجون",
+    "RMDA": "راميدا",
+    "OLFI": "عبور لاند",
     "ARCC": "العربية للأسمنت",
-    "IFAP": "الدولية للمحاصيل الزراعية",
-    "MTIE": "إم إم جروب للصناعة والتجارة",
-    "SAUD": "بنك البركة مصر",
-    "ATQA": "مصر الوطنية للصلب (عتاقة)",
-    "CIRA": "القاهرة للاستثمار والتنمية العقارية (سيرا)",
+    "IFAP": "الدولية للمحاصيل",
+    "MTIE": "إم إم جروب",
+    "SAUD": "بنك البركة",
+    "ATQA": "حديد عتاقة",
+    "CIRA": "سيرا للتعليم",
     "EGAS": "غاز مصر",
     "MPCO": "المنصورة للدواجن",
-    "ACGC": "العربية لحليج الأقطان",
-    "ETRS": "المصرية لخدمات النقل (إيجيترانس)",
+    "ACGC": "العربية للأقطان",
+    "ETRS": "إيجيترانس",
     "LCSW": "ليسيكو مصر",
-    "ICFC": "الدولية للأسمدة والكيماويات"
+    "ICFC": "الدولية للأسمدة"
 }
 
 # Stock keywords for news filtering
@@ -1283,11 +1283,11 @@ def fetch_all_data_tv(tickers, strings):
             
             rec_str = ""
             if rec_val is not None:
-                if rec_val >= 0.5: rec_str = f"🚀 {strings['strong_buy']}"
-                elif rec_val >= 0.1: rec_str = f"📈 {strings['buy']}"
-                elif rec_val <= -0.5: rec_str = f"📉 {strings['strong_sell']}"
-                elif rec_val <= -0.1: rec_str = f"🔻 {strings['sell']}"
-                else: rec_str = "⏸️ محايد"
+                if rec_val >= 0.5: rec_str = strings.get('strong_buy', 'شراء قوي')
+                elif rec_val >= 0.1: rec_str = strings.get('buy', 'شراء')
+                elif rec_val <= -0.5: rec_str = strings.get('strong_sell', 'بيع قوي')
+                elif rec_val <= -0.1: rec_str = strings.get('sell', 'بيع')
+                else: rec_str = "محايد"
             if sym in indices:
                 indices[sym] = {"close": c, "open": o, "chgPct": chg, "volume": vol_val, "val_traded": val_traded}
             else:
@@ -1572,17 +1572,10 @@ def send_report(force=False):
         ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
         name_ar = COMPANY_NAMES_AR.get(k, k)
+        rec_part = f" | {item['rec']}" if item.get("rec") else ""
+        msg_portfolio += f"{s['rlm']}{dir_emoji} {name_ar}({ticker_html}): {item['open']} {s['e_arrow']} {item['close']} ({chg_str}){rec_part}\n"
         
-        extra_badges = []
-        if item.get("rsi_tag"):
-            extra_badges.append(item["rsi_tag"])
-        if item.get("vol_spike"):
-            extra_badges.append("🔥 سيولة")
-        badge_str = f" [{ ' | '.join(extra_badges) }]" if extra_badges else ""
-        rsi_str = f" | RSI:{item['rsi']}" if item.get("rsi") is not None else ""
-        msg_portfolio += f"{s['rlm']}{dir_emoji} <b>{name_ar} ({ticker_html})</b>: {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
-        
-    msg_watchlist = f"{s['rlm']}<b>{watch_header}:</b>\n"
+    msg_watchlist += f"{s['rlm']}<b>{watch_header}:</b>\n"
     for k in sorted_watch:
         item = parsed_stocks[k]
         val = item["chgPct"]
@@ -1591,15 +1584,8 @@ def send_report(force=False):
         ticker_link = COMPANY_WEBSITES.get(k, "#")
         ticker_html = f"<a href='{ticker_link}'>{k}</a>" if ticker_link != "#" else k
         name_ar = COMPANY_NAMES_AR.get(k, k)
-        
-        extra_badges = []
-        if item.get("rsi_tag"):
-            extra_badges.append(item["rsi_tag"])
-        if item.get("vol_spike"):
-            extra_badges.append("🔥 سيولة")
-        badge_str = f" [{ ' | '.join(extra_badges) }]" if extra_badges else ""
-        rsi_str = f" | RSI:{item['rsi']}" if item.get("rsi") is not None else ""
-        msg_watchlist += f"{s['rlm']}{dir_emoji} <b>{name_ar} ({ticker_html})</b>: {item['open']} {s['e_arrow']} <b>{item['close']}</b> ({chg_str}) | {item['rec']}{rsi_str}{badge_str}\n"
+        rec_part = f" | {item['rec']}" if item.get("rec") else ""
+        msg_watchlist += f"{s['rlm']}{dir_emoji} {name_ar}({ticker_html}): {item['open']} {s['e_arrow']} {item['close']} ({chg_str}){rec_part}\n"
     
     # === Build Indices & Currencies Section (separate message) ===
     def fmt_chg(val):
