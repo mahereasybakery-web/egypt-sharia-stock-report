@@ -1,0 +1,31 @@
+{
+  "updated_at": "2026-09-16T13:30:00Z",
+  "indices": {
+    "EGX33": { "name": "مؤشر الشريعة EGX 33", "close": 3380.45, "chgPct": 1.15, "status": "bullish" },
+    "EGX30": { "name": "مؤشر EGX 30", "close": 31450.20, "chgPct": 0.82, "status": "bullish" },
+    "EGX70": { "name": "مؤشر الشركات الصغيرة EGX 70", "close": 7820.15, "chgPct": 1.45, "status": "bullish" }
+  },
+  "fx_gold": {
+    "usd_egp": { "close": 52.15, "chgPct": 0.46, "unit": "ج.م" },
+    "gold_24k": { "close": 4340.91, "chgPct": 1.11, "unit": "ج.م/جرام" }
+  },
+  "ai_pulse": {
+    "sentiment": "bullish",
+    "score": 78,
+    "lead_sector": "الأسمدة والبتروكيماويات والتصدير",
+    "text": "يشهد مؤشر الشريعة EGX33 حركة تجميع إيجابية بقيادة قطاع البتروكيماويات والتصدير، مع دخول سيولة استثمارية ملحوظة في أسهم الأسمدة. التوصية: التركيز على أسهم التدفقات النقدية ذات مكررات الربحية الأقل من 7.5x مع اقتناص الارتدادات الفنية في الأسهم ذات مؤشر RSI < 40 وهامش أمان استثماري يفوق 20%."
+  },
+  "insider_deals": [
+    { "ticker": "TMGH", "name": "طلعت مصطفى", "type": "شراء مجلس إدارة", "qty": 250000, "price": 95.20, "val_m": 23.8, "date": "2026/09/16" },
+    { "ticker": "SKPC", "name": "سيدي كرير", "type": "شراء مجموعة مرتبطة", "qty": 400000, "price": 18.15, "val_m": 7.2, "date": "2026/09/16" },
+    { "ticker": "FWRY", "name": "فوري للمدفوعات", "type": "صفقة كبرى (Block)", "qty": 1200000, "price": 18.90, "val_m": 22.6, "date": "2026/09/15" },
+    { "ticker": "MFPC", "name": "موبكو للأسمدة", "type": "شراء مجلس إدارة", "qty": 150000, "price": 48.20, "val_m": 7.23, "date": "2026/09/15" }
+  ],
+  "dividends_calendar": [
+    { "ticker": "ABUK", "name": "أبو قير للأسمدة", "coupon": 7.50, "yield_pct": 11.8, "cum_date": "أكتوبر 2026", "pay_date": "نوفمبر 2026" },
+    { "ticker": "MFPC", "name": "موبكو للأسمدة", "coupon": 4.25, "yield_pct": 9.2, "cum_date": "مارس 2026", "pay_date": "إبريل 2026" },
+    { "ticker": "ORWE", "name": "النساجون الشرقيون", "coupon": 2.40, "yield_pct": 9.0, "cum_date": "إبريل 2026", "pay_date": "مايو 2026" },
+    { "ticker": "AMOC", "name": "أموك للبترول", "coupon": 1.10, "yield_pct": 8.4, "cum_date": "سبتمبر 2026", "pay_date": "أكتوبر 2026" },
+    { "ticker": "SKPC", "name": "سيدي كرير", "coupon": 1.50, "yield_pct": 8.2, "cum_date": "مارس 2026", "pay_date": "إبريل 2026" }
+  ]
+}
