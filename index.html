@@ -2,14 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة تقرير الأسهم المصرية المتوافقة مع الشريعة | Institutional Sharia Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>منصة تقرير الأسهم المصرية المتوافقة مع الشريعة | EGX Sharia Portal</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -29,9 +31,10 @@
                             900: '#064e3b',
                         },
                         dark: {
-                            bg: '#0f172a',
-                            card: '#1e293b',
-                            border: '#334155'
+                            bg: '#0b0f19',
+                            card: '#151d2f',
+                            card2: '#1b253b',
+                            border: '#24324d'
                         }
                     }
                 }
@@ -41,395 +44,588 @@
     <style>
         body {
             font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         .glass-card {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(21, 29, 47, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-cairo selection:bg-emerald-500 selection:text-white pb-12">
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen font-cairo selection:bg-emerald-500 selection:text-white pb-24">
 
-    <!-- Header / Navbar -->
-    <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-xl">
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg">
                     ☪️
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                        منظومة الأسهم الشرعية والمحفظة الذكية
-                        <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">EGX Sharia 33</span>
+                    <h1 class="text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
+                        منظومة الأسهم الشرعية
+                        <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-medium">EGX 33</span>
                     </h1>
-                    <p class="text-xs text-slate-400">البورصة المصرية • تقارير مؤسسية لحظية • معايير AAOIFI الشرعية</p>
+                    <p class="text-[10px] text-slate-400">البورصة المصرية • معايير AAOIFI • تحديث لحظي</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-300 border border-emerald-800">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    نظام المراقبة السحابي 24/7 نشط
-                </span>
-                <a href="https://t.me" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
-                    🤖 تليجرام البوت
-                </a>
+            <div class="flex items-center gap-2">
+                <button onclick="refreshData()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث فوري">
+                    <span id="refreshIcon" class="inline-block transition-transform duration-500">🔄</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Ticker Bar (Horizontal Scrollable) -->
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pt-3 text-[11px]">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">الدولار:</span>
+                <span class="font-bold text-white">52.15 ج</span>
+                <span class="text-emerald-400 text-[10px]">▲ +0.46%</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">ذهب 24:</span>
+                <span class="font-bold text-amber-300">4,340.9 ج</span>
+                <span class="text-emerald-400 text-[10px]">▲ +1.11%</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">أزيموت جولد (AZG):</span>
+                <span class="font-bold text-amber-400">23.96 ج</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">ثندر جولد:</span>
+                <span class="font-bold text-amber-400">1.68 ج</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">مصر شريعة (CMS):</span>
+                <span class="font-bold text-sky-400">22.72 ج</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">بلتون وفرة (BWA):</span>
+                <span class="font-bold text-sky-400">2.21 ج</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">نعيم مصر (NMF):</span>
+                <span class="font-bold text-sky-400">50.19 ج</span>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <!-- Main Tab Views Container -->
+    <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4">
 
-        <!-- Market Ticker / Indices Bar -->
-        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">مؤشر EGX 33 Shariah</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-white">3,380.45</span>
-                    <span class="text-xs font-bold text-emerald-400">▲ +1.15%</span>
+        <!-- ================= TAB 1: RADAR & STOCKS ================= -->
+        <section id="view-radar" class="tab-content space-y-3.5">
+            <!-- Search & Filter Controls -->
+            <div class="glass-card rounded-2xl p-3 space-y-2.5">
+                <div class="relative">
+                    <input id="searchInput" type="text" oninput="filterStocks()" placeholder="🔍 ابحث عن أي سهم أو رمز (مثال: طلعت مصطفى، فوري، TMGH)..." 
+                           class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none transition">
+                </div>
+                <!-- Filter Pills -->
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
+                    <button onclick="setFilter('all', this)" class="filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل (38)</button>
+                    <button onclick="setFilter('gainers', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🚀 الأعلى صعوداً</button>
+                    <button onclick="setFilter('value', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">💎 فرص القيمة</button>
+                    <button onclick="setFilter('oversold', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">⚡ تشبع بيعي ارتداد</button>
+                    <button onclick="setFilter('funds', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🪙 صناديق الذهب والأسهم</button>
                 </div>
             </div>
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">مؤشر EGX 30</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-white">31,240.10</span>
-                    <span class="text-xs font-bold text-emerald-400">▲ +0.82%</span>
-                </div>
-            </div>
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">ذهب عيار 24 (مصر)</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-amber-300">4,065 ج</span>
-                    <span class="text-xs font-semibold text-slate-400">للجرام</span>
-                </div>
-            </div>
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">صندوق أزيموت جولد (AZG)</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-amber-400">22.84 ج</span>
-                    <span class="text-xs font-bold text-emerald-400">▲ +0.45%</span>
-                </div>
-            </div>
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">صندوق ثندر جولد (THNDR)</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-amber-400">14.15 ج</span>
-                    <span class="text-xs font-bold text-emerald-400">▲ +0.30%</span>
-                </div>
-            </div>
-            <div class="glass-card rounded-xl p-3.5 flex flex-col justify-between">
-                <span class="text-xs text-slate-400 font-medium">صندوق بشاير مصر (BWA)</span>
-                <div class="flex items-baseline justify-between mt-1">
-                    <span class="text-lg font-bold text-sky-400">105.60 ج</span>
-                    <span class="text-xs font-bold text-emerald-400">▲ +0.90%</span>
-                </div>
+
+            <!-- Stocks List Container -->
+            <div id="stocksContainer" class="space-y-2">
+                <!-- Dynamically populated via JS -->
             </div>
         </section>
 
-        <!-- Two Central Pillars: Portfolio & Market Radar -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- Left Pillar: Portfolio Allocation & P&L (Col Span 1) -->
-            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            💼 <span>توزيع الأصول والقطاعات</span>
-                        </h2>
-                        <span class="text-xs text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">
-                            موزع استثمارياً
-                        </span>
-                    </div>
-                    <div class="relative h-56 flex items-center justify-center">
-                        <canvas id="portfolioChart"></canvas>
-                    </div>
+        <!-- ================= TAB 2: PORTFOLIO & ALLOCATION ================= -->
+        <section id="view-portfolio" class="tab-content space-y-3.5 hidden">
+            <!-- P&L Summary Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div class="glass-card rounded-xl p-3">
+                    <span class="text-[11px] text-slate-400">القيمة الإجمالية</span>
+                    <div id="p_total_val" class="text-base font-bold text-white mt-0.5">38,940 ج.م</div>
                 </div>
-
-                <div class="space-y-2 border-t border-slate-800 pt-3 text-xs">
-                    <div class="flex justify-between py-1 text-slate-300">
-                        <span>إجمالي الأسهم المحتواة:</span>
-                        <span class="font-bold text-white">33 سهماً شرعياً</span>
-                    </div>
-                    <div class="flex justify-between py-1 text-slate-300">
-                        <span>أعلى وزن قطاعي:</span>
-                        <span class="font-bold text-emerald-400">العقارات والإنشاءات (34%)</span>
-                    </div>
-                    <div class="flex justify-between py-1 text-slate-300">
-                        <span>التحوط ضد التضخم:</span>
-                        <span class="font-bold text-amber-400">الذهب والتصدير (28%)</span>
-                    </div>
+                <div class="glass-card rounded-xl p-3">
+                    <span class="text-[11px] text-slate-400">صافي الأرباح المحققة</span>
+                    <div class="text-base font-bold text-emerald-400 mt-0.5">+4,820 ج.م</div>
+                </div>
+                <div class="glass-card rounded-xl p-3">
+                    <span class="text-[11px] text-slate-400">العائد الاستثماري</span>
+                    <div class="text-base font-bold text-emerald-400 mt-0.5">+14.1%</div>
+                </div>
+                <div class="glass-card rounded-xl p-3">
+                    <span class="text-[11px] text-slate-400">تقييم الأمان والمناعة</span>
+                    <div class="text-base font-bold text-emerald-400 mt-0.5">ممتاز (A-)</div>
                 </div>
             </div>
 
-            <!-- Right Pillar: Top Opportunities & Radar Cards (Col Span 2) -->
-            <div class="lg:col-span-2 space-y-6">
-
-                <!-- Institutional Features Highlights (The 8 New Engines) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-emerald-500/50 transition cursor-pointer">
-                        <div class="text-emerald-400 font-bold text-sm mb-1">⚡ الدايفرجنس الإيجابي</div>
-                        <p class="text-xs text-slate-400 leading-relaxed">رصد انحراف مؤشر الزخم RSI صعوداً مع ثبات السعر.</p>
-                        <span class="inline-block mt-2 text-[10px] text-emerald-400 font-mono">أمر /divergence</span>
-                    </div>
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-emerald-500/50 transition cursor-pointer">
-                        <div class="text-sky-400 font-bold text-sm mb-1">🎯 مصفوفة السعر العادل</div>
-                        <p class="text-xs text-slate-400 leading-relaxed">3 سيناريوهات تقييمية (متفائل / أساسي / متحفظ).</p>
-                        <span class="inline-block mt-2 text-[10px] text-sky-400 font-mono">أمر /target [السهم]</span>
-                    </div>
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-emerald-500/50 transition cursor-pointer">
-                        <div class="text-amber-400 font-bold text-sm mb-1">💰 رادار الكوبونات</div>
-                        <p class="text-xs text-slate-400 leading-relaxed">عوائد التوزيعات النقدية السنوية ومواعيد الاستحقاق.</p>
-                        <span class="inline-block mt-2 text-[10px] text-amber-400 font-mono">أمر /dividends</span>
-                    </div>
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 hover:border-emerald-500/50 transition cursor-pointer">
-                        <div class="text-purple-400 font-bold text-sm mb-1">🕵️ صفقات الداخليين</div>
-                        <p class="text-xs text-slate-400 leading-relaxed">تتبع عمليات شراء مجالس الإدارات وكبار المساهمين.</p>
-                        <span class="inline-block mt-2 text-[10px] text-purple-400 font-mono">أمر /insiders</span>
-                    </div>
+            <!-- Sector Donut Chart -->
+            <div class="glass-card rounded-2xl p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        💼 <span>توزيع الأصول والقطاعات الاستثمارية</span>
+                    </h2>
+                    <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-medium">توازن مثالي</span>
                 </div>
-
-                <!-- Stock Watchlist Table -->
-                <div class="glass-card rounded-2xl p-5 overflow-hidden">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            📊 <span>رادار الأسهم الشرعية القيادية (عينة فورية)</span>
-                        </h2>
-                        <span class="text-xs text-slate-400">يتم التحديث لحظياً عبر TradingView</span>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right text-xs">
-                            <thead class="text-slate-400 border-b border-slate-800 bg-slate-900/40">
-                                <tr>
-                                    <th class="py-2.5 px-3">السهم</th>
-                                    <th class="py-2.5 px-3">السعر اللحظي</th>
-                                    <th class="py-2.5 px-3">التغير %</th>
-                                    <th class="py-2.5 px-3">RSI (14)</th>
-                                    <th class="py-2.5 px-3">مكرر الأرباح P/E</th>
-                                    <th class="py-2.5 px-3">التوصية الفنية</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800/60 font-medium">
-                                <tr class="hover:bg-slate-800/40 transition">
-                                    <td class="py-2.5 px-3 flex items-center gap-2">
-                                        <span class="font-bold text-white">طلعت مصطفى</span>
-                                        <span class="text-[10px] text-slate-400">TMGH</span>
-                                    </td>
-                                    <td class="py-2.5 px-3 font-bold text-white">58.40 ج</td>
-                                    <td class="py-2.5 px-3 text-emerald-400 font-bold">+2.10%</td>
-                                    <td class="py-2.5 px-3 text-slate-200">54.2</td>
-                                    <td class="py-2.5 px-3 text-slate-300">9.2x</td>
-                                    <td class="py-2.5 px-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold">شراء قوي</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/40 transition">
-                                    <td class="py-2.5 px-3 flex items-center gap-2">
-                                        <span class="font-bold text-white">سوديك للتنمية</span>
-                                        <span class="text-[10px] text-slate-400">OCDI</span>
-                                    </td>
-                                    <td class="py-2.5 px-3 font-bold text-white">35.20 ج</td>
-                                    <td class="py-2.5 px-3 text-emerald-400 font-bold">+1.44%</td>
-                                    <td class="py-2.5 px-3 text-slate-200">48.6</td>
-                                    <td class="py-2.5 px-3 text-slate-300">7.8x</td>
-                                    <td class="py-2.5 px-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold">شراء</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/40 transition">
-                                    <td class="py-2.5 px-3 flex items-center gap-2">
-                                        <span class="font-bold text-white">فوري لتكنولوجيا المدفوعات</span>
-                                        <span class="text-[10px] text-slate-400">FWRY</span>
-                                    </td>
-                                    <td class="py-2.5 px-3 font-bold text-white">19.10 ج</td>
-                                    <td class="py-2.5 px-3 text-emerald-400 font-bold">+3.24%</td>
-                                    <td class="py-2.5 px-3 text-emerald-400">62.1</td>
-                                    <td class="py-2.5 px-3 text-slate-300">18.4x</td>
-                                    <td class="py-2.5 px-3"><span class="bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold">زخم إيجابي</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/40 transition">
-                                    <td class="py-2.5 px-3 flex items-center gap-2">
-                                        <span class="font-bold text-white">سيدي كرير للبتروكيماويات</span>
-                                        <span class="text-[10px] text-slate-400">SKPC</span>
-                                    </td>
-                                    <td class="py-2.5 px-3 font-bold text-white">28.90 ج</td>
-                                    <td class="py-2.5 px-3 text-slate-400">0.00%</td>
-                                    <td class="py-2.5 px-3 text-slate-200">42.5</td>
-                                    <td class="py-2.5 px-3 text-slate-300">5.9x</td>
-                                    <td class="py-2.5 px-3"><span class="bg-sky-950 text-sky-300 px-2 py-0.5 rounded text-[10px] font-bold">فرصة قيمة</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-800/40 transition">
-                                    <td class="py-2.5 px-3 flex items-center gap-2">
-                                        <span class="font-bold text-white">أموك للبترول</span>
-                                        <span class="text-[10px] text-slate-400">AMOC</span>
-                                    </td>
-                                    <td class="py-2.5 px-3 font-bold text-white">8.95 ج</td>
-                                    <td class="py-2.5 px-3 text-rose-400 font-bold">-0.55%</td>
-                                    <td class="py-2.5 px-3 text-amber-400">33.8</td>
-                                    <td class="py-2.5 px-3 text-slate-300">6.4x</td>
-                                    <td class="py-2.5 px-3"><span class="bg-amber-950 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">تشبع بيعي (ارتداد)</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="relative h-56 flex items-center justify-center">
+                    <canvas id="portfolioDonutChart"></canvas>
                 </div>
-
             </div>
-        </section>
 
-        <!-- Interactive Calculators: Smart DCA & Zakat Widget -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Smart DCA Calculator Widget -->
-            <div class="glass-card rounded-2xl p-5">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                    📉 <span>حاسبة التبريد وتعديل متوسط التكلفة (Smart DCA)</span>
+            <!-- Holdings Detail Table -->
+            <div class="glass-card rounded-2xl p-4 space-y-3">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    📜 <span>أسهم المحفظة الحالية (الأسعار اللحظية والأرباح)</span>
                 </h3>
-                <p class="text-xs text-slate-400 mb-4">احسب الكمية الدقيقة والسيولة المطلوبة لخفض متوسط سعر شرائك إلى المتوسط المستهدف.</p>
-                
-                <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
+                            <tr>
+                                <th class="pb-2">السهم</th>
+                                <th class="pb-2">الكمية</th>
+                                <th class="pb-2">سعر الشراء</th>
+                                <th class="pb-2">السعر الحالي</th>
+                                <th class="pb-2">الربح/الخسارة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdingsTableBody" class="divide-y divide-slate-800/60 font-medium">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Stress Test Shock Matrix -->
+            <div class="glass-card rounded-2xl p-4 space-y-2.5">
+                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    💥 <span>محاكي اختبار ضغط وصدمات السوق (Stress Test)</span>
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="p-2 bg-rose-950/40 border border-rose-900/50 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-rose-300">هبوط المؤشر العام (-7.0%)</span>
+                            <p class="text-[10px] text-slate-400">تراجع عام في السوق</p>
+                        </div>
+                        <span class="text-rose-400 font-bold">-7.0% (-2,725 ج)</span>
+                    </div>
+                    <div class="p-2 bg-emerald-950/40 border border-emerald-900/50 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-emerald-300">تحريك سعر الصرف (+10% للدولار)</span>
+                            <p class="text-[10px] text-slate-400">ارتفاع أرباح التصدير والذهب</p>
+                        </div>
+                        <span class="text-emerald-400 font-bold">+5.2% (+2,024 ج)</span>
+                    </div>
+                    <div class="p-2 bg-amber-950/40 border border-amber-900/50 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-amber-300">قفزة تاريخية في الذهب (+15%)</span>
+                            <p class="text-[10px] text-slate-400">مكاسب صناديق الذهب والتحوط</p>
+                        </div>
+                        <span class="text-amber-400 font-bold">+4.1% (+1,596 ج)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: SMART DCA CALCULATOR ================= -->
+        <section id="view-dca" class="tab-content space-y-3.5 hidden">
+            <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        📉 <span>حاسبة التبريد وتعديل متوسط التكلفة (Smart DCA)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">احسب الكمية الدقيقة والسيولة النقدية المطلوبة لخفض متوسط تكلفتك إلى السعر المستهدف.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">الكمية الحالية</label>
-                        <input id="dca_q1" type="number" value="1000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-emerald-500 outline-none">
+                        <label class="block text-[11px] text-slate-400 mb-1">الكمية المملوكة حالياً</label>
+                        <input id="calc_q1" type="number" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
                     </div>
                     <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">سعر الشراء الحالي</label>
-                        <input id="dca_p1" type="number" value="40" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-emerald-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">المتوسط المستهدف</label>
-                        <input id="dca_target" type="number" value="35" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-emerald-500 outline-none">
+                        <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء الحالي</label>
+                        <input id="calc_p1" type="number" value="97.88" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
                     </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-[11px] text-slate-400 mb-1">سعر السوق للشراء الجديد (سعر الهبوط)</label>
-                    <input id="dca_p2" type="number" value="30" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:border-emerald-500 outline-none">
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">سعر الشراء الجديد (سعر الهبوط)</label>
+                        <input id="calc_p2" type="number" value="85.00" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">المتوسط الجديد المستهدف</label>
+                        <input id="calc_target" type="number" value="90.00" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
+                    </div>
                 </div>
 
-                <button onclick="calculateDCA()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 rounded-lg transition shadow-md shadow-emerald-600/20">
+                <button onclick="runDcaCalculation()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">
                     حساب خطة التبريد الذكية
                 </button>
 
-                <div id="dca_result" class="mt-4 p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-300 hidden">
+                <div id="calc_dca_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
+                    <!-- DCA Results -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: ZAKAT & SHARIA ================= -->
+        <section id="view-zakat" class="tab-content space-y-3.5 hidden">
+            <!-- Zakat Calculator Widget -->
+            <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        🕌 <span>حاسبة زكاة الأسهم والمحفظة (معايير AAOIFI)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">حساب زكاة عروض التجارة والأسهم حسب المعايير الشرعية المعتمدة (2.577% للسنة الميلادية).</p>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1">إجمالي القيمة السوقية لمحفظتك (ج.م)</label>
+                    <input id="zakat_val" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="calculateZakat('speculative')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl border border-slate-700 active:scale-95 transition font-medium">
+                        💼 نية المضاربة والتداول
+                    </button>
+                    <button onclick="calculateZakat('investor')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl border border-slate-700 active:scale-95 transition font-medium">
+                        🏢 نية الاستثمار طويل الأجل
+                    </button>
+                </div>
+
+                <div id="zakat_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-1.5 hidden">
+                    <!-- Zakat Results -->
                 </div>
             </div>
 
-            <!-- Stress Test Simulator Summary -->
-            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                        💥 <span>محاكي اختبار ضغط وصدمات السوق (Stress Test)</span>
-                    </h3>
-                    <p class="text-xs text-slate-400 mb-4">محاكاة مقاومة المحفظة لثلاث سيناريوهات أزمات حقيقية:</p>
-
-                    <div class="space-y-3 text-xs">
-                        <div class="p-2.5 bg-rose-950/40 border border-rose-900/50 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-rose-300">هبوط تصحيحي عام (-7.5%)</span>
-                                <p class="text-[10px] text-slate-400">تراجع المؤشر العام EGX30 بمقدار 2,300 نقطة</p>
-                            </div>
-                            <span class="text-rose-400 font-bold">-7.5%</span>
-                        </div>
-
-                        <div class="p-2.5 bg-emerald-950/40 border border-emerald-900/50 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-emerald-300">تحريك سعر الصرف والدولار (+10%)</span>
-                                <p class="text-[10px] text-slate-400">ارتفاع أرباح أسهم التصدير وصناديق الذهب</p>
-                            </div>
-                            <span class="text-emerald-400 font-bold">+5.4%</span>
-                        </div>
-
-                        <div class="p-2.5 bg-amber-950/40 border border-amber-900/50 rounded-xl flex items-center justify-between">
-                            <div>
-                                <span class="font-bold text-amber-300">قفزة أسعار الفائدة بمقدار 200 نقطة</span>
-                                <p class="text-[10px] text-slate-400">ضغط على الشركات ذات المديونية المرتفعة</p>
-                            </div>
-                            <span class="text-amber-400 font-bold">-2.1%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-800 pt-3 mt-4 text-[11px] text-slate-400">
-                    🛡️ درجة مناعة المحفظة: <b class="text-emerald-400">قوية جداً (A-)</b> بفضل التوازن القطاعي وحصانة أسهم الشريعة ذات المديونيات المتدنية.
-                </div>
+            <!-- Sharia Guidelines Card -->
+            <div class="glass-card rounded-2xl p-4 space-y-2 text-xs">
+                <h3 class="font-bold text-white">ضوابط التوافق الشرعي للأسهم (EGX Shariah 33):</h3>
+                <ul class="space-y-1 text-slate-300 text-[11px] list-disc list-inside leading-relaxed">
+                    <li><b>نسبة الديون الربوية:</b> إجمالي القروض ذات الفائدة أقل من 30% من القيمة السوقية للشركة.</li>
+                    <li><b>الاستثمارات والودائع بفائدة:</b> أقل من 30% من إجمالي الأصول.</li>
+                    <li><b>الإيرادات غير المتوافقة:</b> أقل من 5% من إجمالي إيرادات الشركة، وتُخرج للتطهير.</li>
+                </ul>
             </div>
         </section>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
-        <p>منظومة التحليل والتدقيق المالي للأسهم المتوافقة مع الشريعة الإسلامية بالبورصة المصرية</p>
-        <p class="mt-1">مبني وفق معايير AAOIFI الشرعية وتوجيهات SOCPA والمحاسبة المالية الدولية • نظام ترحيل سحابي متصل دائماً (24/7)</p>
-    </footer>
+    <!-- Bottom Fixed Tab Bar for Telegram Mobile -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0b0f19]/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-2">
+        <div class="max-w-md mx-auto grid grid-cols-4 gap-1 text-center text-[10px]">
+            <button onclick="switchTab('radar', this)" class="tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95">
+                <span class="text-base">⚡</span>
+                <span>رادار الأسهم</span>
+            </button>
+            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+                <span class="text-base">💼</span>
+                <span>المحفظة</span>
+            </button>
+            <button onclick="switchTab('dca', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+                <span class="text-base">📉</span>
+                <span>التبريد DCA</span>
+            </button>
+            <button onclick="switchTab('zakat', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+                <span class="text-base">🕌</span>
+                <span>الزكاة والشرعية</span>
+            </button>
+        </div>
+    </nav>
 
-    <!-- Chart.js Script -->
+    <!-- Core App Logic & Data Script -->
     <script>
-        const ctx = document.getElementById('portfolioChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['العقارات والإنشاءات', 'البتروكيماويات والأسمدة', 'الذهب وصناديق التحوط', 'التكنولوجيا والمدفوعات', 'الأغذية والأدوية', 'الصناعة والتصدير'],
-                datasets: [{
-                    data: [34, 22, 16, 12, 10, 6],
-                    backgroundColor: [
-                        '#10b981', // emerald
-                        '#0ea5e9', // sky
-                        '#f59e0b', // amber
-                        '#8b5cf6', // purple
-                        '#ec4899', // pink
-                        '#64748b'  // slate
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#94a3b8',
-                            font: {
-                                family: 'Cairo',
-                                size: 10
-                            },
-                            boxWidth: 10
-                        }
-                    }
-                },
-                cutout: '70%'
-            }
-        });
+        // 1. Initialize Telegram WebApp SDK
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
+            if (tg.setHeaderColor) tg.setHeaderColor('#0b0f19');
+            if (tg.setBackgroundColor) tg.setBackgroundColor('#0b0f19');
+        }
 
-        function calculateDCA() {
-            const q1 = parseFloat(document.getElementById('dca_q1').value) || 0;
-            const p1 = parseFloat(document.getElementById('dca_p1').value) || 0;
-            const target = parseFloat(document.getElementById('dca_target').value) || 0;
-            const p2 = parseFloat(document.getElementById('dca_p2').value) || 0;
-            const resDiv = document.getElementById('dca_result');
+        function triggerHaptic(style = 'light') {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred(style);
+            }
+        }
+
+        // 2. Comprehensive Stocks & Funds Database
+        const STOCKS_DATA = [
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 48.69, chg: 4.71, rsi: 73.2, pe: 6.8, type: "stock", rec: "شراء قوي" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13.45, chg: 2.83, rsi: 66.2, pe: 6.4, type: "stock", rec: "شراء وتجميع" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 14.40, chg: 2.64, rsi: 58.7, pe: 8.2, type: "stock", rec: "اتجاه صاعد" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 221.00, chg: 2.42, rsi: 46.2, pe: 5.9, type: "stock", rec: "محايد إيجابي" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23.38, chg: 1.65, rsi: 61.3, pe: 7.1, type: "stock", rec: "شراء" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89.00, chg: 1.25, rsi: 59.2, pe: 6.5, type: "stock", rec: "شراء" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.33, chg: 1.00, rsi: 44.6, pe: 5.4, type: "stock", rec: "استقرار" },
+            { ticker: "ARCC", name: "العربية للأسمنت", close: 73.03, chg: 0.90, rsi: 50.6, pe: 7.0, type: "stock", rec: "شراء" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 26.80, chg: 0.90, rsi: 52.0, pe: 6.9, type: "stock", rec: "تماسك قوي" },
+            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 46.90, chg: 0.90, rsi: 65.2, pe: 4.8, type: "stock", rec: "شراء" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.25, chg: 0.83, rsi: 57.2, pe: 5.8, type: "stock", rec: "زخم صاعد" },
+            { ticker: "ATQA", name: "حديد عتاقة", close: 12.58, chg: 0.64, rsi: 63.8, pe: 6.1, type: "stock", rec: "شراء" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 364.00, chg: 0.39, rsi: 57.4, pe: 5.2, type: "stock", rec: "تحوط وتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.88, chg: -0.11, rsi: 44.6, pe: 18.2, type: "stock", rec: "منطقة تجميع" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 30.00, chg: 0.00, rsi: 40.8, pe: 7.6, type: "stock", rec: "دعم فني رئيسي" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 95.00, chg: -0.98, rsi: 38.5, pe: 9.1, type: "stock", rec: "ارتداد متوقع" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.77, chg: -0.29, rsi: 31.1, pe: 6.8, type: "stock", rec: "تشبع بيعي حاد" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.20, chg: -3.02, rsi: 39.1, pe: 8.0, type: "stock", rec: "اقتراب من القاع" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 131.30, chg: -0.53, rsi: 75.1, pe: 6.0, type: "stock", rec: "تشبع شرائي" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 23.27, chg: -1.06, rsi: 46.7, pe: 14.5, type: "stock", rec: "تجميع هادئ" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 52.01, chg: -0.15, rsi: 47.0, pe: 4.2, type: "stock", rec: "محايد إيجابي" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 23.10, chg: -0.43, rsi: 47.4, pe: 4.1, type: "stock", rec: "محايد" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.89, chg: 0.13, rsi: 47.8, pe: 6.5, type: "stock", rec: "محايد" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 30.80, chg: 1.02, rsi: 49.3, pe: 11.2, type: "stock", rec: "محايد" },
+            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.14, chg: 0.49, rsi: 51.9, pe: 7.8, type: "stock", rec: "شراء" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 42.35, chg: -0.28, rsi: 52.9, pe: 8.5, type: "stock", rec: "شراء" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 124.45, chg: -0.84, rsi: 53.6, pe: 7.4, type: "stock", rec: "محايد" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27.08, chg: 0.30, rsi: 54.1, pe: 9.3, type: "stock", rec: "شراء" },
+            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 837.01, chg: -0.96, rsi: 57.1, pe: 7.9, type: "stock", rec: "شراء" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.00, chg: -2.03, rsi: 60.0, pe: 12.1, type: "stock", rec: "شراء" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.45, rsi: 55.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.30, rsi: 54.0, pe: null, type: "fund", rec: "صندوق الذهب" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي" }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderStocks() {
+            const container = document.getElementById('stocksContainer');
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = STOCKS_DATA.filter(s => {
+                const matchSearch = s.name.toLowerCase().includes(search) || s.ticker.toLowerCase().includes(search);
+                if (!matchSearch) return false;
+
+                if (currentFilter === 'gainers') return s.chg > 1.0;
+                if (currentFilter === 'value') return s.pe && s.pe <= 7.5;
+                if (currentFilter === 'oversold') return s.rsi && s.rsi <= 42.0;
+                if (currentFilter === 'funds') return s.type === 'fund';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400">لا توجد نتائج مطابقة لبحثك</div>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                const isPos = s.chg >= 0;
+                const chgColor = isPos ? 'text-emerald-400' : 'text-rose-400';
+                const chgBg = isPos ? 'bg-emerald-950/70 border-emerald-800' : 'bg-rose-950/70 border-rose-800';
+                const sign = isPos ? '+' : '';
+                
+                let rsiBadge = '';
+                if (s.rsi) {
+                    const rsiColor = s.rsi <= 35 ? 'text-amber-400' : s.rsi >= 70 ? 'text-purple-400' : 'text-slate-300';
+                    rsiBadge = `<span class="text-[10px] ${rsiColor}">RSI: <b>${s.rsi.toFixed(1)}</b></span>`;
+                }
+
+                const peBadge = s.pe ? `<span class="text-[10px] text-slate-400">P/E: <b>${s.pe}x</b></span>` : '';
+
+                const card = document.createElement('div');
+                card.className = "glass-card rounded-xl p-3 flex items-center justify-between hover:border-slate-600 transition active:scale-99";
+                card.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-white">${s.name}</span>
+                            <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${s.ticker}</span>
+                            ${s.type === 'fund' ? '<span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1 rounded">صندوق</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-2.5 text-xs text-slate-400">
+                            ${rsiBadge}
+                            ${peBadge}
+                            <span class="text-[10px] text-slate-400">• ${s.rec}</span>
+                        </div>
+                    </div>
+
+                    <div class="text-left space-y-0.5">
+                        <div class="text-sm font-bold text-white">${s.close.toFixed(2)} <span class="text-[10px] font-normal text-slate-400">ج.م</span></div>
+                        <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
+                            ${sign}${s.chg.toFixed(2)}%
+                        </span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterStocks() {
+            renderStocks();
+        }
+
+        function setFilter(f, btn) {
+            triggerHaptic('selection');
+            currentFilter = f;
+            document.querySelectorAll('.filter-pill').forEach(b => {
+                b.className = "filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700";
+            });
+            btn.className = "filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm";
+            renderStocks();
+        }
+
+        // 3. Tab Switching
+        function switchTab(tabId, btn) {
+            triggerHaptic('medium');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('view-' + tabId);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.className = "tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95";
+            });
+            btn.className = "tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95";
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. Smart DCA Logic
+        function runDcaCalculation() {
+            triggerHaptic('medium');
+            const q1 = parseFloat(document.getElementById('calc_q1').value) || 0;
+            const p1 = parseFloat(document.getElementById('calc_p1').value) || 0;
+            const p2 = parseFloat(document.getElementById('calc_p2').value) || 0;
+            const target = parseFloat(document.getElementById('calc_target').value) || 0;
+            const out = document.getElementById('calc_dca_output');
 
             if (target <= p2) {
-                resDiv.innerHTML = '<span class="text-rose-400 font-bold">⚠️ السعر المستهدف يجب أن يكون أعلى من سعر الشراء الجديد (سعر الهبوط).</span>';
-                resDiv.classList.remove('hidden');
+                out.innerHTML = '<span class="text-rose-400 font-bold">⚠️ السعر المستهدف يجب أن يكون أعلى من سعر الشراء الجديد (سعر الهبوط).</span>';
+                out.classList.remove('hidden');
                 return;
             }
 
             const q2 = Math.ceil((q1 * (p1 - target)) / (target - p2));
             const cost = q2 * p2;
-            const newTotalQty = q1 + q2;
-            const newAvg = ((q1 * p1) + cost) / newTotalQty;
+            const totalQ = q1 + q2;
+            const newAvg = ((q1 * p1) + cost) / totalQ;
 
-            resDiv.innerHTML = `
-                <div class="space-y-1.5">
-                    <div class="font-bold text-emerald-400">✅ خطة التبريد المحسوبة بدقة:</div>
-                    <div>عدد الأسهم المطلوب شراؤها: <b class="text-white">${q2.toLocaleString()} سهم</b> بسعر <b class="text-white">${p2.toFixed(2)} ج</b></div>
-                    <div>السيولة النقدية الإضافية المطلوبة: <b class="text-amber-400">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م</b></div>
-                    <div>إجمالي كمية المحفظة الجديدة: <b class="text-white">${newTotalQty.toLocaleString()} سهم</b></div>
-                    <div>متوسط التكلفة الجديد المحقق: <b class="text-emerald-400">${newAvg.toFixed(2)} ج.م</b> (بانخفاض ${(p1 - newAvg).toFixed(2)} ج للسهم)</div>
-                </div>
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400">✅ خطة التبريد المحسوبة بدقة:</div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>عدد الأسهم المطلوب شراؤها:</span><b class="text-white">${q2.toLocaleString()} سهم</b></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>السيولة النقدية المطلوبة:</span><b class="text-amber-400">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م</b></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>إجمالي كمية المحفظة الجديدة:</span><b class="text-white">${totalQ.toLocaleString()} سهم</b></div>
+                <div class="flex justify-between pt-0.5"><span>متوسط التكلفة الجديد:</span><b class="text-emerald-400">${newAvg.toFixed(2)} ج.م (توفير ${(p1 - newAvg).toFixed(2)} ج للسهم)</b></div>
             `;
-            resDiv.classList.remove('hidden');
+            out.classList.remove('hidden');
         }
+
+        // 5. Zakat Calculator
+        function calculateZakat(type) {
+            triggerHaptic('medium');
+            const val = parseFloat(document.getElementById('zakat_val').value) || 0;
+            const out = document.getElementById('zakat_output');
+            
+            let rate = 0.02577; // الميلادية
+            let zakat = 0;
+            let note = "";
+
+            if (type === 'speculative') {
+                zakat = val * rate;
+                note = "زكاة عروض التجارة (المضارب): تزكى كامل القيمة السوقية للمحفظة في يوم الحول.";
+            } else {
+                // المستثمر طويل الأجل يزكي الموجودات الزكوية فقط (متوسط 25% من القيمة)
+                zakat = val * 0.25 * rate;
+                note = "زكاة المستثمر طويل الأجل (النماء): تزكى الأصول المتداولة الزكوية للشركات (حوالي 25% من القيمة السوقية).";
+            }
+
+            out.innerHTML = `
+                <div class="font-bold text-amber-300">🕌 مقدار الزكاة المستحقة شرعاً:</div>
+                <div class="text-base font-bold text-white">${zakat.toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م</div>
+                <p class="text-[10px] text-slate-400 leading-relaxed">${note}</p>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 6. Refresh Button Animation
+        function refreshData() {
+            triggerHaptic('medium');
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('rotate-180');
+            setTimeout(() => {
+                icon.classList.remove('rotate-180');
+                renderStocks();
+            }, 600);
+        }
+
+        // 7. Initialize Chart & Holdings Table
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStocks();
+
+            // Populate Holdings Table
+            const myHoldings = [
+                { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.14, cur: 131.30 },
+                { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00 },
+                { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.88, cur: 23.27 },
+                { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00 },
+                { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.77, cur: 52.01 },
+                { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 43.43, cur: 42.35 },
+                { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00 },
+                { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80 },
+                { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88 },
+                { ticker: "RACC", name: "راية مراكز", qty: 2, buy: 11.21, cur: 9.65 }
+            ];
+
+            const tbody = document.getElementById('holdingsTableBody');
+            let totalMarketVal = 0;
+            myHoldings.forEach(h => {
+                const pnl = (h.cur - h.buy) * h.qty;
+                const pnlPct = ((h.cur - h.buy) / h.buy) * 100;
+                const isP = pnl >= 0;
+                totalMarketVal += h.cur * h.qty;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40";
+                tr.innerHTML = `
+                    <td class="py-2"><span class="font-bold text-white">${h.name}</span> <span class="text-[9px] text-slate-400">(${h.ticker})</span></td>
+                    <td class="py-2">${h.qty}</td>
+                    <td class="py-2 text-slate-300">${h.buy.toFixed(2)}</td>
+                    <td class="py-2 font-bold text-white">${h.cur.toFixed(2)}</td>
+                    <td class="py-2 font-bold ${isP ? 'text-emerald-400' : 'text-rose-400'}">${isP ? '+' : ''}${pnl.toFixed(1)} (${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('p_total_val').innerText = `${totalMarketVal.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
+
+            // Render Donut Chart
+            const ctx = document.getElementById('portfolioDonutChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['العقارات والإنشاءات', 'البتروكيماويات والأسمدة', 'الذهب وصناديق التحوط', 'التكنولوجيا والمدفوعات', 'الأغذية والأدوية', 'الصناعة والتصدير'],
+                    datasets: [{
+                        data: [34, 22, 16, 12, 10, 6],
+                        backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { family: 'Cairo', size: 10 }, boxWidth: 10 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        });
     </script>
 </body>
 </html>
