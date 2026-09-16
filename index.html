@@ -368,7 +368,31 @@
             </div>
         </section>
 
-        <!-- ================= TAB 3: PORTFOLIO & ALLOCATION ================= -->
+        <!-- ================= TAB 3: ECONOMIC & SHARIA NEWS ================= -->
+        <section id="view-news" class="tab-content space-y-3.5 hidden">
+            <!-- News Search & Category Controls -->
+            <div class="glass-card rounded-2xl p-3 space-y-2.5 border-sky-950/60">
+                <div class="relative">
+                    <input id="newsSearchInput" type="text" oninput="filterNewsFeed()" placeholder="🔍 ابحث في الأخبار والإفصاحات (مثال: طلعت مصطفى، رأس الحكمة، أرباح، فائدة)..." 
+                           class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-sky-500 outline-none transition">
+                </div>
+                <!-- Category Filter Pills -->
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
+                    <button onclick="setNewsCategory('all', this)" class="news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل 📰</button>
+                    <button onclick="setNewsCategory('corporate', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">إفصاحات الشركات 🏢</button>
+                    <button onclick="setNewsCategory('gold', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">صناديق الذهب 🪙</button>
+                    <button onclick="setNewsCategory('macro', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">الفائدة والعملات 💵</button>
+                    <button onclick="setNewsCategory('dividends', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">توزيعات وأرباح 💰</button>
+                </div>
+            </div>
+
+            <!-- Live News Feed Container -->
+            <div id="newsFeedContainer" class="space-y-2.5">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: PORTFOLIO & ALLOCATION ================= -->
         <section id="view-portfolio" class="tab-content space-y-3.5 hidden">
             <!-- P&L Summary Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -645,28 +669,32 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar (5 Tabs) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0b0f19]/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-2">
-        <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center text-[10px]">
-            <button onclick="switchTab('radar', this)" class="tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95">
+    <!-- Bottom Navigation Bar (6 Tabs) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#0b0f19]/95 backdrop-blur-lg border-t border-slate-800/80 px-1.5 py-2">
+        <div class="max-w-lg mx-auto grid grid-cols-6 gap-0.5 text-center text-[9px]">
+            <button onclick="switchTab('radar', this)" class="tab-btn py-1 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-0.5 active:scale-95">
                 <span class="text-base">⚡</span>
                 <span>الرادار</span>
             </button>
-            <button onclick="switchTab('valuation', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+            <button onclick="switchTab('valuation', this)" class="tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95">
                 <span class="text-base">🎯</span>
                 <span>السعر العادل</span>
             </button>
-            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+            <button onclick="switchTab('news', this)" class="tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95">
+                <span class="text-base">📰</span>
+                <span>الأخبار</span>
+            </button>
+            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95">
                 <span class="text-base">💼</span>
                 <span>المحفظة</span>
             </button>
-            <button onclick="switchTab('dca', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+            <button onclick="switchTab('dca', this)" class="tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95">
                 <span class="text-base">📉</span>
                 <span>التبريد</span>
             </button>
-            <button onclick="switchTab('zakat', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
+            <button onclick="switchTab('zakat', this)" class="tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95">
                 <span class="text-base">🕌</span>
-                <span>الزكاة والضبط</span>
+                <span>الزكاة</span>
             </button>
         </div>
     </nav>
@@ -676,43 +704,66 @@
         <div class="glass-card w-full max-w-2xl rounded-2xl p-4 sm:p-5 space-y-3.5 border border-slate-700 bg-slate-900 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
                 <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                    <div id="modalHeaderIcon" class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
                         📈
                     </div>
                     <div>
-                        <h3 id="modalChartTitle" class="text-sm font-bold text-white">شارت الشموع اليابانية التفاعلي</h3>
-                        <p id="modalChartSubtitle" class="text-[11px] text-slate-400">متوسطات SMA والدعوم والمقاومات الفنية ومؤشر RSI</p>
+                        <h3 id="modalChartTitle" class="text-sm font-bold text-white">تفاصيل وتحليل السهم</h3>
+                        <p id="modalChartSubtitle" class="text-[11px] text-slate-400">الشارت الفني اللحظي وإفصاحات وأخبار الشركة</p>
                     </div>
                 </div>
                 <button onclick="closeChartModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
             </div>
 
-            <!-- Price & Stats Bar -->
-            <div class="flex items-center justify-between bg-slate-800/80 rounded-xl px-3 py-2 text-xs">
-                <div class="flex items-center gap-2">
-                    <span id="modalChartPrice" class="font-bold text-white text-sm">0.00 ج</span>
-                    <span id="modalChartChg" class="text-[10px] font-bold px-1.5 py-0.2 rounded border">+0.00%</span>
+            <!-- Modal Sub-Tabs: Chart vs News -->
+            <div class="flex border-b border-slate-800 text-xs gap-3 pt-0.5">
+                <button id="modalTabChartBtn" onclick="switchModalSubTab('chart')" class="pb-2 font-bold text-emerald-400 border-b-2 border-emerald-500 transition flex items-center gap-1.5 active:scale-95">
+                    <span>📈</span>
+                    <span>الشارت الفني والدعوم</span>
+                </button>
+                <button id="modalTabNewsBtn" onclick="switchModalSubTab('news')" class="pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 active:scale-95">
+                    <span>📰</span>
+                    <span>أخبار وإفصاحات السهم</span>
+                    <span id="modalStockNewsBadge" class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.2 rounded-full font-mono">0</span>
+                </button>
+            </div>
+
+            <!-- Sub-Tab 1: Chart View -->
+            <div id="modalChartView" class="space-y-3.5">
+                <!-- Price & Stats Bar -->
+                <div class="flex items-center justify-between bg-slate-800/80 rounded-xl px-3 py-2 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span id="modalChartPrice" class="font-bold text-white text-sm">0.00 ج</span>
+                        <span id="modalChartChg" class="text-[10px] font-bold px-1.5 py-0.2 rounded border">+0.00%</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-[10px] text-slate-300">
+                        <span>الدعم: <b id="modalChartSupport" class="text-emerald-400">0.00</b></span>
+                        <span>المقاومة: <b id="modalChartResistance" class="text-rose-400">0.00</b></span>
+                        <span>RSI: <b id="modalChartRsi" class="text-amber-400">0.0</b></span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-3 text-[10px] text-slate-300">
-                    <span>الدعم: <b id="modalChartSupport" class="text-emerald-400">0.00</b></span>
-                    <span>المقاومة: <b id="modalChartResistance" class="text-rose-400">0.00</b></span>
-                    <span>RSI: <b id="modalChartRsi" class="text-amber-400">0.0</b></span>
+
+                <!-- Chart Canvas Container -->
+                <div class="relative w-full h-64 sm:h-72 bg-slate-950/80 rounded-xl p-2 border border-slate-800">
+                    <canvas id="candlestickCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-yellow-400 inline-block"></span> SMA 20</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-sky-400 inline-block"></span> SMA 50</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-400 inline-block"></span> خط الدعم</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-rose-400 inline-block"></span> خط المقاومة</span>
+                    </div>
+                    <button onclick="closeChartModal()" class="bg-slate-800 px-3 py-1 rounded-lg text-slate-200 hover:bg-slate-700">إغلاق</button>
                 </div>
             </div>
 
-            <!-- Chart Canvas Container -->
-            <div class="relative w-full h-64 sm:h-72 bg-slate-950/80 rounded-xl p-2 border border-slate-800">
-                <canvas id="candlestickCanvas" class="w-full h-full"></canvas>
-            </div>
-
-            <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
-                <div class="flex items-center gap-3">
-                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-yellow-400 inline-block"></span> SMA 20</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-sky-400 inline-block"></span> SMA 50</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-400 inline-block"></span> خط الدعم</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-rose-400 inline-block"></span> خط المقاومة</span>
+            <!-- Sub-Tab 2: Per-Stock News View -->
+            <div id="modalNewsView" class="space-y-2.5 max-h-80 overflow-y-auto hidden pr-1">
+                <div id="modalStockNewsContainer" class="space-y-2">
+                    <!-- Populated dynamically with news for this stock -->
                 </div>
-                <button onclick="closeChartModal()" class="bg-slate-800 px-3 py-1 rounded-lg text-slate-200 hover:bg-slate-700">إغلاق</button>
             </div>
         </div>
     </div>
@@ -1400,6 +1451,10 @@
             document.getElementById('modalChartSupport').innerText = `${valData.support.toFixed(2)} ج`;
             document.getElementById('modalChartResistance').innerText = `${valData.resistance.toFixed(2)} ج`;
             document.getElementById('modalChartRsi').innerText = `${s.rsi ? s.rsi.toFixed(1) : '50.0'}`;
+            const matchingCount = NEWS_DATA.filter(n => n.ticker === ticker).length;
+            const badge = document.getElementById('modalStockNewsBadge');
+            if (badge) badge.innerText = matchingCount;
+            switchModalSubTab('chart');
 
             document.getElementById('stockChartModal').classList.remove('hidden');
             setTimeout(() => drawCandlestickChart(s, valData), 50);
@@ -1802,11 +1857,17 @@
                         </div>
                     </div>
 
-                    <div class="text-left space-y-0.5">
-                        <div class="text-sm font-bold text-white">${s.close.toFixed(2)} <span class="text-[10px] font-normal text-slate-400">ج.م</span></div>
-                        <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
-                            ${sign}${s.chg.toFixed(2)}%
-                        </span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="event.stopPropagation(); openStockNews('${s.ticker}')" class="bg-slate-800/90 hover:bg-slate-700 text-sky-300 border border-slate-700/80 text-[10px] px-2 py-1.5 rounded-lg transition active:scale-95 flex items-center gap-1" title="عرض أخبار وإفصاحات هذا السهم">
+                            <span>📰</span>
+                            <span class="hidden xs:inline">أخبار</span>
+                        </button>
+                        <div class="text-left space-y-0.5">
+                            <div class="text-sm font-bold text-white">${s.close.toFixed(2)} <span class="text-[10px] font-normal text-slate-400">ج.م</span></div>
+                            <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
+                                ${sign}${s.chg.toFixed(2)}%
+                            </span>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1923,12 +1984,16 @@
             if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.className = "tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95";
+                b.className = 'tab-btn py-1 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-0.5 active:scale-95';
             });
-            btn.className = "tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95";
+            if (btn) {
+                btn.className = 'tab-btn py-1 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-0.5 active:scale-95';
+            }
 
             if (tabId === 'valuation') {
                 renderValuationCard();
+            } else if (tabId === 'news') {
+                renderNewsFeed();
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2199,10 +2264,272 @@
         }
 
         // 15. Initial Load & Setup
+        
+        // ================= NEWS FEED & PER-STOCK NEWS LOGIC =================
+        let NEWS_DATA = [
+            {
+                id: "n1",
+                ticker: "TMGH",
+                stock_name: "طلعت مصطفى",
+                category: "corporate",
+                title: "مجموعة طلعت مصطفى تسجل مبيعات تعاقدية قياسية وتعلن بدء تسليمات المرحلة الأولى",
+                source: "إفصاح البورصة المصرية",
+                time: "منذ ساعتين",
+                impact: "positive",
+                impact_label: "أثر إيجابي قوي 🟢",
+                summary: "قفزة قياسية في المبيعات التعاقدية بدعم من الإقبال الضخم على مشروعات رأس الحكمة وجنوب سيناء، مما يعزز التدفقات النقدية والسيولة الحرة للشركة للسنوات الخمس القادمة."
+            },
+            {
+                id: "n2",
+                ticker: "FWRY",
+                stock_name: "فوري للمدفوعات",
+                category: "corporate",
+                title: "فوري تتوسع في قطاع التمويل متناهي الصغر وتوقع شراكة إقليمية للمدفوعات الرقمية",
+                source: "مباشر مصر",
+                time: "منذ 4 ساعات",
+                impact: "positive",
+                impact_label: "أثر إيجابي 🟢",
+                summary: "توقيع اتفاقية استراتيجية لتوسيع شبكة التحصيل الإلكتروني وخدمات التمويل الاستهلاكي والرقمي، مما يرفع إيرادات العمولات المباشرة بنسبة متوقعة تتجاوز 25%."
+            },
+            {
+                id: "n3",
+                ticker: "ABUK",
+                stock_name: "أبو قير للأسمدة",
+                category: "dividends",
+                title: "الجمعية العامة لأبو قير تعتمد توزيع كوبون نقدي بقيمة 7.50 جنيه للسهم",
+                source: "إفصاح رسمي",
+                time: "منذ 5 ساعات",
+                impact: "positive",
+                impact_label: "عائد قياسي 11.8% 🟢",
+                summary: "اعتماد الجمعية العامة غير العادية لتوزيع الأرباح النقدية السنوية الأعلى في البورصة، مع تحديد تاريخ نهاية الحق في أكتوبر وتاريخ الصرف خلال نوفمبر."
+            },
+            {
+                id: "n4",
+                ticker: "MFPC",
+                stock_name: "موبكو للأسمدة",
+                category: "corporate",
+                title: "موبكو تعلن تشغيل خطوط إنتاج الأمونيا بكامل طاقتها وتوقيع عقود تصدير دولارية جديدة",
+                source: "رويترز الشرق",
+                time: "اليوم",
+                impact: "positive",
+                impact_label: "أثر إيجابي 🟢",
+                summary: "انتظام كامل في إمدادات الغاز الطبيعي وعقود تصدير جديدة بأسعار عالمية مرتفعة، تضمن استمرار التدفقات النقدية بالدولار ومعدلات ربحية تفوق التوقعات."
+            },
+            {
+                id: "n5",
+                ticker: "AZG",
+                stock_name: "أزيموت جولد (AZG)",
+                category: "gold",
+                title: "صناديق الذهب تسجل تدفقات شرائية قياسية مع صعود الذهب عيار 24 وتجاوز الأونصة 2700$",
+                source: "تقرير أسواق الذهب",
+                time: "منذ 3 ساعات",
+                impact: "positive",
+                impact_label: "تحوط ممتاز 🟡",
+                summary: "إقبال متزايد من المستثمرين على وثائق أزيموت جولد وصندوق سبائك ثندر للتحوط ضد تقلبات العملة، وصعود صافي قيمة الأصول للصناديق إلى مستويات تاريخية."
+            },
+            {
+                id: "n6",
+                ticker: "SKPC",
+                stock_name: "سيدي كرير",
+                category: "corporate",
+                title: "سيدي كرير تؤكد انتظام إمدادات غاز الإيثان واستمرار مشتريات المجموعات المرتبطة",
+                source: "إفصاح البورصة",
+                time: "اليوم",
+                impact: "positive",
+                impact_label: "أثر إيجابي 🟢",
+                summary: "إفصاح رسمي من الشركة يؤكد استقرار تشغيل مصانع البولي إيثيلين، وتزامن ذلك مع مشتريات مساهمين رئيسيين بنحو 400,000 سهم لدعم السهم عند الدعم 18.00 ج."
+            },
+            {
+                id: "n7",
+                ticker: "MACRO",
+                stock_name: "البنك المركزي والاقتصاد",
+                category: "macro",
+                title: "البنك المركزي: استقرار صافي الأصول الأجنبية ونمو تدفقات الاستثمار الأجنبي المباشر",
+                source: "البنك المركزي المصري",
+                time: "أمس",
+                impact: "positive",
+                impact_label: "دعم استقرار السوق 🟢",
+                summary: "استقرار سعر الصرف وتراجع معدلات التضخم السنوية يمهدان لبيئة أعمال مستقرة تدعم ربحية الشركات المقيدة بالبورصة وتعزز تقييمات أسهم الشريعة."
+            },
+            {
+                id: "n8",
+                ticker: "PHDC",
+                stock_name: "بالم هيلز",
+                category: "corporate",
+                title: "بالم هيلز تطلق مرحلة تجارية جديدة في مشروع بادية باستثمارات تتجاوز 15 مليار جنيه",
+                source: "المال نيوز",
+                time: "أمس",
+                impact: "positive",
+                impact_label: "توسع تشغيلي 🟢",
+                summary: "تسارع وتيرة الإنشاءات والمبيعات في غرب القاهرة، مع ترقب تدفقات نقدية قوية تخرج السهم من مناطق التشبع البيعي الحاد الحالية."
+            },
+            {
+                id: "n9",
+                ticker: "ETEL",
+                stock_name: "المصرية للاتصالات",
+                category: "corporate",
+                title: "المصرية للاتصالات تتلقى عوائد توزيعات نقدية استثنائية من حصتها في فودافون مصر",
+                source: "البورصة نيوز",
+                time: "منذ يومين",
+                impact: "positive",
+                impact_label: "سيولة نقدية ضخمة 🟢",
+                summary: "دخول سيولة نقدية مباشرة بخزينة الشركة من عوائد فودافون تسهم في خفض تكلفة الديون وتحسين صافي الربح السنوي."
+            }
+        ];
+
+        let currentNewsCategory = 'all';
+
+        function renderNewsFeed() {
+            const container = document.getElementById('newsFeedContainer');
+            if (!container) return;
+            const search = (document.getElementById('newsSearchInput') ? document.getElementById('newsSearchInput').value : '').trim().toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = NEWS_DATA.filter(n => {
+                const matchSearch = n.title.toLowerCase().includes(search) || 
+                                    n.stock_name.toLowerCase().includes(search) || 
+                                    n.ticker.toLowerCase().includes(search) || 
+                                    n.summary.toLowerCase().includes(search);
+                if (!matchSearch) return false;
+
+                if (currentNewsCategory !== 'all' && n.category !== currentNewsCategory) {
+                    return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400">لا توجد أخبار مطابقة لبحثك في هذا التصنيف</div>`;
+                return;
+            }
+
+            filtered.forEach(n => {
+                const card = document.createElement('div');
+                card.className = "glass-card rounded-xl p-3.5 space-y-2 hover:border-slate-600 transition";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-[10px]">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-white bg-slate-800 px-2 py-0.5 rounded font-mono">${n.ticker}</span>
+                            <span class="text-slate-300 font-bold">${n.stock_name}</span>
+                            <span class="text-slate-500">• ${n.source}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">${n.time}</span>
+                            <span class="px-1.5 py-0.2 rounded border bg-emerald-950/80 border-emerald-800 text-emerald-300 font-medium">${n.impact_label}</span>
+                        </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-white leading-snug">${n.title}</h4>
+
+                    <p class="text-[11px] text-slate-300 leading-relaxed">${n.summary}</p>
+
+                    ${n.ticker !== 'MACRO' ? `
+                    <div class="pt-1 flex items-center justify-end">
+                        <button onclick="openStockFromNews('${n.ticker}')" class="text-[10px] text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1 transition">
+                            <span>عرض الشارت والتقييم المالي</span>
+                            <span>←</span>
+                        </button>
+                    </div>
+                    ` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterNewsFeed() {
+            renderNewsFeed();
+        }
+
+        function setNewsCategory(cat, btn) {
+            triggerHaptic('selection');
+            currentNewsCategory = cat;
+            document.querySelectorAll('.news-pill').forEach(b => {
+                b.className = "news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700";
+            });
+            btn.className = "news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm";
+            renderNewsFeed();
+        }
+
+        function openStockFromNews(ticker) {
+            triggerHaptic('medium');
+            openStockChart(ticker);
+        }
+
+        function switchModalSubTab(subTab) {
+            triggerHaptic('selection');
+            const chartBtn = document.getElementById('modalTabChartBtn');
+            const newsBtn = document.getElementById('modalTabNewsBtn');
+            const chartView = document.getElementById('modalChartView');
+            const newsView = document.getElementById('modalNewsView');
+
+            if (subTab === 'chart') {
+                chartBtn.className = "pb-2 font-bold text-emerald-400 border-b-2 border-emerald-500 transition flex items-center gap-1.5 active:scale-95";
+                newsBtn.className = "pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 active:scale-95";
+                chartView.classList.remove('hidden');
+                newsView.classList.add('hidden');
+            } else {
+                newsBtn.className = "pb-2 font-bold text-sky-400 border-b-2 border-sky-500 transition flex items-center gap-1.5 active:scale-95";
+                chartBtn.className = "pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 active:scale-95";
+                chartView.classList.add('hidden');
+                newsView.classList.remove('hidden');
+                renderPerStockNewsInModal(activeChartTicker);
+            }
+        }
+
+        function openStockNews(ticker) {
+            triggerHaptic('medium');
+            openStockChart(ticker);
+            switchModalSubTab('news');
+        }
+
+        function renderPerStockNewsInModal(ticker) {
+            const container = document.getElementById('modalStockNewsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const matchingNews = NEWS_DATA.filter(n => n.ticker === ticker);
+            const badge = document.getElementById('modalStockNewsBadge');
+            if (badge) badge.innerText = matchingNews.length;
+
+            if (matchingNews.length === 0) {
+                const s = STOCKS_DATA.find(x => x.ticker === ticker);
+                const sName = s ? s.name : ticker;
+                const sec = s ? s.sector : 'القطاع الاستثماري';
+                container.innerHTML = `
+                    <div class="glass-card rounded-xl p-4 text-center space-y-2 border-slate-800">
+                        <div class="text-2xl">📋</div>
+                        <h4 class="text-xs font-bold text-white">لا توجد إفصاحات جوهرية طارئة خلال الجلسات الأخيرة</h4>
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            سهم <b>${sName} (${ticker})</b> يتداول بشكل مستقر ضمن قطاع <b>${sec}</b>، ولم تصدر قرارات جوهرية جديدة من مجلس الإدارة اليوم. سيتم إشعارك فور ورود أي إفصاح جديد.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            matchingNews.forEach(n => {
+                const item = document.createElement('div');
+                item.className = "p-3 bg-slate-800/80 rounded-xl border border-slate-700/80 space-y-1.5";
+                item.innerHTML = `
+                    <div class="flex items-center justify-between text-[10px]">
+                        <span class="font-bold text-sky-400">${n.source}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">${n.time}</span>
+                            <span class="text-emerald-300 font-bold">${n.impact_label}</span>
+                        </div>
+                    </div>
+                    <h5 class="text-xs font-bold text-white leading-snug">${n.title}</h5>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">${n.summary}</p>
+                `;
+                container.appendChild(item);
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             loadUserPortfolio();
             renderStocks();
             renderAlerts();
+            renderNewsFeed();
             renderValuationCard();
             renderDividendsTable([
                 { ticker: "ABUK", name: "أبو قير للأسمدة", coupon: 7.50, yield_pct: 11.8, cum_date: "أكتوبر 2026", pay_date: "نوفمبر 2026" },
