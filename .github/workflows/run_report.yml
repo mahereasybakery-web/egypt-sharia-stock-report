@@ -2,9 +2,13 @@ name: Send Sharia Stock Report
 
 on:
   schedule:
-    # Resilient cron grid: every 15 minutes on odd minutes (12, 27, 42, 57) from 05:00 to 12:00 UTC (08:00 to 15:00 Cairo)
-    # Using non-round minutes completely avoids GitHub Actions top-of-hour congestion and queue drops
-    - cron: '12,27,42,57 5-12 * * 0,1,2,3,4'
+    # Emergency safety-net crons (only fire if the perpetual 24/7 cloud relay was somehow stopped):
+    # 08:47 Cairo (05:47 UTC) - Pre-market opening backup
+    - cron: '47 5 * * 0,1,2,3,4'
+    # 09:47 Cairo (06:47 UTC) - Main trading opening backup
+    - cron: '47 6 * * 0,1,2,3,4'
+    # 12:47 Cairo (09:47 UTC) - Mid-day session backup
+    - cron: '47 9 * * 0,1,2,3,4'
   workflow_dispatch:
     inputs:
       force:
