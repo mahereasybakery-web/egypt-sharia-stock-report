@@ -177,8 +177,49 @@ def escape_html(text):
         return ""
     return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-def reply_telegram(text):
-    """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400، ودعم تقسيم الرسائل الطويلة."""
+DEFAULT_KEYBOARD = {
+    "keyboard": [
+        [{"text": "💼 محفظتي الاستثمارية"}, {"text": "📊 تقرير الأسعار"}],
+        [{"text": "📌 ملخص حركة اليوم"}, {"text": "⚙️ حالة النظام"}],
+        [{"text": "❓ مساعدة والأوامر"}]
+    ],
+    "resize_keyboard": True,
+    "is_persistent": True
+}
+
+PORTFOLIO_INLINE_KEYBOARD = {
+    "inline_keyboard": [
+        [
+            {"text": "💼 محفظتي الاستثمارية (P&L)", "callback_data": "btn_portfolio"},
+            {"text": "🔄 تحديث فوري", "callback_data": "btn_report"}
+        ],
+        [
+            {"text": "📌 ملخص الجلسة", "callback_data": "btn_summary"},
+            {"text": "⚙️ حالة النظام", "callback_data": "btn_status"}
+        ]
+    ]
+}
+
+def setup_telegram_bot_menu():
+    """تسجيل قائمة الأوامر الرسمية لتظهر في زر Menu بتطبيق تليجرام تلقائياً."""
+    if not BOT_TOKEN:
+        return
+    commands = [
+        {"command": "portfolio", "description": "💼 كشف حساب المحفظة اللحظي والأرباح"},
+        {"command": "report", "description": "📊 بث تقرير الأسعار والمؤشرات اللحظي"},
+        {"command": "summary", "description": "📌 ملخص الجلسة والتحليل الفني"},
+        {"command": "compare", "description": "⚖️ مقارنة فنية بين سهمين بالذكاء الاصطناعي"},
+        {"command": "alert", "description": "🎯 ضبط تنبيه سعري فوري"},
+        {"command": "ask", "description": "🧠 استشارة المحلل المالي الذكي"},
+        {"command": "status", "description": "⚙️ حالة الخادم وسلسلة الترحيل 24/7"}
+    ]
+    try:
+        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands", json={"commands": commands}, timeout=10)
+    except Exception as e:
+        print("Warning setting bot commands menu:", e)
+
+def reply_telegram(text, reply_markup=None):
+    """دالة موحدة لإرسال Telegram مع فحص status وإعادة محاولة بدون HTML عند 400، ودعم أزرار التحكم التفاعلية."""
     if not BOT_TOKEN or not CHAT_ID:
         return
     
@@ -196,15 +237,18 @@ def reply_telegram(text):
                 chunk.append(line)
                 chunk_len += len(line) + 1
         if chunk:
-            reply_telegram("\n".join(chunk))
+            reply_telegram("\n".join(chunk), reply_markup=reply_markup)
         return
+
+    markup = reply_markup if reply_markup is not None else DEFAULT_KEYBOARD
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": CHAT_ID,
         "text": text,
         "parse_mode": "HTML",
-        "disable_web_page_preview": True
+        "disable_web_page_preview": True,
+        "reply_markup": markup
     }
     try:
         r = requests.post(url, json=payload, timeout=15)
@@ -213,7 +257,8 @@ def reply_telegram(text):
             requests.post(url, json={
                 "chat_id": CHAT_ID,
                 "text": re.sub(r'<[^>]+>', '', text),
-                "disable_web_page_preview": True
+                "disable_web_page_preview": True,
+                "reply_markup": markup
             }, timeout=15)
         elif r.status_code != 200:
             print(f"Telegram reply error {r.status_code}: {r.text[:200]}")
@@ -1506,8 +1551,8 @@ def send_report(force=False):
     msg_indices += f"{s['rlm']}{dir_e(usdegp['chgPct'])} <b>USD/EGP</b>:{s['rlm']} {usdegp['open']} {s['e_arrow']} <b>{usdegp['close']}</b> ({fmt_chg(usdegp['chgPct'])})\n"
     msg_indices += f"{s['rlm']}{dir_e(xauusd['chgPct'])} <b>{s['gold']}</b>:{s['rlm']} {xauusd['open']} {s['e_arrow']} <b>{xauusd['close']}</b>$ ({fmt_chg(xauusd['chgPct'])})\n"
     
-    # ✅ إصلاح: استخدام دالة reply_telegram الموحدة والمؤمنة ضد الطول الزائد والمشاكل البرمجية
-    reply_telegram(msg_portfolio)
+    # ✅ إصلاح: استخدام دالة reply_telegram الموحدة والمؤمنة مع إرفاق أزرار التحكم اللحظية
+    reply_telegram(msg_portfolio, reply_markup=PORTFOLIO_INLINE_KEYBOARD)
     reply_telegram(msg_watchlist)
     reply_telegram(msg_indices)
     
@@ -1839,24 +1884,24 @@ def send_daily_summary():
     return True
 
 def handle_telegram_command(text):
-    text_lower = text.lower()
-    if text_lower.startswith("/start") or text_lower.startswith("/help"):
+    text_clean = text.strip()
+    text_lower = text_clean.lower()
+    if text_lower.startswith("/start") or text_lower.startswith("/help") or "مساعدة" in text_clean or "مساعده" in text_clean or "أوامر" in text_clean:
         help_msg = (
             "<b>🤖 أهلاً بك في منصة تداول أسهم الشريعة المؤسسية!</b>\n\n"
-            "إليك الأوامر الذكية المتاحة:\n"
-            "📌 <code>/report</code> : توليد وإرسال تقرير الأسعار والمؤشرات اللحظية.\n"
-            "📌 <code>/summary</code> : ملخص حركة اليوم والتحليل الفني وتوقعات الغد.\n"
-            "💼 <code>/portfolio</code> : كشف حساب المحفظة اللحظي وصافي الأرباح/الخسائر (P&L).\n"
-            "➕ <code>/set_holding [السهم] [الكمية] [سعر_الشراء]</code> : لتسجيل أسهم محفظتك.\n"
+            "إليك الأزرار الذكية المتاحة للضغط المباشر:\n"
+            "💼 <b>[💼 محفظتي الاستثمارية]</b> أو <code>/portfolio</code> : كشف حساب أرباح/خسائر محفظتك اللحظي (P&L).\n"
+            "📊 <b>[📊 تقرير الأسعار]</b> أو <code>/report</code> : بث فوري لأحدث الأسعار والمؤشرات الفنية.\n"
+            "📌 <b>[📌 ملخص حركة اليوم]</b> أو <code>/summary</code> : ملخص الجلسة والتحليل الفني وتوقعات الغد.\n"
+            "⚙️ <b>[⚙️ حالة النظام]</b> أو <code>/status</code> : التحقق من اتصال البوت وسلسلة الترحيل 24/7.\n"
+            "➕ <code>/set_holding [السهم] [الكمية] [سعر_الشراء]</code> : لتعديل أو تسجيل أسهم محفظتك.\n"
             "⚖️ <code>/compare [سهم1] [سهم2]</code> : مقارنة فنية واستثمارية مباشرة بالذكاء الاصطناعي.\n"
             "🎯 <code>/alert [السهم] [> أو <] [السعر]</code> : ضبط تنبيه سعري فوري.\n"
-            "🧠 <code>/ask [سؤالك]</code> : استشارة المحلل المالي الذكي (Claude/Gemini).\n"
-            "📰 <code>/add_news [الخبر]</code> : إضافة خبر يدوي.\n"
-            "⚙️ <code>/status</code> : حالة النظام والمحركات."
+            "🧠 <code>/ask [سؤالك]</code> : استشارة المحلل المالي الذكي (Claude/Gemini)."
         )
-        reply_telegram(help_msg)
+        reply_telegram(help_msg, reply_markup=DEFAULT_KEYBOARD)
         
-    elif text_lower.startswith("/portfolio") or text_lower.startswith("/محفظت") or text_lower.startswith("/محفظه"):
+    elif text_lower.startswith("/portfolio") or "محفظت" in text_clean or "محفظه" in text_clean:
         try:
             state_data, _ = get_github_state()
             holdings = state_data.get("holdings", {})
@@ -1866,9 +1911,17 @@ def handle_telegram_command(text):
                     s = json.load(f)
             parsed_stocks, _ = fetch_all_data_tv(ALL_TICKERS, s)
             pnl_data = calculate_portfolio_pnl(holdings, parsed_stocks)
-            reply_telegram(format_portfolio_pnl_message(pnl_data))
+            reply_telegram(format_portfolio_pnl_message(pnl_data), reply_markup=PORTFOLIO_INLINE_KEYBOARD)
         except Exception as e:
             reply_telegram(f"⚠️ حدث خطأ أثناء حساب المحفظة: {e}")
+            
+    elif text_lower.startswith("/report") or "تقرير الأسعار" in text_clean or "تقرير الاسعار" in text_clean:
+        reply_telegram("🔄 جاري تحديث بيانات السوق وبث التقرير اللحظي فوراً...")
+        send_report(force=True)
+        
+    elif text_lower.startswith("/summary") or "ملخص" in text_clean:
+        reply_telegram("🔄 جاري إعداد ملخص حركة اليوم والتحليل الفني...")
+        send_daily_summary()
             
     elif text_lower.startswith("/set_holding") or text_lower.startswith("/حيازة"):
         parts = text.split()
@@ -1884,7 +1937,7 @@ def handle_telegram_command(text):
                 state_data["holdings"] = {}
             state_data["holdings"][ticker] = {"qty": qty, "buy_price": buy_price}
             if update_github_state(state_data, state_sha):
-                reply_telegram(f"✅ <b>تم تحديث المحفظة بنجاح:</b>\nتم تسجيل حيازة <b>{ticker}</b>: {qty:,.0f} سهم بسعر {buy_price:.2f} ج.م.\nيمكنك الآن كتابة <code>/portfolio</code> لعرض الأرباح اللحظية.")
+                reply_telegram(f"✅ <b>تم تحديث المحفظة بنجاح:</b>\nتم تسجيل حيازة <b>{ticker}</b>: {qty:,.0f} سهم بسعر {buy_price:.2f} ج.م.\nيمكنك الآن الضغط على زر <b>[💼 محفظتي الاستثمارية]</b> لعرض الأرباح اللحظية.")
             else:
                 reply_telegram("❌ فشل حفظ بيانات المحفظة على الخادم. يرجى المحاولة لاحقاً.")
         except ValueError:
@@ -1977,16 +2030,16 @@ def handle_telegram_command(text):
         reply_telegram("🔄 جاري التفكير والتحليل...")
         reply_telegram(ask_ai(question))
         
-    elif text_lower.startswith("/status") or text_lower.startswith("/حالة") or text_lower.startswith("/حاله"):
+    elif text_lower.startswith("/status") or "حالة النظام" in text_clean or "حاله النظام" in text_clean or "حالة" in text_clean or "حاله" in text_clean:
         import time
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         status_msg = (
-            "🟢 <b>حالة البوت: متصل ويعمل بنجاح</b>\n"
+            "🟢 <b>حالة البوت: متصل ويعمل بنجاح (24/7 Cloud Relay)</b>\n"
             f"🕒 <b>وقت الخادم (UTC):</b> {current_time}\n"
             f"🧠 <b>المحرك الذكي:</b> {GEMINI_MODEL}\n"
-            "⚙️ <b>العملية:</b> قيد المراقبة المستمرة لأخبار السوق."
+            "⚙️ <b>العملية:</b> قيد المراقبة المستمرة، وسلسلة الترحيل السحابي نشطة."
         )
-        reply_telegram(status_msg)
+        reply_telegram(status_msg, reply_markup=DEFAULT_KEYBOARD)
         
     else:
         reply_telegram("🔄 جاري معالجة سؤالك واستشارة الذكاء الاصطناعي...")
@@ -2004,6 +2057,34 @@ def poll_telegram_messages():
             updates = r.json().get("result", [])
             for update in updates:
                 offset = update["update_id"] + 1
+                
+                # 1. معالجة نقرات الأزرار المدمجة التفاعلية (Inline Keyboard Buttons)
+                if "callback_query" in update:
+                    cb = update["callback_query"]
+                    cb_id = cb.get("id")
+                    chat_id = str(cb.get("message", {}).get("chat", {}).get("id", ""))
+                    if chat_id == CHAT_ID:
+                        cb_data = cb.get("data", "")
+                        try:
+                            requests.post(
+                                f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
+                                json={"callback_query_id": cb_id},
+                                timeout=5
+                            )
+                        except Exception:
+                            pass
+                            
+                        if cb_data == "btn_portfolio":
+                            handle_telegram_command("/portfolio")
+                        elif cb_data == "btn_report":
+                            handle_telegram_command("/report")
+                        elif cb_data == "btn_summary":
+                            handle_telegram_command("/summary")
+                        elif cb_data == "btn_status":
+                            handle_telegram_command("/status")
+                    continue
+                
+                # 2. معالجة الرسائل النصية ونقرات الأزرار السفلية الثابتة (Reply Keyboard)
                 msg = update.get("message", {})
                 chat_id = str(msg.get("chat", {}).get("id", ""))
                 if chat_id != CHAT_ID:
@@ -2110,6 +2191,9 @@ if __name__ == "__main__":
     today_str = now.strftime("%Y-%m-%d")
     # ✅ تسجيل وقت البدء لتجاهل رسائل Telegram القديمة مع هامش أمان 5 دقائق لتلافي فجوة الانتقال بين الـ runners
     _startup_epoch = int(time.time()) - 300
+    
+    # ✅ إعداد وتحديث قائمة الأزرار والأوامر الرسمية في تطبيق تليجرام تلقائياً
+    setup_telegram_bot_menu()
     
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     
