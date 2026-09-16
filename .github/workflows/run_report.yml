@@ -2,13 +2,19 @@ name: Send Sharia Stock Report
 
 on:
   schedule:
-    # Emergency safety-net crons (only fire if the perpetual 24/7 cloud relay was somehow stopped):
-    # 08:47 Cairo (05:47 UTC) - Pre-market opening backup
-    - cron: '47 5 * * 0,1,2,3,4'
-    # 09:47 Cairo (06:47 UTC) - Main trading opening backup
-    - cron: '47 6 * * 0,1,2,3,4'
-    # 12:47 Cairo (09:47 UTC) - Mid-day session backup
-    - cron: '47 9 * * 0,1,2,3,4'
+    # Emergency safety-net crons across Egyptian trading sessions (UTC = Cairo - 3h):
+    # 08:45 Cairo (05:45 UTC) - Pre-market opening backup
+    - cron: '45 5 * * 0,1,2,3,4'
+    # 10:15 Cairo (07:15 UTC) - Mid-morning backup
+    - cron: '15 7 * * 0,1,2,3,4'
+    # 11:45 Cairo (08:45 UTC) - Mid-day backup
+    - cron: '45 8 * * 0,1,2,3,4'
+    # 13:15 Cairo (10:15 UTC) - Afternoon session backup
+    - cron: '15 10 * * 0,1,2,3,4'
+    # 14:30 Cairo (11:30 UTC) - Market closing backup
+    - cron: '30 11 * * 0,1,2,3,4'
+    # 15:00 Cairo (12:00 UTC) - Daily summary closing backup
+    - cron: '0 12 * * 0,1,2,3,4'
   workflow_dispatch:
     inputs:
       force:
@@ -23,6 +29,7 @@ concurrency:
 jobs:
   run-report:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,3 +52,14 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
           FORCE_RUN: ${{ github.event.inputs.force }}
         run: python report.py
+
+      - name: Emergency auto-recovery on failure
+        if: failure()
+        run: |
+          echo "Process failed! Dispatching emergency recovery runner..."
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_report.yml/dispatches \
+            -d '{"ref":"main","inputs":{"force":"false"}}'
