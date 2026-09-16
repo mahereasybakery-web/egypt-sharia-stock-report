@@ -77,10 +77,27 @@
         }
         @keyframes pulse-slow {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+            50% { opacity: 0.5; }
         }
         .pulse-live {
             animation: pulse-slow 2s infinite ease-in-out;
+        }
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            header, nav, #pwaInstallBanner, .no-print, button {
+                display: none !important;
+            }
+            .glass-card {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+            }
+            #printStatementView {
+                display: block !important;
+            }
         }
     </style>
 </head>
@@ -110,6 +127,9 @@
         </div>
     </div>
 
+    <!-- Live Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm space-y-2 pointer-events-none"></div>
+
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-40 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div class="flex items-center justify-between gap-3">
@@ -122,36 +142,45 @@
                         منظومة الأسهم الشرعية
                         <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-medium">EGX 33</span>
                     </h1>
-                    <p class="text-[10px] text-slate-400">البورصة المصرية • معايير AAOIFI • تحديث لحظي</p>
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span class="text-slate-400">معايير AAOIFI</span>
+                        <span id="syncStatusBadge" class="text-emerald-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
+                            <span id="syncStatusText">محدث سحابياً</span>
+                        </span>
+                    </div>
                 </div>
             </div>
             
             <div class="flex items-center gap-1.5">
+                <button onclick="requestNotificationPermission()" id="pushNotifyBtn" class="text-[11px] bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تفعيل إشعارات الجوال">
+                    <span>🔔</span>
+                </button>
                 <button onclick="openInstallModal()" class="text-[11px] bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تثبيت التطبيق على الجوال">
                     <span>📲</span>
-                    <span class="hidden sm:inline font-bold">تثبيت التطبيق</span>
+                    <span class="hidden sm:inline font-bold">تثبيت</span>
                 </button>
-                <button onclick="refreshData()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث فوري">
+                <button onclick="refreshData()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث ومزامنة فورية">
                     <span id="refreshIcon" class="inline-block transition-transform duration-500">🔄</span>
                 </button>
             </div>
         </div>
 
         <!-- Live Ticker Bar (Horizontal Scrollable) -->
-        <div class="flex gap-2 overflow-x-auto no-scrollbar pt-3 text-[11px]">
+        <div id="liveTickerBar" class="flex gap-2 overflow-x-auto no-scrollbar pt-3 text-[11px]">
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">الدولار:</span>
-                <span class="font-bold text-white">52.15 ج</span>
+                <span id="ticker_usd" class="font-bold text-white">52.15 ج</span>
                 <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
             </div>
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">الذهب 24:</span>
-                <span class="font-bold text-amber-400">4,340.91 ج</span>
+                <span id="ticker_gold" class="font-bold text-amber-400">4,340.91 ج</span>
                 <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
             </div>
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">مؤشر EGX33:</span>
-                <span class="font-bold text-emerald-400">3,380.45</span>
+                <span id="ticker_egx33" class="font-bold text-emerald-400">3,380.45</span>
                 <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
             </div>
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
@@ -165,10 +194,6 @@
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">مصر شريعة (CMS):</span>
                 <span class="font-bold text-sky-400">22.72 ج</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">بلتون وفرة (BWA):</span>
-                <span class="font-bold text-sky-400">2.21 ج</span>
             </div>
         </div>
     </header>
@@ -201,6 +226,10 @@
                 <!-- Populated dynamically if insiders or divergence or dividends is active -->
             </div>
 
+            <div class="text-[11px] text-slate-400 px-1 flex items-center justify-between">
+                <span>انقر على أي سهم لفتح الشارت الفني التفاعلي (Candlestick & RSI) 📈</span>
+            </div>
+
             <!-- Stocks List Container -->
             <div id="stocksContainer" class="space-y-2">
                 <!-- Dynamically populated via JS -->
@@ -221,22 +250,60 @@
                         تحليل مباشر للجلسة
                     </span>
                 </div>
-                <p class="text-xs text-slate-300 leading-relaxed">
+                <p id="ai_pulse_text" class="text-xs text-slate-300 leading-relaxed">
                     «يشهد مؤشر الشريعة $EGX33$ حركة تجميع إيجابية بقيادة قطاع البتروكيماويات والتصدير، مع دخول سيولة استثمارية ملحوظة في أسهم الأسمدة. التوصية: التركيز على أسهم التدفقات النقدية ذات مكررات الربحية الأقل من $7.5x$ مع اقتناص الارتدادات الفنية في الأسهم ذات مؤشر $RSI < 40$ وهامش أمان استثماري يفوق $20\%$».
                 </p>
                 <div class="grid grid-cols-3 gap-2 pt-1 text-center text-[10px]">
                     <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                         <span class="text-slate-400 block">شهية المخاطرة</span>
-                        <b class="text-emerald-400 font-bold text-xs mt-0.5 block">متفائلة (72%)</b>
+                        <b id="ai_score_badge" class="text-emerald-400 font-bold text-xs mt-0.5 block">متفائلة (78%)</b>
                     </div>
                     <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                         <span class="text-slate-400 block">القطاع القائد</span>
-                        <b class="text-amber-300 font-bold text-xs mt-0.5 block">الأسمدة والبتروكيماويات</b>
+                        <b id="ai_sector_badge" class="text-amber-300 font-bold text-xs mt-0.5 block">الأسمدة والبتروكيماويات</b>
                     </div>
                     <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                         <span class="text-slate-400 block">اتجاه السيولة</span>
                         <b class="text-sky-300 font-bold text-xs mt-0.5 block">شراء مؤسسي</b>
                     </div>
+                </div>
+            </div>
+
+            <!-- Interactive AI Financial Chatbot Box -->
+            <div class="glass-card rounded-2xl p-4 space-y-3 border-sky-900/50 bg-gradient-to-br from-slate-900 to-sky-950/20">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-sm">
+                            💬
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-white">المستشار المالي الرقمي الذكي (AI Stock Advisor)</h3>
+                            <p class="text-[10px] text-slate-400">اطرح أي سؤال عن الأسهم، التبريد، أو السعر العادل</p>
+                        </div>
+                    </div>
+                    <span class="text-[9px] bg-sky-950 text-sky-300 border border-sky-800 px-1.5 py-0.5 rounded">Gemini Live</span>
+                </div>
+
+                <!-- Suggested Quick Questions -->
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[10px]">
+                    <button onclick="askAiAdvisor('ما هو تقييم سهم طلعت مصطفى (TMGH) الاستثماري الآن؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 تقييم TMGH</button>
+                    <button onclick="askAiAdvisor('هل سهم فوري (FWRY) في منطقة تبريد وتجميع جيدة؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 تبريد فوري FWRY</button>
+                    <button onclick="askAiAdvisor('رشح لي أعلى الأسهم توزيعاً للأرباح النقدية المتوافقة مع الشريعة')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 أعلى توزيعات نقدية</button>
+                    <button onclick="askAiAdvisor('كيف أحسب زكاة محفظتي إذا كانت نيتي استثمار طويل الأجل؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 زكاة المستثمر</button>
+                </div>
+
+                <!-- Chat History / Output -->
+                <div id="aiChatOutput" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 max-h-48 overflow-y-auto hidden leading-relaxed text-slate-200">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Chat Input Box -->
+                <div class="flex gap-2">
+                    <input id="aiChatInput" type="text" placeholder="اكتب سؤالك للمستشار المالي (مثال: ما هو الدعم الفني لسهم سيدي كرير؟)..." 
+                           class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-sky-500 outline-none">
+                    <button onclick="sendUserAiQuestion()" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow">
+                        إرسال
+                    </button>
                 </div>
             </div>
 
@@ -293,42 +360,8 @@
                                 <th class="pb-2">الصرف المتوقع</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-800/60 font-medium text-[11px]">
-                            <tr class="hover:bg-slate-800/30">
-                                <td class="py-2.5 font-bold text-white">أبو قير للأسمدة (ABUK)</td>
-                                <td class="py-2.5 text-amber-300 font-bold">7.50 ج</td>
-                                <td class="py-2.5 text-emerald-400 font-bold">11.8%</td>
-                                <td class="py-2.5 text-slate-300">أكتوبر 2026</td>
-                                <td class="py-2.5 text-slate-400">نوفمبر 2026</td>
-                            </tr>
-                            <tr class="hover:bg-slate-800/30">
-                                <td class="py-2.5 font-bold text-white">موبكو للأسمدة (MFPC)</td>
-                                <td class="py-2.5 text-amber-300 font-bold">4.25 ج</td>
-                                <td class="py-2.5 text-emerald-400 font-bold">9.2%</td>
-                                <td class="py-2.5 text-slate-300">مارس 2026</td>
-                                <td class="py-2.5 text-slate-400">إبريل 2026</td>
-                            </tr>
-                            <tr class="hover:bg-slate-800/30">
-                                <td class="py-2.5 font-bold text-white">النساجون الشرقيون (ORWE)</td>
-                                <td class="py-2.5 text-amber-300 font-bold">2.40 ج</td>
-                                <td class="py-2.5 text-emerald-400 font-bold">9.0%</td>
-                                <td class="py-2.5 text-slate-300">إبريل 2026</td>
-                                <td class="py-2.5 text-slate-400">مايو 2026</td>
-                            </tr>
-                            <tr class="hover:bg-slate-800/30">
-                                <td class="py-2.5 font-bold text-white">أموك للبترول (AMOC)</td>
-                                <td class="py-2.5 text-amber-300 font-bold">1.10 ج</td>
-                                <td class="py-2.5 text-emerald-400 font-bold">8.4%</td>
-                                <td class="py-2.5 text-slate-300">سبتمبر 2026</td>
-                                <td class="py-2.5 text-slate-400">أكتوبر 2026</td>
-                            </tr>
-                            <tr class="hover:bg-slate-800/30">
-                                <td class="py-2.5 font-bold text-white">سيدي كرير (SKPC)</td>
-                                <td class="py-2.5 text-amber-300 font-bold">1.50 ج</td>
-                                <td class="py-2.5 text-emerald-400 font-bold">8.2%</td>
-                                <td class="py-2.5 text-slate-300">مارس 2026</td>
-                                <td class="py-2.5 text-slate-400">إبريل 2026</td>
-                            </tr>
+                        <tbody id="dividendsTableBody" class="divide-y divide-slate-800/60 font-medium text-[11px]">
+                            <!-- Populated dynamically -->
                         </tbody>
                     </table>
                 </div>
@@ -345,15 +378,33 @@
                 </div>
                 <div class="glass-card rounded-xl p-3">
                     <span class="text-[11px] text-slate-400">صافي الأرباح المحققة</span>
-                    <div class="text-base font-bold text-emerald-400 mt-0.5">+4,820 ج.م</div>
+                    <div id="p_total_pnl" class="text-base font-bold text-emerald-400 mt-0.5">+4,820 ج.م</div>
                 </div>
                 <div class="glass-card rounded-xl p-3">
                     <span class="text-[11px] text-slate-400">العائد الاستثماري</span>
-                    <div class="text-base font-bold text-emerald-400 mt-0.5">+14.1%</div>
+                    <div id="p_total_return" class="text-base font-bold text-emerald-400 mt-0.5">+14.1%</div>
                 </div>
                 <div class="glass-card rounded-xl p-3">
                     <span class="text-[11px] text-slate-400">تقييم الأمان والمناعة</span>
                     <div class="text-base font-bold text-emerald-400 mt-0.5">ممتاز (A-)</div>
+                </div>
+            </div>
+
+            <!-- Portfolio Action Bar -->
+            <div class="flex items-center justify-between gap-2">
+                <button onclick="openAddHoldingModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow active:scale-95">
+                    <span>➕</span>
+                    <span>إضافة سهم للمحفظة</span>
+                </button>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="exportPortfolioToCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-2 rounded-xl transition flex items-center gap-1 active:scale-95" title="تصدير إكسل">
+                        <span>📊</span>
+                        <span>Excel</span>
+                    </button>
+                    <button onclick="printPortfolioStatement()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-2 rounded-xl transition flex items-center gap-1 active:scale-95" title="طباعة / PDF">
+                        <span>📄</span>
+                        <span>PDF</span>
+                    </button>
                 </div>
             </div>
 
@@ -370,13 +421,13 @@
                 </div>
             </div>
 
-            <!-- Holdings Detail Table -->
+            <!-- Holdings Detail Table with Edit/Delete -->
             <div class="glass-card rounded-2xl p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                        📜 <span>أسهم المحفظة الحالية (الأسعار اللحظية والأرباح)</span>
+                        📜 <span>أسهم محفظتك المحفوظة محلياً بخصوصية تامة</span>
                     </h3>
-                    <span class="text-[10px] text-slate-400">10 أسهم رئيسية</span>
+                    <button onclick="resetPortfolioToDefault()" class="text-[10px] text-slate-400 hover:text-slate-200 underline">استعادة الافتراضي</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-right text-xs">
@@ -384,9 +435,10 @@
                             <tr>
                                 <th class="pb-2">السهم</th>
                                 <th class="pb-2">الكمية</th>
-                                <th class="pb-2">سعر الشراء</th>
-                                <th class="pb-2">السعر الحالي</th>
+                                <th class="pb-2">الشراء</th>
+                                <th class="pb-2">الحالي</th>
                                 <th class="pb-2">الربح/الخسارة</th>
+                                <th class="pb-2 text-center">إجراء</th>
                             </tr>
                         </thead>
                         <tbody id="holdingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -407,28 +459,29 @@
                             <span class="font-bold text-rose-300">هبوط المؤشر العام (-7.0%)</span>
                             <p class="text-[10px] text-slate-400">تراجع عام في السوق</p>
                         </div>
-                        <span class="text-rose-400 font-bold">-7.0% (-2,725 ج)</span>
+                        <span id="stress_shock_1" class="text-rose-400 font-bold">-7.0%</span>
                     </div>
                     <div class="p-2 bg-emerald-950/40 border border-emerald-900/50 rounded-xl flex items-center justify-between">
                         <div>
                             <span class="font-bold text-emerald-300">تحريك سعر الصرف (+10% للدولار)</span>
                             <p class="text-[10px] text-slate-400">ارتفاع أرباح التصدير والذهب</p>
                         </div>
-                        <span class="text-emerald-400 font-bold">+5.2% (+2,024 ج)</span>
+                        <span id="stress_shock_2" class="text-emerald-400 font-bold">+5.2%</span>
                     </div>
                     <div class="p-2 bg-amber-950/40 border border-amber-900/50 rounded-xl flex items-center justify-between">
                         <div>
                             <span class="font-bold text-amber-300">قفزة تاريخية في الذهب (+15%)</span>
                             <p class="text-[10px] text-slate-400">مكاسب صناديق الذهب والتحوط</p>
                         </div>
-                        <span class="text-amber-400 font-bold">+4.1% (+1,596 ج)</span>
+                        <span id="stress_shock_3" class="text-amber-400 font-bold">+4.1%</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= TAB 4: SMART DCA CALCULATOR ================= -->
+        <!-- ================= TAB 4: SMART DCA CALCULATOR & COMPOUND WEALTH ================= -->
         <section id="view-dca" class="tab-content space-y-3.5 hidden">
+            <!-- Smart DCA Widget -->
             <div class="glass-card rounded-2xl p-4 space-y-3.5">
                 <div>
                     <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -465,6 +518,46 @@
 
                 <div id="calc_dca_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
                     <!-- DCA Results -->
+                </div>
+            </div>
+
+            <!-- Compound Wealth & Dividend Reinvestment Calculator -->
+            <div class="glass-card rounded-2xl p-4 space-y-3.5 border-amber-900/50 bg-gradient-to-br from-slate-900 to-amber-950/20">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        📈 <span>حاسبة العائد التراكمي وتنمية الثروة بالكوبونات (Compound Wealth)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">محاكاة نمو محفظتك عند إعادة استثمار التوزيعات النقدية مع الاستقطاع الشهري.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">رأس المال المبدئي (ج.م)</label>
+                        <input id="cw_initial" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">الادخار الشهري (ج.م)</label>
+                        <input id="cw_monthly" type="number" value="3000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">عائد الكوبون السنوي %</label>
+                        <input id="cw_yield" type="number" value="9.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">معدل نمو السهم السنوي %</label>
+                        <input id="cw_growth" type="number" value="12.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                    </div>
+                </div>
+
+                <button onclick="calculateCompoundWealth()" class="w-full bg-amber-600 hover:bg-amber-500 active:scale-98 text-slate-950 font-bold text-xs py-2 rounded-xl transition shadow">
+                    حساب خطة تنمية الثروة
+                </button>
+
+                <div id="cw_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
+                    <!-- Compound Wealth Output -->
                 </div>
             </div>
         </section>
@@ -518,7 +611,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] text-slate-400 mb-1">إجمالي القيمة السوقية لمحفظتك (ج.م)</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[11px] text-slate-400">إجمالي القيمة السوقية لمحفظتك (ج.م)</label>
+                        <button onclick="fillZakatFromPortfolio()" class="text-[10px] text-emerald-400 underline">جلب من المحفظة</button>
+                    </div>
                     <input id="zakat_val" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
                 </div>
 
@@ -575,6 +671,90 @@
         </div>
     </nav>
 
+    <!-- Interactive Candlestick Chart Modal -->
+    <div id="stockChartModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-2 sm:p-4 hidden">
+        <div class="glass-card w-full max-w-2xl rounded-2xl p-4 sm:p-5 space-y-3.5 border border-slate-700 bg-slate-900 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                        📈
+                    </div>
+                    <div>
+                        <h3 id="modalChartTitle" class="text-sm font-bold text-white">شارت الشموع اليابانية التفاعلي</h3>
+                        <p id="modalChartSubtitle" class="text-[11px] text-slate-400">متوسطات SMA والدعوم والمقاومات الفنية ومؤشر RSI</p>
+                    </div>
+                </div>
+                <button onclick="closeChartModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
+            </div>
+
+            <!-- Price & Stats Bar -->
+            <div class="flex items-center justify-between bg-slate-800/80 rounded-xl px-3 py-2 text-xs">
+                <div class="flex items-center gap-2">
+                    <span id="modalChartPrice" class="font-bold text-white text-sm">0.00 ج</span>
+                    <span id="modalChartChg" class="text-[10px] font-bold px-1.5 py-0.2 rounded border">+0.00%</span>
+                </div>
+                <div class="flex items-center gap-3 text-[10px] text-slate-300">
+                    <span>الدعم: <b id="modalChartSupport" class="text-emerald-400">0.00</b></span>
+                    <span>المقاومة: <b id="modalChartResistance" class="text-rose-400">0.00</b></span>
+                    <span>RSI: <b id="modalChartRsi" class="text-amber-400">0.0</b></span>
+                </div>
+            </div>
+
+            <!-- Chart Canvas Container -->
+            <div class="relative w-full h-64 sm:h-72 bg-slate-950/80 rounded-xl p-2 border border-slate-800">
+                <canvas id="candlestickCanvas" class="w-full h-full"></canvas>
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-slate-400 px-1">
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-yellow-400 inline-block"></span> SMA 20</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-sky-400 inline-block"></span> SMA 50</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-400 inline-block"></span> خط الدعم</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-rose-400 inline-block"></span> خط المقاومة</span>
+                </div>
+                <button onclick="closeChartModal()" class="bg-slate-800 px-3 py-1 rounded-lg text-slate-200 hover:bg-slate-700">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Holding Modal -->
+    <div id="holdingModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+        <div class="glass-card w-full max-w-sm rounded-2xl p-4 space-y-3.5 border border-slate-700 bg-slate-900 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <h3 id="holdingModalTitle" class="text-sm font-bold text-white">إضافة سهم لمحفظتك</h3>
+                <button onclick="closeHoldingModal()" class="text-slate-400 hover:text-white text-base">✕</button>
+            </div>
+
+            <input type="hidden" id="modalHoldingIndex" value="-1">
+
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1">اختر السهم</label>
+                <select id="modalHoldingStock" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1">الكمية (عدد الأسهم)</label>
+                <input id="modalHoldingQty" type="number" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+            </div>
+
+            <div>
+                <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء (ج.م)</label>
+                <input id="modalHoldingBuyPrice" type="number" step="0.01" value="50.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button onclick="saveHoldingFromModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 shadow">
+                    حفظ في المحفظة
+                </button>
+                <button onclick="closeHoldingModal()" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs hover:bg-slate-700 transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile Installation Modal Guide (for iOS & General) -->
     <div id="installModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 hidden">
         <div class="glass-card w-full max-w-md rounded-2xl p-5 space-y-4 border border-slate-700 bg-slate-900 shadow-2xl">
@@ -625,6 +805,34 @@
         </div>
     </div>
 
+    <!-- Printable Statement Layout (Only shown during window.print) -->
+    <div id="printStatementView" class="hidden p-8 text-black bg-white">
+        <div class="text-center border-b pb-4 mb-4">
+            <h1 class="text-xl font-bold">كشف حساب المحفظة الاستثمارية وحساب الزكاة الشرعية المعتمد</h1>
+            <p class="text-xs text-gray-600">منظومة الأسهم المصرية المتوافقة مع الشريعة • معايير AAOIFI</p>
+            <p id="printDate" class="text-xs text-gray-500 mt-1"></p>
+        </div>
+        <table class="w-full text-right border-collapse border border-gray-300 text-xs mb-4">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border p-2">السهم</th>
+                    <th class="border p-2">الكمية</th>
+                    <th class="border p-2">سعر التكلفة</th>
+                    <th class="border p-2">السعر الحالي</th>
+                    <th class="border p-2">القيمة السوقية</th>
+                    <th class="border p-2">الربح / الخسارة</th>
+                </tr>
+            </thead>
+            <tbody id="printTableBody"></tbody>
+        </table>
+        <div class="border p-3 text-xs space-y-1 bg-gray-50 mb-4">
+            <div class="flex justify-between"><span>إجمالي القيمة السوقية للمحفظة:</span><b id="printTotalVal"></b></div>
+            <div class="flex justify-between"><span>صافي الأرباح المحققة:</span><b id="printTotalPnl"></b></div>
+            <div class="flex justify-between"><span>مقدار الزكاة المستحقة (2.577% عروض تجارة):</span><b id="printZakatVal"></b></div>
+        </div>
+        <p class="text-[10px] text-gray-500 text-center">تم استخراج هذا التقرير تلقائياً عبر منصة EGX Sharia Portal لأغراض المراجعة الشخصية والزكوية.</p>
+    </div>
+
     <!-- Core App Logic & Data Script -->
     <script>
         // 1. Initialize Telegram WebApp SDK & PWA
@@ -663,7 +871,6 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted PWA install');
                         dismissInstallBanner();
                     }
                     deferredPrompt = null;
@@ -700,43 +907,59 @@
             }
         }
 
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-900/90 border-emerald-700 text-emerald-200' :
+                       type === 'warning' ? 'bg-amber-900/90 border-amber-700 text-amber-200' :
+                       'bg-slate-800/90 border-slate-700 text-white';
+            toast.className = `p-3 rounded-xl border text-xs shadow-xl backdrop-blur-md transition-all duration-300 pointer-events-auto ${bg}`;
+            toast.innerHTML = `<div class="flex items-center gap-2"><span>🔔</span><span>${msg}</span></div>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
         // 2. Comprehensive Stocks & Funds Database
-        const STOCKS_DATA = [
-            { ticker: "MFPC", name: "موبكو للأسمدة", close: 48.69, chg: 4.71, rsi: 73.2, pe: 6.8, type: "stock", rec: "شراء قوي" },
-            { ticker: "AMOC", name: "أموك للبترول", close: 13.45, chg: 2.83, rsi: 66.2, pe: 6.4, type: "stock", rec: "شراء وتجميع" },
-            { ticker: "ACGC", name: "العربية للأقطان", close: 14.40, chg: 2.64, rsi: 58.7, pe: 8.2, type: "stock", rec: "اتجاه صاعد" },
-            { ticker: "MCQE", name: "أسمنت قنا", close: 221.00, chg: 2.42, rsi: 46.2, pe: 5.9, type: "stock", rec: "محايد إيجابي" },
-            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23.38, chg: 1.65, rsi: 61.3, pe: 7.1, type: "stock", rec: "شراء" },
-            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89.00, chg: 1.25, rsi: 59.2, pe: 6.5, type: "stock", rec: "شراء" },
-            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.33, chg: 1.00, rsi: 44.6, pe: 5.4, type: "stock", rec: "استقرار" },
-            { ticker: "ARCC", name: "العربية للأسمنت", close: 73.03, chg: 0.90, rsi: 50.6, pe: 7.0, type: "stock", rec: "شراء" },
-            { ticker: "ORWE", name: "النساجون الشرقيون", close: 26.80, chg: 0.90, rsi: 52.0, pe: 6.9, type: "stock", rec: "تماسك قوي" },
-            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 46.90, chg: 0.90, rsi: 65.2, pe: 4.8, type: "stock", rec: "شراء" },
-            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.25, chg: 0.83, rsi: 57.2, pe: 5.8, type: "stock", rec: "زخم صاعد" },
-            { ticker: "ATQA", name: "حديد عتاقة", close: 12.58, chg: 0.64, rsi: 63.8, pe: 6.1, type: "stock", rec: "شراء" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", close: 364.00, chg: 0.39, rsi: 57.4, pe: 5.2, type: "stock", rec: "تحوط وتصدير" },
-            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.88, chg: -0.11, rsi: 44.6, pe: 18.2, type: "stock", rec: "منطقة تجميع" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 30.00, chg: 0.00, rsi: 40.8, pe: 7.6, type: "stock", rec: "دعم فني رئيسي" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 95.00, chg: -0.98, rsi: 38.5, pe: 9.1, type: "stock", rec: "ارتداد متوقع" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.77, chg: -0.29, rsi: 31.1, pe: 6.8, type: "stock", rec: "تشبع بيعي حاد" },
-            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.20, chg: -3.02, rsi: 39.1, pe: 8.0, type: "stock", rec: "اقتراب من القاع" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 131.30, chg: -0.53, rsi: 75.1, pe: 6.0, type: "stock", rec: "تشبع شرائي" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 23.27, chg: -1.06, rsi: 46.7, pe: 14.5, type: "stock", rec: "تجميع هادئ" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 52.01, chg: -0.15, rsi: 47.0, pe: 4.2, type: "stock", rec: "محايد إيجابي" },
-            { ticker: "SAUD", name: "بنك البركة مصر", close: 23.10, chg: -0.43, rsi: 47.4, pe: 4.1, type: "stock", rec: "محايد" },
-            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.89, chg: 0.13, rsi: 47.8, pe: 6.5, type: "stock", rec: "محايد" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 30.80, chg: 1.02, rsi: 49.3, pe: 11.2, type: "stock", rec: "محايد" },
-            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.14, chg: 0.49, rsi: 51.9, pe: 7.8, type: "stock", rec: "شراء" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 42.35, chg: -0.28, rsi: 52.9, pe: 8.5, type: "stock", rec: "شراء" },
-            { ticker: "SWDY", name: "السويدي إليكتريك", close: 124.45, chg: -0.84, rsi: 53.6, pe: 7.4, type: "stock", rec: "محايد" },
-            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27.08, chg: 0.30, rsi: 54.1, pe: 9.3, type: "stock", rec: "شراء" },
-            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 837.01, chg: -0.96, rsi: 57.1, pe: 7.9, type: "stock", rec: "شراء" },
-            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.00, chg: -2.03, rsi: 60.0, pe: 12.1, type: "stock", rec: "شراء" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.45, rsi: 55.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.30, rsi: 54.0, pe: null, type: "fund", rec: "صندوق الذهب" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي" }
+        let STOCKS_DATA = [
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 48.69, chg: 4.71, rsi: 73.2, pe: 6.8, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13.45, chg: 2.83, rsi: 66.2, pe: 6.4, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 14.40, chg: 2.64, rsi: 58.7, pe: 8.2, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 221.00, chg: 2.42, rsi: 46.2, pe: 5.9, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23.38, chg: 1.65, rsi: 61.3, pe: 7.1, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89.00, chg: 1.25, rsi: 59.2, pe: 6.5, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.33, chg: 1.00, rsi: 44.6, pe: 5.4, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
+            { ticker: "ARCC", name: "العربية للأسمنت", close: 73.03, chg: 0.90, rsi: 50.6, pe: 7.0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 26.80, chg: 0.90, rsi: 52.0, pe: 6.9, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
+            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 46.90, chg: 0.90, rsi: 65.2, pe: 4.8, type: "stock", rec: "شراء", sector: "البنوك والخدمات المالية" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.25, chg: 0.83, rsi: 57.2, pe: 5.8, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ATQA", name: "حديد عتاقة", close: 12.58, chg: 0.64, rsi: 63.8, pe: 6.1, type: "stock", rec: "شراء", sector: "الصناعة والتصدير" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 364.00, chg: 0.39, rsi: 57.4, pe: 5.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.88, chg: -0.11, rsi: 44.6, pe: 18.2, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 30.00, chg: 0.00, rsi: 40.8, pe: 7.6, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 95.00, chg: -0.98, rsi: 38.5, pe: 9.1, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.77, chg: -0.29, rsi: 31.1, pe: 6.8, type: "stock", rec: "تشبع بيعي حاد", sector: "العقارات والإنشاءات" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.20, chg: -3.02, rsi: 39.1, pe: 8.0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 131.30, chg: -0.53, rsi: 75.1, pe: 6.0, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 23.27, chg: -1.06, rsi: 46.7, pe: 14.5, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 52.01, chg: -0.15, rsi: 47.0, pe: 4.2, type: "stock", rec: "محايد إيجابي", sector: "البنوك والخدمات المالية" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 23.10, chg: -0.43, rsi: 47.4, pe: 4.1, type: "stock", rec: "محايد", sector: "البنوك والخدمات المالية" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.89, chg: 0.13, rsi: 47.8, pe: 6.5, type: "stock", rec: "محايد", sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 30.80, chg: 1.02, rsi: 49.3, pe: 11.2, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
+            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.14, chg: 0.49, rsi: 51.9, pe: 7.8, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 42.35, chg: -0.28, rsi: 52.9, pe: 8.5, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 124.45, chg: -0.84, rsi: 53.6, pe: 7.4, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27.08, chg: 0.30, rsi: 54.1, pe: 9.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
+            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 837.01, chg: -0.96, rsi: 57.1, pe: 7.9, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.00, chg: -2.03, rsi: 60.0, pe: 12.1, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.45, rsi: 55.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.30, rsi: 54.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "الذهب وصناديق التحوط" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "الذهب وصناديق التحوط" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "الذهب وصناديق التحوط" }
         ];
 
         // 3. Valuation Scenarios Database
@@ -873,16 +1096,566 @@
             }
         };
 
+        // 4. User Portfolio State Management (LocalStorage)
+        const DEFAULT_HOLDINGS = [
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.14, cur: 131.30, sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00, sector: "العقارات والإنشاءات" },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.88, cur: 23.27, sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير" },
+            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.77, cur: 52.01, sector: "البنوك والخدمات المالية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 43.43, cur: 42.35, sector: "العقارات والإنشاءات" },
+            { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00, sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80, sector: "الأغذية والأدوية" },
+            { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88, sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "AZG", name: "أزيموت جولد", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" }
+        ];
+
+        let userHoldings = [];
+        let donutChartInstance = null;
+
+        function loadUserPortfolio() {
+            const saved = localStorage.getItem('egx_sharia_portfolio_v2');
+            if (saved) {
+                try {
+                    userHoldings = JSON.parse(saved);
+                } catch(e) {
+                    userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                }
+            } else {
+                userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                saveUserPortfolio();
+            }
+            // Update live prices for user holdings from STOCKS_DATA
+            userHoldings.forEach(h => {
+                const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                if (stock) {
+                    h.cur = stock.close;
+                    if (!h.sector && stock.sector) h.sector = stock.sector;
+                }
+            });
+        }
+
+        function saveUserPortfolio() {
+            localStorage.setItem('egx_sharia_portfolio_v2', JSON.stringify(userHoldings));
+            renderHoldingsTable();
+            checkUserAlerts();
+        }
+
+        function resetPortfolioToDefault() {
+            if (confirm("هل أنت متأكد من استعادة المحفظة الافتراضية الاسترشادية؟")) {
+                triggerHaptic('medium');
+                userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                saveUserPortfolio();
+                showToast("تمت استعادة المحفظة الافتراضية", "success");
+            }
+        }
+
+        function renderHoldingsTable() {
+            const tbody = document.getElementById('holdingsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let totalMarketVal = 0;
+            let totalCost = 0;
+            const sectorWeights = {};
+
+            userHoldings.forEach((h, idx) => {
+                const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                if (stock) h.cur = stock.close;
+
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                const pnlPct = cost > 0 ? ((mVal - cost) / cost) * 100 : 0;
+                const isP = pnl >= 0;
+
+                totalMarketVal += mVal;
+                totalCost += cost;
+
+                const sec = h.sector || 'أخرى';
+                sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition";
+                tr.innerHTML = `
+                    <td class="py-2.5">
+                        <span class="font-bold text-white block">${h.name}</span>
+                        <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
+                    </td>
+                    <td class="py-2.5">${h.qty.toLocaleString()}</td>
+                    <td class="py-2.5 text-slate-300 font-mono">${h.buy.toFixed(2)}</td>
+                    <td class="py-2.5 font-bold text-white font-mono">${h.cur.toFixed(2)}</td>
+                    <td class="py-2.5 font-bold font-mono ${isP ? 'text-emerald-400' : 'text-rose-400'}">
+                        ${isP ? '+' : ''}${pnl.toFixed(0)} <span class="text-[9px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
+                    </td>
+                    <td class="py-2.5 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="editHolding(${idx})" class="p-1 text-slate-400 hover:text-white" title="تعديل">✏️</button>
+                            <button onclick="deleteHolding(${idx})" class="p-1 text-rose-400 hover:text-rose-300" title="حذف">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const totalPnl = totalMarketVal - totalCost;
+            const totalReturn = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0;
+            const isPnlPos = totalPnl >= 0;
+
+            document.getElementById('p_total_val').innerText = `${totalMarketVal.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
+            const pnlElem = document.getElementById('p_total_pnl');
+            pnlElem.innerText = `${isPnlPos ? '+' : ''}${totalPnl.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
+            pnlElem.className = `text-base font-bold mt-0.5 ${isPnlPos ? 'text-emerald-400' : 'text-rose-400'}`;
+
+            const retElem = document.getElementById('p_total_return');
+            retElem.innerText = `${isPnlPos ? '+' : ''}${totalReturn.toFixed(1)}%`;
+            retElem.className = `text-base font-bold mt-0.5 ${isPnlPos ? 'text-emerald-400' : 'text-rose-400'}`;
+
+            // Update Stress Test Calculations
+            const s1 = totalMarketVal * -0.07;
+            const s2 = totalMarketVal * 0.052;
+            const s3 = totalMarketVal * 0.041;
+            document.getElementById('stress_shock_1').innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            document.getElementById('stress_shock_2').innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            document.getElementById('stress_shock_3').innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+
+            // Redraw Donut Chart with Actual Sectors
+            updateDonutChart(sectorWeights);
+        }
+
+        function updateDonutChart(sectorWeights) {
+            const ctx = document.getElementById('portfolioDonutChart');
+            if (!ctx) return;
+            const labels = Object.keys(sectorWeights);
+            const data = Object.values(sectorWeights);
+            const palette = ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b', '#14b8a6', '#f97316'];
+
+            if (donutChartInstance) {
+                donutChartInstance.destroy();
+            }
+
+            donutChartInstance = new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels.length ? labels : ['لا توجد أسهم'],
+                    datasets: [{
+                        data: data.length ? data : [1],
+                        backgroundColor: palette.slice(0, Math.max(labels.length, 1)),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { family: 'Cairo', size: 10 }, boxWidth: 10 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Add / Edit Holding Modals
+        function openAddHoldingModal() {
+            triggerHaptic('medium');
+            document.getElementById('holdingModalTitle').innerText = "إضافة سهم لمحفظتك";
+            document.getElementById('modalHoldingIndex').value = "-1";
+            
+            const select = document.getElementById('modalHoldingStock');
+            select.innerHTML = '';
+            STOCKS_DATA.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.ticker;
+                opt.innerText = `${s.name} (${s.ticker}) - ${s.close.toFixed(2)} ج`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('modalHoldingQty').value = "100";
+            document.getElementById('modalHoldingBuyPrice').value = STOCKS_DATA[0].close.toFixed(2);
+            select.onchange = () => {
+                const st = STOCKS_DATA.find(x => x.ticker === select.value);
+                if (st) document.getElementById('modalHoldingBuyPrice').value = st.close.toFixed(2);
+            };
+
+            document.getElementById('holdingModal').classList.remove('hidden');
+        }
+
+        function editHolding(idx) {
+            triggerHaptic('medium');
+            const h = userHoldings[idx];
+            if (!h) return;
+
+            document.getElementById('holdingModalTitle').innerText = `تعديل سهم ${h.name}`;
+            document.getElementById('modalHoldingIndex').value = idx;
+
+            const select = document.getElementById('modalHoldingStock');
+            select.innerHTML = `<option value="${h.ticker}">${h.name} (${h.ticker})</option>`;
+            select.disabled = true;
+
+            document.getElementById('modalHoldingQty').value = h.qty;
+            document.getElementById('modalHoldingBuyPrice').value = h.buy;
+
+            document.getElementById('holdingModal').classList.remove('hidden');
+        }
+
+        function closeHoldingModal() {
+            document.getElementById('modalHoldingStock').disabled = false;
+            document.getElementById('holdingModal').classList.add('hidden');
+        }
+
+        function saveHoldingFromModal() {
+            triggerHaptic('medium');
+            const idx = parseInt(document.getElementById('modalHoldingIndex').value);
+            const ticker = document.getElementById('modalHoldingStock').value;
+            const qty = parseFloat(document.getElementById('modalHoldingQty').value) || 0;
+            const buy = parseFloat(document.getElementById('modalHoldingBuyPrice').value) || 0;
+
+            if (qty <= 0 || buy <= 0) {
+                alert('يرجى كتابة كمية وسعر شراء صحيحين أكبر من الصفر');
+                return;
+            }
+
+            const stock = STOCKS_DATA.find(s => s.ticker === ticker);
+            const name = stock ? stock.name : ticker;
+            const cur = stock ? stock.close : buy;
+            const sector = stock ? stock.sector : 'أخرى';
+
+            if (idx === -1) {
+                // Check if already in portfolio
+                const existing = userHoldings.find(x => x.ticker === ticker);
+                if (existing) {
+                    // Update weighted average
+                    const totalQty = existing.qty + qty;
+                    existing.buy = ((existing.qty * existing.buy) + (qty * buy)) / totalQty;
+                    existing.qty = totalQty;
+                    existing.cur = cur;
+                } else {
+                    userHoldings.push({ ticker, name, qty, buy, cur, sector });
+                }
+                showToast(`تمت إضافة سهم ${name} للمحفظة بنجاح`, 'success');
+            } else {
+                userHoldings[idx].qty = qty;
+                userHoldings[idx].buy = buy;
+                userHoldings[idx].cur = cur;
+                showToast(`تم تحديث سهم ${name}`, 'success');
+            }
+
+            closeHoldingModal();
+            saveUserPortfolio();
+        }
+
+        function deleteHolding(idx) {
+            triggerHaptic('medium');
+            const h = userHoldings[idx];
+            if (!h) return;
+            if (confirm(`هل أنت متأكد من حذف سهم ${h.name} من المحفظة؟`)) {
+                userHoldings.splice(idx, 1);
+                saveUserPortfolio();
+                showToast(`تم حذف سهم ${h.name}`, 'warning');
+            }
+        }
+
+        // 5. Interactive Candlestick Chart Engine (HTML5 Canvas)
+        let activeChartTicker = 'TMGH';
+
+        function openStockChart(ticker) {
+            triggerHaptic('medium');
+            activeChartTicker = ticker;
+            const s = STOCKS_DATA.find(x => x.ticker === ticker) || STOCKS_DATA[0];
+            const valData = VALUATION_DATA[ticker] || { support: s.close * 0.94, resistance: s.close * 1.08 };
+
+            document.getElementById('modalChartTitle').innerText = `${s.name} (${s.ticker})`;
+            document.getElementById('modalChartPrice').innerText = `${s.close.toFixed(2)} ج.م`;
+            
+            const chgElem = document.getElementById('modalChartChg');
+            const isP = s.chg >= 0;
+            chgElem.innerText = `${isP ? '+' : ''}${s.chg.toFixed(2)}%`;
+            chgElem.className = `text-[10px] font-bold px-1.5 py-0.2 rounded border ${isP ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800'}`;
+
+            document.getElementById('modalChartSupport').innerText = `${valData.support.toFixed(2)} ج`;
+            document.getElementById('modalChartResistance').innerText = `${valData.resistance.toFixed(2)} ج`;
+            document.getElementById('modalChartRsi').innerText = `${s.rsi ? s.rsi.toFixed(1) : '50.0'}`;
+
+            document.getElementById('stockChartModal').classList.remove('hidden');
+            setTimeout(() => drawCandlestickChart(s, valData), 50);
+        }
+
+        function closeChartModal() {
+            document.getElementById('stockChartModal').classList.add('hidden');
+        }
+
+        function drawCandlestickChart(stock, valData) {
+            const canvas = document.getElementById('candlestickCanvas');
+            if (!canvas) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Generate 30 historical sessions candles ending with current price
+            const numCandles = 28;
+            const candles = [];
+            let lastClose = stock.close * 0.88;
+            for (let i = 0; i < numCandles; i++) {
+                const isUp = Math.random() > 0.45;
+                const change = (Math.random() * 0.035 - 0.015) * lastClose;
+                let open = lastClose;
+                let close = (i === numCandles - 1) ? stock.close : open + change;
+                let high = Math.max(open, close) + Math.random() * (open * 0.015);
+                let low = Math.min(open, close) - Math.random() * (open * 0.015);
+                candles.push({ open, high, low, close });
+                lastClose = close;
+            }
+
+            // Min and Max price
+            let minP = Math.min(...candles.map(c => c.low), valData.support * 0.98);
+            let maxP = Math.max(...candles.map(c => c.high), valData.resistance * 1.02);
+            const rangeP = maxP - minP || 1;
+
+            const chartTop = 15;
+            const chartBottom = h - 45;
+            const chartHeight = chartBottom - chartTop;
+
+            function getY(p) {
+                return chartBottom - ((p - minP) / rangeP) * chartHeight;
+            }
+
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let k = 0; k <= 4; k++) {
+                const yG = chartTop + (chartHeight / 4) * k;
+                ctx.beginPath();
+                ctx.moveTo(35, yG);
+                ctx.lineTo(w, yG);
+                ctx.stroke();
+
+                const pVal = maxP - (rangeP / 4) * k;
+                ctx.fillStyle = '#64748b';
+                ctx.font = '9px Cairo';
+                ctx.textAlign = 'right';
+                ctx.fillText(pVal.toFixed(1), 30, yG + 3);
+            }
+
+            // Draw Support & Resistance Dashed Lines
+            ctx.setLineDash([4, 4]);
+            // Support
+            const ySup = getY(valData.support);
+            ctx.strokeStyle = '#10b981';
+            ctx.beginPath();
+            ctx.moveTo(35, ySup);
+            ctx.lineTo(w, ySup);
+            ctx.stroke();
+
+            // Resistance
+            const yRes = getY(valData.resistance);
+            ctx.strokeStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.moveTo(35, yRes);
+            ctx.lineTo(w, yRes);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw Candles
+            const candleAreaWidth = w - 45;
+            const stepX = candleAreaWidth / numCandles;
+            const candleW = Math.max(3, stepX * 0.65);
+
+            const sma20Points = [];
+            const sma50Points = [];
+
+            candles.forEach((c, idx) => {
+                const x = 40 + idx * stepX + stepX / 2;
+                const isGreen = c.close >= c.open;
+                const color = isGreen ? '#10b981' : '#f43f5e';
+
+                const yOpen = getY(c.open);
+                const yClose = getY(c.close);
+                const yHigh = getY(c.high);
+                const yLow = getY(c.low);
+
+                // Wick
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(x, yHigh);
+                ctx.lineTo(x, yLow);
+                ctx.stroke();
+
+                // Body
+                ctx.fillStyle = color;
+                const topBody = Math.min(yOpen, yClose);
+                const bodyH = Math.max(2, Math.abs(yClose - yOpen));
+                ctx.fillRect(x - candleW / 2, topBody, candleW, bodyH);
+
+                // SMA 20 mock
+                if (idx >= 5) {
+                    const avg = candles.slice(Math.max(0, idx - 10), idx + 1).reduce((a, b) => a + b.close, 0) / (idx - Math.max(0, idx - 10) + 1);
+                    sma20Points.push({ x, y: getY(avg) });
+                }
+            });
+
+            // Draw SMA Line
+            if (sma20Points.length > 1) {
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.moveTo(sma20Points[0].x, sma20Points[0].y);
+                for (let j = 1; j < sma20Points.length; j++) {
+                    ctx.lineTo(sma20Points[j].x, sma20Points[j].y);
+                }
+                ctx.stroke();
+            }
+
+            // RSI Sub-bar at the bottom
+            const rsiY = h - 25;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(40, rsiY, w - 45, 18);
+            ctx.fillStyle = stock.rsi <= 35 ? '#f59e0b' : stock.rsi >= 70 ? '#c084fc' : '#38bdf8';
+            const rsiBarW = ((stock.rsi || 50) / 100) * (w - 45);
+            ctx.fillRect(40, rsiY, rsiBarW, 18);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 9px Cairo';
+            ctx.textAlign = 'right';
+            ctx.fillText(`RSI (14): ${(stock.rsi || 50).toFixed(1)}`, w - 10, rsiY + 12);
+        }
+
+        // 6. Interactive AI Financial Advisor Chatbot
+        function askAiAdvisor(question) {
+            triggerHaptic('medium');
+            document.getElementById('aiChatInput').value = question;
+            sendUserAiQuestion();
+        }
+
+        function sendUserAiQuestion() {
+            triggerHaptic('medium');
+            const input = document.getElementById('aiChatInput');
+            const q = input.value.trim();
+            if (!q) return;
+
+            const box = document.getElementById('aiChatOutput');
+            box.classList.remove('hidden');
+
+            const userBubble = `<div class="p-2 bg-slate-800 rounded-lg text-white font-bold text-left">👤 ${q}</div>`;
+            box.innerHTML += userBubble;
+            input.value = '';
+
+            const loadingId = 'loading_' + Date.now();
+            box.innerHTML += `<div id="${loadingId}" class="p-2 bg-sky-950/70 border border-sky-800 text-sky-200 rounded-lg pulse-live">🤖 جاري التحليل المالي واستدعاء بيانات السوق...</div>`;
+            box.scrollTop = box.scrollHeight;
+
+            setTimeout(() => {
+                const elem = document.getElementById(loadingId);
+                if (elem) elem.remove();
+                const reply = generateAiFinancialResponse(q);
+                box.innerHTML += `<div class="p-2.5 bg-slate-800/90 border border-slate-700 text-slate-100 rounded-lg leading-relaxed">${reply}</div>`;
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+        }
+
+        function generateAiFinancialResponse(q) {
+            const lower = q.toLowerCase();
+            if (lower.includes('طلعت') || lower.includes('tmgh')) {
+                return `🏛️ <b>تحليل سهم مجموعة طلعت مصطفى (TMGH):</b><br>
+                • <b>التقييم وسيناريو السعر العادل:</b> يتداول السهم عند 95.00 ج بهامش أمان استثماري يفوق <b>+24%</b> نحو السعر العادل الأساسي (118.00 ج) ومستهدف صاعد (135.00 ج).<br>
+                • <b>الجانب الفني:</b> يقترب مؤشر RSI من منطقة تشبع بيعي ارتدادي (38.5) مع قاع دعم رئيسي عند 92.00 ج.<br>
+                • <b>إفصاحات الداخليين:</b> تم رصد صفقات شراء قوية من مجلس الإدارة بنحو 250,000 سهم مما يعكس ثقة الإدارة بتدفقات مشروع رأس الحكمة.`;
+            } else if (lower.includes('فوري') || lower.includes('fwry')) {
+                return `💳 <b>تحليل سهم فوري لتكنولوجيا المدفوعات (FWRY):</b><br>
+                • <b>منطقة التبريد والتجميع:</b> السهم حالياً عند 18.88 ج، ويشهد تماسكاً فوق منطقة الدعم الفني 18.20 ج.<br>
+                • <b>مستهدف الصعود:</b> السعر العادل التوازني 22.80 ج والسيناريو المتفائل 26.50 ج (+20% إلى +35%).<br>
+                • <b>التوصية:</b> الشراء التدريجي على دفعات وتفعيل التبريد الذكي في حال ملامسة 18.20 ج.`;
+            } else if (lower.includes('توزيع') || lower.includes('كوبون')) {
+                return `💰 <b>أقوى أسهم التوزيعات النقدية المتوافقة مع الشريعة حالياً:</b><br>
+                1. <b>أبو قير للأسمدة (ABUK):</b> عائد توزيع قياسي يقترب من <b>11.8%</b> (كوبون متوقع 7.50 ج).<br>
+                2. <b>موبكو للأسمدة (MFPC):</b> عائد سنوي <b>9.2%</b> (كوبون 4.25 ج) مع هوامش تصدير قوية.<br>
+                3. <b>النساجون الشرقيون (ORWE):</b> عائد <b>9.0%</b> وتوزيعات نقدية مستقرة تاريخياً.<br>
+                4. <b>سيدي كرير (SKPC):</b> عائد <b>8.2%</b> ومكرر ربحية مغرٍ جداً (5.8x).`;
+            } else if (lower.includes('زكاة')) {
+                return `🕌 <b>دليل حساب زكاة الأسهم حسب معايير AAOIFI:</b><br>
+                • <b>المضارب (عروض التجارة):</b> يُخرج الزكاة عن كامل القيمة السوقية للمحفظة في يوم تمام الحول بنسبة <b>2.577%</b> للسنة الميلادية.<br>
+                • <b>المستثمر طويل الأجل (النماء):</b> يُزكي حصة السهم من الأصول الزكوية المتداولة للشركات (متوسط 25% من القيمة السوقية)، مما يخفف عبء الزكاة بصورة شرعية معتمدة.`;
+            } else {
+                return `📊 <b>رأي المستشار المالي الرقمي:</b><br>
+                السوق المصري يشهد تجميعاً إيجابياً في أسهم التصدير والبتروكيماويات وصناديق الذهب الإسلامية. يُنصح بالالتزام بهامش أمان استثماري أعلى من 15% وتوزيع السيولة بين الأسهم القيادية وصناديق التحوط (AZG, THNDR Gold).`;
+            }
+        }
+
+        // 7. Live Cloud Auto-Sync via market_data.json
+        function syncLiveMarketData() {
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.add('rotate-180');
+            const badge = document.getElementById('syncStatusText');
+            if (badge) badge.innerText = "جاري المزامنة...";
+
+            fetch('./market_data.json?t=' + Date.now())
+                .then(resp => {
+                    if (!resp.ok) throw new Error('Network response not ok');
+                    return resp.json();
+                })
+                .then(data => {
+                    console.log('[Cloud Sync] Received live data:', data);
+                    if (data.fx_gold && data.fx_gold.usd_egp) {
+                        document.getElementById('ticker_usd').innerText = `${data.fx_gold.usd_egp.close} ج`;
+                    }
+                    if (data.fx_gold && data.fx_gold.gold_24k) {
+                        document.getElementById('ticker_gold').innerText = `${data.fx_gold.gold_24k.close.toLocaleString()} ج`;
+                    }
+                    if (data.indices && data.indices.EGX33) {
+                        document.getElementById('ticker_egx33').innerText = `${data.indices.EGX33.close.toLocaleString()}`;
+                    }
+                    if (data.ai_pulse && data.ai_pulse.text) {
+                        document.getElementById('ai_pulse_text').innerText = data.ai_pulse.text;
+                        if (data.ai_pulse.score) {
+                            document.getElementById('ai_score_badge').innerText = `متفائلة (${data.ai_pulse.score}%)`;
+                        }
+                        if (data.ai_pulse.lead_sector) {
+                            document.getElementById('ai_sector_badge').innerText = data.ai_pulse.lead_sector;
+                        }
+                    }
+                    if (data.dividends_calendar) {
+                        renderDividendsTable(data.dividends_calendar);
+                    }
+                    if (badge) badge.innerText = "محدث سحابياً ✓";
+                    showToast("تمت المزامنة اللحظية مع السحابة بنجاح", "success");
+                })
+                .catch(err => {
+                    console.warn('[Cloud Sync] Using bundled local state:', err);
+                    if (badge) badge.innerText = "مزامنة محلية";
+                })
+                .finally(() => {
+                    if (icon) setTimeout(() => icon.classList.remove('rotate-180'), 500);
+                    renderStocks();
+                    renderHoldingsTable();
+                });
+        }
+
+        function refreshData() {
+            triggerHaptic('medium');
+            syncLiveMarketData();
+        }
+
+        // 8. Stocks Radar & Filter Logic
         let currentFilter = 'all';
 
         function renderStocks() {
             const container = document.getElementById('stocksContainer');
             const search = document.getElementById('searchInput').value.trim().toLowerCase();
             const institutionalBox = document.getElementById('radarInstitutionalBox');
+            if (!container) return;
             container.innerHTML = '';
             institutionalBox.innerHTML = '';
 
-            // Handle Institutional Specialized Views
+            // Specialized Views
             if (currentFilter === 'insiders') {
                 institutionalBox.innerHTML = `
                     <div class="glass-card rounded-2xl p-4 space-y-3 border-amber-900/60 bg-gradient-to-br from-slate-900 to-amber-950/30">
@@ -956,13 +1729,6 @@
                         </div>
                     </div>
                 `;
-            } else if (currentFilter === 'dividends') {
-                institutionalBox.innerHTML = `
-                    <div class="glass-card rounded-2xl p-4 space-y-2 border-amber-900/60 bg-gradient-to-br from-slate-900 to-amber-950/30 text-xs">
-                        <h3 class="font-bold text-amber-300">💡 توزيعات الأرباح النقدية المرتفعة:</h3>
-                        <p class="text-slate-300 text-[11px]">يتم فرز الأسهم أدناه حسب عوائد التوزيع النقدي الأقوى في البورصة المصرية مع مراجعة الشريعة.</p>
-                    </div>
-                `;
             }
 
             const filtered = STOCKS_DATA.filter(s => {
@@ -998,7 +1764,8 @@
                 const peBadge = s.pe ? `<span class="text-[10px] text-slate-400">P/E: <b>${s.pe}x</b></span>` : '';
 
                 const card = document.createElement('div');
-                card.className = "glass-card rounded-xl p-3 flex items-center justify-between hover:border-slate-600 transition active:scale-99";
+                card.className = "glass-card rounded-xl p-3 flex items-center justify-between hover:border-slate-600 transition cursor-pointer active:scale-99";
+                card.onclick = () => openStockChart(s.ticker);
                 card.innerHTML = `
                     <div class="space-y-0.5">
                         <div class="flex items-center gap-2">
@@ -1038,7 +1805,6 @@
             renderStocks();
         }
 
-        // 4. Valuation Card Render
         function renderValuationCard() {
             triggerHaptic('selection');
             const ticker = document.getElementById('valuationStockSelect').value;
@@ -1100,11 +1866,34 @@
                     <div class="p-3 bg-slate-900/70 border border-slate-800 rounded-xl text-xs text-slate-300 leading-relaxed">
                         <b class="text-emerald-400">💡 الخلاصة والتقييم الاستثماري:</b> ${data.analysis}
                     </div>
+
+                    <button onclick="openStockChart('${ticker}')" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs py-2 rounded-xl transition border border-slate-700 flex items-center justify-center gap-1.5">
+                        <span>📈</span>
+                        <span>فتح شارت الشموع اليابانية التفاعلي لهذا السهم</span>
+                    </button>
                 </div>
             `;
         }
 
-        // 5. Tab Switching
+        function renderDividendsTable(calendarData) {
+            const tbody = document.getElementById('dividendsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            calendarData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/30";
+                tr.innerHTML = `
+                    <td class="py-2.5 font-bold text-white">${item.name} (${item.ticker})</td>
+                    <td class="py-2.5 text-amber-300 font-bold">${item.coupon.toFixed(2)} ج</td>
+                    <td class="py-2.5 text-emerald-400 font-bold">${item.yield_pct.toFixed(1)}%</td>
+                    <td class="py-2.5 text-slate-300">${item.cum_date}</td>
+                    <td class="py-2.5 text-slate-400">${item.pay_date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 9. Tab Switching
         function switchTab(tabId, btn) {
             triggerHaptic('medium');
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -1123,7 +1912,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 6. Smart DCA Logic
+        // 10. Smart DCA Logic
         function runDcaCalculation() {
             triggerHaptic('medium');
             const q1 = parseFloat(document.getElementById('calc_q1').value) || 0;
@@ -1153,7 +1942,63 @@
             out.classList.remove('hidden');
         }
 
-        // 7. Zakat Calculator
+        // 11. Compound Wealth Calculator
+        function calculateCompoundWealth() {
+            triggerHaptic('medium');
+            const initial = parseFloat(document.getElementById('cw_initial').value) || 0;
+            const monthly = parseFloat(document.getElementById('cw_monthly').value) || 0;
+            const divYield = (parseFloat(document.getElementById('cw_yield').value) || 0) / 100;
+            const capitalGrowth = (parseFloat(document.getElementById('cw_growth').value) || 0) / 100;
+            const totalRate = divYield + capitalGrowth;
+
+            function futureVal(years) {
+                let val = initial;
+                for (let y = 1; y <= years; y++) {
+                    val = (val + (monthly * 12)) * (1 + totalRate);
+                }
+                return val;
+            }
+
+            const y3 = futureVal(3);
+            const y5 = futureVal(5);
+            const y10 = futureVal(10);
+            const y15 = futureVal(15);
+
+            const out = document.getElementById('cw_output');
+            out.innerHTML = `
+                <div class="font-bold text-amber-300">🌟 توقعات نمو الثروة التراكمية مع إعادة استثمار الكوبونات:</div>
+                <div class="grid grid-cols-2 gap-2 text-center pt-1">
+                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
+                        <span class="text-slate-400 text-[10px] block">بعد 3 سنوات</span>
+                        <b class="text-white text-xs font-mono">${y3.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
+                    </div>
+                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
+                        <span class="text-slate-400 text-[10px] block">بعد 5 سنوات</span>
+                        <b class="text-emerald-400 text-xs font-mono">${y5.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
+                    </div>
+                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
+                        <span class="text-slate-400 text-[10px] block">بعد 10 سنوات</span>
+                        <b class="text-amber-400 text-xs font-mono">${y10.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
+                    </div>
+                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
+                        <span class="text-slate-400 text-[10px] block">بعد 15 سنة</span>
+                        <b class="text-purple-400 text-xs font-mono">${y15.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">توضح هذه الأرقام القوة الهائلة لأثر الفائدة المركبة ($Compounding$) عند إعادة شراء وثائق صناديق الذهب والأسهم الشريعية بانتظام.</p>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 12. Zakat Calculator
+        function fillZakatFromPortfolio() {
+            triggerHaptic('light');
+            let total = 0;
+            userHoldings.forEach(h => total += (h.cur * h.qty));
+            document.getElementById('zakat_val').value = Math.round(total);
+            showToast("تم جلب قيمة المحفظة لحساب الزكاة", "info");
+        }
+
         function calculateZakat(type) {
             triggerHaptic('medium');
             const val = parseFloat(document.getElementById('zakat_val').value) || 0;
@@ -1179,10 +2024,10 @@
             out.classList.remove('hidden');
         }
 
-        // 8. Conditional Alerts Manager
+        // 13. Conditional Alerts & Push Notification Handler
         let myAlerts = [
-            { id: 1, stock: "TMGH", desc: "تنبيه عند هبوط السعر دون 92.00 ج", active: true },
-            { id: 2, stock: "FWRY", desc: "تنبيه عند وصول RSI < 35 (تشبع بيعي)", active: true }
+            { id: 1, stock: "TMGH", cond: "price_below", target: 92.00, desc: "السعر هبط دون 92.00 ج", active: true },
+            { id: 2, stock: "FWRY", cond: "rsi_oversold", target: 35, desc: "RSI دخل منطقة تشبع بيعي (< 35)", active: true }
         ];
 
         function renderAlerts() {
@@ -1213,9 +2058,9 @@
             triggerHaptic('medium');
             const stock = document.getElementById('alertStockSelect').value;
             const cond = document.getElementById('alertConditionSelect').value;
-            const target = document.getElementById('alertTargetVal').value;
+            const target = parseFloat(document.getElementById('alertTargetVal').value);
 
-            if (!target && !cond.includes('rsi')) {
+            if (isNaN(target) && !cond.includes('rsi')) {
                 alert('يرجى كتابة القيمة المستهدفة للتنبيه');
                 return;
             }
@@ -1226,9 +2071,10 @@
             else if (cond === 'rsi_oversold') desc = `RSI دخل منطقة تشبع بيعي (< 35)`;
             else if (cond === 'rsi_overbought') desc = `RSI دخل منطقة تشبع شرائي (> 70)`;
 
-            myAlerts.push({ id: Date.now(), stock: stock, desc: desc, active: true });
+            myAlerts.push({ id: Date.now(), stock: stock, cond: cond, target: target || 35, desc: desc, active: true });
             document.getElementById('alertTargetVal').value = '';
             renderAlerts();
+            showToast(`تمت إضافة التنبيه لسهم ${stock}`, "success");
         }
 
         function removeAlert(id) {
@@ -1237,83 +2083,120 @@
             renderAlerts();
         }
 
-        // 9. Refresh Button Animation
-        function refreshData() {
+        function requestNotificationPermission() {
             triggerHaptic('medium');
-            const icon = document.getElementById('refreshIcon');
-            icon.classList.add('rotate-180');
-            setTimeout(() => {
-                icon.classList.remove('rotate-180');
-                renderStocks();
-            }, 600);
+            if (!("Notification" in window)) {
+                alert("متصفحك الحالي لا يدعم إشعارات النظام المباشرة، يتم استخدام تنبيهات المنصة الداخلية.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    showToast("تم تفعيل إشعارات الجوال بنجاح! ستصلك تنبيهات الأسعار الفورية.", "success");
+                    new Notification("منظومة الأسهم الشرعية", {
+                        body: "تم تفعيل إشعارات الأسهم والفرص بنجاح 🟢",
+                        icon: "icon-192.png"
+                    });
+                } else {
+                    showToast("لم يتم منح إذن الإشعارات", "warning");
+                }
+            });
         }
 
-        // 10. Initialize Chart & Holdings Table
-        window.addEventListener('DOMContentLoaded', () => {
-            renderStocks();
-            renderAlerts();
-            renderValuationCard();
+        function checkUserAlerts() {
+            myAlerts.forEach(a => {
+                const s = STOCKS_DATA.find(x => x.ticker === a.stock);
+                if (!s) return;
+                let hit = false;
+                if (a.cond === 'price_below' && s.close <= a.target) hit = true;
+                if (a.cond === 'price_above' && s.close >= a.target) hit = true;
+                if (a.cond === 'rsi_oversold' && s.rsi && s.rsi <= 35) hit = true;
+                if (a.cond === 'rsi_overbought' && s.rsi && s.rsi >= 70) hit = true;
 
-            // Populate Holdings Table
-            const myHoldings = [
-                { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.14, cur: 131.30 },
-                { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00 },
-                { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.88, cur: 23.27 },
-                { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00 },
-                { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.77, cur: 52.01 },
-                { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 43.43, cur: 42.35 },
-                { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00 },
-                { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80 },
-                { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88 },
-                { ticker: "RACC", name: "راية مراكز", qty: 2, buy: 11.21, cur: 9.65 }
-            ];
+                if (hit && a.active) {
+                    showToast(`🚨 تنبيه متحقق: ${a.stock} - ${a.desc}`, 'warning');
+                    if (Notification.permission === 'granted') {
+                        new Notification(`🚨 تنبيه سهم ${a.stock}`, {
+                            body: `${a.desc} • السعر الحالي: ${s.close.toFixed(2)} ج`,
+                            icon: 'icon-192.png'
+                        });
+                    }
+                }
+            });
+        }
 
-            const tbody = document.getElementById('holdingsTableBody');
-            let totalMarketVal = 0;
-            myHoldings.forEach(h => {
-                const pnl = (h.cur - h.buy) * h.qty;
-                const pnlPct = ((h.cur - h.buy) / h.buy) * 100;
-                const isP = pnl >= 0;
-                totalMarketVal += h.cur * h.qty;
+        // 14. Report Exporting (PDF / CSV)
+        function exportPortfolioToCsv() {
+            triggerHaptic('medium');
+            let csv = "\uFEFFالسهم,الرمز,القطاع,الكمية,سعر_الشراء,السعر_الحالي,القيمة_السوقية,الربح_الخسارة,العائد_%\n";
+            userHoldings.forEach(h => {
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+                csv += `"${h.name}","${h.ticker}","${h.sector || ''}",${h.qty},${h.buy.toFixed(2)},${h.cur.toFixed(2)},${mVal.toFixed(2)},${pnl.toFixed(2)},${pnlPct.toFixed(2)}%\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `EGX_Sharia_Portfolio_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("تم تنزيل كشف المحفظة بصيغة Excel (CSV)", "success");
+        }
 
+        function printPortfolioStatement() {
+            triggerHaptic('medium');
+            const tbody = document.getElementById('printTableBody');
+            tbody.innerHTML = '';
+            let totalM = 0;
+            let totalC = 0;
+            userHoldings.forEach(h => {
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                totalM += mVal;
+                totalC += cost;
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40";
                 tr.innerHTML = `
-                    <td class="py-2"><span class="font-bold text-white">${h.name}</span> <span class="text-[9px] text-slate-400">(${h.ticker})</span></td>
-                    <td class="py-2">${h.qty}</td>
-                    <td class="py-2 text-slate-300">${h.buy.toFixed(2)}</td>
-                    <td class="py-2 font-bold text-white">${h.cur.toFixed(2)}</td>
-                    <td class="py-2 font-bold ${isP ? 'text-emerald-400' : 'text-rose-400'}">${isP ? '+' : ''}${pnl.toFixed(1)} (${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</td>
+                    <td class="border p-2 font-bold">${h.name} (${h.ticker})</td>
+                    <td class="border p-2">${h.qty}</td>
+                    <td class="border p-2">${h.buy.toFixed(2)} ج</td>
+                    <td class="border p-2">${h.cur.toFixed(2)} ج</td>
+                    <td class="border p-2">${mVal.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
+                    <td class="border p-2 ${pnl>=0?'text-green-700':'text-red-700'}">${pnl>=0?'+':''}${pnl.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
                 `;
                 tbody.appendChild(tr);
             });
+            document.getElementById('printDate').innerText = `تاريخ الاستخراج: ${new Date().toLocaleDateString('ar-EG')} - الساعة: ${new Date().toLocaleTimeString('ar-EG')}`;
+            document.getElementById('printTotalVal').innerText = `${totalM.toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م`;
+            document.getElementById('printTotalPnl').innerText = `${(totalM - totalC)>=0?'+':''}${(totalM - totalC).toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م`;
+            document.getElementById('printZakatVal').innerText = `${(totalM * 0.02577).toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م`;
 
-            document.getElementById('p_total_val').innerText = `${totalMarketVal.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
+            window.print();
+        }
 
-            // Render Donut Chart
-            const ctx = document.getElementById('portfolioDonutChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['العقارات والإنشاءات', 'البتروكيماويات والأسمدة', 'الذهب وصناديق التحوط', 'التكنولوجيا والمدفوعات', 'الأغذية والأدوية', 'الصناعة والتصدير'],
-                    datasets: [{
-                        data: [34, 22, 16, 12, 10, 6],
-                        backgroundColor: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: '#94a3b8', font: { family: 'Cairo', size: 10 }, boxWidth: 10 }
-                        }
-                    },
-                    cutout: '70%'
-                }
-            });
+        // 15. Initial Load & Setup
+        window.addEventListener('DOMContentLoaded', () => {
+            loadUserPortfolio();
+            renderStocks();
+            renderAlerts();
+            renderValuationCard();
+            renderDividendsTable([
+                { ticker: "ABUK", name: "أبو قير للأسمدة", coupon: 7.50, yield_pct: 11.8, cum_date: "أكتوبر 2026", pay_date: "نوفمبر 2026" },
+                { ticker: "MFPC", name: "موبكو للأسمدة", coupon: 4.25, yield_pct: 9.2, cum_date: "مارس 2026", pay_date: "إبريل 2026" },
+                { ticker: "ORWE", name: "النساجون الشرقيون", coupon: 2.40, yield_pct: 9.0, cum_date: "إبريل 2026", pay_date: "مايو 2026" },
+                { ticker: "AMOC", name: "أموك للبترول", coupon: 1.10, yield_pct: 8.4, cum_date: "سبتمبر 2026", pay_date: "أكتوبر 2026" },
+                { ticker: "SKPC", name: "سيدي كرير", coupon: 1.50, yield_pct: 8.2, cum_date: "مارس 2026", pay_date: "إبريل 2026" }
+            ]);
+
+            // Attempt Cloud Live Sync immediately
+            syncLiveMarketData();
+
+            // Periodic auto-sync every 60 seconds
+            setInterval(() => {
+                syncLiveMarketData();
+            }, 60000);
         });
     </script>
 </body>
