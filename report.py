@@ -51,9 +51,9 @@ offset = 0
 _startup_epoch = 0  # سيُحدَّث في __main__
 
 # Tickers definition
-PORTFOLIO = ["EGAL", "TMGH", "ETEL", "EFID", "ADIB", "ORHD", "EFIH", "OCDI"]
+PORTFOLIO = ["ETEL", "TMGH", "EFIH", "EGAL", "ADIB", "ORHD", "OCDI", "EFID", "FWRY", "RACC"]
 WATCHLIST = [
-    "RACC", "FWRY", "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
+    "ORAS", "PHDC", "SKPC", "MCQE", "FAITA", "ISPH", "JUFO", "AMOC",
     "MASR", "ORWE", "RMDA", "OLFI", "ARCC", "FAIT", "IFAP", "MTIE",
     "SAUD", "ATQA", "CIRA", "EGAS", "MPCO", "ACGC", "ETRS", "LCSW", "ICFC"
 ]
@@ -1823,6 +1823,18 @@ def send_daily_summary():
     chart_file = generate_market_chart(indices_data, stocks_data)
     if chart_file and os.path.exists(chart_file):
         send_telegram_photo(chart_file, caption=f"📊 <b>شارت الأداء الفني ومؤشر الزخم RSI لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>")
+        
+    # ✅ إضافة: كشف حساب المحفظة الاستثمارية P&L اللحظي
+    try:
+        state_data, _ = get_github_state()
+        user_holdings = state_data.get("holdings", {})
+        if user_holdings:
+            pnl_data = calculate_portfolio_pnl(user_holdings, stocks_data)
+            if pnl_data and pnl_data.get("details"):
+                pnl_msg = format_portfolio_pnl_message(pnl_data)
+                reply_telegram(pnl_msg)
+    except Exception as e:
+        print("Error sending daily portfolio summary:", e)
         
     return True
 
