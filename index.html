@@ -845,12 +845,34 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0b0f19');
         }
 
-        // PWA Service Worker Registration
+        // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('[PWA] SW registered:', reg.scope))
+                    .then(reg => {
+                        console.log('[PWA] SW registered:', reg.scope);
+                        try { reg.update(); } catch(e) {}
+                        reg.onupdatefound = () => {
+                            const newWorker = reg.installing;
+                            if (newWorker) {
+                                newWorker.onstatechange = () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        showToast("✨ تم تطبيق أحدث ترقية وتحديث تلقائياً!", "success");
+                                        setTimeout(() => window.location.reload(), 1200);
+                                    }
+                                };
+                            }
+                        };
+                    })
                     .catch(err => console.log('[PWA] SW failed:', err));
+
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                });
             });
         }
 
