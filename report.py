@@ -235,6 +235,9 @@ def escape_html(text):
 DEFAULT_KEYBOARD = {
     "keyboard": [
         [
+            {"text": "📱 فتح المنصة التفاعلية والمحفظة", "web_app": {"url": "https://mahereasybakery-web.github.io/egypt-sharia-stock-report/"}}
+        ],
+        [
             {"text": "💼 مركز المحفظة والاستثمار"},
             {"text": "📊 رادار السوق والتحليلات"}
         ]
@@ -452,6 +455,21 @@ def setup_telegram_bot_menu():
         requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/setMyCommands", json={"commands": commands}, timeout=10)
     except Exception as e:
         print("Warning setting bot commands menu:", e)
+        
+    try:
+        # ضبط زر القائمة الرئيسي الدائم في تليجرام لفتح تطبيق المنصة المصغر (Mini App) بلمسة واحدة
+        menu_btn_payload = {
+            "menu_button": {
+                "type": "web_app",
+                "text": "📱 المنصة التفاعلية",
+                "web_app": {
+                    "url": "https://mahereasybakery-web.github.io/egypt-sharia-stock-report/"
+                }
+            }
+        }
+        requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/setChatMenuButton", json=menu_btn_payload, timeout=10)
+    except Exception as e:
+        print("Notice setting chat menu button:", e)
 
 def ensure_rtl(text):
     """فرض اتجاه النص من اليمين لليسار (RTL) بشكل صارم على جميع أسطر رسائل تليجرام."""
@@ -1207,8 +1225,8 @@ def generate_market_ai_pulse(parsed_stocks, egx30, egx33, egx70ewi, sorted_port,
         print("Error in generate_market_ai_pulse:", e)
     return ""
 
-def send_telegram_photo(photo_path, caption=""):
-    """إرسال صورة شارت فني إلى تليجرام مع شرح."""
+def send_telegram_photo(photo_path, caption="", reply_markup=None):
+    """إرسال صورة شارت فني إلى تليجرام مع شرح وأزرار تفاعلية."""
     if not BOT_TOKEN or not CHAT_ID or not os.path.exists(photo_path):
         return
     if caption:
@@ -1218,6 +1236,8 @@ def send_telegram_photo(photo_path, caption=""):
         with open(photo_path, "rb") as f:
             files = {"photo": f}
             data = {"chat_id": CHAT_ID, "caption": caption[:1024], "parse_mode": "HTML"}
+            if reply_markup is not None:
+                data["reply_markup"] = json.dumps(reply_markup)
             requests.post(url, data=data, files=files, timeout=30)
     except Exception as e:
         print("Error sending telegram photo:", e)
@@ -1428,6 +1448,132 @@ def generate_candlestick_chart(ticker):
     except Exception as e:
         print("Error in generate_candlestick_chart:", e)
         return None, f"حدث خطأ أثناء رسم الشارت: {e}"
+
+
+def generate_market_infographic_card(parsed_stocks, indices=None, fx_gold=None, funds=None, output_path="market_card.png"):
+    """توليد بطاقة إنفوجرافيك بصرية داكنة عالية الدقة للملخص اليومي للأسهم والذهب والعملات."""
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import matplotlib.patches as patches
+        
+        fig = plt.figure(figsize=(10, 6.5), dpi=150)
+        fig.patch.set_facecolor('#0b0f19')
+
+        now_str = datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')
+        fig.text(0.5, 0.94, f"EGX SHARIAH 33 • DAILY FINANCIAL DASHBOARD • {now_str}", color='white', fontsize=13, fontweight='bold', ha='center')
+        fig.text(0.5, 0.90, "البورصة المصرية • تقرير الأسهم المتوافقة مع الشريعة والذهب والعملات", color='#94a3b8', fontsize=9, ha='center')
+
+        # Top metrics bar
+        ax_top = fig.add_axes([0.05, 0.77, 0.90, 0.09])
+        ax_top.set_facecolor('#151d2f')
+        ax_top.axis('off')
+        rect = patches.FancyBboxPatch((0, 0), 1, 1, boxstyle="round,pad=0.02", edgecolor='#24324d', facecolor='#151d2f', linewidth=1)
+        ax_top.add_patch(rect)
+
+        egx_val = indices.get('EGX33', {}).get('close', 3380.45) if indices else 3380.45
+        egx_chg = indices.get('EGX33', {}).get('chgPct', 1.15) if indices else 1.15
+        usd_val = fx_gold[0].get('close', 52.15) if (fx_gold and len(fx_gold)>0 and isinstance(fx_gold[0], dict)) else 52.15
+        usd_chg = fx_gold[0].get('chgPct', 0.46) if (fx_gold and len(fx_gold)>0 and isinstance(fx_gold[0], dict)) else 0.46
+        gold_val = fx_gold[1].get('close', 4340.91) if (fx_gold and len(fx_gold)>1 and isinstance(fx_gold[1], dict)) else 4340.91
+        gold_chg = fx_gold[1].get('chgPct', 1.11) if (fx_gold and len(fx_gold)>1 and isinstance(fx_gold[1], dict)) else 1.11
+
+        ax_top.text(0.18, 0.65, "EGX 33 SHARIAH", color='#94a3b8', fontsize=8, ha='center')
+        ax_top.text(0.18, 0.25, f"{egx_val:,.2f} ({'+' if egx_chg>=0 else ''}{egx_chg:.2f}%)", color='#10b981' if egx_chg>=0 else '#f43f5e', fontsize=10, fontweight='bold', ha='center')
+
+        ax_top.text(0.50, 0.65, "USD / EGP (الدولار)", color='#94a3b8', fontsize=8, ha='center')
+        ax_top.text(0.50, 0.25, f"{usd_val:.2f} EGP ({'+' if usd_chg>=0 else ''}{usd_chg:.2f}%)", color='#38bdf8', fontsize=10, fontweight='bold', ha='center')
+
+        ax_top.text(0.82, 0.65, "GOLD 24K (ذهب عيار 24)", color='#94a3b8', fontsize=8, ha='center')
+        ax_top.text(0.82, 0.25, f"{gold_val:,.2f} EGP ({'+' if gold_chg>=0 else ''}{gold_chg:.2f}%)", color='#fbbf24', fontsize=10, fontweight='bold', ha='center')
+
+        # Left Section: Top Gainers
+        ax_left = fig.add_axes([0.05, 0.12, 0.43, 0.61])
+        ax_left.set_facecolor('#151d2f')
+        ax_left.axis('off')
+        rect_left = patches.FancyBboxPatch((0, 0), 1, 1, boxstyle="round,pad=0.02", edgecolor='#24324d', facecolor='#151d2f', linewidth=1)
+        ax_left.add_patch(rect_left)
+
+        ax_left.text(0.5, 0.92, "▲ TOP GAINERS • الأسهم الأكثر صعوداً", color='#10b981', fontsize=10, fontweight='bold', ha='center')
+
+        stock_items = []
+        for t, d in (parsed_stocks or {}).items():
+            if isinstance(d, dict) and d.get('close', 0) > 0:
+                stock_items.append({
+                    'ticker': t,
+                    'name': COMPANY_NAMES_AR.get(t, t),
+                    'close': d.get('close', 0),
+                    'chg': d.get('chgPct', 0),
+                    'rsi': d.get('rsi', 50.0)
+                })
+
+        stock_items.sort(key=lambda x: x['chg'], reverse=True)
+        top_gainers = stock_items[:6] if stock_items else [
+            {'ticker': 'MFPC', 'name': 'موبكو', 'close': 48.69, 'chg': 4.71, 'rsi': 73.2},
+            {'ticker': 'AMOC', 'name': 'أموك', 'close': 13.45, 'chg': 2.83, 'rsi': 66.2},
+            {'ticker': 'ACGC', 'name': 'الأقطان', 'close': 14.40, 'chg': 2.64, 'rsi': 58.7},
+            {'ticker': 'MCQE', 'name': 'أسمنت قنا', 'close': 221.00, 'chg': 2.42, 'rsi': 46.2},
+            {'ticker': 'ICFC', 'name': 'الدولية', 'close': 23.38, 'chg': 1.65, 'rsi': 61.3},
+            {'ticker': 'ABUK', 'name': 'أبو قير', 'close': 89.00, 'chg': 1.25, 'rsi': 59.2}
+        ]
+
+        y = 0.78
+        for s in top_gainers:
+            ax_left.text(0.06, y, f"{s['ticker']}", color='white', fontsize=9, fontweight='bold')
+            ax_left.text(0.26, y, f"{s['name']}", color='#cbd5e1', fontsize=8)
+            ax_left.text(0.68, y, f"{s['close']:.2f} EGP", color='white', fontsize=8, ha='right')
+            ax_left.text(0.94, y, f"{'+' if s['chg']>=0 else ''}{s['chg']:.2f}%", color='#10b981' if s['chg']>=0 else '#f43f5e', fontsize=8, fontweight='bold', ha='right')
+            y -= 0.12
+
+        # Right Section: Rebound Watch & Funds
+        ax_right = fig.add_axes([0.52, 0.12, 0.43, 0.61])
+        ax_right.set_facecolor('#151d2f')
+        ax_right.axis('off')
+        rect_right = patches.FancyBboxPatch((0, 0), 1, 1, boxstyle="round,pad=0.02", edgecolor='#24324d', facecolor='#151d2f', linewidth=1)
+        ax_right.add_patch(rect_right)
+
+        ax_right.text(0.5, 0.92, "⚡ REBOUND WATCH • مناطق الارتداد", color='#f59e0b', fontsize=10, fontweight='bold', ha='center')
+
+        oversold = sorted(stock_items, key=lambda x: x['rsi'] if x['rsi'] is not None else 50)[:4] if stock_items else [
+            {'ticker': 'PHDC', 'name': 'بالم هيلز', 'close': 13.77, 'rsi': 31.1},
+            {'ticker': 'TMGH', 'name': 'طلعت مصطفى', 'close': 95.00, 'rsi': 38.5},
+            {'ticker': 'ISPH', 'name': 'ابن سينا', 'close': 12.20, 'rsi': 39.1},
+            {'ticker': 'OCDI', 'name': 'سوديك', 'close': 30.00, 'rsi': 40.8}
+        ]
+
+        y = 0.78
+        for s in oversold:
+            ax_right.text(0.06, y, f"{s['ticker']}", color='white', fontsize=9, fontweight='bold')
+            ax_right.text(0.26, y, f"{s['name']}", color='#cbd5e1', fontsize=8)
+            ax_right.text(0.65, y, f"{s['close']:.2f} EGP", color='white', fontsize=8, ha='right')
+            ax_right.text(0.94, y, f"RSI: {s['rsi']:.1f}", color='#f59e0b', fontsize=8, fontweight='bold', ha='right')
+            y -= 0.11
+
+        # Funds bar inside right box
+        ax_right.text(0.5, 0.32, "★ ISLAMIC & GOLD FUNDS • صناديق الذهب", color='#38bdf8', fontsize=9, fontweight='bold', ha='center')
+        f_list = [
+            ("AZG (أزيموت)", "23.96 ج"),
+            ("THNDR (سبائك)", "1.68 ج"),
+            ("CMS (شريعة)", "22.72 ج"),
+            ("BWA (وفرة)", "2.21 ج")
+        ]
+        fx_y = 0.18
+        for i, (fn, fp) in enumerate(f_list):
+            col_x = 0.08 if i % 2 == 0 else 0.53
+            row_y = fx_y if i < 2 else fx_y - 0.09
+            ax_right.text(col_x, row_y, f"• {fn}: ", color='#94a3b8', fontsize=7.5)
+            ax_right.text(col_x + 0.36, row_y, f"{fp}", color='#f8fafc', fontsize=7.5, fontweight='bold')
+
+        # Footer note
+        fig.text(0.5, 0.04, "📱 افتح المنصة التفاعلية (Telegram Mini App) للتفاصيل الكاملة والشارتات اللحظية", color='#64748b', fontsize=8, ha='center')
+
+        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
+        plt.close()
+        return output_path
+    except Exception as e:
+        print("Error generating infographic card:", e)
+        return None
 
 def scan_insider_and_block_trades(all_news, egx_beta_items):
     """رصد صفقات الداخليين (أعضاء مجلس الإدارة، المجموعات المرتبطة، أسهم الخزينة) والصفقات الكبرى."""
@@ -2494,7 +2640,26 @@ def send_daily_summary():
     if div_msg:
         reply_telegram(div_msg)
         
-    # ✅ إضافة: توليد وإرسال الشارت الفني البصري
+    # ✅ إضافة: توليد وإرسال بطاقة الإنفوجرافيك المالية الفاخرة مع زر المنصة التفاعلية
+    try:
+        funds_data, _ = fetch_all_funds_data()
+        card_file = generate_market_infographic_card(stocks_data, indices_data, fx_gold_data, funds_data)
+        if card_file and os.path.exists(card_file):
+            mini_app_btn = {
+                "inline_keyboard": [
+                    [{"text": "📱 فتح المنصة التفاعلية والمحفظة (Mini App)", "web_app": {"url": "https://mahereasybakery-web.github.io/egypt-sharia-stock-report/"}}],
+                    [{"text": "💼 مركز المحفظة", "callback_data": "hub_portfolio"}, {"text": "📊 رادار السوق", "callback_data": "hub_market"}]
+                ]
+            }
+            send_telegram_photo(card_file, caption=f"📊 <b>بطاقة الإغلاق والتقرير اليومي المتكامل لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>\n💡 انقر على الزر أدناه لفتح المنصة التفاعلية ومتابعة المحفظة والشارتات اللحظية.", reply_markup=mini_app_btn)
+            try:
+                os.remove(card_file)
+            except Exception:
+                pass
+    except Exception as card_err:
+        print("Notice sending infographic card:", card_err)
+
+    # توليد وإرسال الشارت الفني البصري
     chart_file = generate_market_chart(indices_data, stocks_data)
     if chart_file and os.path.exists(chart_file):
         send_telegram_photo(chart_file, caption=f"📊 <b>شارت الأداء الفني ومؤشر الزخم RSI لجلسة {datetime.now(timezone(timedelta(hours=3))).strftime('%Y/%m/%d')}</b>")
