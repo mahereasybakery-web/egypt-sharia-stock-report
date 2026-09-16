@@ -229,11 +229,16 @@ def trigger_next_runner():
         "User-Agent": "PerpetualRunner"
     }
     payload = {"ref": "main", "inputs": {"force": "false"}}
-    try:
-        r = requests.post(url, headers=headers, json=payload, timeout=10)
-        print("Next runner dispatch status:", r.status_code)
-    except Exception as e:
-        print("Error dispatching next runner:", e)
+    for attempt in range(1, 4):
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=15)
+            print(f"Next runner dispatch attempt {attempt} status: {r.status_code}")
+            if r.status_code in [200, 204]:
+                return True
+        except Exception as e:
+            print(f"Attempt {attempt} error dispatching next runner: {e}")
+        time.sleep(5)
+    return False
 
 def update_github_news(new_content):
     url = "https://api.github.com/repos/mahereasybakery-web/egypt-sharia-stock-report/contents/news.txt"
@@ -2001,6 +2006,55 @@ def poll_telegram_messages():
     except Exception as e:
         print("Polling error:", e)
 
+def get_next_market_open(now):
+    # Target time is 08:45 AM
+    candidate = now.replace(hour=8, minute=45, second=0, microsecond=0)
+    # If today is already past 08:45 AM or today is weekend, advance to tomorrow
+    if now >= candidate or now.weekday() in [4, 5]:
+        candidate += timedelta(days=1)
+        candidate = candidate.replace(hour=8, minute=45, second=0, microsecond=0)
+    
+    # Keep advancing day until candidate falls on a trading day (Sunday=6, Mon=0, Tue=1, Wed=2, Thu=3)
+    # Weekend in Egypt: Friday=4, Saturday=5
+    while candidate.weekday() in [4, 5]:
+        candidate += timedelta(days=1)
+        
+    return candidate
+
+def enter_perpetual_sleep_and_relay():
+    egypt_tz = timezone(timedelta(hours=3))
+    now = datetime.now(egypt_tz)
+    target = get_next_market_open(now)
+    total_seconds = (target - now).total_seconds()
+    
+    print(f"[{now.strftime('%H:%M:%S')}] Entering Perpetual 24/7 Cloud Relay. Next market session at {target.strftime('%Y-%m-%d %H:%M:%S')} ({total_seconds/3600:.2f} hours remaining).")
+    
+    # GitHub Actions max job execution time is 6 hours (21,600s). Safe chunk is 5 hours (18,000s).
+    SAFE_CHUNK_SECONDS = 5 * 3600
+    
+    if total_seconds > SAFE_CHUNK_SECONDS:
+        sleep_duration = SAFE_CHUNK_SECONDS
+        will_chain = True
+    else:
+        sleep_duration = max(10, total_seconds)
+        will_chain = False
+        
+    print(f"[{now.strftime('%H:%M:%S')}] Relay Chunk: Sleeping for {sleep_duration/3600:.2f} hours (active Telegram polling enabled)...")
+    
+    start_time = time.time()
+    while (time.time() - start_time) < sleep_duration:
+        poll_telegram_messages()
+        time.sleep(5)
+        
+    now_after = datetime.now(egypt_tz)
+    if will_chain:
+        print(f"[{now_after.strftime('%H:%M:%S')}] 5-hour relay chunk complete. Dispatching next runner to maintain perpetual relay...")
+        trigger_next_runner()
+        sys.exit(0)
+    else:
+        print(f"[{now_after.strftime('%H:%M:%S')}] Market opening reached ({now_after.strftime('%H:%M:%S')}). Perpetual relay handoff to market session!")
+        return
+
 def wait_for_market_open():
     egypt_tz = timezone(timedelta(hours=3))
     now = datetime.now(egypt_tz)
@@ -2047,23 +2101,25 @@ if __name__ == "__main__":
     
     force_run = os.environ.get("FORCE_RUN", "false").lower() == "true"
     
-    # 1. Check weekday (Egypt stock market runs Sunday to Thursday: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun)
+    # 1. Check weekday: Weekend in Egypt is Friday/Saturday (4, 5)
     if now.weekday() in [4, 5] and not force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Market closed. Exiting.")
+        print(f"[{now.strftime('%H:%M:%S')}] Weekend (Friday/Saturday). Market closed. Entering Perpetual 24/7 Cloud Relay.")
+        enter_perpetual_sleep_and_relay()
         sys.exit(0)
         
     # 2. Check time of day: If 3:00 PM (15:00) or later, all trading and closing reports for today are finished!
-    # Any delayed/queued runner starting after 15:00 must exit immediately without sending anything.
     if (now.hour * 60 + now.minute >= 15 * 60) and not force_run:
-        print(f"[{now.strftime('%H:%M:%S')}] Past 03:00 PM Cairo time. All sessions and reports completed for today ({today_str}). Exiting cleanly.")
+        print(f"[{now.strftime('%H:%M:%S')}] Past 03:00 PM Cairo time. All sessions and reports completed for today ({today_str}). Entering Perpetual 24/7 Cloud Relay.")
+        enter_perpetual_sleep_and_relay()
         sys.exit(0)
         
-    # 3. Check state: If today's daily summary has already been sent, today's work is 100% finished!
+    # 3. Check state: If today's daily summary has already been sent, today's trading work is finished!
     if not force_run:
         try:
             state_data, _ = get_github_state()
             if state_data.get("date") == today_str and state_data.get("summary_sent", False):
-                print(f"[{now.strftime('%H:%M:%S')}] Daily closing summary was already sent today ({today_str}). Exiting cleanly.")
+                print(f"[{now.strftime('%H:%M:%S')}] Daily closing summary was already sent today ({today_str}). Entering Perpetual 24/7 Cloud Relay.")
+                enter_perpetual_sleep_and_relay()
                 sys.exit(0)
         except Exception as e:
             print(f"Warning checking initial state: {e}")
@@ -2090,7 +2146,8 @@ if __name__ == "__main__":
             print(f"[{now.strftime('%H:%M:%S')}] Market open. Scheduling next runner.")
             trigger_next_runner()
         else:
-            print(f"[{now.strftime('%H:%M:%S')}] Near/past market close or weekend. Not chaining next runner.")
+            print(f"[{now.strftime('%H:%M:%S')}] Near/past market close or weekend. Entering Perpetual 24/7 Cloud Relay.")
+            enter_perpetual_sleep_and_relay()
         sys.exit(0)
         
     wait_for_market_open()
@@ -2108,10 +2165,11 @@ if __name__ == "__main__":
             if current_time_minutes > 14 * 60 + 30:
                 print(f"[{loop_now.strftime('%H:%M:%S')}] Past 2:30 PM (market closed). Handling session close & summary.")
                 
-                # التحقق أولاً: إذا كان التقرير الختامي قد أُرسل اليوم بالفعل، نخرج فوراً دون أي إرسال متكرر
+                # التحقق أولاً: إذا كان التقرير الختامي قد أُرسل اليوم بالفعل، ننتقل للترحيل الليلي
                 state_data, state_sha = get_github_state()
                 if state_data.get("date") == today_str and state_data.get("summary_sent", False):
-                    print(f"[{loop_now.strftime('%H:%M:%S')}] Daily summary already sent today. Exiting cleanly.")
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Daily summary already sent today. Transitioning to Perpetual 24/7 Cloud Relay.")
+                    enter_perpetual_sleep_and_relay()
                     sys.exit(0)
                 
                 # إرسال تقرير الإقفال لأسعار الجلسة
@@ -2138,7 +2196,8 @@ if __name__ == "__main__":
                     state_data["summary_sent"] = True
                     update_github_state(state_data, state_sha)
                 
-                print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Daily summary sent. Terminating runner for the day.")
+                print(f"[{datetime.now(egypt_tz).strftime('%H:%M:%S')}] Daily summary sent. Transitioning to Perpetual 24/7 Cloud Relay...")
+                enter_perpetual_sleep_and_relay()
                 sys.exit(0)
                 
             # خلال ساعات الجلسة (من 08:45 صباحاً حتى 14:30 ظهراً)
@@ -2150,9 +2209,13 @@ if __name__ == "__main__":
             if i == TOTAL_CYCLES - 1:
                 # إطلاق المشغل الجديد فقط إذا كان السوق لا يزال مفتوحاً (قبل 14:30)
                 if loop_now.hour * 60 + loop_now.minute < 14 * 60 + 30:
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Market still active. Dispatching next runner to continue intraday session.")
                     trigger_next_runner()
+                    sys.exit(0)
                 else:
-                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 2:30 PM or later. Stopping chain.")
+                    print(f"[{loop_now.strftime('%H:%M:%S')}] Time is 2:30 PM or later. Transitioning to Perpetual 24/7 Cloud Relay.")
+                    enter_perpetual_sleep_and_relay()
+                    sys.exit(0)
                     
             if i < TOTAL_CYCLES - 1:
                 sleep_until_next_15min_mark()
