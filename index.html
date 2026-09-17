@@ -435,8 +435,13 @@
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-40 bg-[#080c14]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg">
+            <div class="flex items-center gap-2">
+                <!-- زر الرجوع الأيمن في الترويسة (يظهر تلقائياً عند الدخول في أي تبويب فرعي للرجوع للمحفظة) -->
+                <button id="headerBackBtn" onclick="navigateBack()" class="hidden items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shrink-0" title="الرجوع إلى المحفظة">
+                    <span class="text-sm">➔</span>
+                    <span>رجوع للمحفظة</span>
+                </button>
+                <div id="headerMainLogo" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg shrink-0">
                     ☪️
                 </div>
                 <div>
@@ -891,7 +896,7 @@
                                 <th class="pb-2">الحالي</th>
                                 <th class="pb-2">القيمة</th>
                                 <th class="pb-2">الربح / العائد</th>
-                                <th class="pb-2 text-center">حركة</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="stocksHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -932,7 +937,7 @@
                                 <th class="pb-2">الحالي</th>
                                 <th class="pb-2">القيمة</th>
                                 <th class="pb-2">الربح / العائد</th>
-                                <th class="pb-2 text-center">حركة</th>
+                                
                             </tr>
                         </thead>
                         <tbody id="fundsHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -1622,7 +1627,7 @@
     </nav>
 
         <!-- Interactive Advanced Stock Hub Modal (Full-Screen on Mobile, Card on Desktop) -->
-    <div id="stockChartModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div id="stockChartModal" onclick="if(event.target === this) navigateBack();" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
         <div class="glass-card w-full max-w-3xl h-[95vh] sm:h-auto max-h-[95vh] flex flex-col rounded-t-3xl sm:rounded-3xl p-3.5 sm:p-5 space-y-2.5 border border-slate-700 bg-slate-900/98 shadow-2xl overflow-hidden">
             
             <!-- Mobile Drag Indicator -->
@@ -1631,7 +1636,12 @@
             <!-- Modal Header: Asset, Name, Sharia, Live Price & Action Suite -->
             <div class="border-b border-slate-800 pb-2 shrink-0 space-y-2">
                 <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <!-- زر الرجوع الأيمن في نافذة الشارت -->
+                        <button onclick="navigateBack()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0 active:scale-90" title="الرجوع للصفحة السابقة">
+                            <span class="text-sm">➔</span>
+                            <span>رجوع</span>
+                        </button>
                         <div id="modalHeaderIcon" class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-sky-500/20 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/30 shrink-0">
                             📈
                         </div>
@@ -1647,7 +1657,7 @@
                     </div>
 
                     <!-- Close Button (Big Thumb Target) -->
-                    <button onclick="closeChartModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-base transition shrink-0 active:scale-90" title="إغلاق النافذة">✕</button>
+                    <button onclick="navigateBack()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-base transition shrink-0 active:scale-90" title="إغلاق النافذة">✕</button>
                 </div>
 
                 <!-- Price & Action Toolbar Row -->
@@ -1657,7 +1667,7 @@
                         <span id="modalChartChg" class="text-[11px] font-bold px-2 py-0.5 rounded-md border bg-emerald-950 text-emerald-400 border-emerald-800 font-mono">+0.00%</span>
                     </div>
 
-                    <!-- Action Suite -->
+                    <!-- Action Suite (الشراء والبيع والتبريد وحذف الأصل من داخل الشارت) -->
                     <div class="flex items-center gap-1.5">
                         <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'buy');" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="شراء للسهم / زيادة كمية">
                             <span>🟢</span>
@@ -1670,6 +1680,9 @@
                         <button onclick="quickDcaFromModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 active:scale-95" title="حساب التبريد الذكي DCA">
                             <span>📉</span>
                             <span class="hidden xs:inline">تبريد</span>
+                        </button>
+                        <button id="modalDeleteHoldingBtn" onclick="deleteHoldingFromModal()" class="bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700 p-1.5 rounded-xl transition active:scale-95" title="حذف هذا السهم من المحفظة">
+                            <span>🗑️</span>
                         </button>
                     </div>
                 </div>
@@ -1924,18 +1937,23 @@
     </div>
 
     <!-- Upgraded Buy / Sell & Multi-Source Transaction Hub Modal -->
-    <div id="holdingModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-2 sm:p-4 hidden">
+    <div id="holdingModal" onclick="if(event.target === this) navigateBack();" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-2 sm:p-4 hidden">
         <div class="glass-card w-full max-w-lg max-h-[92vh] flex flex-col rounded-2xl p-4 sm:p-5 space-y-3.5 border border-slate-700 bg-slate-900/95 shadow-2xl overflow-hidden">
             <!-- Modal Header -->
             <div class="flex items-center justify-between border-b border-slate-800 pb-2.5 shrink-0">
                 <div class="flex items-center gap-2">
+                    <!-- زر الرجوع الأيمن في نافذة الحركة -->
+                    <button onclick="navigateBack()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0 active:scale-90" title="الرجوع للصفحة السابقة">
+                        <span class="text-sm">➔</span>
+                        <span>رجوع</span>
+                    </button>
                     <span class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm border border-emerald-500/30">🔁</span>
                     <div>
                         <h3 id="holdingModalTitle" class="text-sm font-bold text-white">حركات الشراء والبيع (الأسهم والصناديق)</h3>
                         <p class="text-[10px] text-slate-400">إضافة أو بيع الأصول يدوياً، أو عبر ملف إكسيل، أو صورة الفاتورة</p>
                     </div>
                 </div>
-                <button onclick="closeHoldingModal()" class="text-slate-400 hover:text-white text-base p-1">✕</button>
+                <button onclick="navigateBack()" class="text-slate-400 hover:text-white text-base p-1" title="إغلاق">✕</button>
             </div>
 
             <!-- Mode Selector Tabs: Manual / Excel / Image -->
@@ -2157,10 +2175,15 @@
     </div>
 
     <!-- Mobile Installation Modal Guide (for iOS & General) -->
-    <div id="installModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 hidden">
+    <div id="installModal" onclick="if(event.target === this) navigateBack();" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 hidden">
         <div class="glass-card w-full max-w-md rounded-2xl p-5 space-y-4 border border-slate-700 bg-slate-900 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2.5">
+                    <!-- زر الرجوع الأيمن في نافذة التثبيت -->
+                    <button onclick="navigateBack()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0 active:scale-90" title="الرجوع للصفحة السابقة">
+                        <span class="text-sm">➔</span>
+                        <span>رجوع</span>
+                    </button>
                     <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black">
                         📲
                     </div>
@@ -2169,7 +2192,7 @@
                         <p class="text-[11px] text-slate-400">للوصول السريع والتشغيل الفوري كأي تطبيق أصلي</p>
                     </div>
                 </div>
-                <button onclick="closeInstallModal()" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+                <button onclick="navigateBack()" class="text-slate-400 hover:text-white p-1 text-base" title="إغلاق">✕</button>
             </div>
 
             <!-- Platform specific guide -->
@@ -2346,7 +2369,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.4')
+                navigator.serviceWorker.register('sw.js?v=7.5')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -2412,14 +2435,166 @@
             localStorage.setItem('pwa_banner_dismissed', 'true');
         }
 
-        function openInstallModal() {
+        function openInstallModal(pushHistory = true) {
             triggerHaptic('medium');
+            if (pushHistory) pushAppState('modal', { modalId: 'installModal' });
             document.getElementById('installModal').classList.remove('hidden');
+            updateBackUI();
         }
 
-        function closeInstallModal() {
+        function closeInstallModal(syncHistory = true) {
             document.getElementById('installModal').classList.add('hidden');
+            updateBackUI();
+            if (syncHistory && window.history.state && window.history.state.data && window.history.state.data.modalId === 'installModal') {
+                window.history.back();
+            }
         }
+
+        // =========================================================================
+        // نظام إدارة التنقل والرجوع الذكي (History API & Native Back Navigation Engine)
+        // يدعم:
+        // 1. زر الرجوع الأيمن في هواتف أندرويد (في الواجهات العربية زر الرجوع يكون على اليمين)
+        // 2. إيماءة السحب للرجوع (Swipe Back) وزر المتصفح الأصلي
+        // 3. الضغط بالزر الأيمن للماوس (Right Click / Contextmenu) في الحاسوب
+        // 4. أزرار الرجوع الإضافية في فارة الكمبيوتر (Mouse Back Button 3 & 4)
+        // 5. زر الرجوع الرسمي في تليجرام ويب آب (Telegram WebApp Native Back Button)
+        // 6. زر الرجوع المباشر في ترويسة النوافذ والصفحات بالجهة اليمنى
+        // يضمن البقاء في التطبيق وعدم الخروج المفاجئ وإرجاع المستخدم للشاشة السابقة بدقة
+        // =========================================================================
+        let currentActiveTab = 'portfolio';
+
+        function isAnyModalOpen() {
+            const modalIds = ['stockChartModal', 'holdingModal', 'installModal'];
+            return modalIds.some(id => {
+                const el = document.getElementById(id);
+                return el && !el.classList.contains('hidden');
+            });
+        }
+
+        function getTopOpenModalId() {
+            if (document.getElementById('installModal') && !document.getElementById('installModal').classList.contains('hidden')) return 'installModal';
+            if (document.getElementById('holdingModal') && !document.getElementById('holdingModal').classList.contains('hidden')) return 'holdingModal';
+            if (document.getElementById('stockChartModal') && !document.getElementById('stockChartModal').classList.contains('hidden')) return 'stockChartModal';
+            return null;
+        }
+
+        function pushAppState(type, data = {}) {
+            try {
+                const stateObj = { egxApp: true, type: type, data: data, timestamp: Date.now() };
+                const hash = '#' + type + (data.ticker ? ('-' + data.ticker) : (data.tabId ? ('-' + data.tabId) : ''));
+                window.history.pushState(stateObj, '', hash);
+                updateBackUI();
+            } catch(e) {
+                console.warn('pushAppState error:', e);
+            }
+        }
+
+        function navigateBack() {
+            triggerHaptic('light');
+            // إذا كان هناك حالة تاريخ مسجلة عبر تطبيقنا، نستخدم history.back()
+            if (window.history.state && window.history.state.egxApp) {
+                window.history.back();
+            } else {
+                // إذا لم يكن هناك تاريخ مسجل، ننفذ الرجوع يدوياً وبدقة
+                executeBackAction();
+            }
+        }
+
+        function executeBackAction() {
+            // 1. إذا كانت أي نافذة منبثقة مفتوحة، نغلقها أولاً ونبقى في الصفحة
+            const topModal = getTopOpenModalId();
+            if (topModal) {
+                if (topModal === 'stockChartModal') {
+                    closeChartModal(false);
+                } else if (topModal === 'holdingModal') {
+                    closeHoldingModal(false);
+                } else if (topModal === 'installModal') {
+                    closeInstallModal(false);
+                }
+                updateBackUI();
+                return true;
+            }
+
+            // 2. إذا كان المستخدم في تبويب فرعي (الرادار، التقييم، الأخبار، الأدوات)، يرجع لتبويب المحفظة
+            if (currentActiveTab && currentActiveTab !== 'portfolio') {
+                switchTab('portfolio', null, false);
+                updateBackUI();
+                return true;
+            }
+
+            return false;
+        }
+
+        // الاستماع لحدث popstate (الناتج عن زر الرجوع في الجوال، أو زر الرجوع بالمتصفح، أو السحب)
+        window.addEventListener('popstate', function(e) {
+            executeBackAction();
+        });
+
+        // تحديث حالة أزرار الرجوع في الواجهة وفي تليجرام
+        function updateBackUI() {
+            const hasBack = isAnyModalOpen() || (currentActiveTab && currentActiveTab !== 'portfolio');
+            
+            // زر الرجوع في الترويسة الرئيسية
+            const headerBackBtn = document.getElementById('headerBackBtn');
+            if (headerBackBtn) {
+                if (currentActiveTab !== 'portfolio' && !isAnyModalOpen()) {
+                    headerBackBtn.classList.remove('hidden');
+                    headerBackBtn.classList.add('inline-flex');
+                } else {
+                    headerBackBtn.classList.add('hidden');
+                    headerBackBtn.classList.remove('inline-flex');
+                }
+            }
+
+            // زر الرجوع في تليجرام ويب آب (Telegram WebApp Native Back Button)
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+                try {
+                    if (hasBack) {
+                        window.Telegram.WebApp.BackButton.show();
+                    } else {
+                        window.Telegram.WebApp.BackButton.hide();
+                    }
+                } catch(e) {}
+            }
+        }
+
+        // دعم زر الرجوع في تليجرام
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.BackButton) {
+            try {
+                window.Telegram.WebApp.BackButton.onClick(function() {
+                    navigateBack();
+                });
+            } catch(e) {}
+        }
+
+        // =========================================================================
+        // اعتراض الضغط على الزر الأيمن (Right-Click) وأزرار الرجوع للماوس
+        // تطبيق طلب المستخدم: "عندما يتم الضغط على زر الأيمن يتم الرجوع للصفحة السابقة وليس الخروج من التطبيق"
+        // =========================================================================
+        document.addEventListener('contextmenu', function(e) {
+            // إذا كانت هناك نافذة مفتوحة أو المستخدم في تبويب فرعي
+            if (isAnyModalOpen() || (currentActiveTab && currentActiveTab !== 'portfolio')) {
+                e.preventDefault();
+                e.stopPropagation();
+                navigateBack();
+                return false;
+            }
+        });
+
+        // أزرار الماوس الجانبية للرجوع (Mouse Back Button 3 & 4)
+        window.addEventListener('auxclick', function(e) {
+            if (e.button === 3) {
+                e.preventDefault();
+                navigateBack();
+            }
+        });
+
+        // زر Escape في لوحة المفاتيح
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && (isAnyModalOpen() || (currentActiveTab && currentActiveTab !== 'portfolio'))) {
+                navigateBack();
+            }
+        });
 
         function triggerHaptic(style = 'light') {
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
@@ -2934,25 +3109,13 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between gap-2 pt-0.5" onclick="event.stopPropagation()">
-                    <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm active:scale-95">
-                        <span>📈</span>
-                        <span>الشارت والتحليل</span>
-                    </button>
-
-                    <div class="flex items-center gap-1.5">
-                        <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="text-xs bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold px-2.5 py-1.5 rounded-xl border border-emerald-500/30 transition active:scale-95 flex items-center gap-1" title="شراء المزيد (زيادة كمية)">
-                            <span>🟢</span>
-                            <span class="text-[10px]">شراء</span>
-                        </button>
-                        <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="text-xs bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 font-bold px-2.5 py-1.5 rounded-xl border border-rose-500/30 transition active:scale-95 flex items-center gap-1" title="بيع وتسييل (تخفيض كمية)">
-                            <span>🔴</span>
-                            <span class="text-[10px]">بيع</span>
-                        </button>
-                        <button type="button" onclick="event.stopPropagation(); deleteHolding(${idx})" class="text-xs bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700 p-1.5 rounded-xl transition active:scale-90" title="حذف من المحفظة">
-                            <span>🗑️</span>
-                        </button>
-                    </div>
+                <!-- Clean card footer with tap prompt -->
+                <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/40">
+                    <span class="text-emerald-500/80 font-medium flex items-center gap-1">
+                        <span>انقر لعرض الشارت والتحليل الفني</span>
+                        <span>👈</span>
+                    </span>
+                    <span class="font-mono text-slate-500">تفاصيل متقدمة</span>
                 </div>
             `;
             return card;
@@ -3010,7 +3173,7 @@
                             <div>
                                 <span class="font-bold text-white group-hover/btn:text-emerald-400 transition flex items-center gap-1">
                                     <span>${h.name}</span>
-                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 py-0.2 rounded font-mono">📈 شارت</span>
+                                    
                                 </span>
                                 <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
                             </div>
@@ -3023,14 +3186,7 @@
                     <td class="py-2.5 font-bold font-mono ${isP ? 'text-emerald-400' : 'text-rose-400'}">
                         ${isP ? '+' : ''}${pnl.toFixed(0)} <span class="text-[9px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
                     </td>
-                    <td class="py-2.5 text-center" onclick="event.stopPropagation()">
-                        <div class="flex items-center justify-center gap-1">
-                            <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="p-1 text-sky-400 hover:text-sky-300 transition active:scale-90" title="فتح الشارت الفني والتحليلات">📈</button>
-                            <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="p-1 text-emerald-400 hover:text-emerald-300 transition active:scale-90" title="شراء المزيد (زيادة كمية)">🟢</button>
-                            <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="p-1 text-rose-400 hover:text-rose-300 transition active:scale-90" title="بيع وتسييل (تخفيض كمية)">🔴</button>
-                            <button type="button" onclick="event.stopPropagation(); deleteHolding(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition active:scale-90" title="حذف من المحفظة">🗑️</button>
-                        </div>
-                    </td>
+
                 `;
 
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFundAsset(h));
@@ -3354,8 +3510,9 @@
             }
         }
 
-        function openTransactionModal(defaultTicker = '', defaultType = 'buy') {
+        function openTransactionModal(defaultTicker = '', defaultType = 'buy', pushHistory = true) {
             triggerHaptic('medium');
+            if (pushHistory) pushAppState('modal', { modalId: 'holdingModal', ticker: defaultTicker });
             document.getElementById('modalHoldingIndex').value = "-1";
 
             const select = document.getElementById('modalHoldingStock');
@@ -3413,10 +3570,14 @@
             openTransactionModal(h.ticker, 'buy');
         }
 
-        function closeHoldingModal() {
+        function closeHoldingModal(syncHistory = true) {
             const select = document.getElementById('modalHoldingStock');
             if (select) select.disabled = false;
             document.getElementById('holdingModal').classList.add('hidden');
+            updateBackUI();
+            if (syncHistory && window.history.state && window.history.state.data && window.history.state.data.modalId === 'holdingModal') {
+                window.history.back();
+            }
         }
 
         function saveHoldingFromModal() {
@@ -3869,8 +4030,9 @@
             };
         }
 
-        function openStockChart(ticker) {
+        function openStockChart(ticker, pushHistory = true) {
             triggerHaptic('medium');
+            if (pushHistory) pushAppState('modal', { modalId: 'stockChartModal', ticker: ticker });
             activeChartTicker = ticker;
             const data = getStockComprehensiveData(ticker);
 
@@ -3965,6 +4127,11 @@
             if (badge) badge.innerText = matchingCount;
 
             switchModalSubTab('chart');
+            const delBtn = document.getElementById('modalDeleteHoldingBtn');
+            if (delBtn) {
+                const isHolding = userHoldings.some(h => h.ticker === ticker);
+                delBtn.style.display = isHolding ? 'inline-flex' : 'none';
+            }
             document.getElementById('stockChartModal').classList.remove('hidden');
 
             setTimeout(() => {
@@ -3973,8 +4140,26 @@
             }, 60);
         }
 
-        function closeChartModal() {
+        
+        function deleteHoldingFromModal() {
+            triggerHaptic('medium');
+            const hIdx = userHoldings.findIndex(h => h.ticker === activeChartTicker);
+            if (hIdx !== -1) {
+                const stockName = userHoldings[hIdx].name || activeChartTicker;
+                if (confirm(`هل أنت متأكد من حذف ${stockName} من المحفظة؟`)) {
+                    deleteHolding(hIdx);
+                    closeChartModal();
+                    showToast(`تم حذف ${stockName} من المحفظة بنجاح`, 'info');
+                }
+            }
+        }
+
+        function closeChartModal(syncHistory = true) {
             document.getElementById('stockChartModal').classList.add('hidden');
+            updateBackUI();
+            if (syncHistory && window.history.state && window.history.state.data && window.history.state.data.modalId === 'stockChartModal') {
+                window.history.back();
+            }
         }
 
         function quickAddFromModal() {
@@ -4851,7 +5036,7 @@
             });
         }
 
-        function switchTab(tabId, btn) {
+        function switchTab(tabId, btn, pushHistory = true) {
             triggerHaptic('medium');
             
             // Backward compatibility routing
@@ -4864,6 +5049,12 @@
                 actualTabId = 'tools';
                 subTarget = 'zakat';
             }
+
+            currentActiveTab = actualTabId;
+            if (pushHistory && actualTabId !== 'portfolio') {
+                pushAppState('tab', { tabId: actualTabId });
+            }
+            updateBackUI();
 
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             const target = document.getElementById('view-' + actualTabId);
