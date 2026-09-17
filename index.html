@@ -173,7 +173,11 @@
                     <span>📲</span>
                     <span class="hidden sm:inline font-bold">تثبيت</span>
                 </button>
-                <button onclick="refreshData()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث ومزامنة فورية">
+                <button onclick="forceAppUpdate()" class="text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث وتنشيط فوري للكاش وحفظ أحدث كود">
+                    <span>⚡</span>
+                    <span class="hidden sm:inline">تحديث فوري</span>
+                </button>
+                <button onclick="refreshData()" class="text-xs bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="مزامنة الأسعار">
                     <span id="refreshIcon" class="inline-block transition-transform duration-500">🔄</span>
                 </button>
             </div>
@@ -196,17 +200,20 @@
                 <span id="ticker_egx33" class="font-bold text-emerald-400">3,380.45</span>
                 <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">أزيموت جولد (AZG):</span>
+            <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت أزيموت جولد">
+                <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
                 <span class="font-bold text-amber-400">23.96 ج</span>
+                <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">ثندر جولد:</span>
+            <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت ثندر جولد">
+                <span class="text-slate-400">🪙 ثندر جولد:</span>
                 <span class="font-bold text-amber-400">1.68 ج</span>
+                <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">مصر شريعة (CMS):</span>
+            <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت صندوق مصر شريعة">
+                <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
                 <span class="font-bold text-sky-400">22.72 ج</span>
+                <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
             </div>
             <!-- International & Macro Benchmarks (الفئات 3 و 15) -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
@@ -489,18 +496,53 @@
             </div>
 
                         <!-- Interactive Helper Banner for Stock/Fund Chart & Analytics -->
-            <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-teal-950/70 border border-emerald-500/30 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-lg select-none">
-                <div class="flex items-center gap-3">
-                    <span class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/30 shrink-0">📊</span>
-                    <div>
-                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <span>شاشات التداول والتحليل الفني التفاعلية</span>
-                            <span class="text-[9px] bg-emerald-900/90 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">انقر على أي سهم أو صندوق 👆</span>
+            <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-teal-950/70 border border-emerald-500/30 rounded-2xl p-3.5 space-y-2.5 shadow-lg select-none">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/30 shrink-0">📊</span>
+                        <div>
+                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span>شاشات التداول والتحليل الفني التفاعلية</span>
+                                <span class="text-[9px] bg-emerald-900/90 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">انقر على أي سهم أو صندوق 👆</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 mt-0.5">
+                                انقر على أي سهم أو صندوق في الجدول أدناه لفتح <b>الشارت الفني التفاعلي (شموع وخطي)</b>، <b>المؤشرات والتقييم العادل</b>، <b>مستهدفات بيوت الأبحاث ووقف الخسارة</b>، و<b>الإفصاحات الحصرية</b> مباشرة مع أزرار الشراء والبيع والتبريد.
+                            </p>
                         </div>
-                        <p class="text-[11px] text-slate-300 mt-0.5">
-                            انقر على أي صف في جدول <b>الأسهم</b> أو <b>الصناديق والذهب</b> لفتح <b>الشارت الفني التفاعلي (شموع وخطي)</b>، <b>المؤشرات والتقييم العادل</b>، <b>مستهدفات بيوت الأبحاث ووقف الخسارة</b>، و<b>الإفصاحات الحصرية</b> مباشرة مع أزرار الشراء والبيع والتبريد.
-                        </p>
                     </div>
+                </div>
+                <!-- Quick Dropdown Selector for immediate one-click opening -->
+                <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2 flex-wrap">
+                    <span class="text-[11px] text-slate-400 font-bold">⚡ فتح مباشر:</span>
+                    <select onchange="if(this.value){ openStockChart(this.value); this.value=''; }" class="bg-slate-900 border border-emerald-800/80 hover:border-emerald-500 text-xs text-emerald-300 font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 flex-1 max-w-md cursor-pointer transition">
+                        <option value="">اختر أي سهم أو صندوق لفتح الشارت والتحليلات فوراً...</option>
+                        <optgroup label="محفظتك الحالية - الأسهم">
+                            <option value="EFID">إيديتا للصناعات الغذائية (EFID)</option>
+                            <option value="TMGH">مجموعة طلعت مصطفى (TMGH)</option>
+                            <option value="ADIB">مصرف أبوظبي الإسلامي (ADIB)</option>
+                            <option value="ORHD">أوراسكوم للتنمية مصر (ORHD)</option>
+                            <option value="EFIH">إي فاينانس للاستثمارات (EFIH)</option>
+                            <option value="OCDI">سوديك للتنمية والاستثمار (OCDI)</option>
+                            <option value="ETEL">المصرية للاتصالات (ETEL)</option>
+                            <option value="EGAL">مصر للألومنيوم (EGAL)</option>
+                        </optgroup>
+                        <optgroup label="محفظتك الحالية - صناديق الاستثمار والذهب">
+                            <option value="AZG">🪙 صندوق أزيموت للذهب عيار 24 (AZG)</option>
+                            <option value="THNDR_GOLD">🪙 سبائك ذهب ثندر (THNDR_GOLD)</option>
+                            <option value="CMS">🕌 صندوق سي آي شريعة مصر (CMS)</option>
+                            <option value="BWA">🕌 صندوق بلتون وفرة (BWA)</option>
+                            <option value="NMF">🕌 صندوق نعيم مصر للشريعة (NMF)</option>
+                        </optgroup>
+                        <optgroup label="باقي أسهم مؤشر الشريعة EGX33">
+                            <option value="FWRY">فوري للمدفوعات (FWRY)</option>
+                            <option value="ABUK">أبو قير للأسمدة (ABUK)</option>
+                            <option value="MFPC">موبكو للأسمدة (MFPC)</option>
+                            <option value="SKPC">سيدي كرير للبتروكيماويات (SKPC)</option>
+                            <option value="AMOC">أموك للبترول (AMOC)</option>
+                            <option value="PHDC">بالم هيلز للتعمير (PHDC)</option>
+                            <option value="SWDY">السويدي إليكتريك (SWDY)</option>
+                        </optgroup>
+                    </select>
                 </div>
             </div>
 
@@ -1869,10 +1911,32 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0b0f19');
         }
 
+        // Force Cache Purge and Reload
+        function forceAppUpdate() {
+            triggerHaptic('medium');
+            showToast('جاري تحديث المنصة وتفريغ الذاكرة المؤقتة بالكامل...', 'info');
+            if ('caches' in window) {
+                caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+                .then(() => {
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then(regs => {
+                            return Promise.all(regs.map(r => r.unregister()));
+                        }).then(() => {
+                            setTimeout(() => window.location.reload(true), 300);
+                        });
+                    } else {
+                        setTimeout(() => window.location.reload(true), 300);
+                    }
+                });
+            } else {
+                window.location.reload(true);
+            }
+        }
+
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('sw.js?v=7.2')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -2385,21 +2449,23 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
                 tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
+                tr.setAttribute('role', 'button');
+                tr.setAttribute('tabindex', '0');
                 tr.onclick = (e) => {
                     if (e.target.closest('button')) return;
                     openStockChart(h.ticker);
                 };
                 tr.innerHTML = `
                     <td class="py-2.5">
-                        <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-right flex items-center gap-1.5 hover:opacity-85 active:scale-95 transition group/btn w-full select-none" title="انقر لفتح الشارت والتحليلات لـ ${h.name}">
                             <div>
-                                <span class="font-bold text-white group-hover:text-emerald-400 transition flex items-center gap-1">
-                                    ${h.name}
-                                    <span class="text-[10px] text-emerald-400 opacity-70 group-hover:opacity-100 transition">📊</span>
+                                <span class="font-bold text-white group-hover/btn:text-emerald-400 transition flex items-center gap-1">
+                                    <span>${h.name}</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 py-0.2 rounded font-mono">📈 شارت</span>
                                 </span>
                                 <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
                             </div>
-                        </div>
+                        </button>
                     </td>
                     <td class="py-2.5 font-mono text-white">${h.qty.toLocaleString()}</td>
                     <td class="py-2.5 text-slate-300 font-mono">${h.buy.toFixed(2)}</td>
@@ -2410,9 +2476,10 @@
                     </td>
                     <td class="py-2.5 text-center" onclick="event.stopPropagation()">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="p-1 text-emerald-400 hover:text-emerald-300 transition active:scale-90" title="شراء المزيد (زيادة كمية)">🟢</button>
-                            <button onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="p-1 text-rose-400 hover:text-rose-300 transition active:scale-90" title="بيع وتسييل (تخفيض كمية)">🔴</button>
-                            <button onclick="event.stopPropagation(); deleteHolding(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition active:scale-90" title="حذف من المحفظة">🗑️</button>
+                            <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="p-1 text-sky-400 hover:text-sky-300 transition active:scale-90" title="فتح الشارت الفني والتحليلات">📈</button>
+                            <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="p-1 text-emerald-400 hover:text-emerald-300 transition active:scale-90" title="شراء المزيد (زيادة كمية)">🟢</button>
+                            <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="p-1 text-rose-400 hover:text-rose-300 transition active:scale-90" title="بيع وتسييل (تخفيض كمية)">🔴</button>
+                            <button type="button" onclick="event.stopPropagation(); deleteHolding(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition active:scale-90" title="حذف من المحفظة">🗑️</button>
                         </div>
                     </td>
                 `;
