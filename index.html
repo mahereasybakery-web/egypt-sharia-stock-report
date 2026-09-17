@@ -397,8 +397,31 @@
             border-color: #cbd5e1 !important;
             color: #0f172a !important;
         }
-        html:not(.dark) #themeToggleBtn:hover {
-            background-color: #e2e8f0 !important;
+        html:not(.dark) #thndrBenchmarkBar {
+            background-color: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        /* =========================================================================
+           CONTINUOUS RIGHT-TO-LEFT TICKER ANIMATION (حركة شريط التيكر من اليمين لليسار)
+           ========================================================================= */
+        @keyframes tickerScrollRTL {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+        .ticker-marquee-track {
+            display: inline-flex;
+            width: max-content;
+            animation: tickerScrollRTL 45s linear infinite;
+        }
+        .ticker-marquee-track:hover,
+        .ticker-marquee-track:active,
+        .ticker-marquee-track:focus-within {
+            animation-play-state: paused !important;
         }
 
     </style>
@@ -478,62 +501,149 @@
             </div>
         </div>
 
-        <!-- Live Ticker Bar (Horizontal Scrollable) -->
-        <div id="liveTickerBar" class="flex gap-2 overflow-x-auto no-scrollbar pt-3 text-[11px]">
-            <!-- EGX Market Clock & Session Status Badge -->
-            <div id="egxMarketSessionBadge" class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
-                <span id="marketSessionDot" class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
-                <span id="marketSessionText" class="font-bold">البورصة المصرية: جاري التحقق...</span>
-                <span id="marketClockCairo" class="font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">الدولار:</span>
-                <span id="ticker_usd" class="font-bold text-white">52.15 ج</span>
-                <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">الذهب 24:</span>
-                <span id="ticker_gold" class="font-bold text-amber-400">4,340.91 ج</span>
-                <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">مؤشر EGX33:</span>
-                <span id="ticker_egx33" class="font-bold text-emerald-400">3,380.45</span>
-                <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
-            </div>
-            <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت أزيموت جولد">
-                <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
-                <span class="font-bold text-amber-400">23.96 ج</span>
-                <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
-            </div>
-            <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت ثندر جولد">
-                <span class="text-slate-400">🪙 ثندر جولد:</span>
-                <span class="font-bold text-amber-400">1.68 ج</span>
-                <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
-            </div>
-            <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95" title="انقر لفتح شارت صندوق مصر شريعة">
-                <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
-                <span class="font-bold text-sky-400">22.72 ج</span>
-                <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
-            </div>
-            <!-- International & Macro Benchmarks (الفئات 3 و 15) -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
-                <span id="ticker_sar" class="font-bold text-sky-300 font-mono">13.90 ج</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
-                <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
-                <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">🇺🇸 S&P 500:</span>
-                <span class="font-bold text-emerald-400 font-mono">5,618.20</span>
-                <span class="text-[10px] text-emerald-400 font-bold">+0.40%</span>
-            </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
-                <span class="text-slate-400">🏛️ فائدة المركزي (CBE):</span>
-                <span class="font-bold text-amber-300 font-mono">27.25%</span>
+        <!-- Live Ticker Bar (شريط التيكر المتحرك تلقائياً من اليمين لليسار) -->
+        <div class="relative overflow-hidden w-full pt-2.5 text-[11px] select-none">
+            <div id="liveTickerBarTrack" class="ticker-marquee-track flex gap-2 items-center">
+                <!-- ================= Ticker Sequence 1 ================= -->
+                <!-- EGX Market Clock & Session Status Badge -->
+                <div class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
+                    <span id="marketSessionText" class="font-bold">البورصة المصرية: معتمد بأسعار الإقفال</span>
+                    <span id="marketClockCairo" class="font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">الدولار:</span>
+                    <span id="ticker_usd" class="font-bold text-white ticker-usd-val">52.19 ج</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">الذهب 24:</span>
+                    <span id="ticker_gold" class="font-bold text-amber-400 ticker-gold-val">4,340.91 ج</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX33:</span>
+                    <span id="ticker_egx33" class="font-bold text-emerald-400 ticker-egx33-val">3,380.45</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX30:</span>
+                    <span class="font-bold text-emerald-400 font-mono">55,498.72</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.82%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX70 EWI:</span>
+                    <span class="font-bold text-emerald-400 font-mono">21,061.13</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.47%</span>
+                </div>
+                <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
+                    <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
+                    <span class="font-bold text-amber-400 font-mono">23.96 ج</span>
+                    <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
+                    <span class="text-slate-400">🪙 ثندر جولد:</span>
+                    <span class="font-bold text-amber-400 font-mono">1.68 ج</span>
+                    <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
+                    <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
+                    <span class="font-bold text-sky-400 font-mono">22.72 ج</span>
+                    <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
+                    <span class="text-slate-400">🕌 بلتون وفرة (BWA):</span>
+                    <span class="font-bold text-emerald-400 font-mono">2.21 ج</span>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
+                    <span class="text-slate-400">🕌 نعيم مصر (NMF):</span>
+                    <span class="font-bold text-sky-400 font-mono">50.19 ج</span>
+                    <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
+                    <span id="ticker_sar" class="font-bold text-sky-300 font-mono">13.90 ج</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
+                    <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇺🇸 S&P 500:</span>
+                    <span class="font-bold text-emerald-400 font-mono">5,618.20</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.40%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🏛️ فائدة المركزي (CBE):</span>
+                    <span class="font-bold text-amber-300 font-mono">27.25%</span>
+                </div>
+
+                <!-- ================= Ticker Sequence 2 (Seamless Infinite Loop Duplicate) ================= -->
+                <div class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
+                    <span class="font-bold">البورصة المصرية: مباشر مصر</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">الدولار:</span>
+                    <span class="font-bold text-white ticker-usd-val">52.19 ج</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">الذهب 24:</span>
+                    <span class="font-bold text-amber-400 ticker-gold-val">4,340.91 ج</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX33:</span>
+                    <span class="font-bold text-emerald-400 ticker-egx33-val">3,380.45</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX30:</span>
+                    <span class="font-bold text-emerald-400 font-mono">55,498.72</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.82%</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">مؤشر EGX70 EWI:</span>
+                    <span class="font-bold text-emerald-400 font-mono">21,061.13</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.47%</span>
+                </div>
+                <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
+                    <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
+                    <span class="font-bold text-amber-400 font-mono">23.96 ج</span>
+                    <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
+                    <span class="text-slate-400">🪙 ثندر جولد:</span>
+                    <span class="font-bold text-amber-400 font-mono">1.68 ج</span>
+                    <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
+                    <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
+                    <span class="font-bold text-sky-400 font-mono">22.72 ج</span>
+                    <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
+                    <span class="text-slate-400">🕌 بلتون وفرة (BWA):</span>
+                    <span class="font-bold text-emerald-400 font-mono">2.21 ج</span>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
+                    <span class="text-slate-400">🕌 نعيم مصر (NMF):</span>
+                    <span class="font-bold text-sky-400 font-mono">50.19 ج</span>
+                    <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
+                    <span class="font-bold text-sky-300 font-mono">13.90 ج</span>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
+                    <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
+                </div>
             </div>
         </div>
     </header>
@@ -724,38 +834,49 @@
 
         <!-- ================= TAB 4: PORTFOLIO & ALLOCATION ================= -->
         <section id="view-portfolio" class="tab-content space-y-3.5">
-            <!-- Thndr Grand Wealth Header (مطابق لتطبيق ثندر الفعلي) -->
-            <div class="glass-card rounded-2xl p-4 text-center space-y-2 bg-gradient-to-b from-slate-900/90 via-slate-900/80 to-slate-950/95 border border-slate-700/80 shadow-2xl">
-                <div class="text-[11px] text-slate-400 flex items-center justify-center gap-1">
-                    <span>إجمالي الثروة (ج.م)</span>
-                    <span class="text-[10px] text-slate-500 cursor-help" title="إجمالي القيمة السوقية للأسهم والصناديق وسيولة كلاودز والنقدية">ⓘ</span>
-                </div>
-                <div class="flex items-center justify-center gap-1.5">
-                    <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">87,736</div>
-                    <span class="text-xs text-slate-400 font-mono pt-2">ج.م</span>
-                </div>
-                <!-- Multi-Currency Benchmark (EGP + USD + SAR + Gold) & Health Index (الفئات 15 و 23 من مستند الإضافات) -->
-                <div class="flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-slate-300 font-mono pt-0.5">
-                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-emerald-300 shadow-sm" title="القيمة الإجمالية المعادلة بالدولار الأمريكي">
-                        <span>💵</span>
-                        <span id="p_thndr_usd_val">$1,683 USD</span>
-                    </span>
-                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-sky-300 shadow-sm" title="القيمة الإجمالية بالريال السعودي (عملة الإقامة)">
-                        <span>🇸🇦</span>
-                        <span id="p_thndr_sar_val">6,312 SAR</span>
-                    </span>
-                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-amber-300 shadow-sm" title="القيمة الإجمالية المعادلة بجرام الذهب عيار 24 الصافي">
-                        <span>🪙</span>
-                        <span id="p_thndr_gold_val">20.2 جم ذهب</span>
-                    </span>
-                    <span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-700/80 flex items-center gap-1 text-emerald-300 shadow-sm font-bold" title="مؤشر صحة الثروة الموحد (الفئة 23)">
+            <!-- Thndr Grand Wealth Header (تصميم مبسط ومرتب فائق الأناقة) -->
+            <div class="glass-card rounded-2xl p-4 sm:p-5 space-y-3 bg-gradient-to-b from-slate-900/90 via-slate-900/80 to-slate-950/95 border border-slate-700/80 shadow-2xl">
+                <!-- Top Row: Label & Wealth Health Badge -->
+                <div class="flex items-center justify-between px-0.5">
+                    <span class="text-xs font-semibold text-slate-400">إجمالي قيمة الثروة</span>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full shadow-sm">
                         <span>🛡️</span>
                         <span id="p_thndr_health_score">صحة الثروة: 94/100</span>
                     </span>
                 </div>
-                <div class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1 font-mono">
-                    <span id="p_thndr_grand_pnl">▲ +2,192</span>
-                    <span id="p_thndr_grand_return">+2.56%</span>
+
+                <!-- Main Balance & Immediate Return -->
+                <div class="text-center space-y-1.5 py-0.5">
+                    <div class="flex items-baseline justify-center gap-1.5">
+                        <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">88,481</div>
+                        <span class="text-sm font-bold text-slate-400 font-mono">ج.م</span>
+                    </div>
+                    <!-- Profit/Loss Badge placed directly beneath the balance -->
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+                            <span id="p_thndr_grand_pnl">▲ +2,999</span>
+                            <span id="p_thndr_grand_return">(+3.51%)</span>
+                            <span class="text-[10px] text-emerald-300 font-sans font-medium">أرباح غير محققة</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unified Multi-Currency & Gold Benchmark Strip -->
+                <div id="thndrBenchmarkBar" class="flex items-center justify-center gap-2.5 text-[11px] font-mono text-slate-300 bg-slate-950/60 border border-slate-800/80 rounded-xl py-1.5 px-3 flex-wrap">
+                    <span class="flex items-center gap-1 text-emerald-300" title="القيمة الإجمالية بالدولار الأمريكي">
+                        <span>💵</span>
+                        <span id="p_thndr_usd_val">$1,697 USD</span>
+                    </span>
+                    <span class="text-slate-600 font-sans">•</span>
+                    <span class="flex items-center gap-1 text-sky-300" title="القيمة الإجمالية بالريال السعودي">
+                        <span>🇸🇦</span>
+                        <span id="p_thndr_sar_val">6,366 SAR</span>
+                    </span>
+                    <span class="text-slate-600 font-sans">•</span>
+                    <span class="flex items-center gap-1 text-amber-300" title="القيمة الإجمالية بجرام الذهب عيار 24 الصافي">
+                        <span>🪙</span>
+                        <span id="p_thndr_gold_val">20.4 جم ذهب</span>
+                    </span>
                 </div>
 
                 <!-- Thndr 3 Mini Wealth Status Cards -->
@@ -1624,8 +1745,13 @@
                         <span id="modalChartChg" class="text-[11px] font-bold px-2 py-0.5 rounded-md border bg-emerald-950 text-emerald-400 border-emerald-800 font-mono">+0.00%</span>
                     </div>
 
-                    <!-- Action Suite (الشراء والبيع والتبريد وحذف الأصل من داخل الشارت) -->
-                    <div class="flex items-center gap-1.5">
+                    <!-- Action Suite (الشراء والبيع والتبريد والتوصيات المقترحة وحذف الأصل) -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <!-- زر خاص بالتوصيات المقترحة (بارز ومميز) -->
+                        <button onclick="event.stopPropagation(); switchModalSubTab('targets');" class="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-md active:scale-95 shrink-0" title="عرض التوصيات المقترحة ونقاط الدخول والمستهدفات">
+                            <span>🎯</span>
+                            <span>التوصيات المقترحة</span>
+                        </button>
                         <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'buy');" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="شراء للسهم / زيادة كمية">
                             <span>🟢</span>
                             <span>شراء</span>
@@ -1655,9 +1781,9 @@
                     <span>📊</span>
                     <span>المؤشرات الهامة والتقييم</span>
                 </button>
-                <button id="modalTabTargetsBtn" onclick="switchModalSubTab('targets')" class="modal-subtab-btn pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
+                <button id="modalTabTargetsBtn" onclick="switchModalSubTab('targets')" class="modal-subtab-btn pb-2 font-bold text-amber-400 hover:text-amber-300 border-b-2 border-transparent transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
                     <span>🎯</span>
-                    <span>التوقعات والمستهدفات</span>
+                    <span>التوصيات المقترحة والمستهدفات</span>
                 </button>
                 <button id="modalTabNewsBtn" onclick="switchModalSubTab('news')" class="modal-subtab-btn pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
                     <span>📰</span>
@@ -1693,6 +1819,35 @@
 
                     <!-- CANVAS ENGINE SUB-TOOLBAR (Visible when engine == 'canvas') -->
                     <div id="canvasToolbarWrapper" class="space-y-2">
+                        <!-- 1. Detailed Price Action & Movement Strip (بيانات واضحة ومفصلة عن حركة السعر للمستخدم العادي) -->
+                        <div id="chartPriceActionStrip" class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 text-[11px] font-mono text-center">
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-slate-400 block font-sans">سعر الافتتاح</span>
+                                <b id="paOpenVal" class="text-white font-bold">--</b>
+                            </div>
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-emerald-400 block font-sans">🟢 أعلى سعر</span>
+                                <b id="paHighVal" class="text-emerald-400 font-bold">--</b>
+                            </div>
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-rose-400 block font-sans">🔴 أدنى سعر</span>
+                                <b id="paLowVal" class="text-rose-400 font-bold">--</b>
+                            </div>
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-sky-400 block font-sans">السعر الحالي</span>
+                                <b id="paCloseVal" class="text-sky-300 font-bold">--</b>
+                            </div>
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-slate-400 block font-sans">التغير اليومي</span>
+                                <b id="paChangeVal" class="text-emerald-400 font-bold">--</b>
+                            </div>
+                            <div class="p-1 rounded bg-slate-900/60 border border-slate-800/80">
+                                <span class="text-[10px] text-amber-400 block font-sans">حجم التداول</span>
+                                <b id="paVolVal" class="text-amber-300 font-bold">--</b>
+                            </div>
+                        </div>
+
+                        <!-- 2. Controls & Multi-Indicators Toolbar -->
                         <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 text-[11px]">
                             <!-- Timeframe Selector -->
                             <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
@@ -1703,25 +1858,68 @@
                                 <button onclick="setChartTimeframe('1Y', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1Y</button>
                             </div>
 
-                            <!-- Chart Type Toggle -->
+                            <!-- Chart Type Toggle (Line vs Real Solid Candles) -->
                             <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
-                                <button id="chartTypeCandleBtn" onclick="setChartType('candles')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-300">🕯️ شموع</button>
-                                <button id="chartTypeHollowBtn" onclick="setChartType('hollow')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">🕯️ مجوفة</button>
-                                <button id="chartTypeLineBtn" onclick="setChartType('line')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">📈 مسار ناعم</button>
+                                <button id="chartTypeLineBtn" onclick="setChartType('line')" class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm" title="المسار البياني الأوضح للمستخدم العادي">📈 مسار ناعم</button>
+                                <button id="chartTypeCandleBtn" onclick="setChartType('candles')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white" title="شموع يابانية ملونة واضحة">🕯️ شموع</button>
+                                <button id="chartTypeHollowBtn" onclick="setChartType('hollow')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white" title="شموع مفرغة">🕯️ مفرغة</button>
                             </div>
 
-                            <!-- Indicators Active Badges / Toggles -->
-                            <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800 flex-wrap">
-                                <button id="indToggleBb" onclick="toggleChartIndicator('bb')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-950 text-purple-300 border border-purple-800/80">بولينجر BB</button>
-                                <button id="indToggleEma" onclick="toggleChartIndicator('ema')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-950 text-amber-300 border border-amber-800/80">EMA 9</button>
-                                <button id="indToggleSma" onclick="toggleChartIndicator('sma')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-950 text-sky-300 border border-sky-800/80">SMA 20/50</button>
-                                <button id="indToggleRsi" onclick="toggleChartIndicator('rsi')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800/80">RSI(14)</button>
-                            </div>
+                            <!-- Quick Recommendations CTA in Toolbar -->
+                            <button onclick="switchModalSubTab('targets')" class="px-2.5 py-1 rounded-lg text-[10px] font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm flex items-center gap-1 active:scale-95 shrink-0" title="فتح شاشة التوصيات المقترحة والمستهدفات">
+                                <span>🎯</span>
+                                <span>التوصية المقترحة</span>
+                            </button>
+                        </div>
 
-                            <!-- Interactive HUD Bar -->
-                            <div id="chartHudBox" class="text-[10px] font-mono text-slate-300 w-full sm:w-auto text-left sm:text-right flex items-center gap-2 overflow-x-auto no-scrollbar">
-                                <span class="text-slate-500">حرك المؤشر للتتبع اللحظي 🔍</span>
+                        <!-- 3. Multi-Indicator Suite (إمكانية إضافة مؤشرات متعددة وتفعيلها معاً) -->
+                        <div class="flex items-center justify-between gap-1.5 p-1.5 bg-slate-900/90 rounded-xl border border-slate-800/80 flex-wrap text-[10px]">
+                            <span class="text-slate-400 font-bold px-1 flex items-center gap-1">
+                                <span>⚙️</span> <span>المؤشرات:</span>
+                            </span>
+                            <div class="flex items-center gap-1 flex-wrap flex-1">
+                                <button id="indToggleEma9" onclick="toggleChartIndicator('ema9')" class="px-2 py-0.5 rounded-lg font-bold bg-amber-950 text-amber-300 border border-amber-800/80 flex items-center gap-1" title="متوسط أسي سريع 9">
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span>EMA 9</span>
+                                </button>
+                                <button id="indToggleEma21" onclick="toggleChartIndicator('ema21')" class="px-2 py-0.5 rounded-lg font-bold bg-slate-800 text-slate-400 opacity-60 border border-slate-700 flex items-center gap-1" title="متوسط أسي 21">
+                                    <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                                    <span>EMA 21</span>
+                                </button>
+                                <button id="indToggleSma50" onclick="toggleChartIndicator('sma50')" class="px-2 py-0.5 rounded-lg font-bold bg-sky-950 text-sky-300 border border-sky-800/80 flex items-center gap-1" title="متوسط رئيسي 50">
+                                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                                    <span>SMA 50</span>
+                                </button>
+                                <button id="indToggleSma200" onclick="toggleChartIndicator('sma200')" class="px-2 py-0.5 rounded-lg font-bold bg-slate-800 text-slate-400 opacity-60 border border-slate-700 flex items-center gap-1" title="المتوسط الذهبي 200">
+                                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                                    <span>SMA 200</span>
+                                </button>
+                                <button id="indToggleBb" onclick="toggleChartIndicator('bb')" class="px-2 py-0.5 rounded-lg font-bold bg-slate-800 text-slate-400 opacity-60 border border-slate-700 flex items-center gap-1" title="بولينجر باندز">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                                    <span>بولينجر (BB)</span>
+                                </button>
+                                <button id="indToggleRsi" onclick="toggleChartIndicator('rsi')" class="px-2 py-0.5 rounded-lg font-bold bg-emerald-950 text-emerald-300 border border-emerald-800/80 flex items-center gap-1" title="مؤشر القوة النسبية RSI">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <span>RSI 14</span>
+                                </button>
+                                <button id="indToggleMacd" onclick="toggleChartIndicator('macd')" class="px-2 py-0.5 rounded-lg font-bold bg-slate-800 text-slate-400 opacity-60 border border-slate-700 flex items-center gap-1" title="مؤشر الماكد">
+                                    <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                    <span>MACD</span>
+                                </button>
+                                <button id="indToggleVol" onclick="toggleChartIndicator('vol')" class="px-2 py-0.5 rounded-lg font-bold bg-teal-950 text-teal-300 border border-teal-800/80 flex items-center gap-1" title="أحجام التداول">
+                                    <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+                                    <span>الحجم</span>
+                                </button>
+                                <button id="indToggleSr" onclick="toggleChartIndicator('sr')" class="px-2 py-0.5 rounded-lg font-bold bg-emerald-950 text-emerald-300 border border-emerald-800/80 flex items-center gap-1" title="مستويات الدعم والمقاومة">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                    <span>الدعم والمقاومة</span>
+                                </button>
                             </div>
+                        </div>
+
+                        <!-- 4. Interactive Live HUD Crosshair Box -->
+                        <div id="chartHudBox" class="text-[11px] font-mono text-slate-300 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800/80 flex items-center justify-between overflow-x-auto no-scrollbar">
+                            <span class="text-slate-500">حرك المؤشر للتتبع اللحظي والتفصيلي 🔍</span>
                         </div>
 
                         <!-- Chart Canvas Container with Dynamic Height -->
@@ -3237,10 +3435,19 @@
             if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
 
             const grandPnlElem = document.getElementById('p_thndr_grand_pnl');
-            if (grandPnlElem) grandPnlElem.innerText = `▲ +${Math.round(grandPnl).toLocaleString()}`;
+            if (grandPnlElem) {
+                if (grandPnl >= 0) {
+                    grandPnlElem.innerText = `▲ +${Math.round(grandPnl).toLocaleString()}`;
+                } else {
+                    grandPnlElem.innerText = `▼ -${Math.abs(Math.round(grandPnl)).toLocaleString()}`;
+                }
+            }
 
             const grandReturnElem = document.getElementById('p_thndr_grand_return');
-            if (grandReturnElem) grandReturnElem.innerText = `+${grandReturnPct.toFixed(2)}%`;
+            if (grandReturnElem) {
+                const sign = grandReturnPct >= 0 ? '+' : '';
+                grandReturnElem.innerText = `(${sign}${grandReturnPct.toFixed(2)}%)`;
+            }
 
             const investedElem = document.getElementById('p_thndr_invested');
             if (investedElem) investedElem.innerText = `${(totalInvestedVal / 1000).toFixed(2)}k ج`;
@@ -4190,6 +4397,54 @@
             runDcaCalculation();
         }
 
+
+        function updateTargetsTab() {
+            if (!activeChartTicker) return;
+            const d = getStockComprehensiveData(activeChartTicker);
+            if (!d) return;
+            const cur  = d.close || 0;
+            const supp = d.support    || cur * 0.92;
+            const res  = d.resistance || cur * 1.12;
+            const t1   = res;
+            const t2   = +(cur + (res - cur) * 1.65).toFixed(2);
+            const sl   = +(supp * 0.96).toFixed(2);
+            const pct  = v => ((v - cur) / cur * 100).toFixed(1);
+            const fmt  = v => v.toFixed(2) + ' ج';
+
+            const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            set('target1Val',       fmt(t1));
+            set('target1Pct',       `+${pct(t1)}%`);
+            set('target2Val',       fmt(t2));
+            set('target2Pct',       `+${pct(t2)}%`);
+            set('targetStopLossVal',fmt(sl));
+            set('targetStopLossPct',`${pct(sl)}%`);
+
+            const rsi = d.rsi || 50;
+            let recTxt = '🟢 شراء وتجميع على الدعوم';
+            let recCls = 'px-2.5 py-1 rounded-lg font-bold text-xs bg-emerald-950 text-emerald-400 border border-emerald-800';
+            if (rsi < 32 && d.chg < -2) {
+                recTxt = '🟢 شراء قوي — تشبع بيعي حاد';
+                recCls = 'px-2.5 py-1 rounded-lg font-bold text-xs bg-emerald-900 text-emerald-200 border border-emerald-500 shadow shadow-emerald-900';
+            } else if (rsi > 72) {
+                recTxt = '🔴 بيع جزئي — تشبع شرائي';
+                recCls = 'px-2.5 py-1 rounded-lg font-bold text-xs bg-rose-950 text-rose-300 border border-rose-700';
+            } else if (d.chg > 2.5) {
+                recTxt = '🟡 مراقبة — انتظار تراجع للشراء';
+                recCls = 'px-2.5 py-1 rounded-lg font-bold text-xs bg-amber-950 text-amber-300 border border-amber-700';
+            }
+            const badge = document.getElementById('targetRecommendationBadge');
+            if (badge) { badge.textContent = recTxt; badge.className = recCls; }
+
+            const rr = cur > sl ? ((t1 - cur) / (cur - sl)).toFixed(1) : '∞';
+            set('targetAnalysisSummary',
+                `يتداول ${d.ticker} عند ${fmt(cur)} بتغيير ${d.chg >= 0 ? '+' : ''}${d.chg.toFixed(2)}% اليوم. ` +
+                `الدعم الرئيسي: ${fmt(supp)} | المقاومة: ${fmt(res)}. ` +
+                `مؤشر RSI: ${rsi.toFixed(0)} — نسبة العائد/المخاطرة (R:R): 1:${rr}.`);
+            set('targetDcaAdvice',
+                `يُنصح بألا تتجاوز نسبة ${d.name.split(' ')[0]} في المحفظة 15% حداً أقصى. ` +
+                `وقف الخسارة الحاسم: ${fmt(sl)} (${pct(sl)}%). عند الوصول للدعم ${fmt(supp)} يمكن التبريد.`);
+        }
+
         function switchModalSubTab(subTab) {
             triggerHaptic('selection');
             const tabBtns = {
@@ -4222,6 +4477,8 @@
 
             if (subTab === 'chart') {
                 setTimeout(() => drawAdvancedChart(), 30);
+            } else if (subTab === 'targets') {
+                updateTargetsTab();
             } else if (subTab === 'news') {
                 renderPerStockNewsInModal(activeChartTicker);
             }
@@ -4331,10 +4588,15 @@
         let activeChartEngine = 'canvas';
         activeChartType = 'candles';
         let chartIndicators = {
-            bb: true,
-            ema: true,
-            sma: true,
-            rsi: true
+            ema9:  true,   // EMA 9  – أصفر سريع
+            ema21: false,  // EMA 21 – برتقالي
+            sma50: true,   // SMA 50 – سماوي
+            sma200:false,  // SMA 200 – بنفسجي
+            bb:    false,  // Bollinger Bands
+            rsi:   true,   // RSI 14 panel
+            macd:  false,  // MACD panel
+            vol:   true,   // Volume bars
+            sr:    true    // Support/Resistance
         };
         let isChartFullscreen = false;
 
@@ -4425,13 +4687,16 @@
         function toggleChartIndicator(ind) {
             triggerHaptic('light');
             chartIndicators[ind] = !chartIndicators[ind];
-            const btn = document.getElementById(`indToggle${ind.charAt(0).toUpperCase() + ind.slice(1)}`);
+            const idMap = {
+                ema9:'indToggleEma9', ema21:'indToggleEma21',
+                sma50:'indToggleSma50', sma200:'indToggleSma200',
+                bb:'indToggleBb', rsi:'indToggleRsi',
+                macd:'indToggleMacd', vol:'indToggleVol', sr:'indToggleSr'
+            };
+            const btn = document.getElementById(idMap[ind] || '');
             if (btn) {
-                if (chartIndicators[ind]) {
-                    btn.classList.remove('opacity-40', 'line-through');
-                } else {
-                    btn.classList.add('opacity-40', 'line-through');
-                }
+                btn.classList.toggle('opacity-40', !chartIndicators[ind]);
+                btn.style.textDecoration = chartIndicators[ind] ? '' : 'line-through';
             }
             drawAdvancedChart();
         }
@@ -4491,7 +4756,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v8.1',
+                appVersion: 'egx-sharia-v8.3',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
@@ -4537,332 +4802,300 @@
         function drawAdvancedChart(cursorX = null, cursorY = null) {
             const canvas = document.getElementById('candlestickCanvas');
             if (!canvas) return;
-
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) return;
-
-            canvas.width = rect.width * dpr;
+            canvas.width  = rect.width  * dpr;
             canvas.height = rect.height * dpr;
             const ctx = canvas.getContext('2d');
             ctx.scale(dpr, dpr);
-            const w = rect.width;
-            const h = rect.height;
+            const W = rect.width, H = rect.height;
+            ctx.clearRect(0, 0, W, H);
 
-            ctx.clearRect(0, 0, w, h);
-
-            const data = getStockComprehensiveData(activeChartTicker);
+            const data    = getStockComprehensiveData(activeChartTicker);
             const candles = generateTimeframeCandles(data, data, activeChartTimeframe);
             cachedChartCandles = candles;
+            if (!candles || candles.length === 0) return;
 
-            // Geometry calculations with expanded price axis
-            const numCandles = candles.length;
-            const rightMargin = 58; // Increased margin for crystal-clear price tags
-            const leftMargin = 10;
-            const chartTop = 15;
-            const volumeHeight = h * 0.18;
-            const chartBottom = h - volumeHeight - 20;
-            const chartHeight = chartBottom - chartTop;
+            const isDark      = document.documentElement.classList.contains('dark');
+            const showVol     = chartIndicators.vol  !== false;
+            const showRsi     = chartIndicators.rsi  !== false;
+            const showMacd    = chartIndicators.macd !== false;
+            const subPanelH   = 58;
+            const numSub      = (showRsi ? 1 : 0) + (showMacd ? 1 : 0);
+            const volH        = showVol ? 44 : 0;
+            const rightM      = 60, leftM = 8, chartTop = 14;
+            const chartBottom = H - volH - subPanelH * numSub - 12;
+            const chartH      = chartBottom - chartTop;
+            const numC        = candles.length;
+            const stepX       = (W - rightM - leftM) / Math.max(numC, 1);
+            const candleW     = Math.max(2, Math.min(14, stepX * 0.65));
 
-            let minP = Math.min(...candles.map(c => c.low), data.support * 0.985);
-            let maxP = Math.max(...candles.map(c => c.high), data.resistance * 1.015);
+            // Price range
+            let minP = Math.min(...candles.map(c => c.low));
+            let maxP = Math.max(...candles.map(c => c.high));
+            if (chartIndicators.sr !== false) {
+                minP = Math.min(minP, (data.support   || minP) * 0.983);
+                maxP = Math.max(maxP, (data.resistance || maxP) * 1.017);
+            }
             const rangeP = maxP - minP || 1;
+            function getY(p) { return chartBottom - ((p - minP) / rangeP) * chartH; }
+            function cx(i)   { return leftM + i * stepX + stepX / 2; }
 
-            function getY(p) {
-                return chartBottom - ((p - minP) / rangeP) * chartHeight;
+            // Axis bg
+            ctx.fillStyle = isDark ? 'rgba(15,23,42,0.55)' : 'rgba(241,245,249,0.75)';
+            ctx.fillRect(W - rightM, 0, rightM, H);
+            ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(W - rightM, 0); ctx.lineTo(W - rightM, H); ctx.stroke();
+
+            // Grid & price labels
+            const usedY = [];
+            const pillW = rightM - 6, pillH = 14, pillX = W - rightM + 3;
+            function canLabel(y, gap=15) { return !usedY.some(oy=>Math.abs(oy-y)<gap); }
+            function drawPill(y, txt, bg='#0284c7') {
+                if (!canLabel(y,14)) return;
+                ctx.fillStyle = bg;
+                if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(pillX,y-7,pillW,pillH,3); ctx.fill(); }
+                else ctx.fillRect(pillX,y-7,pillW,pillH);
+                ctx.fillStyle='#fff'; ctx.font='bold 9px Cairo,monospace'; ctx.textAlign='center';
+                ctx.fillText(txt, pillX+pillW/2, y+4);
+                usedY.push(y);
             }
 
-            const isDarkChart = document.documentElement.classList.contains('dark');
-
-            // Draw Right Price Axis Column Background
-            ctx.fillStyle = isDarkChart ? 'rgba(15, 23, 42, 0.5)' : 'rgba(241, 245, 249, 0.7)';
-            ctx.fillRect(w - rightMargin, 0, rightMargin, h);
-            ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(w - rightMargin, 0);
-            ctx.lineTo(w - rightMargin, h);
-            ctx.stroke();
-
-            // Anti-Collision Price Registry
-            const occupiedY = [];
-            function canDrawPriceLabel(yTarget, minDistance = 16) {
-                for (const occY of occupiedY) {
-                    if (Math.abs(occY - yTarget) < minDistance) return false;
-                }
-                return true;
-            }
-
-            const pillW = rightMargin - 6;
-            const pillH = 15;
-            const pillX = w - rightMargin + 3;
-
-            // 1. Draw Resistance Line & High-Visibility Pill (Top Priority)
-            const yRes = getY(data.resistance);
-            ctx.strokeStyle = 'rgba(244, 63, 94, 0.85)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(leftMargin, yRes);
-            ctx.lineTo(w - rightMargin, yRes);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.fillStyle = '#f43f5e';
-            if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(pillX, yRes - 7.5, pillW, pillH, 3);
-                ctx.fill();
-            } else {
-                ctx.fillRect(pillX, yRes - 7.5, pillW, pillH);
-            }
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 9px Cairo, monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText(`م ${data.resistance.toFixed(1)}`, pillX + pillW / 2, yRes + 3.5);
-            occupiedY.push(yRes);
-
-            // 2. Draw Support Line & High-Visibility Pill (Top Priority)
-            const ySup = getY(data.support);
-            ctx.strokeStyle = 'rgba(16, 185, 129, 0.85)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([4, 4]);
-            ctx.beginPath();
-            ctx.moveTo(leftMargin, ySup);
-            ctx.lineTo(w - rightMargin, ySup);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.fillStyle = '#10b981';
-            if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(pillX, ySup - 7.5, pillW, pillH, 3);
-                ctx.fill();
-            } else {
-                ctx.fillRect(pillX, ySup - 7.5, pillW, pillH);
-            }
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 9px Cairo, monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText(`د ${data.support.toFixed(1)}`, pillX + pillW / 2, ySup + 3.5);
-            occupiedY.push(ySup);
-
-            // 3. Draw Live Current Price Line & Blue Pill (TradingView Style)
-            const lastCandle = candles[candles.length - 1];
-            const yCur = getY(lastCandle.close);
-            ctx.strokeStyle = isDarkChart ? 'rgba(56, 189, 248, 0.75)' : 'rgba(2, 132, 199, 0.75)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([2, 2]);
-            ctx.beginPath();
-            ctx.moveTo(leftMargin, yCur);
-            ctx.lineTo(w - rightMargin, yCur);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            if (canDrawPriceLabel(yCur, 15)) {
-                ctx.fillStyle = isDarkChart ? '#0284c7' : '#0369a1';
-                if (ctx.roundRect) {
-                    ctx.beginPath();
-                    ctx.roundRect(pillX, yCur - 7.5, pillW, pillH, 3);
-                    ctx.fill();
-                } else {
-                    ctx.fillRect(pillX, yCur - 7.5, pillW, pillH);
-                }
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 9px Cairo, monospace';
-                ctx.textAlign = 'center';
-                ctx.fillText(lastCandle.close.toFixed(2), pillX + pillW / 2, yCur + 3.5);
-                occupiedY.push(yCur);
-            }
-
-            // 4. Draw Background Grid Lines with Anti-Collision on Axis Labels
-            ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.07)';
-            ctx.lineWidth = 1;
-            for (let k = 0; k <= 4; k++) {
-                const yG = chartTop + (chartHeight / 4) * k;
-                ctx.beginPath();
-                ctx.moveTo(leftMargin, yG);
-                ctx.lineTo(w - rightMargin, yG);
-                ctx.stroke();
-
-                if (canDrawPriceLabel(yG, 14)) {
-                    const pVal = maxP - (rangeP / 4) * k;
-                    ctx.fillStyle = isDarkChart ? '#94a3b8' : '#475569';
-                    ctx.font = '9px Cairo, monospace';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(pVal.toFixed(2), pillX + pillW / 2, yG + 3);
-                    occupiedY.push(yG);
+            ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+            for (let k=0;k<=4;k++) {
+                const yG = chartTop + (chartH/4)*k;
+                ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(leftM,yG); ctx.lineTo(W-rightM,yG); ctx.stroke();
+                if (canLabel(yG,14)) {
+                    ctx.fillStyle=isDark?'#94a3b8':'#475569';
+                    ctx.font='9px Cairo,monospace'; ctx.textAlign='center';
+                    ctx.fillText((maxP-(rangeP/4)*k).toFixed(2), pillX+pillW/2, yG+3.5);
+                    usedY.push(yG);
                 }
             }
 
-            // Draw Candle Step Coordinates
-            const candleAreaWidth = w - rightMargin - leftMargin;
-            const stepX = candleAreaWidth / numCandles;
-            const candleW = Math.max(3, stepX * 0.65);
+            // ── Compute indicators ─────────────────────────────────────
+            const closes = candles.map(c=>c.close);
+            function ema(arr, p) {
+                const k=2/(p+1), r=[];
+                arr.forEach((v,i)=>r.push(i===0?v:v*k+r[r.length-1]*(1-k)));
+                return r;
+            }
+            function sma(arr, p) {
+                return arr.map((_,i)=>i<p-1?null:arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);
+            }
+            const ema9arr=ema(closes,9), ema21arr=ema(closes,21);
+            const sma50arr=sma(closes,Math.min(50,closes.length));
+            const sma200arr=sma(closes,Math.min(200,closes.length));
 
-            const sma20Points = [];
-            const sma50Points = [];
-            const linePoints = [];
+            // Bollinger
+            const bbU=[],bbL=[],bbM=[], bbP=20;
+            closes.forEach((_,i)=>{
+                if(i<bbP-1){bbU.push(null);bbL.push(null);bbM.push(null);return;}
+                const sl=closes.slice(i-bbP+1,i+1);
+                const mean=sl.reduce((a,b)=>a+b,0)/bbP;
+                const std=Math.sqrt(sl.reduce((a,b)=>a+(b-mean)**2,0)/bbP);
+                bbU.push(mean+2*std); bbL.push(mean-2*std); bbM.push(mean);
+            });
 
-            // Max Volume for scaling volume sub-chart
-            const maxVol = Math.max(...candles.map(c => c.vol), 10000);
-
-            // Render Candles & Volumes
-            candles.forEach((c, idx) => {
-                const x = leftMargin + idx * stepX + stepX / 2;
-                const isGreen = c.close >= c.open;
-                const color = isGreen ? '#10b981' : '#f43f5e';
-
-                const yOpen = getY(c.open);
-                const yClose = getY(c.close);
-                const yHigh = getY(c.high);
-                const yLow = getY(c.low);
-
-                linePoints.push({ x, y: yClose });
-
-                if (activeChartType === 'candles') {
-                    // Wick
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 1.2;
-                    ctx.beginPath();
-                    ctx.moveTo(x, yHigh);
-                    ctx.lineTo(x, yLow);
-                    ctx.stroke();
-
-                    // Body
-                    ctx.fillStyle = color;
-                    const topBody = Math.min(yOpen, yClose);
-                    const bodyH = Math.max(2, Math.abs(yClose - yOpen));
-                    ctx.fillRect(x - candleW / 2, topBody, candleW, bodyH);
+            // RSI 14
+            const rsiArr=new Array(closes.length).fill(null);
+            if(showRsi||showMacd) {
+                const p=14; let gS=0,lS=0;
+                for(let i=1;i<=p&&i<closes.length;i++){const d=closes[i]-closes[i-1];if(d>0)gS+=d;else lS-=d;}
+                let ag=gS/p,al=lS/p;
+                rsiArr[p]=100-100/(1+ag/(al||0.001));
+                for(let i=p+1;i<closes.length;i++){
+                    const d=closes[i]-closes[i-1];
+                    ag=(ag*(p-1)+Math.max(d,0))/p; al=(al*(p-1)+Math.max(-d,0))/p;
+                    rsiArr[i]=100-100/(1+ag/(al||0.001));
                 }
+            }
 
-                // Volume Bar
-                const vBarH = (c.vol / maxVol) * volumeHeight;
-                const vBarY = h - 10 - vBarH;
-                ctx.fillStyle = isGreen ? 'rgba(16, 185, 129, 0.35)' : 'rgba(244, 63, 94, 0.35)';
-                ctx.fillRect(x - candleW / 2, vBarY, candleW, vBarH);
-
-                // SMA Calculations
-                if (idx >= 3) {
-                    const avg20 = candles.slice(Math.max(0, idx - 8), idx + 1).reduce((a, b) => a + b.close, 0) / (idx - Math.max(0, idx - 8) + 1);
-                    sma20Points.push({ x, y: getY(avg20) });
+            // ── Bollinger Bands (behind candles) ──────────────────────
+            if(chartIndicators.bb) {
+                const upts=[],lpts=[];
+                candles.forEach((_,i)=>{if(bbU[i]==null)return;upts.push({x:cx(i),y:getY(bbU[i])});lpts.push({x:cx(i),y:getY(bbL[i])});});
+                if(upts.length>1){
+                    ctx.save();
+                    ctx.beginPath(); ctx.moveTo(upts[0].x,upts[0].y);
+                    upts.forEach(p=>ctx.lineTo(p.x,p.y));
+                    for(let j=lpts.length-1;j>=0;j--)ctx.lineTo(lpts[j].x,lpts[j].y);
+                    ctx.closePath(); ctx.fillStyle='rgba(139,92,246,0.10)'; ctx.fill();
+                    ctx.strokeStyle='rgba(139,92,246,0.6)'; ctx.lineWidth=1.1;
+                    ctx.beginPath(); ctx.moveTo(upts[0].x,upts[0].y); upts.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(lpts[0].x,lpts[0].y); lpts.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
+                    ctx.restore();
                 }
-                if (idx >= 6) {
-                    const avg50 = candles.slice(Math.max(0, idx - 16), idx + 1).reduce((a, b) => a + b.close, 0) / (idx - Math.max(0, idx - 16) + 1);
-                    sma50Points.push({ x, y: getY(avg50) });
+            }
+
+            // ── Volume bars ────────────────────────────────────────────
+            if(showVol && volH>0) {
+                const vTop=chartBottom, maxV=Math.max(...candles.map(c=>c.vol||0))||1;
+                candles.forEach((c,i)=>{
+                    const x=cx(i), bH=((c.vol||0)/maxV)*(volH-4), isUp=c.close>=c.open;
+                    ctx.fillStyle=isUp?'rgba(16,185,129,0.48)':'rgba(244,63,94,0.48)';
+                    ctx.fillRect(x-candleW/2, vTop+(volH-4)-bH, Math.max(1.5,candleW), bH);
+                });
+                ctx.fillStyle=isDark?'#475569':'#94a3b8';
+                ctx.font='8px Cairo,monospace'; ctx.textAlign='right';
+                ctx.fillText('حجم', W-rightM-3, chartBottom+volH-2);
+            }
+
+            // ── Candles / Line ─────────────────────────────────────────
+            const linePts=[];
+            candles.forEach((c,i)=>{
+                const x=cx(i), yO=getY(c.open), yC=getY(c.close), yH=getY(c.high), yL=getY(c.low);
+                const isUp=c.close>=c.open;
+                linePts.push({x,y:yC});
+                if(activeChartType==='candles') {
+                    ctx.strokeStyle=isUp?'#10b981':'#f43f5e'; ctx.lineWidth=1;
+                    ctx.beginPath(); ctx.moveTo(x,yH); ctx.lineTo(x,yL); ctx.stroke();
+                    ctx.fillStyle=isUp?'#10b981':'#f43f5e';
+                    const bT=Math.min(yO,yC), bH=Math.max(2,Math.abs(yC-yO));
+                    ctx.fillRect(x-candleW/2,bT,candleW,bH);
+                } else if(activeChartType==='hollow') {
+                    ctx.strokeStyle=isUp?'#10b981':'#f43f5e'; ctx.lineWidth=1;
+                    ctx.beginPath(); ctx.moveTo(x,yH); ctx.lineTo(x,yL); ctx.stroke();
+                    const bT=Math.min(yO,yC), bH=Math.max(1,Math.abs(yC-yO));
+                    ctx.strokeRect(x-candleW/2,bT,candleW,bH);
+                    if(!isUp){ctx.fillStyle='rgba(244,63,94,0.35)';ctx.fillRect(x-candleW/2,bT,candleW,bH);}
                 }
             });
 
-            // If Line Chart Mode
-            if (activeChartType === 'line' && linePoints.length > 1) {
-                // Gradient Fill
-                const grad = ctx.createLinearGradient(0, chartTop, 0, chartBottom);
-                grad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-                grad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.moveTo(linePoints[0].x, chartBottom);
-                linePoints.forEach(p => ctx.lineTo(p.x, p.y));
-                ctx.lineTo(linePoints[linePoints.length - 1].x, chartBottom);
-                ctx.closePath();
-                ctx.fill();
-
-                // Stroke
-                ctx.strokeStyle = '#10b981';
-                ctx.lineWidth = 2.2;
-                ctx.beginPath();
-                ctx.moveTo(linePoints[0].x, linePoints[0].y);
-                for (let j = 1; j < linePoints.length; j++) {
-                    ctx.lineTo(linePoints[j].x, linePoints[j].y);
-                }
-                ctx.stroke();
+            if(activeChartType==='line'&&linePts.length>1){
+                const grad=ctx.createLinearGradient(0,chartTop,0,chartBottom);
+                grad.addColorStop(0,'rgba(16,185,129,0.38)'); grad.addColorStop(1,'rgba(16,185,129,0)');
+                ctx.fillStyle=grad; ctx.beginPath();
+                ctx.moveTo(linePts[0].x,chartBottom); linePts.forEach(p=>ctx.lineTo(p.x,p.y));
+                ctx.lineTo(linePts[linePts.length-1].x,chartBottom); ctx.closePath(); ctx.fill();
+                ctx.strokeStyle='#10b981'; ctx.lineWidth=2.2;
+                ctx.beginPath(); ctx.moveTo(linePts[0].x,linePts[0].y);
+                linePts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
+                const lp=linePts[linePts.length-1];
+                ctx.fillStyle='#34d399'; ctx.beginPath(); ctx.arc(lp.x,lp.y,4,0,Math.PI*2); ctx.fill();
             }
 
-            // Draw SMA 20 (Yellow)
-            if (sma20Points.length > 1) {
-                ctx.strokeStyle = '#facc15';
-                ctx.lineWidth = 1.8;
-                ctx.beginPath();
-                ctx.moveTo(sma20Points[0].x, sma20Points[0].y);
-                for (let j = 1; j < sma20Points.length; j++) {
-                    ctx.lineTo(sma20Points[j].x, sma20Points[j].y);
-                }
-                ctx.stroke();
+            // ── Moving averages ──────────────────────────────────────
+            function drawLine(arr,color,lw=1.6){
+                const pts=arr.map((v,i)=>v==null?null:{x:cx(i),y:getY(v)}).filter(Boolean);
+                if(pts.length<2)return;
+                ctx.strokeStyle=color; ctx.lineWidth=lw;
+                ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y); pts.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.stroke();
             }
+            if(chartIndicators.ema9)   drawLine(ema9arr,  '#f59e0b',1.8);
+            if(chartIndicators.ema21)  drawLine(ema21arr, '#fb923c',1.5);
+            if(chartIndicators.sma50)  drawLine(sma50arr, '#38bdf8',1.5);
+            if(chartIndicators.sma200) drawLine(sma200arr,'#a78bfa',1.4);
 
-            // Draw SMA 50 (Cyan)
-            if (sma50Points.length > 1) {
-                ctx.strokeStyle = '#38bdf8';
-                ctx.lineWidth = 1.6;
-                ctx.beginPath();
-                ctx.moveTo(sma50Points[0].x, sma50Points[0].y);
-                for (let j = 1; j < sma50Points.length; j++) {
-                    ctx.lineTo(sma50Points[j].x, sma50Points[j].y);
-                }
-                ctx.stroke();
-            }
-
-            // Interactive Crosshair & HUD
-            const hud = document.getElementById('chartHudBox');
-            if (cursorX !== null && cursorX >= leftMargin && cursorX <= w - rightMargin) {
-                // Find nearest candle
-                const relX = cursorX - leftMargin;
-                let nearestIdx = Math.round((relX - stepX / 2) / stepX);
-                nearestIdx = Math.max(0, Math.min(numCandles - 1, nearestIdx));
-                const targetC = candles[nearestIdx];
-                const cX = leftMargin + nearestIdx * stepX + stepX / 2;
-                const cY = getY(targetC.close);
-
-                // Draw Vertical Crosshair Line
-                ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.35)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([3, 3]);
-                ctx.beginPath();
-                ctx.moveTo(cX, chartTop);
-                ctx.lineTo(cX, h - 10);
-                ctx.stroke();
-
-                // Draw Horizontal Crosshair Line
-                ctx.beginPath();
-                ctx.moveTo(leftMargin, cY);
-                ctx.lineTo(w - rightMargin, cY);
-                ctx.stroke();
+            // ── Support / Resistance pills ───────────────────────────
+            if(chartIndicators.sr!==false) {
+                const yR=getY(data.resistance||maxP); drawPill(yR,`م ${(data.resistance||maxP).toFixed(1)}`,'#f43f5e');
+                const yS=getY(data.support   ||minP); drawPill(yS,`د ${(data.support   ||minP).toFixed(1)}`,'#10b981');
+                ctx.strokeStyle='rgba(244,63,94,0.75)'; ctx.lineWidth=1.1; ctx.setLineDash([4,4]);
+                ctx.beginPath(); ctx.moveTo(leftM,getY(data.resistance||maxP)); ctx.lineTo(W-rightM,getY(data.resistance||maxP)); ctx.stroke();
+                ctx.strokeStyle='rgba(16,185,129,0.75)';
+                ctx.beginPath(); ctx.moveTo(leftM,getY(data.support||minP)); ctx.lineTo(W-rightM,getY(data.support||minP)); ctx.stroke();
                 ctx.setLineDash([]);
-
-                // Target Price Circle
-                ctx.fillStyle = targetC.close >= targetC.open ? '#10b981' : '#f43f5e';
-                ctx.beginPath();
-                ctx.arc(cX, cY, 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-
-                // Update HUD
-                if (hud) {
-                    const isPos = targetC.close >= targetC.open;
-                    hud.innerHTML = `
-                        <span class="text-slate-400 font-bold">${targetC.date}</span>
-                        <span>O: <b class="text-white">${targetC.open.toFixed(2)}</b></span>
-                        <span>H: <b class="text-emerald-300">${targetC.high.toFixed(2)}</b></span>
-                        <span>L: <b class="text-rose-300">${targetC.low.toFixed(2)}</b></span>
-                        <span>C: <b class="${isPos ? 'text-emerald-400' : 'text-rose-400'}">${targetC.close.toFixed(2)}</b></span>
-                        <span class="${isPos ? 'text-emerald-400' : 'text-rose-400'} font-bold">(${isPos ? '+' : ''}${targetC.chgPct}%)</span>
-                        <span class="text-slate-400">V: ${(targetC.vol / 1000).toFixed(0)}K</span>
-                    `;
-                }
-            } else {
-                if (hud) {
-                    const cleanNameHud = data.name.replace(/\s*\([A-Za-z0-9_]+\)/g, '').trim();
-                    hud.innerHTML = `
-                        <span class="text-slate-400">${cleanNameHud} (${data.ticker})</span>
-                        <span>السعر: <b class="text-white">${data.close.toFixed(2)} ج</b></span>
-                        <span class="${data.chg >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${data.chg >= 0 ? '+' : ''}${data.chg.toFixed(2)}%</span>
-                        <span class="text-slate-500">حرك المؤشر للتتبع 🔍</span>
-                    `;
-                }
             }
+
+            // ── Current price pill ────────────────────────────────────
+            const lastC=candles[candles.length-1], yCur=getY(lastC.close);
+            ctx.strokeStyle='rgba(56,189,248,0.75)'; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+            ctx.beginPath(); ctx.moveTo(leftM,yCur); ctx.lineTo(W-rightM,yCur); ctx.stroke(); ctx.setLineDash([]);
+            drawPill(yCur, lastC.close.toFixed(2), '#0284c7');
+
+            // ── RSI sub-panel ─────────────────────────────────────────
+            let subTop = chartBottom + volH;
+            if(showRsi) {
+                const pH=subPanelH;
+                ctx.fillStyle=isDark?'rgba(8,12,20,0.7)':'rgba(241,245,249,0.8)'; ctx.fillRect(0,subTop,W-rightM,pH);
+                const yOB=subTop+pH*(1-70/100), yOS=subTop+pH*(1-30/100);
+                ctx.lineWidth=0.7;
+                ctx.strokeStyle='rgba(244,63,94,0.4)'; ctx.setLineDash([2,3]);
+                ctx.beginPath(); ctx.moveTo(0,yOB); ctx.lineTo(W-rightM,yOB); ctx.stroke();
+                ctx.strokeStyle='rgba(16,185,129,0.4)';
+                ctx.beginPath(); ctx.moveTo(0,yOS); ctx.lineTo(W-rightM,yOS); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle=isDark?'#64748b':'#94a3b8'; ctx.font='8px Cairo,monospace'; ctx.textAlign='left';
+                ctx.fillText('RSI 14',3,subTop+9);
+                const lastRsi=rsiArr.filter(v=>v!=null).pop()||50;
+                const rc=lastRsi>70?'#f43f5e':lastRsi<30?'#10b981':'#94a3b8';
+                ctx.fillStyle=rc; ctx.fillText(lastRsi.toFixed(1),3,subTop+pH-3);
+                ctx.strokeStyle=rc; ctx.lineWidth=1.5;
+                ctx.beginPath(); let st=false;
+                candles.forEach((_,i)=>{
+                    if(rsiArr[i]==null)return;
+                    const x=cx(i), y=subTop+pH*(1-rsiArr[i]/100);
+                    if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);
+                }); ctx.stroke();
+                subTop+=pH;
+            }
+
+            // ── MACD sub-panel ────────────────────────────────────────
+            if(showMacd) {
+                const pH=subPanelH;
+                const e12=ema(closes,12), e26=ema(closes,26);
+                const ml=e12.map((v,i)=>v-e26[i]), sig=ema(ml,9);
+                const hist=ml.map((v,i)=>v-sig[i]);
+                const maxH=Math.max(...hist.map(Math.abs).filter(isFinite))||1;
+                const midY=subTop+pH/2;
+                ctx.fillStyle=isDark?'rgba(8,12,20,0.7)':'rgba(241,245,249,0.8)'; ctx.fillRect(0,subTop,W-rightM,pH);
+                ctx.fillStyle=isDark?'#64748b':'#94a3b8'; ctx.font='8px Cairo,monospace'; ctx.textAlign='left';
+                ctx.fillText('MACD',3,subTop+9);
+                hist.forEach((v,i)=>{
+                    const x=cx(i), bH=(Math.abs(v)/maxH)*(pH/2-4);
+                    ctx.fillStyle=v>=0?'rgba(16,185,129,0.7)':'rgba(244,63,94,0.7)';
+                    if(v>=0)ctx.fillRect(x-candleW/2,midY-bH,Math.max(1.5,candleW),bH);
+                    else    ctx.fillRect(x-candleW/2,midY,Math.max(1.5,candleW),bH);
+                });
+            }
+
+            // ── Crosshair & HUD ───────────────────────────────────────
+            const hud=document.getElementById('chartHudBox');
+            if(cursorX!==null&&cursorX>=leftM&&cursorX<=W-rightM) {
+                let ni=Math.round((cursorX-leftM-stepX/2)/stepX);
+                ni=Math.max(0,Math.min(numC-1,ni));
+                const tc=candles[ni], cX=cx(ni), cY=getY(tc.close);
+                ctx.strokeStyle=isDark?'rgba(255,255,255,0.38)':'rgba(0,0,0,0.32)';
+                ctx.lineWidth=1; ctx.setLineDash([3,3]);
+                ctx.beginPath(); ctx.moveTo(cX,chartTop); ctx.lineTo(cX,H-8); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(leftM,cY); ctx.lineTo(W-rightM,cY); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle=tc.close>=tc.open?'#10b981':'#f43f5e';
+                ctx.beginPath(); ctx.arc(cX,cY,4,0,Math.PI*2); ctx.fill();
+                ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+                if(hud){const ip=tc.close>=tc.open;hud.innerHTML=`
+                    <span class="text-slate-400 font-bold">${tc.date}</span>
+                    <span>افتتاح: <b class="text-white">${tc.open.toFixed(2)}</b></span>
+                    <span>أعلى: <b class="text-emerald-300">${tc.high.toFixed(2)}</b></span>
+                    <span>أدنى: <b class="text-rose-300">${tc.low.toFixed(2)}</b></span>
+                    <span>إغلاق: <b class="${ip?'text-emerald-400':'text-rose-400'}">${tc.close.toFixed(2)}</b></span>
+                    <span class="${ip?'text-emerald-400':'text-rose-400'} font-bold">(${ip?'+':''}${tc.chgPct}%)</span>
+                    <span class="text-slate-400">حجم: ${(tc.vol/1000).toFixed(0)}K</span>`;}
+            } else {
+                if(hud){const cn=data.name.replace(/\s*\([A-Za-z0-9_]+\)/g,'').trim();
+                    hud.innerHTML=`<span class="text-slate-400">${cn} (${data.ticker})</span>
+                    <span>السعر: <b class="text-white">${data.close.toFixed(2)} ج</b></span>
+                    <span class="${data.chg>=0?'text-emerald-400':'text-rose-400'} font-bold">${data.chg>=0?'+':''}${data.chg.toFixed(2)}%</span>
+                    <span class="text-slate-500">حرك المؤشر للتتبع 🔍</span>`;}
+            }
+
+            // ── Price Action Strip fill ───────────────────────────────
+            const today=candles[candles.length-1], ip=today.close>=today.open;
+            const elO=document.getElementById('paOpenVal'),
+                  elH=document.getElementById('paHighVal'),
+                  elL=document.getElementById('paLowVal'),
+                  elC=document.getElementById('paCloseVal'),
+                  elG=document.getElementById('paChangeVal'),
+                  elV=document.getElementById('paVolVal');
+            if(elO) elO.textContent=today.open.toFixed(2);
+            if(elH) elH.textContent=today.high.toFixed(2);
+            if(elL) elL.textContent=today.low.toFixed(2);
+            if(elC){elC.textContent=today.close.toFixed(2);elC.className=ip?'text-emerald-400 font-bold':'text-rose-400 font-bold';}
+            if(elG){elG.textContent=(ip?'+':'')+today.chgPct+'%';elG.className=ip?'text-emerald-400 font-bold':'text-rose-400 font-bold';}
+            if(elV) elV.textContent=today.vol>=1e6?`${(today.vol/1e6).toFixed(1)}M`:`${(today.vol/1000).toFixed(0)}K`;
         }
 
         // 6. Interactive AI Financial Advisor Chatbot
@@ -5126,6 +5359,118 @@
         // محرك التحديث التلقائي اللحظي المستمر (Auto-Polling Moment-by-Moment)
         // يتم التحديث كل 15 ثانية تلقائياً أثناء تشغيل التطبيق لضمان دقة الأسعار دائماً
         // =========================================================================
+
+        // =========================================================================
+        // DIRECT BROWSER MUBASHER REAL-TIME FETCH (لحظي مباشر من المتصفح)
+        // يسحب أسعار الأسهم مباشرة من Mubasher عبر proxy CORS خلال جلسة التداول
+        // =========================================================================
+        const MUBASHER_TICKERS = [
+            'TMGH','EFIH','ADIB','EFID','ORHD','OCDI','EGAL','FWRY','ABUK','MFPC',
+            'SKPC','MACRO','PHDC','ETEL'
+        ];
+        const MUBASHER_CORS_PROXY = 'https://corsproxy.io/?';
+
+        async function fetchMubasherDirect(ticker) {
+            const url = `https://english.mubasher.info/markets/EGX/stocks/${ticker}/`;
+            try {
+                const res = await fetch(MUBASHER_CORS_PROXY + encodeURIComponent(url), {
+                    cache: 'no-store',
+                    headers: { 'Accept': 'text/html' },
+                    signal: AbortSignal.timeout(7000)
+                });
+                if (!res.ok) return null;
+                const html = await res.text();
+                const priceM = html.match(/<div class="market-summary__last-price[^"]*">([^<]+)<\/div>/);
+                const chgM   = html.match(/<div class="market-summary__change-percentage[^"]*">([^<]+)<\/div>/);
+                const openM  = html.match(/Open<\/span>\s*<span[^>]*>([^<]+)<\/span>/);
+                const highM  = html.match(/High<\/span>\s*<span[^>]*>([^<]+)<\/span>/);
+                const lowM   = html.match(/Low<\/span>\s*<span[^>]*>([^<]+)<\/span>/);
+                const volM   = html.match(/Volume<\/span>\s*<span[^>]*>([^<]+)<\/span>/);
+                if (!priceM) return null;
+                const close = parseFloat(priceM[1].replace(/,/g,''));
+                if (!close || isNaN(close)) return null;
+                return {
+                    close,
+                    chg:    parseFloat((chgM?.[1]||'0').replace(/[%,]/g,'')),
+                    open:   parseFloat((openM?.[1]||'0').replace(/,/g,'')) || close,
+                    high:   parseFloat((highM?.[1]||'0').replace(/,/g,'')) || close,
+                    low:    parseFloat((lowM?.[1] ||'0').replace(/,/g,'')) || close,
+                    volume: parseInt((volM?.[1]  ||'0').replace(/,/g,''))  || 0,
+                    source: 'Mubasher-Direct'
+                };
+            } catch(e) { return null; }
+        }
+
+        async function syncMubasherDirectAll() {
+            // فقط خلال جلسة التداول الرسمية (الأحد-الخميس 10:00-14:30 بتوقيت مصر)
+            const now = new Date();
+            const cairoH = (now.getUTCHours() + 3) % 24;
+            const cairoMin = now.getUTCMinutes();
+            const dayOfWeek = now.getUTCDay(); // 0=Sun..4=Thu
+            const totalMin = cairoH * 60 + cairoMin;
+            const isTradingSession = dayOfWeek >= 0 && dayOfWeek <= 4 && totalMin >= 600 && totalMin < 870;
+
+            if (!isTradingSession) {
+                console.log('[Mubasher-Direct] خارج جلسة التداول – تم التخطي');
+                return;
+            }
+
+            console.log('[Mubasher-Direct] بدء السحب المباشر لـ', MUBASHER_TICKERS.length, 'سهماً...');
+            let updated = 0;
+
+            await Promise.allSettled(MUBASHER_TICKERS.map(async (ticker) => {
+                const d = await fetchMubasherDirect(ticker);
+                if (!d) return;
+                // تحديث STOCKS_DATA
+                const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                if (local) {
+                    if (d.close > 0) { local.close = d.close; updated++; }
+                    if (d.chg  !== undefined) local.chg    = d.chg;
+                    if (d.open > 0) local.open    = d.open;
+                    if (d.high > 0) local.high    = d.high;
+                    if (d.low  > 0) local.low     = d.low;
+                    if (d.volume)   local.volume  = d.volume;
+                }
+                // تحديث أسعار المحفظة فوراً
+                userHoldings.forEach(h => {
+                    if (h.ticker === ticker && d.close > 0) h.cur = d.close;
+                });
+            }));
+
+            if (updated > 0) {
+                console.log(`[Mubasher-Direct] ✓ تم تحديث ${updated} سهماً مباشرةً`);
+                renderStocks();
+                renderHoldingsTable();
+                if (typeof renderValuationCard === 'function') renderValuationCard();
+                // تحديث شاشة الشارت إذا كانت مفتوحة
+                const cm = document.getElementById('stockChartModal');
+                if (cm && !cm.classList.contains('hidden') && activeChartTicker) {
+                    if (activeChartEngine === 'canvas') drawAdvancedChart();
+                }
+                // تحديث شريط الأسعار اللحظي في التيكر
+                MUBASHER_TICKERS.forEach(ticker => {
+                    const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                    if (!local) return;
+                    // تحديث أي عناصر ديناميكية في التيكر
+                    document.querySelectorAll(`[data-live-ticker="${ticker}"]`).forEach(el => {
+                        el.textContent = local.close.toFixed(2) + ' ج';
+                        el.className = el.className.replace(/text-(emerald|rose)-\d+/g,'');
+                        el.classList.add(local.chg >= 0 ? 'text-emerald-400' : 'text-rose-400');
+                    });
+                });
+                const badge = document.getElementById('syncStatusText');
+                if (badge) badge.innerText = `مباشر لحظي ✓ (${updated} سهماً — ${new Date().toLocaleTimeString('ar-EG')})`;
+            }
+        }
+
+        // تشغيل المزامنة المباشرة كل 30 ثانية (أسرع من الـ cloud JSON الذي هو كل 15 ثانية)
+        setInterval(() => {
+            if (!document.hidden) syncMubasherDirectAll();
+        }, 30000);
+        // وكذلك عند فتح الصفحة
+        setTimeout(syncMubasherDirectAll, 3000);
+
+
         setInterval(() => {
             if (!document.hidden) {
                 syncLiveMarketData(true);
