@@ -1,17 +1,17 @@
 {
-  "updated_at": "2026-09-17T15:01:33.523664+03:00",
-  "updated_at_display": "2026-09-17 15:01:33",
+  "updated_at": "2026-09-17T15:22:06.737111+03:00",
+  "updated_at_display": "2026-09-17 15:22:06",
   "indices": {
     "EGX33": {
       "close": 3380.45,
       "chgPct": 1.15
     },
     "EGX30": {
-      "close": 55498.7,
+      "close": 55498.72,
       "chgPct": 1.23
     },
     "EGX70EWI": {
-      "close": 21061.1,
+      "close": 21061.13,
       "chgPct": 1.52
     }
   },
@@ -36,11 +36,11 @@
       "ticker": "MFPC",
       "name": "موبكو للأسمدة",
       "sector": "البتروكيماويات والأسمدة",
-      "close": 50,
+      "close": 50.0,
       "chg": 2.69,
       "open": 48.69,
       "high": 50.49,
-      "low": 48.69,
+      "low": 48.7,
       "volume": 7725894,
       "rsi": 76.1,
       "sma20": 44.5,
@@ -49,13 +49,15 @@
       "pb": 3.19,
       "support": 40.44,
       "resistance": 52.5,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "AMOC": {
       "ticker": "AMOC",
       "name": "أموك للبترول",
       "sector": "البتروكيماويات والأسمدة",
-      "close": 13.8,
+      "close": 13.73,
       "chg": 2.6,
       "open": 13.45,
       "high": 13.91,
@@ -67,14 +69,16 @@
       "pe": 0,
       "pb": 3.71,
       "support": 10.54,
-      "resistance": 14.49,
-      "type": "stock"
+      "resistance": 14.42,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ACGC": {
       "ticker": "ACGC",
       "name": "العربية للأقطان",
       "sector": "الصناعة والتصدير",
-      "close": 14.21,
+      "close": 14.38,
       "chg": -1.32,
       "open": 14.4,
       "high": 14.4,
@@ -86,17 +90,19 @@
       "pe": 0,
       "pb": 0,
       "support": 11.9,
-      "resistance": 14.92,
-      "type": "stock"
+      "resistance": 15.1,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:27 PM market time.",
+      "source": "Mubasher.info"
     },
     "MCQE": {
       "ticker": "MCQE",
       "name": "أسمنت قنا",
       "sector": "العقارات والإنشاءات",
-      "close": 218.98,
+      "close": 218.99,
       "chg": -0.91,
-      "open": 221,
-      "high": 224,
+      "open": 221.0,
+      "high": 224.0,
       "low": 216.02,
       "volume": 77595,
       "rsi": 45.0,
@@ -104,19 +110,21 @@
       "sma50": 212.08,
       "pe": 0,
       "pb": 6.93,
-      "support": 208.03,
-      "resistance": 229.93,
-      "type": "stock"
+      "support": 208.04,
+      "resistance": 229.94,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ABUK": {
       "ticker": "ABUK",
       "name": "أبو قير للأسمدة",
       "sector": "البتروكيماويات والأسمدة",
-      "close": 92.55,
+      "close": 92.22,
       "chg": 3.99,
-      "open": 89,
-      "high": 94,
-      "low": 89,
+      "open": 89.0,
+      "high": 94.0,
+      "low": 89.0,
       "volume": 3106148,
       "rsi": 64.3,
       "sma20": 86.1,
@@ -124,14 +132,16 @@
       "pe": 0,
       "pb": 0,
       "support": 78.53,
-      "resistance": 97.18,
-      "type": "stock"
+      "resistance": 96.83,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "LCSW": {
       "ticker": "LCSW",
       "name": "ليسيكو مصر",
       "sector": "الصناعة والتصدير",
-      "close": 33.5,
+      "close": 33.4,
       "chg": 0.51,
       "open": 33.33,
       "high": 33.75,
@@ -142,9 +152,11 @@
       "sma50": 34.05,
       "pe": 0,
       "pb": 0.66,
-      "support": 31.82,
-      "resistance": 35.18,
-      "type": "stock"
+      "support": 31.73,
+      "resistance": 35.07,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
     },
     "FAIT": {
       "ticker": "FAIT",
@@ -163,13 +175,15 @@
       "pb": 0.65,
       "support": 40.98,
       "resistance": 49.88,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:25 PM market time.",
+      "source": "Mubasher.info"
     },
     "SKPC": {
       "ticker": "SKPC",
       "name": "سيدي كرير للبتروكيماويات",
       "sector": "البتروكيماويات والأسمدة",
-      "close": 18.5,
+      "close": 18.48,
       "chg": 1.37,
       "open": 18.25,
       "high": 18.8,
@@ -181,14 +195,16 @@
       "pe": 0,
       "pb": 3.24,
       "support": 17.01,
-      "resistance": 19.43,
-      "type": "stock"
+      "resistance": 19.4,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "FWRY": {
       "ticker": "FWRY",
       "name": "فوري للمدفوعات",
       "sector": "التكنولوجيا والمدفوعات",
-      "close": 18.95,
+      "close": 19.0,
       "chg": 0.37,
       "open": 18.88,
       "high": 19.2,
@@ -199,9 +215,11 @@
       "sma50": 19.09,
       "pe": 19.8,
       "pb": 7.12,
-      "support": 18.0,
-      "resistance": 19.9,
-      "type": "stock"
+      "support": 18.05,
+      "resistance": 19.95,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "OCDI": {
       "ticker": "OCDI",
@@ -209,7 +227,7 @@
       "sector": "العقارات والإنشاءات",
       "close": 30.5,
       "chg": 1.67,
-      "open": 30,
+      "open": 30.0,
       "high": 30.8,
       "low": 29.7,
       "volume": 1747239,
@@ -220,15 +238,17 @@
       "pb": 2.36,
       "support": 28.97,
       "resistance": 32.02,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "TMGH": {
       "ticker": "TMGH",
       "name": "مجموعة طلعت مصطفى",
       "sector": "العقارات والإنشاءات",
-      "close": 95.8,
+      "close": 95.65,
       "chg": 0.84,
-      "open": 95,
+      "open": 95.0,
       "high": 95.86,
       "low": 94.06,
       "volume": 2617992,
@@ -237,15 +257,17 @@
       "sma50": 98.22,
       "pe": 12.8,
       "pb": 2.15,
-      "support": 91.01,
-      "resistance": 100.59,
-      "type": "stock"
+      "support": 90.87,
+      "resistance": 100.43,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
     },
     "PHDC": {
       "ticker": "PHDC",
       "name": "بالم هيلز للتعمير",
       "sector": "العقارات والإنشاءات",
-      "close": 13.7,
+      "close": 13.66,
       "chg": -0.51,
       "open": 13.77,
       "high": 13.87,
@@ -256,15 +278,17 @@
       "sma50": 14.85,
       "pe": 9.3,
       "pb": 2.24,
-      "support": 13.01,
-      "resistance": 14.38,
-      "type": "stock"
+      "support": 12.98,
+      "resistance": 14.34,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ISPH": {
       "ticker": "ISPH",
       "name": "ابن سينا فارما",
       "sector": "الأغذية والأدوية",
-      "close": 12.16,
+      "close": 12.05,
       "chg": -0.33,
       "open": 12.2,
       "high": 12.2,
@@ -275,18 +299,20 @@
       "sma50": 12.61,
       "pe": 0,
       "pb": 0,
-      "support": 11.55,
-      "resistance": 12.77,
-      "type": "stock"
+      "support": 11.45,
+      "resistance": 12.65,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ETEL": {
       "ticker": "ETEL",
       "name": "المصرية للاتصالات",
       "sector": "التكنولوجيا والمدفوعات",
-      "close": 133,
+      "close": 131.73,
       "chg": 1.29,
       "open": 131.3,
-      "high": 133,
+      "high": 133.0,
       "low": 128.52,
       "volume": 6008319,
       "rsi": 76.7,
@@ -295,36 +321,40 @@
       "pe": 10.1,
       "pb": 3.08,
       "support": 112.06,
-      "resistance": 139.65,
-      "type": "stock"
+      "resistance": 138.32,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "EFIH": {
       "ticker": "EFIH",
       "name": "إي فاينانس",
       "sector": "التكنولوجيا والمدفوعات",
-      "close": 23.99,
+      "close": 23.82,
       "chg": 3.09,
       "open": 23.27,
       "high": 23.99,
-      "low": 23,
+      "low": 23.0,
       "volume": 2536196,
       "rsi": 54.0,
       "sma20": 23.67,
       "sma50": 23.41,
       "pe": 0,
       "pb": 9.64,
-      "support": 22.79,
-      "resistance": 25.19,
-      "type": "stock"
+      "support": 22.63,
+      "resistance": 25.01,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
     },
     "ADIB": {
       "ticker": "ADIB",
       "name": "مصرف أبوظبي الإسلامي",
       "sector": "البنوك والخدمات المالية",
-      "close": 54,
+      "close": 53.63,
       "chg": 3.83,
       "open": 52.01,
-      "high": 54,
+      "high": 54.0,
       "low": 51.52,
       "volume": 2572584,
       "rsi": 58.2,
@@ -332,9 +362,11 @@
       "sma50": 51.77,
       "pe": 5.2,
       "pb": 1.76,
-      "support": 51.3,
-      "resistance": 56.7,
-      "type": "stock"
+      "support": 50.95,
+      "resistance": 56.31,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "SAUD": {
       "ticker": "SAUD",
@@ -344,7 +376,7 @@
       "chg": 2.9,
       "open": 23.1,
       "high": 23.8,
-      "low": 23,
+      "low": 23.0,
       "volume": 350534,
       "rsi": 55.9,
       "sma20": 23.58,
@@ -353,13 +385,15 @@
       "pb": 1.07,
       "support": 22.58,
       "resistance": 24.96,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:27 PM market time.",
+      "source": "Mubasher.info"
     },
     "MASR": {
       "ticker": "MASR",
       "name": "مدينة مصر للإسكان",
       "sector": "العقارات والإنشاءات",
-      "close": 7.88,
+      "close": 7.89,
       "chg": -0.13,
       "open": 7.89,
       "high": 7.99,
@@ -370,15 +404,17 @@
       "sma50": 7.97,
       "pe": 5.5,
       "pb": 1.28,
-      "support": 7.49,
-      "resistance": 8.27,
-      "type": "stock"
+      "support": 7.5,
+      "resistance": 8.28,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "EFID": {
       "ticker": "EFID",
       "name": "إيديتا للصناعات الغذائية",
       "sector": "الأغذية والأدوية",
-      "close": 31.2,
+      "close": 31.74,
       "chg": 1.3,
       "open": 30.8,
       "high": 31.84,
@@ -389,38 +425,42 @@
       "sma50": 30.2,
       "pe": 13.9,
       "pb": 7.3,
-      "support": 29.64,
-      "resistance": 32.76,
-      "type": "stock"
+      "support": 30.15,
+      "resistance": 33.33,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ORHD": {
       "ticker": "ORHD",
       "name": "أوراسكوم للتنمية مصر",
       "sector": "العقارات والإنشاءات",
-      "close": 43.47,
+      "close": 43.35,
       "chg": 2.64,
       "open": 42.35,
       "high": 43.78,
-      "low": 42.35,
+      "low": 42.46,
       "volume": 4878208,
       "rsi": 60.0,
       "sma20": 42.31,
       "sma50": 41.25,
       "pe": 0,
       "pb": 2.59,
-      "support": 41.25,
-      "resistance": 45.64,
-      "type": "stock"
+      "support": 41.18,
+      "resistance": 45.52,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "SWDY": {
       "ticker": "SWDY",
       "name": "السويدي إليكتريك",
       "sector": "الصناعة والتصدير",
-      "close": 127,
+      "close": 126.86,
       "chg": 2.05,
       "open": 124.45,
       "high": 127.95,
-      "low": 124.45,
+      "low": 124.5,
       "volume": 225995,
       "rsi": 57.3,
       "sma20": 127.59,
@@ -428,14 +468,16 @@
       "pe": 0,
       "pb": 3.73,
       "support": 111.29,
-      "resistance": 133.35,
-      "type": "stock"
+      "resistance": 133.2,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "JUFO": {
       "ticker": "JUFO",
       "name": "جهينة للصناعات الغذائية",
       "sector": "الأغذية والأدوية",
-      "close": 27,
+      "close": 27.0,
       "chg": -0.3,
       "open": 27.08,
       "high": 27.45,
@@ -448,17 +490,19 @@
       "pb": 4.95,
       "support": 25.65,
       "resistance": 28.35,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ORAS": {
       "ticker": "ORAS",
       "name": "أوراسكوم للإنشاء",
       "sector": "العقارات والإنشاءات",
-      "close": 879,
+      "close": 867.84,
       "chg": 5.02,
       "open": 837.01,
-      "high": 879,
-      "low": 831,
+      "high": 879.0,
+      "low": 831.0,
       "volume": 2606576,
       "rsi": 66.1,
       "sma20": 837.02,
@@ -466,8 +510,10 @@
       "pe": 8.5,
       "pb": 1.96,
       "support": 764.58,
-      "resistance": 922.95,
-      "type": "stock"
+      "resistance": 911.23,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "CIRA": {
       "ticker": "CIRA",
@@ -475,9 +521,9 @@
       "sector": "خدمات وتعليم",
       "close": 40.65,
       "chg": 4.23,
-      "open": 39,
-      "high": 41,
-      "low": 39,
+      "open": 39.0,
+      "high": 41.0,
+      "low": 39.0,
       "volume": 1048301,
       "rsi": 65.1,
       "sma20": 36.8,
@@ -486,16 +532,18 @@
       "pb": 9.53,
       "support": 35.53,
       "resistance": 42.68,
-      "type": "stock"
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
     },
     "COMI": {
       "ticker": "COMI",
       "name": "البنك التجاري الدولي",
       "sector": "البنوك والخدمات المالية",
-      "close": 132.5,
+      "close": 133.11,
       "chg": 0.57,
       "open": 131.75,
-      "high": 134,
+      "high": 134.0,
       "low": 131.31,
       "volume": 11412459,
       "rsi": 36.5,
@@ -503,9 +551,11 @@
       "sma50": 138.07,
       "pe": 6.4,
       "pb": 1.89,
-      "support": 125.88,
-      "resistance": 139.12,
-      "type": "stock"
+      "support": 126.45,
+      "resistance": 139.77,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "HELI": {
       "ticker": "HELI",
@@ -661,7 +711,7 @@
     },
     "EAST": {
       "ticker": "EAST",
-      "close": 32.02,
+      "close": 32.62,
       "chg": -1.63,
       "open": 32.55,
       "high": 33.19,
@@ -672,17 +722,19 @@
       "sma50": 35.97,
       "pe": 10.8,
       "pb": 6.62,
-      "support": 30.42,
-      "resistance": 33.62,
-      "type": "stock"
+      "support": 30.99,
+      "resistance": 34.25,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
     },
     "EGAL": {
       "ticker": "EGAL",
-      "close": 370,
+      "close": 371.41,
       "chg": 1.65,
-      "open": 364,
+      "open": 364.0,
       "high": 374.51,
-      "low": 360,
+      "low": 360.0,
       "volume": 241953,
       "rsi": 60.6,
       "sma20": 363.04,
@@ -690,13 +742,15 @@
       "pe": 14.2,
       "pb": 5.29,
       "support": 329.95,
-      "resistance": 388.5,
-      "type": "stock"
+      "resistance": 389.98,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "CERA": {
       "ticker": "CERA",
-      "close": 1.47,
-      "chg": 0,
+      "close": 1.46,
+      "chg": 0.0,
       "open": 1.47,
       "high": 1.5,
       "low": 1.44,
@@ -707,15 +761,17 @@
       "pe": 46.2,
       "pb": 3.39,
       "support": 1.38,
-      "resistance": 1.54,
-      "type": "stock"
+      "resistance": 1.53,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ARCC": {
       "ticker": "ARCC",
-      "close": 73.44,
+      "close": 73.0,
       "chg": 0.56,
       "open": 73.03,
-      "high": 74,
+      "high": 74.0,
       "low": 72.59,
       "volume": 264595,
       "rsi": 51.7,
@@ -724,12 +780,14 @@
       "pe": 0,
       "pb": 5.93,
       "support": 66.89,
-      "resistance": 77.11,
-      "type": "stock"
+      "resistance": 76.65,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ATQA": {
       "ticker": "ATQA",
-      "close": 12.69,
+      "close": 12.7,
       "chg": 0.87,
       "open": 12.58,
       "high": 12.82,
@@ -741,15 +799,17 @@
       "pe": 0,
       "pb": 0,
       "support": 10.93,
-      "resistance": 13.32,
-      "type": "stock"
+      "resistance": 13.33,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "ORWE": {
       "ticker": "ORWE",
-      "close": 28,
+      "close": 27.91,
       "chg": 4.48,
       "open": 26.8,
-      "high": 28,
+      "high": 28.0,
       "low": 26.68,
       "volume": 2520250,
       "rsi": 59.6,
@@ -758,12 +818,14 @@
       "pe": 8.5,
       "pb": 0.99,
       "support": 25.28,
-      "resistance": 29.4,
-      "type": "stock"
+      "resistance": 29.31,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "RMDA": {
       "ticker": "RMDA",
-      "close": 6.22,
+      "close": 6.16,
       "chg": 1.3,
       "open": 6.14,
       "high": 6.24,
@@ -775,8 +837,10 @@
       "pe": 36.7,
       "pb": 5.42,
       "support": 5.83,
-      "resistance": 6.53,
-      "type": "stock"
+      "resistance": 6.47,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     },
     "MACRO": {
       "ticker": "MACRO",
@@ -797,10 +861,10 @@
     },
     "GBCO": {
       "ticker": "GBCO",
-      "close": 31,
+      "close": 30.96,
       "chg": 1.47,
       "open": 30.55,
-      "high": 31,
+      "high": 31.0,
       "low": 30.25,
       "volume": 3147534,
       "rsi": 56.3,
@@ -808,9 +872,24 @@
       "sma50": 30.62,
       "pe": 0,
       "pb": 1.17,
-      "support": 29.45,
-      "resistance": 32.55,
-      "type": "stock"
+      "support": 29.41,
+      "resistance": 32.51,
+      "type": "stock",
+      "last_update_mubasher": "Last update: 01:28 PM market time.",
+      "source": "Mubasher.info"
+    },
+    "MCRO": {
+      "ticker": "MCRO",
+      "close": 1.69,
+      "chg": -2.31,
+      "open": 1.73,
+      "high": 1.74,
+      "low": 1.68,
+      "volume": 44074141,
+      "support": 1.61,
+      "resistance": 1.77,
+      "last_update_mubasher": "Last update: 01:29 PM market time.",
+      "source": "Mubasher.info"
     }
   },
   "funds": {
@@ -1093,6 +1172,7 @@
       "summary": "زيادة حجم الذهب الفيزيائي المودع في الخزائن المؤمنة لتغطية طلبات الاكتتاب المستمرة في وثائق الصندوق كأداة تحوط سهلة ومباشرة عبر تطبيق ثندر."
     }
   ],
-  "data_source": "TradingView Live EGX Core Feed",
-  "market_status": "جلسة التداول الرسمية / أحدث تنفيذ"
+  "data_source": "Mubasher.info API Engine (مباشر مصر)",
+  "market_status": "جلسة التداول الرسمية / أحدث تنفيذ",
+  "primary_provider": "مباشر (Mubasher)"
 }
