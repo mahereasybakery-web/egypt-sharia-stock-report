@@ -395,23 +395,37 @@
 
         <!-- ================= TAB 4: PORTFOLIO & ALLOCATION ================= -->
         <section id="view-portfolio" class="tab-content space-y-3.5">
-            <!-- P&L Summary Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div class="glass-card rounded-xl p-3">
-                    <span class="text-[11px] text-slate-400">القيمة الإجمالية</span>
-                    <div id="p_total_val" class="text-base font-bold text-white mt-0.5">38,940 ج.م</div>
+            <!-- Thndr Grand Wealth Header (مطابق لتطبيق ثندر الفعلي) -->
+            <div class="glass-card rounded-2xl p-4 text-center space-y-2 bg-gradient-to-b from-slate-900/90 via-slate-900/80 to-slate-950/95 border border-slate-700/80 shadow-2xl">
+                <div class="text-[11px] text-slate-400 flex items-center justify-center gap-1">
+                    <span>إجمالي الثروة (ج.م)</span>
+                    <span class="text-[10px] text-slate-500 cursor-help" title="إجمالي القيمة السوقية للأسهم والصناديق وسيولة كلاودز والنقدية">ⓘ</span>
                 </div>
-                <div class="glass-card rounded-xl p-3">
-                    <span class="text-[11px] text-slate-400">صافي الأرباح المحققة</span>
-                    <div id="p_total_pnl" class="text-base font-bold text-emerald-400 mt-0.5">+4,820 ج.م</div>
+                <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">87,736</div>
+                <div class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1 font-mono">
+                    <span id="p_thndr_grand_pnl">▲ +2,192</span>
+                    <span id="p_thndr_grand_return">+2.56%</span>
                 </div>
-                <div class="glass-card rounded-xl p-3">
-                    <span class="text-[11px] text-slate-400">العائد الاستثماري</span>
-                    <div id="p_total_return" class="text-base font-bold text-emerald-400 mt-0.5">+14.1%</div>
-                </div>
-                <div class="glass-card rounded-xl p-3">
-                    <span class="text-[11px] text-slate-400">تقييم الأمان والمناعة</span>
-                    <div class="text-base font-bold text-emerald-400 mt-0.5">ممتاز (A-)</div>
+
+                <!-- Thndr 3 Mini Wealth Status Cards -->
+                <div class="grid grid-cols-3 gap-2 pt-2.5 border-t border-slate-800/80 text-center text-xs">
+                    <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
+                        <div class="text-sm">🪙</div>
+                        <div class="text-[10px] text-slate-400">المحفظة (نقدية)</div>
+                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px]">145.00 ج</div>
+                    </div>
+                    <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
+                        <div class="text-sm">⚡</div>
+                        <div class="text-[10px] text-slate-400">كلاودز (سيولة يومية)</div>
+                        <div id="p_thndr_clawdz" class="font-bold text-sky-400 font-mono text-[11px]">49,672 ج</div>
+                        <div class="text-[9px] text-emerald-400 font-mono">▲ +0.04%</div>
+                    </div>
+                    <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
+                        <div class="text-sm">📊</div>
+                        <div class="text-[10px] text-slate-400">الأسهم والصناديق</div>
+                        <div id="p_thndr_invested" class="font-bold text-emerald-400 font-mono text-[11px]">37.92k ج</div>
+                        <div class="text-[9px] text-emerald-400 font-mono">▲ +6.08%</div>
+                    </div>
                 </div>
             </div>
 
@@ -433,13 +447,117 @@
                 </div>
             </div>
 
+            <!-- 1. SECTION: STOCKS (الأسهم في الأعلى) -->
+            <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-500/30">📈</span>
+                        <div>
+                            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span>محفظة الأسهم المتوافقة مع الشريعة</span>
+                            </h3>
+                            <p class="text-[10px] text-slate-400">الأسهم المصرية المتوافقة مع معايير الشريعة الإسلامية</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span id="stocksSubtotalBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-medium">37,110 ج.م (+6.1%)</span>
+                        <button onclick="resetPortfolioToDefault()" class="text-[10px] text-slate-400 hover:text-slate-200 underline">استعادة الافتراضي</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
+                            <tr>
+                                <th class="pb-2">السهم</th>
+                                <th class="pb-2">الكمية</th>
+                                <th class="pb-2">الشراء</th>
+                                <th class="pb-2">الحالي</th>
+                                <th class="pb-2">القيمة</th>
+                                <th class="pb-2">الربح / العائد</th>
+                                <th class="pb-2 text-center">حركة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocksHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
+                            <!-- Populated dynamically with Stocks -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. SECTION: FUNDS & GOLD (الصناديق والذهب في الأسفل) -->
+            <div class="glass-card rounded-2xl p-4 space-y-3 border-amber-900/40">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/30">🏦</span>
+                        <div>
+                            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span>صناديق الاستثمار والذهب الشرعية</span>
+                            </h3>
+                            <p class="text-[10px] text-slate-400">صناديق الأسهم الإسلامية ووثائق الذهب عيار 24 الصافي</p>
+                        </div>
+                    </div>
+                    <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">813 ج.م (+7.0%)</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
+                            <tr>
+                                <th class="pb-2">الصندوق / الأصل</th>
+                                <th class="pb-2">الوثائق</th>
+                                <th class="pb-2">الشراء</th>
+                                <th class="pb-2">الحالي</th>
+                                <th class="pb-2">القيمة</th>
+                                <th class="pb-2">الربح / العائد</th>
+                                <th class="pb-2 text-center">حركة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fundsHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
+                            <!-- Populated dynamically with Funds & Gold -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. SECTION: CLAWDZ & CASH BREAKDOWN (كلاودز والنقدية) -->
+            <div class="glass-card rounded-2xl p-4 space-y-2.5 border-sky-900/40 bg-slate-900/60">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/30">⚡</span>
+                        <div>
+                            <h3 class="text-xs font-bold text-white">سيولة كلاودز والاستثمار اللحظي (Clawdz)</h3>
+                            <p class="text-[10px] text-slate-400">عائد يومي لحظي %17.34 لحفظ القوة الشرائية</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded font-mono">49,817 ج.م (56.8% من الثروة)</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                    <div class="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-slate-300 font-bold block text-[11px]">Amount to be invest (كلاودز)</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">+21.69 ج (▲ +0.04% لحظي)</span>
+                        </div>
+                        <span class="font-mono font-bold text-white text-sm">49,672.00 ج</span>
+                    </div>
+                    <div class="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-slate-300 font-bold block text-[11px]">المحفظة (النقدية المتاحة للتداول)</span>
+                            <span class="text-[10px] text-slate-400">جاهزة للشراء الفوري بالبورصة</span>
+                        </div>
+                        <span class="font-mono font-bold text-white text-sm">145.00 ج</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sector Donut Chart & Risk Concentration Radar -->
             <div class="glass-card rounded-2xl p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
                         💼 <span>توزيع الأصول ورادار تركز القطاعات</span>
                     </h2>
-                    <span id="portfolioBalanceStatusBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-medium">توازن مثالي</span>
+                    <span id="portfolioBalanceStatusBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-medium">توزيع مثالي</span>
                 </div>
                 <div class="relative h-48 flex items-center justify-center">
                     <canvas id="portfolioDonutChart"></canvas>
@@ -451,39 +569,6 @@
                 <!-- Concentration Risk Advice -->
                 <div id="portfolioSectorAlert" class="hidden p-2.5 rounded-xl text-[11px] leading-relaxed">
                     <!-- Populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Holdings Detail Table with Edit/Delete -->
-            <div class="glass-card rounded-2xl p-4 space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                        📜 <span>أصول محفظتك (الأسهم والصناديق الشرعية)</span>
-                    </h3>
-                    <div class="flex items-center gap-2">
-                        <button onclick="loadClaudeModelPortfolio()" class="text-[10px] bg-emerald-950 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300 px-2.5 py-1 rounded-lg transition active:scale-95 flex items-center gap-1 shadow-sm font-medium" title="تحميل نموذج كلود (10 أصول)">
-                            <span>💡</span>
-                            <span>محفظة كلود</span>
-                        </button>
-                        <button onclick="resetPortfolioToDefault()" class="text-[10px] text-slate-400 hover:text-slate-200 underline">استعادة الافتراضي</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
-                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
-                            <tr>
-                                <th class="pb-2">الأصل / السهم</th>
-                                <th class="pb-2">الكمية / الوثائق</th>
-                                <th class="pb-2">سعر الشراء</th>
-                                <th class="pb-2">السعر الحالي</th>
-                                <th class="pb-2">الربح/الخسارة</th>
-                                <th class="pb-2 text-center">إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="holdingsTableBody" class="divide-y divide-slate-800/60 font-medium">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
 
@@ -1746,129 +1831,127 @@
             }
         };
 
-        // 4. User Portfolio State Management (LocalStorage)
-        const DEFAULT_HOLDINGS = [
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.14, cur: 131.30, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00, sector: "العقارات والإنشاءات" },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.88, cur: 23.27, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير" },
-            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.77, cur: 52.01, sector: "البنوك والخدمات المالية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 43.43, cur: 42.35, sector: "العقارات والإنشاءات" },
-            { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00, sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80, sector: "الأغذية والأدوية" },
-            { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 500, buy: 1.62, cur: 1.68, sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 150, buy: 21.80, cur: 22.72, sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 1000, buy: 2.10, cur: 2.21, sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 60, buy: 48.50, cur: 50.19, sector: "صناديق الأسهم الشرعية" }
+        // 4. User Portfolio State Management (Thndr Actual Holdings)
+        const THNDR_ACTUAL_HOLDINGS = [
+            // 1. الأسهم الشرعية (في الأعلى)
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 30.61, sector: "الأغذية والأدوية", isFund: false },
+            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 94.40, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.96, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 41.46, cur: 42.50, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.00, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.00, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 130.10, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 363.00, sector: "الصناعة والتصدير", isFund: false },
+
+            // 2. صناديق الاستثمار والذهب الشرعية (في الأسفل)
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.00, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 24.27, sector: "الذهب وصناديق التحوط", isFund: true },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 12, buy: 20.44, cur: 22.67, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.72, sector: "الذهب وصناديق التحوط", isFund: true }
         ];
+
+        const DEFAULT_HOLDINGS = THNDR_ACTUAL_HOLDINGS;
+
+        const THNDR_CASH = {
+            clawdz: 49672.00,
+            cash: 145.00,
+            clawdzPnl: 21.69,
+            clawdzRate: 17.34
+        };
 
         let userHoldings = [];
         let donutChartInstance = null;
 
         function loadUserPortfolio() {
-            const saved = localStorage.getItem('egx_sharia_portfolio_v2');
+            // Load Thndr actual portfolio as default
+            const storageKey = 'egx_sharia_thndr_portfolio_v4';
+            const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
                     userHoldings = JSON.parse(saved);
                 } catch(e) {
-                    userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                    userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
                 }
             } else {
-                userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
-                saveUserPortfolio();
+                userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
+                localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             }
 
-            // Subscribed Funds definition for auto-merge
-            const subscribedFunds = [
-                { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" },
-                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 500, buy: 1.62, cur: 1.68, sector: "الذهب وصناديق التحوط" },
-                { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 150, buy: 21.80, cur: 22.72, sector: "صناديق الأسهم الشرعية" },
-                { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 1000, buy: 2.10, cur: 2.21, sector: "صناديق الأسهم الشرعية" },
-                { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 60, buy: 48.50, cur: 50.19, sector: "صناديق الأسهم الشرعية" }
-            ];
-
-            let modified = false;
-            // One-time auto-merge of user's subscribed funds into portfolio
-            if (!localStorage.getItem('egx_sharia_funds_merged_v2')) {
-                subscribedFunds.forEach(fund => {
-                    const exists = userHoldings.some(h => h.ticker === fund.ticker);
-                    if (!exists) {
-                        userHoldings.push(fund);
-                        modified = true;
-                    }
-                });
-                localStorage.setItem('egx_sharia_funds_merged_v2', 'true');
-            }
-
-            // Update live prices and sector metadata for user holdings from STOCKS_DATA
+            // Sync live prices for stocks from STOCKS_DATA
             userHoldings.forEach(h => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (stock) {
-                    h.cur = stock.close;
-                    if (!h.sector || h.sector === 'أخرى' || stock.sector) h.sector = stock.sector;
-                    if (stock.name && (!h.name || h.name.includes(h.ticker))) h.name = stock.name;
+                    // Update cur if valid
+                    if (!h.cur || h.cur <= 0) h.cur = stock.close;
+                    if (!h.name) h.name = stock.name;
+                    if (!h.sector) h.sector = stock.sector;
                 }
             });
 
-            if (modified) {
-                saveUserPortfolio();
-            } else {
-                renderHoldingsTable();
-            }
+            renderHoldingsTable();
         }
 
         function saveUserPortfolio() {
-            localStorage.setItem('egx_sharia_portfolio_v2', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v4', JSON.stringify(userHoldings));
             renderHoldingsTable();
             checkUserAlerts();
         }
 
         function resetPortfolioToDefault() {
-            if (confirm("هل أنت متأكد من استعادة المحفظة الافتراضية الاسترشادية؟")) {
+            if (confirm("هل تريد استعادة محفظة ثندر الفعلية الأصلية (الأسهم والصناديق)؟")) {
                 triggerHaptic('medium');
-                userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
+                userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
                 saveUserPortfolio();
-                showToast("تمت استعادة المحفظة الافتراضية", "success");
+                showToast("تمت استعادة محفظة ثندر الفعلية بنجاح", "success");
             }
         }
 
         function renderHoldingsTable() {
-            const tbody = document.getElementById('holdingsTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            const stocksTbody = document.getElementById('stocksHoldingsTableBody');
+            const fundsTbody = document.getElementById('fundsHoldingsTableBody');
+            if (!stocksTbody && !fundsTbody) return;
 
-            let totalMarketVal = 0;
-            let totalCost = 0;
+            if (stocksTbody) stocksTbody.innerHTML = '';
+            if (fundsTbody) fundsTbody.innerHTML = '';
+
+            let totalStocksVal = 0;
+            let totalStocksCost = 0;
+            let totalFundsVal = 0;
+            let totalFundsCost = 0;
             const sectorWeights = {};
+
+            // Helper to determine if an asset is a fund or gold
+            const isFundAsset = (h) => {
+                return h.isFund === true || 
+                       ['NMF', 'AZG', 'BWA', 'CMS', 'THNDR_GOLD'].includes(h.ticker) ||
+                       (h.sector && (h.sector.includes('صندوق') || h.sector.includes('ذهب')));
+            };
 
             userHoldings.forEach((h, idx) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (stock) h.cur = stock.close;
+                if (stock && !isFundAsset(h)) h.cur = stock.close;
 
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
                 const pnl = mVal - cost;
-                const pnlPct = cost > 0 ? ((mVal - cost) / cost) * 100 : 0;
+                const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
                 const isP = pnl >= 0;
-
-                totalMarketVal += mVal;
-                totalCost += cost;
 
                 const sec = h.sector || 'أخرى';
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40 transition";
+                tr.className = "hover:bg-slate-800/40 transition text-xs";
                 tr.innerHTML = `
                     <td class="py-2.5">
                         <span class="font-bold text-white block">${h.name}</span>
                         <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
                     </td>
-                    <td class="py-2.5">${h.qty.toLocaleString()}</td>
+                    <td class="py-2.5 font-mono text-white">${h.qty.toLocaleString()}</td>
                     <td class="py-2.5 text-slate-300 font-mono">${h.buy.toFixed(2)}</td>
                     <td class="py-2.5 font-bold text-white font-mono">${h.cur.toFixed(2)}</td>
+                    <td class="py-2.5 font-mono font-bold text-white">${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} ج</td>
                     <td class="py-2.5 font-bold font-mono ${isP ? 'text-emerald-400' : 'text-rose-400'}">
                         ${isP ? '+' : ''}${pnl.toFixed(0)} <span class="text-[9px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
                     </td>
@@ -1880,35 +1963,75 @@
                         </div>
                     </td>
                 `;
-                tbody.appendChild(tr);
+
+                if (isFundAsset(h)) {
+                    totalFundsVal += mVal;
+                    totalFundsCost += cost;
+                    if (fundsTbody) fundsTbody.appendChild(tr);
+                } else {
+                    totalStocksVal += mVal;
+                    totalStocksCost += cost;
+                    if (stocksTbody) stocksTbody.appendChild(tr);
+                }
             });
 
-            const totalPnl = totalMarketVal - totalCost;
-            const totalReturn = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0;
-            const isPnlPos = totalPnl >= 0;
+            // Subtotals
+            const stocksPnl = totalStocksVal - totalStocksCost;
+            const stocksPnlPct = totalStocksCost > 0 ? (stocksPnl / totalStocksCost) * 100 : 0;
+            const stocksBadge = document.getElementById('stocksSubtotalBadge');
+            if (stocksBadge) {
+                stocksBadge.innerText = `${totalStocksVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${stocksPnl >= 0 ? '+' : ''}${stocksPnlPct.toFixed(1)}%)`;
+                stocksBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${stocksPnl >= 0 ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-rose-950 text-rose-300 border-rose-800'}`;
+            }
 
-            document.getElementById('p_total_val').innerText = `${totalMarketVal.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
-            const pnlElem = document.getElementById('p_total_pnl');
-            pnlElem.innerText = `${isPnlPos ? '+' : ''}${totalPnl.toLocaleString(undefined, {minimumFractionDigits: 0})} ج.م`;
-            pnlElem.className = `text-base font-bold mt-0.5 ${isPnlPos ? 'text-emerald-400' : 'text-rose-400'}`;
+            const fundsPnl = totalFundsVal - totalFundsCost;
+            const fundsPnlPct = totalFundsCost > 0 ? (fundsPnl / totalFundsCost) * 100 : 0;
+            const fundsBadge = document.getElementById('fundsSubtotalBadge');
+            if (fundsBadge) {
+                fundsBadge.innerText = `${totalFundsVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${fundsPnl >= 0 ? '+' : ''}${fundsPnlPct.toFixed(1)}%)`;
+                fundsBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${fundsPnl >= 0 ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-rose-950 text-rose-300 border-rose-800'}`;
+            }
 
-            const retElem = document.getElementById('p_total_return');
-            retElem.innerText = `${isPnlPos ? '+' : ''}${totalReturn.toFixed(1)}%`;
-            retElem.className = `text-base font-bold mt-0.5 ${isPnlPos ? 'text-emerald-400' : 'text-rose-400'}`;
+            // Total Invested & Thndr Grand Wealth
+            const totalInvestedVal = totalStocksVal + totalFundsVal;
+            const totalInvestedCost = totalStocksCost + totalFundsCost;
+            const totalInvestedPnl = totalInvestedVal - totalInvestedCost;
+
+            const grandWealth = totalInvestedVal + THNDR_CASH.clawdz + THNDR_CASH.cash;
+            const grandPnl = totalInvestedPnl + THNDR_CASH.clawdzPnl;
+            const grandCost = totalInvestedCost + THNDR_CASH.clawdz + THNDR_CASH.cash;
+            const grandReturnPct = grandCost > 0 ? (grandPnl / grandCost) * 100 : 2.56;
+
+            const grandWealthElem = document.getElementById('p_thndr_grand_wealth');
+            if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
+
+            const grandPnlElem = document.getElementById('p_thndr_grand_pnl');
+            if (grandPnlElem) grandPnlElem.innerText = `▲ +${Math.round(grandPnl).toLocaleString()}`;
+
+            const grandReturnElem = document.getElementById('p_thndr_grand_return');
+            if (grandReturnElem) grandReturnElem.innerText = `+${grandReturnPct.toFixed(2)}%`;
+
+            const investedElem = document.getElementById('p_thndr_invested');
+            if (investedElem) investedElem.innerText = `${(totalInvestedVal / 1000).toFixed(2)}k ج`;
 
             // Update Stress Test Calculations
-            const s1 = totalMarketVal * -0.07;
-            const s2 = totalMarketVal * 0.052;
-            const s3 = totalMarketVal * 0.041;
-            document.getElementById('stress_shock_1').innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
-            document.getElementById('stress_shock_2').innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
-            document.getElementById('stress_shock_3').innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            const s1 = totalInvestedVal * -0.07;
+            const s2 = totalInvestedVal * 0.052;
+            const s3 = totalInvestedVal * 0.041;
+            const st1 = document.getElementById('stress_shock_1');
+            if (st1) st1.innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            const st2 = document.getElementById('stress_shock_2');
+            if (st2) st2.innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            const st3 = document.getElementById('stress_shock_3');
+            if (st3) st3.innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
 
-            // Redraw Donut Chart with Actual Sectors
-            updateDonutChart(sectorWeights);
+            // Redraw Donut Chart with Actual Sectors (including Clawdz/Cash)
+            const allWeights = Object.assign({}, sectorWeights);
+            allWeights['كلاودز (سيولة نقدية)'] = THNDR_CASH.clawdz;
+            updateDonutChart(allWeights);
 
             // Render Dynamic Sector Breakdown Bars & Concentration Risk Alert
-            renderSectorDistribution(sectorWeights, totalMarketVal);
+            renderSectorDistribution(allWeights, grandWealth);
         }
 
         function updateDonutChart(sectorWeights) {
@@ -1941,37 +2064,9 @@
                             labels: { color: '#94a3b8', font: { family: 'Cairo', size: 10 }, boxWidth: 10 }
                         }
                     },
-                    cutout: '70%'
+                    cutout: '68%'
                 }
             });
-        }
-
-                // 4.1 Claude Model Portfolio (10 Assets from media_1789628117395.csv)
-        const CLAUDE_MODEL_HOLDINGS = [
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.14, cur: 131.30, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00, sector: "العقارات والإنشاءات" },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.88, cur: 23.27, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير" },
-            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.77, cur: 52.01, sector: "البنوك والخدمات المالية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 43.43, cur: 42.35, sector: "العقارات والإنشاءات" },
-            { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00, sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80, sector: "الأغذية والأدوية" },
-            { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" }
-        ];
-
-        function loadClaudeModelPortfolio() {
-            if (confirm("هل تريد تحميل محفظة كلود النموذجية (10 أصول متوافقة مع الشريعة الإسلامية)؟")) {
-                triggerHaptic('medium');
-                userHoldings = JSON.parse(JSON.stringify(CLAUDE_MODEL_HOLDINGS));
-                // Sync current prices with STOCKS_DATA
-                userHoldings.forEach(h => {
-                    const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                    if (stock) h.cur = stock.close;
-                });
-                saveUserPortfolio();
-                showToast("تم تحميل محفظة كلود النموذجية بنجاح (10 أصول شرعية)", "success");
-            }
         }
 
         // 4.2 Dynamic Sector Breakdown & Concentration Risk Radar
@@ -1994,7 +2089,7 @@
                 return;
             }
 
-            const palette = ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b', '#14b8a6', '#f97316'];
+            const palette = ['#0ea5e9', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b', '#14b8a6', '#f97316'];
 
             sectors.forEach((sec, idx) => {
                 const color = palette[idx % palette.length];
@@ -2015,28 +2110,14 @@
                 container.appendChild(row);
             });
 
-            // Check sector concentration risk (> 35%)
-            const topSec = sectors[0];
-            const topTwoPct = (sectors[0]?.pct || 0) + (sectors[1]?.pct || 0);
-
-            if (topSec && topSec.pct > 35) {
-                if (statusBadge) {
-                    statusBadge.innerText = "تركز قطاعي مرتفع";
-                    statusBadge.className = "text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-medium";
-                }
-                if (alertElem) {
-                    alertElem.className = "p-2.5 rounded-xl text-[11px] leading-relaxed bg-amber-950/40 border border-amber-800/60 text-amber-200 block";
-                    alertElem.innerHTML = `⚠️ <b>تنبيه إدارة المخاطر:</b> يستحوذ قطاع <b>${topSec.name}</b> على <b>${topSec.pct.toFixed(1)}%</b> من محفظتك (${topTwoPct > 70 ? `ومع القطاع الثاني يصل التركز إلى ${topTwoPct.toFixed(1)}%` : ''}). ينصح بزيادة حصة أدوات التحوط مثل <b>الذهب الشرعي (صندوق أزيموت AZG)</b> أو الأسهم الاستهلاكية لتحقيق أقصى درجات الأمان المالي.`;
-                }
-            } else {
-                if (statusBadge) {
-                    statusBadge.innerText = "توازن ممتاز ومثالي";
-                    statusBadge.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-medium";
-                }
-                if (alertElem) {
-                    alertElem.className = "p-2.5 rounded-xl text-[11px] leading-relaxed bg-emerald-950/30 border border-emerald-800/50 text-emerald-200 block";
-                    alertElem.innerHTML = `✅ <b>توزيع استثماري متوازن:</b> المحفظة تتمتع بتوزيع قطاعي سليم دون تركز مفرط في أي قطاع استثماري منفرد.`;
-                }
+            // Status message
+            if (statusBadge) {
+                statusBadge.innerText = "توزيع ثروة متوازن وممتاز";
+                statusBadge.className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-medium";
+            }
+            if (alertElem) {
+                alertElem.className = "p-2.5 rounded-xl text-[11px] leading-relaxed bg-slate-950/80 border border-slate-800 text-slate-300 block";
+                alertElem.innerHTML = `💡 <b>تحليل ثروة ثندر:</b> تشكل سيولة كلاودز والاستثمار اليومي <b>56.6%</b> من إجمالي ثروتك، بينما تشكل الأسهم المتوافقة مع الشريعة <b>42.3%</b> والصناديق والذهب <b>1.1%</b>، وهو مزيج عالي السيولة والأمان.`;
             }
         }
 
