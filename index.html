@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -7,7 +7,21 @@
     
     <!-- PWA & Mobile Web App Meta Tags -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0b0f19">
+    <meta id="metaThemeColor" name="theme-color" content="#080c14">
+    <!-- Early Theme Mode Initializer (Zero Flash / FOUC) -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('egx_theme_mode');
+                if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                } else {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch(e) {}
+        })();
+    </script>
+
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -112,6 +126,281 @@
                 display: block !important;
             }
         }
+
+        /* =========================================================================
+           ADVANCED LIGHT & DARK THEME SYSTEM (معايير التباين والجمالية الفائقة)
+           ========================================================================= */
+        html.dark {
+            color-scheme: dark;
+        }
+        html:not(.dark) {
+            color-scheme: light;
+        }
+
+        /* Light Mode Base */
+        html:not(.dark) body {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+        }
+
+        /* Header in Light Mode */
+        html:not(.dark) header {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+        html:not(.dark) header h1 {
+            color: #0f172a !important;
+        }
+
+        /* Top Ticker Bar in Light Mode */
+        html:not(.dark) #liveTickerBar > div {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        }
+        html:not(.dark) #liveTickerBar .text-slate-400 {
+            color: #64748b !important;
+        }
+        html:not(.dark) #liveTickerBar .text-white {
+            color: #0f172a !important;
+        }
+
+        /* Bottom Floating Dock in Light Mode */
+        html:not(.dark) nav {
+            background-color: rgba(255, 255, 255, 0.96) !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06) !important;
+        }
+        html:not(.dark) nav .tab-btn.text-slate-400 {
+            color: #64748b !important;
+        }
+        html:not(.dark) nav .tab-btn.text-slate-400:hover {
+            color: #0f172a !important;
+        }
+
+        /* Glass Cards in Light Mode */
+        html:not(.dark) .glass-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 18px -2px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Fast-access Chart Card & Emerald Banners in Light Mode */
+        html:not(.dark) [class*="from-emerald-950"],
+        html:not(.dark) [class*="to-teal-950"],
+        html:not(.dark) [class*="to-emerald-950"] {
+            background-image: none !important;
+            background-color: #f0fdf4 !important;
+            border: 1px solid #86efac !important;
+        }
+        html:not(.dark) [class*="from-emerald-950"] *,
+        html:not(.dark) [class*="to-teal-950"] *,
+        html:not(.dark) [class*="to-emerald-950"] * {
+            color: #14532d !important;
+        }
+        html:not(.dark) [class*="from-emerald-950"] [class*="bg-emerald-900"] {
+            background-color: #dcfce7 !important;
+            color: #15803d !important;
+            border-color: #86efac !important;
+        }
+        html:not(.dark) [class*="from-emerald-950"] select {
+            background-color: #ffffff !important;
+            color: #14532d !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Slate-900 / Slate-950 containers to Crisp White in Light Mode */
+        html:not(.dark) .bg-slate-900,
+        html:not(.dark) [class*="bg-slate-900/"],
+        html:not(.dark) .bg-slate-950,
+        html:not(.dark) [class*="bg-slate-950/"],
+        html:not(.dark) .bg-slate-800,
+        html:not(.dark) [class*="bg-slate-800/"],
+        html:not(.dark) .bg-\[\#080c14\],
+        html:not(.dark) .bg-\[\#0e1626\],
+        html:not(.dark) .bg-\[\#141e33\] {
+            background-color: #ffffff !important;
+        }
+
+        /* Secondary subtle backgrounds (inner pill boxes, secondary panels) */
+        html:not(.dark) [class*="bg-slate-950/60"],
+        html:not(.dark) [class*="bg-slate-950/70"],
+        html:not(.dark) [class*="bg-slate-950/80"],
+        html:not(.dark) [class*="bg-slate-950/40"],
+        html:not(.dark) [class*="bg-slate-900/40"],
+        html:not(.dark) [class*="bg-slate-800/50"],
+        html:not(.dark) [class*="bg-slate-800/40"],
+        html:not(.dark) .bg-slate-850 {
+            background-color: #f1f5f9 !important;
+        }
+
+        /* Neutralize dark gradients in Light Mode */
+        html:not(.dark) [class*="bg-gradient-to-br from-slate-900"],
+        html:not(.dark) [class*="bg-gradient-to-b from-slate-900"] {
+            background-image: none !important;
+            background-color: #ffffff !important;
+        }
+
+        /* Borders in Light Mode */
+        html:not(.dark) .border-slate-800,
+        html:not(.dark) .border-slate-700,
+        html:not(.dark) [class*="border-slate-800/"],
+        html:not(.dark) [class*="border-slate-700/"] {
+            border-color: #e2e8f0 !important;
+        }
+
+        /* Inputs, Selects & Textareas */
+        html:not(.dark) input:not([type="checkbox"]):not([type="radio"]),
+        html:not(.dark) select,
+        html:not(.dark) textarea {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html:not(.dark) input::placeholder,
+        html:not(.dark) textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+        html:not(.dark) select option {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+        }
+
+        /* Typography & Contrast in Light Mode */
+        html:not(.dark) .text-white {
+            color: #0f172a !important;
+        }
+        html:not(.dark) .text-slate-100 {
+            color: #0f172a !important;
+        }
+        html:not(.dark) .text-slate-200 {
+            color: #1e293b !important;
+        }
+        html:not(.dark) .text-slate-300 {
+            color: #334155 !important;
+        }
+        html:not(.dark) .text-slate-400 {
+            color: #64748b !important;
+        }
+        html:not(.dark) .text-slate-500 {
+            color: #64748b !important;
+        }
+
+        /* Preserve bright white text on colored CTA buttons & active badges */
+        html:not(.dark) button.bg-emerald-600,
+        html:not(.dark) button.bg-emerald-500,
+        html:not(.dark) button.bg-rose-600,
+        html:not(.dark) button.bg-rose-500,
+        html:not(.dark) button.bg-sky-600,
+        html:not(.dark) button.bg-amber-600,
+        html:not(.dark) .chart-tf-btn.bg-emerald-600,
+        html:not(.dark) .btn-keep-white,
+        html:not(.dark) [class*="bg-emerald-600"] > span.text-white,
+        html:not(.dark) button[class*="bg-emerald-600"],
+        html:not(.dark) button[class*="bg-rose-600"],
+        html:not(.dark) button[class*="bg-sky-600"],
+        html:not(.dark) button[class*="bg-amber-600"],
+        html:not(.dark) button[class*="bg-emerald-500"],
+        html:not(.dark) [class*="from-emerald-600"] {
+            color: #ffffff !important;
+        }
+
+        /* Badges styling in Light Mode */
+        html:not(.dark) [class*="bg-emerald-950"] {
+            background-color: #ecfdf5 !important;
+            border-color: #a7f3d0 !important;
+            color: #065f46 !important;
+        }
+        html:not(.dark) [class*="bg-emerald-950"] * {
+            color: #065f46 !important;
+        }
+
+        html:not(.dark) [class*="bg-amber-950"] {
+            background-color: #fffbeb !important;
+            border-color: #fde68a !important;
+            color: #92400e !important;
+        }
+        html:not(.dark) [class*="bg-amber-950"] * {
+            color: #92400e !important;
+        }
+
+        html:not(.dark) [class*="bg-rose-950"] {
+            background-color: #fff1f2 !important;
+            border-color: #fecdd3 !important;
+            color: #9f1239 !important;
+        }
+        html:not(.dark) [class*="bg-rose-950"] * {
+            color: #9f1239 !important;
+        }
+
+        html:not(.dark) [class*="bg-sky-950"] {
+            background-color: #f0f9ff !important;
+            border-color: #bae6fd !important;
+            color: #0369a1 !important;
+        }
+        html:not(.dark) [class*="bg-sky-950"] * {
+            color: #0369a1 !important;
+        }
+
+        /* Tables in Light Mode */
+        html:not(.dark) table {
+            color: #0f172a !important;
+        }
+        html:not(.dark) table thead,
+        html:not(.dark) table th {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-color: #e2e8f0 !important;
+        }
+        html:not(.dark) table td {
+            border-color: #f1f5f9 !important;
+            color: #1e293b !important;
+        }
+        html:not(.dark) tbody tr:hover,
+        html:not(.dark) [class*="hover:bg-slate-800"]:hover,
+        html:not(.dark) [class*="hover:bg-slate-850"]:hover {
+            background-color: #f8fafc !important;
+        }
+
+        /* Modal Overlays & Windows in Light Mode */
+        html:not(.dark) #stockChartModal,
+        html:not(.dark) #holdingModal,
+        html:not(.dark) #installModal {
+            background-color: rgba(15, 23, 42, 0.6) !important;
+        }
+        html:not(.dark) #stockChartModal > div,
+        html:not(.dark) #holdingModal > div,
+        html:not(.dark) #installModal > div {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.18) !important;
+            color: #0f172a !important;
+        }
+
+        /* Canvas Chart container in Light Mode */
+        html:not(.dark) #candlestickCanvas {
+            background-color: #ffffff !important;
+        }
+        html:not(.dark) #stockChartModal .bg-slate-950\/90,
+        html:not(.dark) #stockChartModal [class*="bg-slate-950/"] {
+            background-color: #f8fafc !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        /* Theme Toggle Button Styling */
+        #themeToggleBtn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        html:not(.dark) #themeToggleBtn {
+            background-color: #f1f5f9 !important;
+            border-color: #cbd5e1 !important;
+            color: #0f172a !important;
+        }
+        html:not(.dark) #themeToggleBtn:hover {
+            background-color: #e2e8f0 !important;
+        }
+
     </style>
 </head>
 <body class="bg-[#080c14] text-slate-100 min-h-screen selection:bg-emerald-500 font-sans selection:text-white pb-24">
@@ -166,6 +455,11 @@
             </div>
             
             <div class="flex items-center gap-1.5">
+                                <!-- Theme Mode Toggle (Dark / Light) -->
+                <button onclick="toggleThemeMode()" id="themeToggleBtn" class="text-[11px] bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer" title="التبديل بين الوضع الليلي والنهاري">
+                    <span id="themeToggleIcon" class="text-xs">☀️</span>
+                    <span id="themeToggleLabel" class="hidden sm:inline font-bold">نهاري</span>
+                </button>
                 <button onclick="requestNotificationPermission()" id="pushNotifyBtn" class="text-[11px] bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تفعيل إشعارات الجوال">
                     <span>🔔</span>
                 </button>
@@ -1911,6 +2205,81 @@
             if (tg.setBackgroundColor) tg.setBackgroundColor('#0b0f19');
         }
 
+        
+        // =========================================================================
+        // THEME MODE CONTROLLER (Dark / Light Mode)
+        // =========================================================================
+        function initThemeMode() {
+            const savedTheme = localStorage.getItem('egx_theme_mode');
+            const isDark = savedTheme ? (savedTheme === 'dark') : true;
+            applyThemeMode(isDark, false);
+        }
+
+        function applyThemeMode(isDark, notify = false) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Update Meta Theme Color
+            const metaThemeColor = document.getElementById('metaThemeColor') || document.querySelector('meta[name="theme-color"]');
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', isDark ? '#080c14' : '#f8fafc');
+            }
+
+            // Update Telegram WebApp Theme
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                if (tg.setHeaderColor) tg.setHeaderColor(isDark ? '#080c14' : '#ffffff');
+                if (tg.setBackgroundColor) tg.setBackgroundColor(isDark ? '#080c14' : '#f8fafc');
+            }
+
+            // Update Toggle Button UI
+            const btn = document.getElementById('themeToggleBtn');
+            const icon = document.getElementById('themeToggleIcon');
+            const label = document.getElementById('themeToggleLabel');
+            if (icon && label) {
+                if (isDark) {
+                    icon.innerText = '☀️';
+                    label.innerText = 'نهاري';
+                    if (btn) btn.title = 'التحويل إلى الوضع النهاري الفاتح (Light Mode)';
+                } else {
+                    icon.innerText = '🌙';
+                    label.innerText = 'ليلي';
+                    if (btn) btn.title = 'التحويل إلى الوضع الليلي المظلم (Dark Mode)';
+                }
+            }
+
+            // Update Chart.js Doughnut Legend if active
+            if (typeof donutChartInstance !== 'undefined' && donutChartInstance && donutChartInstance.options) {
+                try {
+                    donutChartInstance.options.plugins.legend.labels.color = isDark ? '#94a3b8' : '#334155';
+                    donutChartInstance.update();
+                } catch(e) {}
+            }
+
+            // Redraw Advanced Canvas Chart if open
+            const chartModal = document.getElementById('stockChartModal');
+            if (chartModal && !chartModal.classList.contains('hidden') && typeof drawAdvancedChart === 'function') {
+                try {
+                    drawAdvancedChart();
+                } catch(e) {}
+            }
+
+            if (notify) {
+                showToast(isDark ? 'تم التبديل إلى الوضع الليلي 🌙' : 'تم التبديل إلى الوضع النهاري ☀️', 'info');
+            }
+        }
+
+        function toggleThemeMode() {
+            triggerHaptic('selection');
+            const isCurrentlyDark = document.documentElement.classList.contains('dark');
+            const newDark = !isCurrentlyDark;
+            localStorage.setItem('egx_theme_mode', newDark ? 'dark' : 'light');
+            applyThemeMode(newDark, true);
+        }
+
         // Force Cache Purge and Reload
         function forceAppUpdate() {
             triggerHaptic('medium');
@@ -1936,7 +2305,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.2')
+                navigator.serviceWorker.register('sw.js?v=7.3')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3629,7 +3998,8 @@
             }
 
             // Draw Background Grid
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            const isDarkChart = document.documentElement.classList.contains('dark');
+            ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.07)';
             ctx.lineWidth = 1;
             for (let k = 0; k <= 4; k++) {
                 const yG = chartTop + (chartHeight / 4) * k;
@@ -3639,7 +4009,7 @@
                 ctx.stroke();
 
                 const pVal = maxP - (rangeP / 4) * k;
-                ctx.fillStyle = '#64748b';
+                ctx.fillStyle = isDarkChart ? '#64748b' : '#475569';
                 ctx.font = '9px Cairo, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.fillText(pVal.toFixed(2), w - 5, yG + 3);
@@ -3788,7 +4158,7 @@
                 const cY = getY(targetC.close);
 
                 // Draw Vertical Crosshair Line
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.35)';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([3, 3]);
                 ctx.beginPath();
@@ -4941,6 +5311,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            initThemeMode();
             loadUserPortfolio();
             renderStocks();
             renderAlerts();
