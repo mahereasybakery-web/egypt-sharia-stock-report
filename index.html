@@ -209,7 +209,7 @@
     <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4">
 
         <!-- ================= TAB 1: RADAR & STOCKS ================= -->
-        <section id="view-radar" class="tab-content space-y-3.5">
+        <section id="view-radar" class="tab-content space-y-3.5 hidden">
             <!-- Search & Filter Controls -->
             <div class="glass-card rounded-2xl p-3 space-y-2.5">
                 <div class="relative">
@@ -280,34 +280,34 @@
                         <option value="MFPC">موبكو للأسمدة (MFPC)</option>
                         <option value="SKPC">سيدي كرير للبتروكيماويات (SKPC)</option>
                         <option value="ABUK">أبو قير للأسمدة (ABUK)</option>
+                        <option value="ORWE">النساجون الشرقيون (ORWE)</option>
+                        <option value="ISPH">ابن سينا فارما (ISPH)</option>
+                        <option value="AMOC">الإسكندرية للزيوت المعدنية (AMOC)</option>
                         <option value="SWDY">السويدي إليكتريك (SWDY)</option>
                         <option value="ETEL">المصرية للاتصالات (ETEL)</option>
-                        <option value="ORWE">النساجون الشرقيون (ORWE)</option>
-                        <option value="PHDC">بالم هيلز للتعمير (PHDC)</option>
-                        <option value="AMOC">الإسكندرية للزيوت المعدنية (AMOC)</option>
+                        <option value="AZG">صندوق أزيموت للذهب (AZG)</option>
                     </select>
 
                     <div id="valuationCardContainer">
-                        <!-- Valuation Card Populated dynamically via renderValuationCard() -->
+                        <!-- Dynamic Valuation Card -->
                     </div>
                 </div>
             </div>
 
-            <!-- Sub-View 2: Dividends Calendar Table -->
+            <!-- Sub-View 2: Dividends & Cash Yield -->
             <div id="valSubViewDividends" class="space-y-3.5 hidden">
                 <div class="glass-card rounded-2xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                💰 <span>أجندة التوزيعات النقدية والكوبونات المعتمدة</span>
+                                💰 <span>سجل التوزيعات النقدية وعوائد الكوبونات</span>
                             </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">مواعيد نهاية الحق والصرف للشركات الشرعية ذات العوائد النقدية الأعلى.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">الأسهم ذات التدفقات النقدية الدورية ومواعيد استحقاق الكوبونات.</p>
                         </div>
-                        <span class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-medium">عائد سنوي نقدي</span>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs">
-                            <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
+                            <thead class="text-slate-400 border-b border-slate-800 text-[10px]">
                                 <tr>
                                     <th class="pb-2">السهم</th>
                                     <th class="pb-2">قيمة الكوبون</th>
@@ -347,7 +347,7 @@
                         </div>
                         <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400 block">القطاع القائد</span>
-                            <b class="text-amber-400 font-bold text-xs mt-0.5 block">الأسمدة والكيماويات</b>
+                            <b id="ai_sector_badge" class="text-amber-400 font-bold text-xs mt-0.5 block">الأسمدة والكيماويات</b>
                         </div>
                         <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400 block">استراتيجية اليوم</span>
@@ -383,7 +383,7 @@
         </section>
 
         <!-- ================= TAB 4: PORTFOLIO & ALLOCATION ================= -->
-        <section id="view-portfolio" class="tab-content space-y-3.5 hidden">
+        <section id="view-portfolio" class="tab-content space-y-3.5">
             <!-- P&L Summary Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div class="glass-card rounded-xl p-3">
@@ -491,7 +491,47 @@
                     </div>
                 </div>
             </div>
-        </section>
+        
+            <!-- Compound Wealth & Dividend Reinvestment Calculator -->
+            <div class="glass-card rounded-2xl p-4 space-y-3.5 border-amber-900/50 bg-gradient-to-br from-slate-900 to-amber-950/20">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        📈 <span>حاسبة العائد التراكمي وتنمية الثروة بالكوبونات (Compound Wealth)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">محاكاة نمو محفظتك عند إعادة استثمار التوزيعات النقدية مع الادخار الشهري المنتظم.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">رأس المال المبدئي (ج.م)</label>
+                        <input id="cw_initial" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">الادخار الشهري (ج.م)</label>
+                        <input id="cw_monthly" type="number" value="3000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">عائد الكوبون السنوي %</label>
+                        <input id="cw_yield" type="number" value="9.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">معدل نمو السهم السنوي %</label>
+                        <input id="cw_growth" type="number" value="12.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                    </div>
+                </div>
+
+                <button onclick="calculateCompoundWealth()" class="w-full bg-amber-600 hover:bg-amber-500 active:scale-98 text-slate-950 font-bold text-xs py-2.5 rounded-xl transition shadow">
+                    حساب خطة تنمية الثروة
+                </button>
+
+                <div id="cw_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
+                    <!-- Compound Wealth Output -->
+                </div>
+            </div>
+</section>
 
         <!-- ================= TAB 5: TOOLS & SHARIA HUB ================= -->
         <section id="view-tools" class="tab-content space-y-3.5 hidden">
@@ -510,52 +550,51 @@
                     <span>التنبيهات</span>
                 </button>
                 <button id="toolSubTabAiBtn" onclick="switchToolsSubTab('ai_chat')" class="tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
-                    <span>💬</span>
-                    <span>المستشار الذكي</span>
+                    <span>🤖</span>
+                    <span>المستشار الشرعي</span>
                 </button>
             </div>
 
-            <!-- Sub-View 1: Zakat Calculator -->
+            <!-- Sub-View 1: Sharia Zakat Calculator -->
             <div id="toolSubViewZakat" class="space-y-3.5">
-                <!-- Zakat Calculator Widget -->
                 <div class="glass-card rounded-2xl p-4 space-y-3.5">
-                    <div>
-                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                            🕌 <span>حاسبة زكاة الأسهم والمحفظة (معايير AAOIFI)</span>
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">حساب زكاة عروض التجارة والأسهم حسب المعايير الشرعية المعتمدة (2.577% للسنة الميلادية).</p>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[11px] text-slate-400">إجمالي القيمة السوقية لمحفظتك (ج.م)</label>
-                            <button onclick="fillZakatFromPortfolio()" class="text-[10px] text-emerald-400 underline">جلب من المحفظة</button>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                🕌 <span>حاسبة زكاة الأسهم والصناديق الشرعية</span>
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-0.5">وفقاً لقرارات مجمع الفقه الإسلامي ومعايير هيئة المحاسبة والمراجعة (AAOIFI).</p>
                         </div>
-                        <input id="zakat_val" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none font-mono">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="calculateZakat('speculative')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl border border-slate-700 active:scale-95 transition font-medium">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-[11px] text-slate-300">إجمالي القيمة السوقية لمحفظتك (ج.م)</label>
+                            <button onclick="fillZakatFromPortfolio()" class="text-[10px] text-emerald-400 hover:underline">جلب من المحفظة 💼</button>
+                        </div>
+                        <input id="zakat_val" type="number" placeholder="50000" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="calculateZakat('speculative')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow text-center">
                             💼 نية المضاربة والتداول
                         </button>
-                        <button onclick="calculateZakat('investor')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 rounded-xl border border-slate-700 active:scale-95 transition font-medium">
+                        <button onclick="calculateZakat('investor')" class="bg-slate-800 hover:bg-slate-700 active:scale-98 text-emerald-300 border border-slate-700 font-bold text-xs py-2.5 rounded-xl transition shadow text-center">
                             🏢 نية الاستثمار طويل الأجل
                         </button>
                     </div>
 
-                    <div id="zakat_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-1.5 hidden">
-                        <!-- Zakat Results -->
+                    <div id="zakat_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
+                        <!-- Zakat Calculation Output -->
                     </div>
-                </div>
 
-                <!-- Sharia Guidelines Card -->
-                <div class="glass-card rounded-2xl p-4 space-y-2 text-xs">
-                    <h3 class="font-bold text-white">ضوابط التوافق الشرعي للأسهم (EGX Shariah 33):</h3>
-                    <ul class="space-y-1 text-slate-300 text-[11px] list-disc list-inside leading-relaxed">
-                        <li><b>نسبة الديون الربوية:</b> إجمالي القروض ذات الفائدة أقل من 30% من القيمة السوقية للشركة.</li>
-                        <li><b>الاستثمارات والودائع بفائدة:</b> أقل من 30% من إجمالي الأصول.</li>
-                        <li><b>الإيرادات غير المتوافقة:</b> أقل من 5% من إجمالي إيرادات الشركة، وتُخرج للتطهير.</li>
-                    </ul>
+                    <div class="p-3 bg-emerald-950/20 border border-emerald-900/40 rounded-xl text-[11px] text-emerald-300 space-y-1">
+                        <span class="font-bold block">💡 تنبيه شرعي هام:</span>
+                        <p class="text-slate-300 leading-relaxed">
+                            - <b>المضارب (عروض تجارة):</b> تُزكى كامل القيمة السوقية بنسبة 2.5% هجرياً (أو 2.577% ميلادياً) إذا بلغ المجموع نصاب 85 جرام ذهب خالص وحال عليه الحول.<br>
+                            - <b>المستثمر طويل الأجل:</b> تُزكى الأصول الزكوية للشركات فقط (النقدية + المدينون + المخزون بعد خصم الديون قصيرة الأجل)، ويُعفى من زكاة الأصول الثابتة والمعدات.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -564,52 +603,54 @@
                 <div class="glass-card rounded-2xl p-4 space-y-3.5">
                     <div>
                         <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                            📉 <span>حاسبة التبريد وتعديل متوسط التكلفة (Smart DCA)</span>
+                            📉 <span>حاسبة التبريد وتعديل المتوسط الذكي (Smart DCA)</span>
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">احسب الكمية والسيولة النقدية المطلوبة لخفض متوسط تكلفتك إلى السعر المستهدف.</p>
+                        <p class="text-xs text-slate-400 mt-1">حساب دقيق لمتوسط التكلفة الجديد والسيولة المطلوبة مع نسبة خفض المتوسط.</p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">الكمية المملوكة حالياً</label>
-                            <input id="calc_q1" type="number" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none font-mono">
+                    <div class="space-y-2.5">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">الكمية المملوكة حالياً</label>
+                                <input id="calc_q1" type="number" placeholder="مثلاً: 500" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء الحالي (ج)</label>
+                                <input id="calc_p1" type="number" placeholder="مثلاً: 70.0" value="70.0" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء الحالي</label>
-                            <input id="calc_p1" type="number" value="97.88" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none font-mono">
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">سعر الشراء الجديد للتبريد (ج)</label>
+                                <input id="calc_p2" type="number" placeholder="مثلاً: 55.0" value="55.0" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">المتوسط الجديد المستهدف (ج)</label>
+                                <input id="calc_target" type="number" placeholder="مثلاً: 60.0" value="60.0" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">سعر الشراء الجديد (الهبوط)</label>
-                            <input id="calc_p2" type="number" value="85.00" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">المتوسط الجديد المستهدف</label>
-                            <input id="calc_target" type="number" value="90.00" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none font-mono">
-                        </div>
-                    </div>
-
-                    <button onclick="runDcaCalculation()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-lg shadow-emerald-600/20">
+                    <button onclick="runDcaCalculation()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow">
                         حساب خطة التبريد الذكية
                     </button>
 
-                    <div id="calc_dca_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
-                        <!-- DCA Results -->
+                    <div id="calc_dca_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
+                        <!-- Output calculated by runDcaCalculation() -->
                     </div>
                 </div>
             </div>
 
-            <!-- Sub-View 3: Smart Alerts Manager -->
+            <!-- Sub-View 3: Live Alerts -->
             <div id="toolSubViewAlerts" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                <div class="glass-card rounded-2xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
                                 🔔 <span>مركز التنبيهات المشروطة السعرية (Smart Alerts)</span>
                             </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">تنبيهات فورية عند وصول الأسهم لأسعار محددة أو مستويات تشبع RSI.</p>
+                            <p class="text-xs text-slate-400 mt-0.5">إشعار فوري عند كسر الدعم أو اختراق المقاومة الفنية أو وصول RSI.</p>
                         </div>
                     </div>
 
@@ -619,7 +660,13 @@
                             <option value="FWRY">فوري (FWRY)</option>
                             <option value="MFPC">موبكو (MFPC)</option>
                             <option value="SKPC">سيدي كرير (SKPC)</option>
-                            <option value="PHDC">بالم هيلز (PHDC)</option>
+                            <option value="ABUK">أبو قير (ABUK)</option>
+                            <option value="ORWE">النساجون (ORWE)</option>
+                            <option value="ISPH">ابن سينا (ISPH)</option>
+                            <option value="AMOC">أموك (AMOC)</option>
+                            <option value="SWDY">السويدي إليكتريك (SWDY)</option>
+                            <option value="ETEL">المصرية للاتصالات (ETEL)</option>
+                            <option value="AZG">أزيموت للذهب (AZG)</option>
                         </select>
                         <select id="alertConditionSelect" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
                             <option value="price_below">السعر هبط دون (&lt;)</option>
@@ -634,37 +681,57 @@
                         ➕ إضافة تنبيه مشروط جديد
                     </button>
 
-                    <div id="alertsListContainer" class="space-y-1.5 text-xs">
-                        <!-- Populated via JS -->
+                    <div class="pt-2">
+                        <span class="text-[11px] font-bold text-slate-300 block mb-1.5">التنبيهات الفعالة:</span>
+                        <div id="alertsListContainer" class="space-y-1.5 max-h-48 overflow-y-auto">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sub-View 4: AI Financial Chatbot -->
+            <!-- Sub-View 4: AI Sharia Advisor Chat -->
             <div id="toolSubViewAiChat" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3.5 border-sky-900/60 bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950/30">
+                <div class="glass-card rounded-2xl p-4 space-y-3 border-sky-900/50 bg-gradient-to-br from-slate-900 to-sky-950/20">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="text-xl">💬</span>
+                            <span class="text-base">💬</span>
                             <div>
-                                <h3 class="text-sm font-bold text-white">المستشار المالي الرقمي (Gemini Live)</h3>
-                                <p class="text-[11px] text-slate-400">استشارات مالية فورية وتحليل استثماري متوافق مع الشريعة</p>
+                                <h2 class="text-xs font-bold text-white">المستشار المالي والشرعي التفاعلي</h2>
+                                <p class="text-[10px] text-slate-400">اطرح أي سؤال عن الأسهم، التبريد، أو السعر العادل</p>
                             </div>
                         </div>
-                        <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded-full font-bold">نشط 🟢</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">ذكاء اصطناعي مدرب</span>
                     </div>
 
-                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
-                        <button onclick="askAiAdvisor('ما هو تقييم سهم طلعت مصطفى TMGH الآن؟')" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 تقييم طلعت مصطفى</button>
-                        <button onclick="askAiAdvisor('ما هي أفضل أسهم للتجميع طويل الأجل؟')" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 أسهم التجميع</button>
-                        <button onclick="askAiAdvisor('ما هي أعلى الأسهم توزيعاً للأرباح النقدية؟')" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg whitespace-nowrap border border-slate-700 transition">💡 أعلى توزيعات</button>
+                    <div class="flex items-center gap-1 overflow-x-auto text-[10px] pt-1 no-scrollbar">
+                        <button onclick="askAiAdvisor('ما هي أعلى 3 أسهم توزيعات نقدية حالياً؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 whitespace-nowrap">
+                            💡 أعلى توزيعات
+                        </button>
+                        <button onclick="askAiAdvisor('ما هو تقييم سهم طلعت مصطفى TMGH الآن؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 whitespace-nowrap">
+                            💡 تقييم TMGH
+                        </button>
+                        <button onclick="askAiAdvisor('كيف أحسب زكاة محفظتي إذا كانت نيتي استثمار طويل الأجل؟')" class="bg-slate-800/90 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 whitespace-nowrap">
+                            💡 زكاة المستثمر
+                        </button>
                     </div>
 
-                    <div id="aiChatOutput" class="max-h-64 overflow-y-auto space-y-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800/80 text-xs hidden"></div>
+                    <div id="aiChatOutput" class="h-64 overflow-y-auto space-y-2 p-2 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
+                        <div class="p-2.5 bg-slate-800/90 rounded-xl border border-slate-700/60 text-slate-200">
+                            مرحباً بك! أنا مستشارك المالي والشرعي الآلي للبورصة المصرية. اسألني عن:
+                            <ul class="list-disc list-inside text-slate-300 text-[11px] mt-1 space-y-0.5">
+                                <li>حكم سهم معين أو نسبة التطهير المطلوبة</li>
+                                <li>أفضل توقيت للدخول في أسهم الأسمدة أو البتروكيماويات</li>
+                                <li>استراتيجية إدارة المخاطر وتوزيع المحفظة</li>
+                            </ul>
+                        </div>
+                    </div>
 
-                    <div class="flex gap-2">
-                        <input id="aiChatInput" type="text" placeholder="اكتب سؤالك المالي هنا (مثال: متى أشتري فوري؟)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-sky-500 outline-none">
-                        <button onclick="sendUserAiQuestion()" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow">إرسال 🚀</button>
+                    <div class="flex items-center gap-1.5 pt-1">
+                        <input id="aiChatInput" type="text" placeholder="اكتب سؤالك هنا (مثلاً: ما حكم سهم فوري؟)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-sky-500" onkeydown="if(event.key==='Enter') sendUserAiQuestion()">
+                        <button onclick="sendUserAiQuestion()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95">
+                            إرسال
+                        </button>
                     </div>
                 </div>
             </div>
@@ -672,25 +739,30 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar (5 Tabs) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#080c14]/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-2">
-        <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center text-[10px]">
-            <button onclick="switchTab('radar', this)" class="tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95">
+    <!-- Bottom Navigation Bar (5 Professional Tabs) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#080c14]/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-1 max-w-lg mx-auto shadow-2xl">
+        <div class="grid grid-cols-5 gap-1 text-[11px] font-medium text-center">
+            <!-- 1. Far Right in RTL: محفظتي -->
+            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95">
+                <span class="text-base">💼</span>
+                <span>محفظتي</span>
+            </button>
+            <!-- 2. الرادار -->
+            <button onclick="switchTab('radar', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
                 <span class="text-base">⚡</span>
                 <span>الرادار</span>
             </button>
+            <!-- 3. التحليل -->
             <button onclick="switchTab('valuation', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
                 <span class="text-base">🎯</span>
                 <span>التحليل</span>
             </button>
-            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">💼</span>
-                <span>المحفظة</span>
-            </button>
+            <!-- 4. الأخبار -->
             <button onclick="switchTab('news', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
                 <span class="text-base">📰</span>
                 <span>الأخبار</span>
             </button>
+            <!-- 5. الأدوات -->
             <button onclick="switchTab('tools', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
                 <span class="text-base">🛠️</span>
                 <span>الأدوات</span>
@@ -1810,8 +1882,8 @@
             const data = getStockComprehensiveData(activeChartTicker);
             closeChartModal();
             switchTab('dca');
-            const dcaP1 = document.getElementById('dca_p1');
-            const dcaP2 = document.getElementById('dca_p2');
+            const dcaP1 = document.getElementById('calc_p1');
+            const dcaP2 = document.getElementById('calc_p2');
             if (dcaP1) dcaP1.value = data.close.toFixed(2);
             if (dcaP2) dcaP2.value = data.support.toFixed(2);
             runDcaCalculation();
@@ -2286,23 +2358,23 @@
                 })
                 .then(data => {
                     console.log('[Cloud Sync] Received live data:', data);
-                    if (data.fx_gold && data.fx_gold.usd_egp) {
+                    if (data.fx_gold && data.fx_gold.usd_egp && document.getElementById('ticker_usd')) {
                         document.getElementById('ticker_usd').innerText = `${data.fx_gold.usd_egp.close} ج`;
                     }
-                    if (data.fx_gold && data.fx_gold.gold_24k) {
+                    if (data.fx_gold && data.fx_gold.gold_24k && document.getElementById('ticker_gold')) {
                         document.getElementById('ticker_gold').innerText = `${data.fx_gold.gold_24k.close.toLocaleString()} ج`;
                     }
-                    if (data.indices && data.indices.EGX33) {
+                    if (data.indices && data.indices.EGX33 && document.getElementById('ticker_egx33')) {
                         document.getElementById('ticker_egx33').innerText = `${data.indices.EGX33.close.toLocaleString()}`;
                     }
-                    if (data.ai_pulse && data.ai_pulse.text) {
+                    if (data.ai_pulse && data.ai_pulse.text && document.getElementById('ai_pulse_text')) {
                         document.getElementById('ai_pulse_text').innerText = data.ai_pulse.text;
-                        if (data.ai_pulse.score) {
-                            document.getElementById('ai_score_badge').innerText = `متفائلة (${data.ai_pulse.score}%)`;
-                        }
-                        if (data.ai_pulse.lead_sector) {
-                            document.getElementById('ai_sector_badge').innerText = data.ai_pulse.lead_sector;
-                        }
+                    }
+                    if (data.ai_pulse && data.ai_pulse.score && document.getElementById('ai_score_badge')) {
+                        document.getElementById('ai_score_badge').innerText = `متفائلة (${data.ai_pulse.score}%)`;
+                    }
+                    if (data.ai_pulse && data.ai_pulse.lead_sector && document.getElementById('ai_sector_badge')) {
+                        document.getElementById('ai_sector_badge').innerText = data.ai_pulse.lead_sector;
                     }
                     if (data.dividends_calendar) {
                         renderDividendsTable(data.dividends_calendar);
@@ -2581,7 +2653,6 @@
             });
         }
 
-        // 9. Tab Switching
         function switchTab(tabId, btn) {
             triggerHaptic('medium');
             
@@ -2612,7 +2683,9 @@
                 }
             }
 
-            if (actualTabId === 'valuation') {
+            if (actualTabId === 'portfolio') {
+                renderHoldingsTable();
+            } else if (actualTabId === 'valuation') {
                 renderValuationCard();
             } else if (actualTabId === 'news') {
                 renderNewsFeed();
@@ -3131,26 +3204,7 @@
             openStockChart(ticker);
         }
 
-        function switchModalSubTab(subTab) {
-            triggerHaptic('selection');
-            const chartBtn = document.getElementById('modalTabChartBtn');
-            const newsBtn = document.getElementById('modalTabNewsBtn');
-            const chartView = document.getElementById('modalChartView');
-            const newsView = document.getElementById('modalNewsView');
-
-            if (subTab === 'chart') {
-                chartBtn.className = "pb-2 font-bold text-emerald-400 border-b-2 border-emerald-500 transition flex items-center gap-1.5 active:scale-95";
-                newsBtn.className = "pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 active:scale-95";
-                chartView.classList.remove('hidden');
-                newsView.classList.add('hidden');
-            } else {
-                newsBtn.className = "pb-2 font-bold text-sky-400 border-b-2 border-sky-500 transition flex items-center gap-1.5 active:scale-95";
-                chartBtn.className = "pb-2 font-bold text-slate-400 hover:text-slate-200 border-b-2 border-transparent transition flex items-center gap-1.5 active:scale-95";
-                chartView.classList.add('hidden');
-                newsView.classList.remove('hidden');
-                renderPerStockNewsInModal(activeChartTicker);
-            }
-        }
+// 2-tab duplicate switchModalSubTab removed (using 4-tab definition at line 1821)
 
         function openStockNews(ticker) {
             triggerHaptic('medium');
