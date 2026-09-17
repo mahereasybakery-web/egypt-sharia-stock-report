@@ -536,6 +536,24 @@
         </div>
     </header>
 
+        <!-- REGULATORY TRANSPARENCY & HELP BAR (Liner Audit Compliance) -->
+        <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/90 px-3 py-1.5 flex items-center justify-between text-[10px] text-slate-300">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">⚠️ تنويه تنظيمي</span>
+                <span class="text-slate-300 truncate">منصة تحليل ومتابعة شخصية مستقلة، لا تنفذ أوامر تداول بالبورصة وتعتمد معايير مؤشر الشريعة EGX33</span>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="openHelpGlossaryModal()" class="px-2 py-0.5 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-800/80 font-bold flex items-center gap-1 transition-colors">
+                    <span>📖 دليل المستثمر والقاموس المالي</span>
+                </button>
+                <button onclick="openPortfolioBackupModal()" class="px-2 py-0.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 font-bold flex items-center gap-1 transition-colors">
+                    <span>💾 نسخ/استعادة</span>
+                </button>
+            </div>
+        </div>
+
+
+
     <!-- Main Views Container -->
     <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4">
 
@@ -954,7 +972,10 @@
                         <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/30">⚡</span>
                         <div>
                             <h3 class="text-xs font-bold text-white">سيولة كلاودز والاستثمار اللحظي (Clawdz)</h3>
-                            <p class="text-[10px] text-slate-400">عائد يومي لحظي %17.34 لحفظ القوة الشرائية</p>
+                            <p class="text-[10px] text-slate-400 flex items-center gap-1 flex-wrap">
+                                <span>متوسط عائد سنوي تقريبي %17.34 (أدوات نقدية وأذون خزانة إسلامية مركبة يومياً)</span>
+                                <button onclick="openLiquidityDetailModal()" class="text-sky-400 underline hover:text-sky-300 font-bold">ℹ️ تفاصيل ومخاطر المنتج</button>
+                            </p>
                         </div>
                     </div>
                     <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded font-mono">49,817 ج.م (56.8% من الثروة)</span>
@@ -1713,33 +1734,73 @@
             <div class="overflow-y-auto pr-1 flex-1 space-y-3">
                 
                 <!-- SUB-TAB 1: ADVANCED INTERACTIVE CHART -->
-                <div id="modalChartView" class="space-y-2.5">
-                    <!-- Timeframe & Chart Style Toolbar + Interactive HUD -->
-                    <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 text-[11px]">
-                        <!-- Timeframe Selector -->
+                                <div id="modalChartView" class="space-y-2.5">
+                    <!-- Dual-Engine Switcher & Pro Controls -->
+                    <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-950/80 p-2 rounded-xl border border-slate-800/90 text-[11px]">
+                        <!-- Engine Switcher -->
                         <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
-                            <button onclick="setChartTimeframe('1D', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">1D</button>
-                            <button onclick="setChartTimeframe('1W', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1W</button>
-                            <button onclick="setChartTimeframe('1M', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1M</button>
-                            <button onclick="setChartTimeframe('3M', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">3M</button>
-                            <button onclick="setChartTimeframe('1Y', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1Y</button>
+                            <button id="engineCanvasBtn" onclick="setChartEngine('canvas')" class="px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1">
+                                <span>⚡ استوديو الكانفاس السريع</span>
+                            </button>
+                            <button id="engineTvBtn" onclick="setChartEngine('tradingview')" class="px-2.5 py-1 rounded text-[10px] font-bold text-slate-400 hover:text-white flex items-center gap-1">
+                                <span>🌐 منصة TradingView الرسمية</span>
+                            </button>
                         </div>
 
-                        <!-- Chart Type Toggle -->
-                        <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
-                            <button id="chartTypeCandleBtn" onclick="setChartType('candles')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-300">🕯️ شموع</button>
-                            <button id="chartTypeLineBtn" onclick="setChartType('line')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">📈 خطي</button>
-                        </div>
-
-                        <!-- Interactive HUD Bar -->
-                        <div id="chartHudBox" class="text-[10px] font-mono text-slate-300 w-full sm:w-auto text-left sm:text-right flex items-center gap-2 overflow-x-auto no-scrollbar">
-                            <span class="text-slate-500">حرك المؤشر للتتبع 🔍</span>
+                        <!-- Fullscreen / Expand Button -->
+                        <div class="flex items-center gap-1">
+                            <button onclick="toggleChartFullscreen()" class="px-2 py-1 rounded bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-[10px] font-bold flex items-center gap-1">
+                                <span id="fsIcon">⛶</span> <span id="fsLabel">تكبير الشارت</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Chart Canvas Container -->
-                    <div class="relative w-full h-72 sm:h-80 bg-slate-950/90 rounded-xl p-1.5 border border-slate-800 select-none touch-none">
-                        <canvas id="candlestickCanvas" class="w-full h-full block"></canvas>
+                    <!-- CANVAS ENGINE SUB-TOOLBAR (Visible when engine == 'canvas') -->
+                    <div id="canvasToolbarWrapper" class="space-y-2">
+                        <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 text-[11px]">
+                            <!-- Timeframe Selector -->
+                            <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
+                                <button onclick="setChartTimeframe('1D', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">1D</button>
+                                <button onclick="setChartTimeframe('1W', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1W</button>
+                                <button onclick="setChartTimeframe('1M', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1M</button>
+                                <button onclick="setChartTimeframe('3M', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">3M</button>
+                                <button onclick="setChartTimeframe('1Y', this)" class="chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">1Y</button>
+                            </div>
+
+                            <!-- Chart Type Toggle -->
+                            <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800">
+                                <button id="chartTypeCandleBtn" onclick="setChartType('candles')" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-300">🕯️ شموع</button>
+                                <button id="chartTypeHollowBtn" onclick="setChartType('hollow')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">🕯️ مجوفة</button>
+                                <button id="chartTypeLineBtn" onclick="setChartType('line')" class="px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white">📈 مسار ناعم</button>
+                            </div>
+
+                            <!-- Indicators Active Badges / Toggles -->
+                            <div class="flex items-center gap-1 bg-slate-900 rounded-lg p-0.5 border border-slate-800 flex-wrap">
+                                <button id="indToggleBb" onclick="toggleChartIndicator('bb')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-950 text-purple-300 border border-purple-800/80">بولينجر BB</button>
+                                <button id="indToggleEma" onclick="toggleChartIndicator('ema')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-950 text-amber-300 border border-amber-800/80">EMA 9</button>
+                                <button id="indToggleSma" onclick="toggleChartIndicator('sma')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-950 text-sky-300 border border-sky-800/80">SMA 20/50</button>
+                                <button id="indToggleRsi" onclick="toggleChartIndicator('rsi')" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800/80">RSI(14)</button>
+                            </div>
+
+                            <!-- Interactive HUD Bar -->
+                            <div id="chartHudBox" class="text-[10px] font-mono text-slate-300 w-full sm:w-auto text-left sm:text-right flex items-center gap-2 overflow-x-auto no-scrollbar">
+                                <span class="text-slate-500">حرك المؤشر للتتبع اللحظي 🔍</span>
+                            </div>
+                        </div>
+
+                        <!-- Chart Canvas Container with Dynamic Height -->
+                        <div id="canvasChartContainer" class="relative w-full h-80 sm:h-96 bg-slate-950/95 rounded-xl p-1.5 border border-slate-800 select-none touch-none overflow-hidden">
+                            <canvas id="candlestickCanvas" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- TRADINGVIEW ENGINE EMBED (Visible when engine == 'tradingview') -->
+                    <div id="tradingviewEmbedContainer" class="hidden relative w-full h-80 sm:h-96 rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                        <iframe id="tradingviewIframe" class="w-full h-full border-0" allowtransparency="true" scrolling="no" allowfullscreen></iframe>
+                        <div id="tvLoadingOverlay" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center gap-2 text-xs text-slate-300 z-10">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400"></div>
+                            <span>جاري تحميل منصة TradingView الرسمية المباشرة...</span>
+                        </div>
                     </div>
 
                     <!-- Indicators Legend & Level Tags -->
@@ -1763,13 +1824,16 @@
                     </div>
 
                     <!-- Chart Indicators Legend Details -->
-                    <div class="flex items-center justify-between text-[10px] text-slate-400 px-1 pt-0.5">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 px-1 pt-0.5 flex-wrap gap-2">
                         <div class="flex items-center gap-2.5 flex-wrap">
                             <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-yellow-400 inline-block"></span> SMA 20</span>
                             <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-sky-400 inline-block"></span> SMA 50</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-400 inline-block border-b border-dashed border-emerald-400"></span> الدعم</span>
-                            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-rose-400 inline-block border-b border-dashed border-rose-400"></span> المقاومة</span>
-                            <span class="flex items-center gap-1">📊 حجم التداول (Volume)</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-amber-500 inline-block"></span> EMA 9</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-purple-400 inline-block"></span> بولينجر BB</span>
+                            <span class="flex items-center gap-1">📊 الفوليوم ومتوسط السيولة</span>
+                        </div>
+                        <div class="text-[9px] text-slate-500">
+                            مصدر البيانات: TradingView / EGX / SNDUK اللحظي
                         </div>
                     </div>
                 </div>
@@ -4234,20 +4298,7 @@
             drawAdvancedChart();
         }
 
-        function setChartType(type) {
-            triggerHaptic('selection');
-            activeChartType = type;
-            const cBtn = document.getElementById('chartTypeCandleBtn');
-            const lBtn = document.getElementById('chartTypeLineBtn');
-            if (type === 'candles') {
-                cBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-300";
-                lBtn.className = "px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white";
-            } else {
-                lBtn.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-300";
-                cBtn.className = "px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white";
-            }
-            drawAdvancedChart();
-        }
+// setChartType consolidated
 
         function generateTimeframeCandles(stock, valData, tf) {
             let numCandles = 28;
@@ -4333,6 +4384,216 @@
             canvas.addEventListener('touchend', handleEnd);
             crosshairHandlerAttached = true;
         }
+
+        
+        /* ==========================================================================
+           ULTRA-PRO DUAL ENGINE CHART & LINER AUDIT IMPLEMENTATION (v7.7)
+           ========================================================================== */
+        let activeChartEngine = 'canvas';
+        activeChartType = 'candles';
+        let chartIndicators = {
+            bb: true,
+            ema: true,
+            sma: true,
+            rsi: true
+        };
+        let isChartFullscreen = false;
+
+        const TRADINGVIEW_TICKER_MAP = {
+            'TMGH': 'EGX:TMGH',
+            'ETEL': 'EGX:ETEL',
+            'EFIH': 'EGX:EFIH',
+            'EGAL': 'EGX:EGAL',
+            'ADIB': 'EGX:ADIB',
+            'ISPH': 'EGX:ISPH',
+            'COMI': 'EGX:COMI',
+            'SWDY': 'EGX:SWDY',
+            'MFPC': 'EGX:MFPC',
+            'ABUK': 'EGX:ABUK',
+            'SKPC': 'EGX:SKPC',
+            'EKHO': 'EGX:EKHO',
+            'FWRY': 'EGX:FWRY',
+            'ORAS': 'EGX:ORAS',
+            'HELI': 'EGX:HELI',
+            'MNHD': 'EGX:MNHD',
+            'PHDC': 'EGX:PHDC',
+            'CIEB': 'EGX:CIEB',
+            'SAUD': 'EGX:SAUD',
+            'ESRS': 'EGX:ESRS',
+            'AMOC': 'EGX:AMOC',
+            'SIDPEC': 'EGX:SKPC',
+            'JUFO': 'EGX:JUFO',
+            'DOMTY': 'EGX:DOMT',
+            'OBOUR': 'EGX:OLFI',
+            'EPPK': 'EGX:EPPK',
+            'CLHO': 'EGX:CLHO',
+            'MCQE': 'EGX:MCQE',
+            'ARAB': 'EGX:ARAB',
+            'AZG': 'TVC:GOLD'
+        };
+
+        function setChartEngine(engine) {
+            activeChartEngine = engine;
+            triggerHaptic('light');
+            const canvasWrapper = document.getElementById('canvasToolbarWrapper');
+            const tvContainer = document.getElementById('tradingviewEmbedContainer');
+            const btnCanvas = document.getElementById('engineCanvasBtn');
+            const btnTv = document.getElementById('engineTvBtn');
+
+            if (engine === 'tradingview') {
+                if (canvasWrapper) canvasWrapper.classList.add('hidden');
+                if (tvContainer) tvContainer.classList.remove('hidden');
+                if (btnTv) {
+                    btnTv.className = 'px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1';
+                }
+                if (btnCanvas) {
+                    btnCanvas.className = 'px-2.5 py-1 rounded text-[10px] font-bold text-slate-400 hover:text-white flex items-center gap-1';
+                }
+                loadTradingViewWidget();
+            } else {
+                if (canvasWrapper) canvasWrapper.classList.remove('hidden');
+                if (tvContainer) tvContainer.classList.add('hidden');
+                if (btnCanvas) {
+                    btnCanvas.className = 'px-2.5 py-1 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1';
+                }
+                if (btnTv) {
+                    btnTv.className = 'px-2.5 py-1 rounded text-[10px] font-bold text-slate-400 hover:text-white flex items-center gap-1';
+                }
+                drawAdvancedChart();
+            }
+        }
+
+        function loadTradingViewWidget() {
+            const iframe = document.getElementById('tradingviewIframe');
+            const overlay = document.getElementById('tvLoadingOverlay');
+            if (!iframe) return;
+
+            if (overlay) overlay.classList.remove('hidden');
+
+            const tvSymbol = TRADINGVIEW_TICKER_MAP[activeChartTicker] || `EGX:${activeChartTicker}`;
+            const isDark = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+            const theme = isDark ? 'dark' : 'light';
+            
+            // Official responsive TradingView embed URL with Arabic locale and technical tools
+            const url = `https://s.tradingview.com/widgetembed/?symbol=${encodeURIComponent(tvSymbol)}&interval=D&theme=${theme}&style=1&locale=ar_AE&toolbar_bg=%230b0f19&enable_publishing=false&hide_top_toolbar=false&hide_legend=false&save_image=false&studies=%5B%22MASimple%40tv-basicstudies%22%2C%22RSI%40tv-basicstudies%22%2C%22BB%40tv-basicstudies%22%5D`;
+
+            iframe.src = url;
+            iframe.onload = () => {
+                if (overlay) overlay.classList.add('hidden');
+            };
+        }
+
+        function toggleChartIndicator(ind) {
+            triggerHaptic('light');
+            chartIndicators[ind] = !chartIndicators[ind];
+            const btn = document.getElementById(`indToggle${ind.charAt(0).toUpperCase() + ind.slice(1)}`);
+            if (btn) {
+                if (chartIndicators[ind]) {
+                    btn.classList.remove('opacity-40', 'line-through');
+                } else {
+                    btn.classList.add('opacity-40', 'line-through');
+                }
+            }
+            drawAdvancedChart();
+        }
+
+// setChartType consolidated
+
+        function toggleChartFullscreen() {
+            triggerHaptic('medium');
+            const container = document.getElementById('canvasChartContainer');
+            const tvContainer = document.getElementById('tradingviewEmbedContainer');
+            const fsIcon = document.getElementById('fsIcon');
+            const fsLabel = document.getElementById('fsLabel');
+            isChartFullscreen = !isChartFullscreen;
+
+            if (isChartFullscreen) {
+                if (container) container.style.height = '520px';
+                if (tvContainer) tvContainer.style.height = '520px';
+                if (fsIcon) fsIcon.textContent = '🗗';
+                if (fsLabel) fsLabel.textContent = 'تصغير الشارت';
+            } else {
+                if (container) container.style.height = '';
+                if (tvContainer) tvContainer.style.height = '';
+                if (fsIcon) fsIcon.textContent = '⛶';
+                if (fsLabel) fsLabel.textContent = 'تكبير الشارت';
+            }
+            if (activeChartEngine === 'canvas') {
+                setTimeout(() => drawAdvancedChart(), 50);
+            }
+        }
+
+        /* Help, Glossary, Liquidity & Backup Modal Handlers */
+        function openHelpGlossaryModal() {
+            triggerHaptic('light');
+            document.getElementById('helpGlossaryModal')?.classList.remove('hidden');
+        }
+        function closeHelpGlossaryModal() {
+            document.getElementById('helpGlossaryModal')?.classList.add('hidden');
+        }
+
+        function openLiquidityDetailModal() {
+            triggerHaptic('light');
+            document.getElementById('liquidityDetailModal')?.classList.remove('hidden');
+        }
+        function closeLiquidityDetailModal() {
+            document.getElementById('liquidityDetailModal')?.classList.add('hidden');
+        }
+
+        function openPortfolioBackupModal() {
+            triggerHaptic('light');
+            document.getElementById('portfolioBackupModal')?.classList.remove('hidden');
+        }
+        function closePortfolioBackupModal() {
+            document.getElementById('portfolioBackupModal')?.classList.add('hidden');
+        }
+
+        function exportPortfolioJsonBackup() {
+            triggerHaptic('medium');
+            const backupData = {
+                exportDate: new Date().toISOString(),
+                appVersion: 'egx-sharia-v7.7',
+                userHoldings: userHoldings || [],
+                portfolioCash: portfolioCash || 145.0,
+                clawdzBalance: clawdzBalance || 49672.0,
+                goldOunces: goldOunces || 0.0
+            };
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `EGX_Sharia_Portfolio_Backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تصدير نسخة احتياطية من المحفظة بنجاح 💾', 'success');
+            closePortfolioBackupModal();
+        }
+
+        function importPortfolioJsonBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data && Array.isArray(data.userHoldings)) {
+                        userHoldings = data.userHoldings;
+                        if (typeof data.portfolioCash === 'number') portfolioCash = data.portfolioCash;
+                        if (typeof data.clawdzBalance === 'number') clawdzBalance = data.clawdzBalance;
+                        if (typeof data.goldOunces === 'number') goldOunces = data.goldOunces;
+                        saveUserPortfolio();
+                        showToast('تم استعادة المحفظة بنجاح ✅', 'success');
+                        closePortfolioBackupModal();
+                    } else {
+                        showToast('الملف غير صالح أو لا يحتوي على بنية محفظة صحيحة', 'danger');
+                    }
+                } catch (err) {
+                    showToast('خطأ في قراءة ملف JSON', 'danger');
+                }
+            };
+            reader.readAsText(file);
+        }
+
 
         function drawAdvancedChart(cursorX = null, cursorY = null) {
             const canvas = document.getElementById('candlestickCanvas');
@@ -6299,5 +6560,148 @@
         }
 
     </script>
+
+
+    <!-- MODAL: HELP, GLOSSARY & SHARIAH GOVERNANCE (Liner Recommendation) -->
+    <div id="helpGlossaryModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-4 shadow-2xl text-right" dir="rtl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📖</span>
+                    <h3 class="text-base font-bold text-white">دليل المستثمر، القاموس المالي ومعايير الشريعة</h3>
+                </div>
+                <button onclick="closeHelpGlossaryModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3.5 text-xs text-slate-300">
+                <!-- Shariah Governance -->
+                <div class="p-3 bg-slate-950/80 rounded-xl border border-emerald-900/50 space-y-1.5">
+                    <h4 class="font-bold text-emerald-400 text-sm flex items-center gap-1.5">
+                        <span>🛡️</span> <span>منهجية الامتثال الشرعي ومؤشر EGX33</span>
+                    </h4>
+                    <p class="leading-relaxed text-slate-300">
+                        يعتمد التطبيق على معايير مؤشر الشريعة الصادر عن البورصة المصرية (EGX33 Shariah Index) بالتعاون مع لجنة الرقابة الشرعية المعتمدة بالهيئة العامة للرقابة المالية:
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-400 pr-2">
+                        <li><b>ضوابط النشاط:</b> استبعاد الأنشطة المحرمة كالربا والخمور والتبغ والقمار والتأمين التجاري التقليدي.</li>
+                        <li><b>نسبة الديون الربوية:</b> إجمالي الديون المحملة بفائدة مقسومة على متوسط القيمة السوقية يجب ألا تتجاوز <b>33%</b>.</li>
+                        <li><b>الاستثمارات المحرمة:</b> الاستثمارات والسيولة المودعة بفائدة لا تتجاوز <b>33%</b> من القيمة السوقية.</li>
+                        <li><b>الإيرادات غير المتوافقة:</b> الإيرادات العرضية المحرمة لا تتجاوز <b>5%</b> من إجمالي الإيرادات (مع وجوب التطهير).</li>
+                        <li><b>دورية المراجعة:</b> مراجعة نصف سنوية رسمية في شهري فبراير وأغسطس مع تدقيق ربع سنوي للقوائم المالية.</li>
+                    </ul>
+                </div>
+
+                <!-- Financial Glossary -->
+                <div class="p-3 bg-slate-950/80 rounded-xl border border-sky-900/50 space-y-2">
+                    <h4 class="font-bold text-sky-400 text-sm flex items-center gap-1.5">
+                        <span>💡</span> <span>القاموس المالي ومصطلحات التداول</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-amber-300 block mb-0.5">القيمة العادلة (Fair Value):</b>
+                            <span>التقييم الجوهري للسهم بناءً على التدفقات النقدية المخصومة (DCF) ومضاعفات الربحية الصادرة عن كبرى بنوك الاستثمار والأبحاث.</span>
+                        </div>
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-amber-300 block mb-0.5">مكرر الربحية (P/E Ratio):</b>
+                            <span>سعر السهم مقسوماً على ربحية السهم السنوية. مكرر أقل من متوسط السوق (8-10) يشير لجاذبية السعر مع جودة الأرباح.</span>
+                        </div>
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-amber-300 block mb-0.5">متوسط التكلفة المرجح:</b>
+                            <span>إجمالي المبالغ المدفوعة مقسومة على إجمالي الأسهم المشتراة عبر صفقات متتالية لاحتساب الربح/الخسارة بدقة.</span>
+                        </div>
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-amber-300 block mb-0.5">استراتيجية التبريد (Averaging Down):</b>
+                            <span>شراء كميات إضافية عند مستويات دعم قوية بعد هبوط غير مبرر لخفض متوسط سعر الشراء وتسريع العودة للربحية.</span>
+                        </div>
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-rose-300 block mb-0.5">وقف الخسارة (Stop Loss):</b>
+                            <span>مستوى سعري فني حاسم يُنصح عنده بوقف الخسارة في حال كسر الدعم لمنع تآكل رأس المال في مسار هابط.</span>
+                        </div>
+                        <div class="p-2 bg-slate-900 rounded-lg border border-slate-800">
+                            <b class="text-emerald-300 block mb-0.5">العائد التراكمي المركب:</b>
+                            <span>محاكاة رياضية لنمو رأس المال عند إعادة استثمار الأرباح والتوزيعات النقدية شهرياً وسنوياً (تأثير كرة الثلج).</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testing & Safety -->
+                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] leading-relaxed text-slate-400">
+                    <b class="text-slate-200 block mb-1">⚖️ ميثاق الشفافية وإدارة المخاطر:</b>
+                    هذا التطبيق أداة مساعدة للمستثمر ولا يقدم توصيات بيع أو شراء ملزمة أو وساطة في البورصة. جميع البيانات التقديرية ومستهدفات الأبحاث هي لأغراض المقارنة والاسترشاد فقط، والقرار الاستثماري يخضع لتقدير المستثمر الفردي وقدرته على تحمل المخاطر.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LIQUIDITY & CLAWDZ BREAKDOWN (Liner Recommendation) -->
+    <div id="liquidityDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-card w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-4 shadow-2xl text-right" dir="rtl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl text-sky-400">⚡</span>
+                    <h3 class="text-base font-bold text-white">تفاصيل سيولة كلاودز والاستثمار اللحظي</h3>
+                </div>
+                <button onclick="closeLiquidityDetailModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300">
+                <div class="p-3 bg-sky-950/50 rounded-xl border border-sky-800/60 space-y-1">
+                    <span class="text-[10px] text-sky-400 font-bold block">معدل العائد السنوي الاسترشادي المحول:</span>
+                    <div class="text-2xl font-bold font-mono text-white">17.34% <span class="text-xs font-normal text-slate-400">سنوياً (مركب يومياً)</span></div>
+                    <p class="text-[11px] text-slate-300 mt-1">يُحسب العائد يومياً بمعدل (~0.04% يومياً) لضمان حماية السيولة النقدية غير المستثمرة من التضخم لحين اقتناص فرص بالأسهم.</p>
+                </div>
+
+                <div class="space-y-2 text-[11px] text-slate-400">
+                    <div class="flex items-start gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <span><b>طبيعة الأصول:</b> أدوات سيولة نقدية متوافقة مع الشريعة، أذون خزانة حكومية، وصناديق النقد يوم بيوم (Money Market Funds).</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <span><b>مستوى المخاطر:</b> منخفض جداً (أصول نقدية وشبه نقدية عالية الأمان).</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-emerald-400 font-bold">✓</span>
+                        <span><b>سياسة السحب:</b> سحب فوري بدون غرامات أو قيود للتحويل إلى المحفظة للشراء في جلسات البورصة.</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-amber-400 font-bold">!</span>
+                        <span><b>تنويه الإفصاح:</b> العائد متغير دورياً وفقاً لأسعار الفائدة وعوائد أدوات الدين السيادية ولا يُعد عائداً ثابتاً أو مضموناً بصورة قطعية.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PORTFOLIO BACKUP & RESTORE (Liner Recommendation) -->
+    <div id="portfolioBackupModal" class="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-card w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-5 space-y-4 shadow-2xl text-right" dir="rtl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl text-emerald-400">💾</span>
+                    <h3 class="text-base font-bold text-white">النسخ الاحتياطي واستعادة المحفظة</h3>
+                </div>
+                <button onclick="closePortfolioBackupModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-300">
+                <p class="text-slate-400 leading-relaxed text-[11px]">
+                    احفظ نسخة من بيانات محفظتك وصفقاتك المسجلة وأرصدتك كملف JSON لضمان عدم فقدانها في حال مسح المتصفح أو لتشغيلها على أجهزة أخرى.
+                </p>
+
+                <div class="flex flex-col gap-2 pt-1">
+                    <button onclick="exportPortfolioJsonBackup()" class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2 transition-colors">
+                        <span>💾 تنزيل نسخة احتياطية (JSON)</span>
+                    </button>
+                    
+                    <label class="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                        <span>📂 استعادة محفظة من ملف JSON</span>
+                        <input type="file" id="importJsonFileInput" accept=".json" onchange="importPortfolioJsonBackup(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
