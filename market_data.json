@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-09-17T15:22:06.737111+03:00",
-  "updated_at_display": "2026-09-17 15:22:06",
+  "updated_at": "2026-09-17T15:26:42.455925+03:00",
+  "updated_at_display": "2026-09-17 15:26:42",
   "indices": {
     "EGX33": {
       "close": 3380.45,
@@ -1172,7 +1172,7 @@
       "summary": "زيادة حجم الذهب الفيزيائي المودع في الخزائن المؤمنة لتغطية طلبات الاكتتاب المستمرة في وثائق الصندوق كأداة تحوط سهلة ومباشرة عبر تطبيق ثندر."
     }
   ],
-  "data_source": "Mubasher.info API Engine (مباشر مصر)",
+  "data_source": "Mubasher.info Core API",
   "market_status": "جلسة التداول الرسمية / أحدث تنفيذ",
   "primary_provider": "مباشر (Mubasher)"
 }
