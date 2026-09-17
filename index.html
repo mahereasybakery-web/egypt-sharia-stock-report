@@ -401,7 +401,21 @@
                     <span>إجمالي الثروة (ج.م)</span>
                     <span class="text-[10px] text-slate-500 cursor-help" title="إجمالي القيمة السوقية للأسهم والصناديق وسيولة كلاودز والنقدية">ⓘ</span>
                 </div>
-                <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">87,736</div>
+                <div class="flex items-center justify-center gap-1.5">
+                    <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">87,736</div>
+                    <span class="text-xs text-slate-400 font-mono pt-2">ج.م</span>
+                </div>
+                <!-- USD Equivalent & Gold Benchmark (طبقاً للفقرة 1 من مستند المواصفات الفنية) -->
+                <div class="flex items-center justify-center gap-2 text-[11px] text-slate-300 font-mono pt-0.5">
+                    <span class="bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-emerald-300 shadow-sm" title="القيمة الإجمالية المعادلة بالدولار الأمريكي">
+                        <span>💵</span>
+                        <span id="p_thndr_usd_val">$1,683 USD</span>
+                    </span>
+                    <span class="bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-amber-300 shadow-sm" title="القيمة الإجمالية المعادلة بجرام الذهب عيار 24 الصافي">
+                        <span>🪙</span>
+                        <span id="p_thndr_gold_val">20.2 جم ذهب</span>
+                    </span>
+                </div>
                 <div class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1 font-mono">
                     <span id="p_thndr_grand_pnl">▲ +2,192</span>
                     <span id="p_thndr_grand_return">+2.56%</span>
@@ -2013,6 +2027,17 @@
 
             const investedElem = document.getElementById('p_thndr_invested');
             if (investedElem) investedElem.innerText = `${(totalInvestedVal / 1000).toFixed(2)}k ج`;
+
+            // USD Equivalent & Gold Benchmark (المعيار المالي بالدولار والذهب)
+            const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
+            const goldRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k : 4340.91;
+            const usdVal = grandWealth / usdRate;
+            const goldGrams = grandWealth / goldRate;
+
+            const usdElem = document.getElementById('p_thndr_usd_val');
+            if (usdElem) usdElem.innerText = `$${Math.round(usdVal).toLocaleString()} USD`;
+            const goldElem = document.getElementById('p_thndr_gold_val');
+            if (goldElem) goldElem.innerText = `${goldGrams.toFixed(1)} جم ذهب`;
 
             // Update Stress Test Calculations
             const s1 = totalInvestedVal * -0.07;
