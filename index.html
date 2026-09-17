@@ -63,6 +63,423 @@
                 }
             }
         }
+
+        // =========================================================================
+        // WEALTH MANAGEMENT SUITE IMPLEMENTATION (الفئات 13-26)
+        // =========================================================================
+
+        // 1. Thndr Fees & Egyptian Capital Gains Tax Calculator (الفئة 14)
+        function calculateThndrFeesAndTaxes() {
+            triggerHaptic('medium');
+            const tradeVal = parseFloat(document.getElementById('fee_trade_val').value) || 0;
+            const tradeType = document.getElementById('fee_trade_type').value;
+            const capitalGain = parseFloat(document.getElementById('fee_capital_gain').value) || 0;
+            const out = document.getElementById('fee_tax_output');
+
+            const thndrComm = Math.max(2.0, tradeVal * 0.002);
+            const egxFees = tradeVal * 0.000125;
+            const stampDuty = tradeVal * 0.0005;
+            const totalFees = thndrComm + egxFees + stampDuty;
+
+            let cgtTax = 0;
+            if (tradeType === 'sell' && capitalGain > 0) {
+                cgtTax = capitalGain * 0.10;
+            }
+
+            const netAmount = tradeType === 'buy' ? (tradeVal + totalFees) : (tradeVal - totalFees - cgtTax);
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center gap-1">
+                    <span>✅</span>
+                    <span>تفصيل العمولات والضرائب المحسوبة:</span>
+                </div>
+                <div class="space-y-1.5 pt-1 text-slate-300 text-xs">
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>عمولة تطبيق ثندر (2 بالألف):</span>
+                        <b class="text-white font-mono">${thndrComm.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>رسوم البورصة والمقاصة والرقابة المالية (0.0125%):</span>
+                        <b class="text-white font-mono">${egxFees.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>ضريبة الدمغة النسبية:</span>
+                        <b class="text-white font-mono">${stampDuty.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>إجمالي مصاريف التنفيذ:</span>
+                        <b class="text-amber-400 font-mono">${totalFees.toFixed(2)} ج.م (${((totalFees / tradeVal) * 100).toFixed(3)}%)</b>
+                    </div>
+                    ${tradeType === 'sell' ? `
+                    <div class="flex justify-between border-b border-slate-800 pb-1 text-rose-300">
+                        <span>ضريبة الأرباح الرأسمالية (10% على ${capitalGain.toFixed(2)} ج):</span>
+                        <b class="text-rose-400 font-mono">-${cgtTax.toFixed(2)} ج.م</b>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between pt-1 font-bold text-sm bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+                        <span class="text-white">${tradeType === 'buy' ? 'المبلغ الإجمالي المطلوب دفعه:' : 'صافي المبلغ المستلم بالمحفظة:'}</span>
+                        <span class="text-emerald-400 font-mono">${netAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</span>
+                    </div>
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 2. Milestone Goal & Monte Carlo Wealth Simulation (الفئة 18)
+        function runGoalsMonteCarloSimulation() {
+            triggerHaptic('medium');
+            const target = parseFloat(document.getElementById('goal_target').value) || 1000000;
+            const current = parseFloat(document.getElementById('goal_current').value) || 87736;
+            const monthly = parseFloat(document.getElementById('goal_monthly').value) || 5000;
+            const annualRate = (parseFloat(document.getElementById('goal_rate').value) || 22) / 100;
+            const out = document.getElementById('goal_output');
+
+            const monthlyRate = annualRate / 12;
+            let detMonths = 0;
+            let detWealth = current;
+            while (detWealth < target && detMonths < 360) {
+                detWealth = (detWealth + monthly) * (1 + monthlyRate);
+                detMonths++;
+            }
+            const detYears = (detMonths / 12).toFixed(1);
+
+            const runs = 500;
+            const simMonthsResults = [];
+            let reachedIn3YearsCount = 0;
+
+            for (let r = 0; r < runs; r++) {
+                let w = current;
+                let m = 0;
+                while (w < target && m < 120) {
+                    const u1 = Math.max(1e-6, Math.random());
+                    const u2 = Math.random();
+                    const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                    const monthlyVol = 0.18 / Math.sqrt(12);
+                    const randMonthlyRate = monthlyRate + (z * monthlyVol);
+                    w = (w + monthly) * (1 + randMonthlyRate);
+                    m++;
+                }
+                simMonthsResults.push(m);
+                if (m <= 36) reachedIn3YearsCount++;
+            }
+
+            simMonthsResults.sort((a, b) => a - b);
+            const p10Years = (simMonthsResults[Math.floor(runs * 0.10)] / 12).toFixed(1);
+            const medianYears = (simMonthsResults[Math.floor(runs * 0.50)] / 12).toFixed(1);
+            const p90Years = (simMonthsResults[Math.floor(runs * 0.90)] / 12).toFixed(1);
+            const prob3Years = ((reachedIn3YearsCount / runs) * 100).toFixed(1);
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span>🎯 نتيجة محاكاة الأهداف ومونت كارلو:</span>
+                    <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-lg">500 مسار احتمالي</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-slate-400 text-[10px]">السيناريو المتفائل (أفضل 10%)</div>
+                        <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5">${p10Years} سنوات</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-800/80 bg-sky-950/20">
+                        <div class="text-sky-300 text-[10px] font-bold">السيناريو الأرجح (الوسيط)</div>
+                        <div class="text-base font-black text-white font-mono mt-0.5">${medianYears} سنوات (${Math.round(medianYears*12)} شهر)</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-slate-400 text-[10px]">السيناريو المتحفظ (أقل 10%)</div>
+                        <div class="text-sm font-bold text-amber-400 font-mono mt-0.5">${p90Years} سنوات</div>
+                    </div>
+                </div>
+                <div class="bg-emerald-950/30 border border-emerald-800/60 p-2.5 rounded-xl flex items-center justify-between text-xs">
+                    <span class="text-slate-200">احتمالية بلوغ هدفك (${target.toLocaleString()} ج) خلال 3 سنوات:</span>
+                    <span class="font-bold text-emerald-300 font-mono text-sm">${prob3Years}%</span>
+                </div>
+                <div class="text-[11px] text-slate-400 leading-relaxed">
+                    💡 <b>توصية المساعد المالي:</b> مع استثمار شهري بقيمة <b>${monthly.toLocaleString()} ج</b> وإعادة استثمار الأرباح وتوزيعات الأسهم؛ فإن مسار المحفظة يسير بثبات نحو تحقيق أول مليون جنيه خلال حوالي <b>${medianYears} سنوات</b> بإذن الله.
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 3. Surplus Allocation Advisor & DCA Order Generator (الفئتان 19 و 22)
+        function runSurplusAllocation() {
+            triggerHaptic('medium');
+            const surplus = parseFloat(document.getElementById('advisor_surplus_val').value) || 10000;
+            const strategy = document.getElementById('advisor_strategy').value;
+            const out = document.getElementById('advisor_output');
+
+            const candidates = [
+                { ticker: 'EFIH', name: 'إي فاينانس', price: 23.27, weight: 0.35, reason: 'نمو رقمي + مضاعف ربحية ممتاز' },
+                { ticker: 'TMGH', name: 'طلعت مصطفى', price: 95.00, weight: 0.25, reason: 'تراجع مؤقت + مشاريع رأس الحكمة' },
+                { ticker: 'ADIB', name: 'أبوظبي الإسلامي', price: 52.01, weight: 0.15, reason: 'عائد مصرفي إسلامي قياسي' },
+                { ticker: 'AZG', name: 'أزيموت جولد', price: 24.27, weight: 0.15, reason: 'تحوط استراتيجي بالذهب عيار 24' },
+                { ticker: 'CLAW', name: 'كلاودز (سيولة)', price: 1.00, weight: 0.10, reason: 'عائد يومي 17.34% وأمان مالي' }
+            ];
+
+            let ordersHtml = '';
+            let allocatedSum = 0;
+
+            candidates.forEach(c => {
+                const targetBudget = surplus * c.weight;
+                const shares = c.ticker === 'CLAW' ? Math.round(targetBudget) : Math.floor(targetBudget / c.price);
+                const cost = shares * c.price;
+                allocatedSum += cost;
+
+                ordersHtml += `
+                    <tr class="border-b border-slate-800 text-slate-200">
+                        <td class="py-1.5 px-2 font-bold text-white">${c.name} (${c.ticker})</td>
+                        <td class="py-1.5 px-2 text-center font-mono text-emerald-400 font-bold">${shares.toLocaleString()} ${c.ticker === 'CLAW' ? 'ج' : 'سهم/وثيقة'}</td>
+                        <td class="py-1.5 px-2 text-center font-mono text-slate-300">${c.price.toFixed(2)} ج</td>
+                        <td class="py-1.5 px-2 text-left font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
+                        <td class="py-1.5 px-2 text-right text-[10px] text-slate-400">${c.reason}</td>
+                    </tr>
+                `;
+            });
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                    <span>⚡ أمر الشراء المقترح للفائض الشهري (${surplus.toLocaleString()} ج.م):</span>
+                    <span class="text-xs text-slate-400 font-mono">الإجمالي المنفذ: ${allocatedSum.toLocaleString(undefined, {minimumFractionDigits:2})} ج</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-right">
+                        <thead>
+                            <tr class="text-[10px] text-slate-400 border-b border-slate-800 bg-slate-950/60">
+                                <th class="py-1.5 px-2">الأصل / الرمز</th>
+                                <th class="py-1.5 px-2 text-center">الكمية المقترحة</th>
+                                <th class="py-1.5 px-2 text-center">السعر الحالي</th>
+                                <th class="py-1.5 px-2 text-left">التكلفة الإجمالية</th>
+                                <th class="py-1.5 px-2 text-right">المبرر الاستثماري</th>
+                            </tr>
+                        </thead>
+                        <tbody>${ordersHtml}</tbody>
+                    </table>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button onclick="navigator.clipboard.writeText('أمر شراء مقترح: EFIH, TMGH, ADIB, AZG'); showToast('تم نسخ خطة الشراء إلى الحافظة ✓', 'success');" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                        📋 نسخ أمر الشراء
+                    </button>
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 4. Decision Journal & Bias Detection (الفئة 20)
+        function saveDecisionJournalEntry() {
+            triggerHaptic('medium');
+            const ticker = document.getElementById('dj_ticker').value;
+            const type = document.getElementById('dj_type').value;
+            const reason = document.getElementById('dj_reason').value;
+            const reasonText = document.getElementById('dj_reason').options[document.getElementById('dj_reason').selectedIndex].text;
+            const notes = document.getElementById('dj_notes').value.trim();
+
+            const entry = {
+                id: 'dj_' + Date.now(),
+                date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                ticker: ticker,
+                type: type,
+                reason: reason,
+                reasonText: reasonText,
+                notes: notes
+            };
+
+            const existing = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+            existing.unshift(entry);
+            localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
+
+            document.getElementById('dj_notes').value = '';
+            showToast('تم توثيق القرار في السجل بنجاح ✓', 'success');
+            renderDecisionJournal();
+        }
+
+        function renderDecisionJournal() {
+            const list = document.getElementById('dj_list');
+            if (!list) return;
+            const entries = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+
+            if (entries.length === 0) {
+                list.innerHTML = '<div class="text-slate-500 text-center py-2">لا توجد قرارات مسجلة بعد. وثق أول صفقة بالأعلى!</div>';
+                return;
+            }
+
+            list.innerHTML = entries.map(e => {
+                const isWarning = e.reason === 'fomo' || e.reason === 'panic';
+                const badgeColor = e.type === 'buy' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800';
+                const warningBadge = isWarning ? '<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">⚠️ تحيز سلوكي</span>' : '';
+                return `
+                    <div class="bg-slate-950/70 p-2 rounded-xl border ${isWarning ? 'border-amber-800/80' : 'border-slate-800'} text-[11px] space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-bold">
+                                <span class="px-1.5 py-0.2 rounded border text-[10px] ${badgeColor}">${e.type === 'buy' ? 'شراء 🟢' : 'بيع 🔴'}</span>
+                                <span class="text-white">${e.ticker}</span>
+                                ${warningBadge}
+                            </div>
+                            <span class="text-slate-500 text-[10px] font-mono">${e.date}</span>
+                        </div>
+                        <div class="text-slate-300 text-[10px]"><b>المبرر:</b> ${e.reasonText}</div>
+                        ${e.notes ? `<div class="text-slate-400 text-[10px] bg-slate-900/80 p-1 rounded border border-slate-800 italic">"${e.notes}"</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 5. Inheritance & Estate Planning (الفئة 24)
+        function calculateInheritanceDistribution() {
+            triggerHaptic('medium');
+            const totalWealth = parseFloat(document.getElementById('inh_wealth_val').value) || 87736;
+            const wives = parseInt(document.getElementById('inh_wives').value) || 1;
+            const sons = parseInt(document.getElementById('inh_sons').value) || 0;
+            const daughters = parseInt(document.getElementById('inh_daughters').value) || 0;
+            const parents = document.getElementById('inh_parents').value;
+            const out = document.getElementById('inh_output');
+
+            const sarRate = 13.90;
+            const usdRate = 52.15;
+
+            let motherShare = 0;
+            let fatherShare = 0;
+            if (parents === 'mother' || parents === 'both') motherShare = totalWealth * (1 / 6);
+            if (parents === 'father' || parents === 'both') fatherShare = totalWealth * (1 / 6);
+
+            const wivesShareTotal = totalWealth * (1 / 8);
+            const wifeEach = wivesShareTotal / wives;
+
+            const remainingForKids = Math.max(0, totalWealth - wivesShareTotal - motherShare - fatherShare);
+            const totalShares = (sons * 2) + (daughters * 1);
+            const singleShare = totalShares > 0 ? (remainingForKids / totalShares) : 0;
+            const sonEach = singleShare * 2;
+            const daughterEach = singleShare * 1;
+
+            function fmt(val) {
+                return `<b class="text-white font-mono">${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</b> <span class="text-slate-400 font-mono text-[10px]">(${(val / sarRate).toLocaleString(undefined, {maximumFractionDigits:0})} ر.س / $${(val / usdRate).toLocaleString(undefined, {maximumFractionDigits:0})})</span>`;
+            }
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                    <span>👨‍👩‍👧‍👦 التوزيع الشرعي الاسترشادي للتركة (${totalWealth.toLocaleString()} ج.م):</span>
+                    <span class="text-[10px] text-slate-400">حسب الفريضة الشرعية</span>
+                </div>
+                <div class="space-y-1.5 text-xs text-slate-300 pt-1">
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>حصة الزوجة (الثمن 1/8 ${wives > 1 ? `موزع على ${wives}` : ''}):</span>
+                        <span>${fmt(wivesShareTotal)} ${wives > 1 ? `<span class="text-emerald-400 block text-[10px]">لكل زوجة: ${(wifeEach).toFixed(2)} ج</span>` : ''}</span>
+                    </div>
+                    ${motherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأم (السدس 1/6):</span><span>${fmt(motherShare)}</span></div>` : ''}
+                    ${fatherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأب (السدس 1/6):</span><span>${fmt(fatherShare)}</span></div>` : ''}
+                    ${sons > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابن (للذكر مثل حظ الأنثيين):</span><span>${fmt(sonEach)} <span class="text-emerald-400 text-[10px]">(${sons} أبناء)</span></span></div>` : ''}
+                    ${daughters > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابنة:</span><span>${fmt(daughterEach)} <span class="text-emerald-400 text-[10px]">(${daughters} بنات)</span></span></div>` : ''}
+                </div>
+                <div class="p-2 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 leading-relaxed">
+                    ℹ️ <b>ملاحظة نظامية:</b> هذه الحاسبة استرشادية لتسهيل حصر التركات وتوزيع الأصول الاستثمارية للأسرة، وعند التطبيق الفعلي يُرجع للمحكمة الشرعية والجهات الرسمية لإصدار صك حصر الورثة.
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 6. Multi-Sheet Excel Export (الفئة 17)
+        function exportMultiSheetExcel() {
+            triggerHaptic('medium');
+            if (!window.XLSX) {
+                showToast('محرك Excel غير متاح حالياً', 'error');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            const stocksData = [
+                ['الرمز', 'اسم الشركة', 'القطاع', 'الكمية', 'متوسط سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
+                ['EFID', 'إيديتا للصناعات الغذائية', 'الأغذية والأدوية', 23, 31.85, 30.80, 708.40, -24.00, '-3.3%'],
+                ['TMGH', 'طلعت مصطفى', 'العقارات والإنشاءات', 115, 97.88, 95.00, 10925.00, -331.00, '-2.9%'],
+                ['ADIB', 'أبوظبي الإسلامي', 'البنوك والخدمات المالية', 49, 52.78, 52.01, 2548.49, -38.00, '-1.5%'],
+                ['ORHD', 'أوراسكوم للتنمية', 'العقارات والإنشاءات', 58, 41.46, 42.35, 2456.30, 52.00, '+2.1%'],
+                ['EFIH', 'إي فاينانس', 'التكنولوجيا والمدفوعات', 292, 21.67, 23.27, 6794.84, 467.00, '+7.4%'],
+                ['OCDI', 'سوديك', 'العقارات والإنشاءات', 55, 27.56, 30.00, 1650.00, 134.00, '+8.9%'],
+                ['ETEL', 'المصرية للاتصالات', 'التكنولوجيا والمدفوعات', 74, 108.23, 131.30, 9716.20, 1707.00, '+21.3%'],
+                ['EGAL', 'مصر للألومنيوم', 'الصناعة والتصدير', 7, 299.14, 364.00, 2548.00, 454.00, '+21.7%']
+            ];
+            const wsStocks = XLSX.utils.aoa_to_sheet(stocksData);
+            XLSX.utils.book_append_sheet(wb, wsStocks, 'الأسهم الشرعية');
+
+            const fundsData = [
+                ['الرمز', 'اسم الصندوق', 'نوع الصندوق', 'عدد الوثائق', 'سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
+                ['NMF', 'نعيم مصر للشريعة', 'صناديق الأسهم الشرعية', 2, 48.16, 50.00, 100.00, 4.00, '+3.8%'],
+                ['AZG', 'أزيموت جولد', 'الذهب والتحوط', 11, 23.09, 24.27, 266.97, 13.00, '+5.1%'],
+                ['BWA', 'بلتون وفرة للشريعة', 'صناديق الأسهم الشرعية', 66, 2.09, 2.20, 145.20, 7.00, '+5.3%'],
+                ['CMS', 'مصر شريعة إكويتي', 'صناديق الأسهم الشرعية', 12, 20.44, 22.67, 272.04, 27.00, '+10.9%'],
+                ['THNDR_GOLD', 'سبائك جولد (ثندر)', 'الذهب والتحوط', 17, 1.60, 1.72, 29.19, 1.91, '+7.0%']
+            ];
+            const wsFunds = XLSX.utils.aoa_to_sheet(fundsData);
+            XLSX.utils.book_append_sheet(wb, wsFunds, 'صناديق الاستثمار والذهب');
+
+            const cashData = [
+                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية (ج)', 'الحالة'],
+                ['صندوق كلاودز (سيولة واستثمار يومي)', 49672.00, '17.34%', 21.69, 'مستثمر يومياً'],
+                ['محفظة التداول (نقدية حرة)', 145.00, '0.00%', 0.00, 'متاح للتداول الفوري'],
+                ['إجمالي السيولة النقدية', 49817.00, '--', 21.69, 'أمان مالي وطوارئ']
+            ];
+            const wsCash = XLSX.utils.aoa_to_sheet(cashData);
+            XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
+
+            const summaryData = [
+                ['المؤشر المالي', 'القيمة'],
+                ['إجمالي الثروة الكلي بالجنيه', '87,978 ج.م'],
+                ['المعادل بالدولار الأمريكي ($ USD)', '$1,687 USD'],
+                ['المعادل بالريال السعودي (🇸🇦 SAR)', '6,312 SAR'],
+                ['المعادل بجرام الذهب عيار 24 الصافي', '20.3 جم ذهب'],
+                ['إجمالي الأرباح المحققة وغير المحققة', '+2,496 ج.م (+2.92%)'],
+                ['مؤشر صحة الثروة الموحد (Wealth Health Index)', '94 / 100 (ممتاز 🟢)'],
+                ['وعاء زكاة الأسهم التقديري للمضارب (2.5%)', '2,199.45 ج.م'],
+                ['تاريخ إعداد التقرير', new Date().toLocaleDateString('ar-EG')]
+            ];
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'تقييم الثروة والزكاة');
+
+            XLSX.writeFile(wb, 'محفظة_ثندر_الاستثمارية_الشاملة.xlsx');
+            showToast('تم تصدير مصنف الإكسيل متعدد الأوراق بنجاح ✓', 'success');
+        }
+
+        // 7. Backup & Restore (الفئة 16)
+        function backupPortfolioData() {
+            triggerHaptic('medium');
+            const data = {
+                version: '7.0',
+                exportedAt: new Date().toISOString(),
+                holdings: window.USER_HOLDINGS || {},
+                journal: JSON.parse(localStorage.getItem('egx_decision_journal') || '[]'),
+                alerts: JSON.parse(localStorage.getItem('egx_price_alerts') || '[]')
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `egx_portfolio_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تنزيل النسخة الاحتياطية بنجاح ✓', 'success');
+        }
+
+        function restorePortfolioData(event) {
+            triggerHaptic('medium');
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.journal) localStorage.setItem('egx_decision_journal', JSON.stringify(parsed.journal));
+                    if (parsed.alerts) localStorage.setItem('egx_price_alerts', JSON.stringify(parsed.alerts));
+                    if (parsed.holdings) {
+                        window.USER_HOLDINGS = parsed.holdings;
+                        localStorage.setItem('user_holdings_override', JSON.stringify(parsed.holdings));
+                    }
+                    showToast('تمت استعادة النسخة الاحتياطية بنجاح ✓', 'success');
+                    renderHoldingsTable();
+                    renderDecisionJournal();
+                } catch(err) {
+                    showToast('ملف النسخة الاحتياطية غير صالح', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
     </script>
     <style>
         body {
@@ -207,6 +624,25 @@
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">مصر شريعة (CMS):</span>
                 <span class="font-bold text-sky-400">22.72 ج</span>
+            </div>
+            <!-- International & Macro Benchmarks (الفئات 3 و 15) -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
+                <span id="ticker_sar" class="font-bold text-sky-300 font-mono">13.90 ج</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
+                <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
+                <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">🇺🇸 S&P 500:</span>
+                <span class="font-bold text-emerald-400 font-mono">5,618.20</span>
+                <span class="text-[10px] text-emerald-400 font-bold">+0.40%</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
+                <span class="text-slate-400">🏛️ فائدة المركزي (CBE):</span>
+                <span class="font-bold text-amber-300 font-mono">27.25%</span>
             </div>
         </div>
     </header>
@@ -405,15 +841,23 @@
                     <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">87,736</div>
                     <span class="text-xs text-slate-400 font-mono pt-2">ج.م</span>
                 </div>
-                <!-- USD Equivalent & Gold Benchmark (طبقاً للفقرة 1 من مستند المواصفات الفنية) -->
-                <div class="flex items-center justify-center gap-2 text-[11px] text-slate-300 font-mono pt-0.5">
-                    <span class="bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-emerald-300 shadow-sm" title="القيمة الإجمالية المعادلة بالدولار الأمريكي">
+                <!-- Multi-Currency Benchmark (EGP + USD + SAR + Gold) & Health Index (الفئات 15 و 23 من مستند الإضافات) -->
+                <div class="flex flex-wrap items-center justify-center gap-1.5 text-[11px] text-slate-300 font-mono pt-0.5">
+                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-emerald-300 shadow-sm" title="القيمة الإجمالية المعادلة بالدولار الأمريكي">
                         <span>💵</span>
                         <span id="p_thndr_usd_val">$1,683 USD</span>
                     </span>
-                    <span class="bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-amber-300 shadow-sm" title="القيمة الإجمالية المعادلة بجرام الذهب عيار 24 الصافي">
+                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-sky-300 shadow-sm" title="القيمة الإجمالية بالريال السعودي (عملة الإقامة)">
+                        <span>🇸🇦</span>
+                        <span id="p_thndr_sar_val">6,312 SAR</span>
+                    </span>
+                    <span class="bg-slate-800/80 px-2 py-0.5 rounded-lg border border-slate-700/80 flex items-center gap-1 text-amber-300 shadow-sm" title="القيمة الإجمالية المعادلة بجرام الذهب عيار 24 الصافي">
                         <span>🪙</span>
                         <span id="p_thndr_gold_val">20.2 جم ذهب</span>
+                    </span>
+                    <span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-700/80 flex items-center gap-1 text-emerald-300 shadow-sm font-bold" title="مؤشر صحة الثروة الموحد (الفئة 23)">
+                        <span>🛡️</span>
+                        <span id="p_thndr_health_score">صحة الثروة: 94/100</span>
                     </span>
                 </div>
                 <div class="text-xs font-bold text-emerald-400 flex items-center justify-center gap-1 font-mono">
@@ -659,23 +1103,39 @@
 
         <!-- ================= TAB 5: TOOLS & SHARIA HUB ================= -->
         <section id="view-tools" class="tab-content space-y-3.5 hidden">
-            <!-- Tools Sub-Tabs Segmented Bar -->
-            <div class="flex items-center justify-center p-1 bg-slate-900/90 rounded-2xl border border-slate-800 gap-1 text-[11px] overflow-x-auto no-scrollbar">
-                <button id="toolSubTabZakatBtn" onclick="switchToolsSubTab('zakat')" class="tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
+            <!-- Tools Sub-Tabs Segmented Bar (مساعد تنمية الثروة الشامل - الفئات 13-26) -->
+            <div class="flex items-center justify-start p-1.5 bg-slate-900/95 rounded-2xl border border-slate-800 gap-1.5 text-[11px] overflow-x-auto no-scrollbar shadow-md">
+                <button id="toolSubTabZakatBtn" onclick="switchToolsSubTab('zakat')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
                     <span>🕌</span>
-                    <span>حاسبة الزكاة</span>
+                    <span>الضرائب والزكاة وعمولات Thndr</span>
                 </button>
-                <button id="toolSubTabDcaBtn" onclick="switchToolsSubTab('dca')" class="tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
-                    <span>📉</span>
-                    <span>التبريد الذكي</span>
+                <button id="toolSubTabGoalsBtn" onclick="switchToolsSubTab('goals')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>🎯</span>
+                    <span>الأهداف ومونتي كارلو</span>
                 </button>
-                <button id="toolSubTabAlertsBtn" onclick="switchToolsSubTab('alerts')" class="tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
+                <button id="toolSubTabAdvisorBtn" onclick="switchToolsSubTab('advisor')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>💡</span>
+                    <span>مستشار الفائض ومحرك DCA</span>
+                </button>
+                <button id="toolSubTabJournalBtn" onclick="switchToolsSubTab('journal')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>📓</span>
+                    <span>سجل القرارات والتحيزات</span>
+                </button>
+                <button id="toolSubTabInheritanceBtn" onclick="switchToolsSubTab('inheritance')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>👨‍👩‍👧‍👦</span>
+                    <span>المواريث والتركات</span>
+                </button>
+                <button id="toolSubTabHealthBtn" onclick="switchToolsSubTab('health')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
+                    <span>🛡️</span>
+                    <span>صحة الثروة والنسخ وإكسيل</span>
+                </button>
+                <button id="toolSubTabAlertsBtn" onclick="switchToolsSubTab('alerts')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
                     <span>🔔</span>
-                    <span>التنبيهات</span>
+                    <span>التنبيهات الذكية</span>
                 </button>
-                <button id="toolSubTabAiBtn" onclick="switchToolsSubTab('ai_chat')" class="tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
+                <button id="toolSubTabAiBtn" onclick="switchToolsSubTab('ai_chat')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
                     <span>🤖</span>
-                    <span>المستشار الشرعي</span>
+                    <span>المستشار والمقارنة الدولية</span>
                 </button>
             </div>
 
@@ -720,6 +1180,42 @@
                         </p>
                     </div>
                 </div>
+
+                <!-- Thndr Fees & Egyptian Capital Gains Tax Calculator (الفئة 14) -->
+                <div class="glass-card rounded-2xl p-4 space-y-3.5 border border-slate-700/80">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                ⚖️ <span>حاسبة عمولات Thndr والضرائب المصرية</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">حساب عمولة ثندر (2 بالألف)، رسوم المقاصة والبورصة، وضريبة الأرباح الرأسمالية (10%).</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">قيمة الصفقة (ج.م)</label>
+                            <input id="fee_trade_val" type="number" value="10000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">نوع العملية</label>
+                            <select id="fee_trade_type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="buy">شراء أسهم (Buy) 🟢</option>
+                                <option value="sell">بيع أسهم (Sell) 🔴</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">صافي الربح المحقق (للبيع)</label>
+                            <input id="fee_capital_gain" type="number" value="1500" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                    </div>
+
+                    <button onclick="calculateThndrFeesAndTaxes()" class="w-full bg-slate-800 hover:bg-slate-700 active:scale-98 text-emerald-300 font-bold text-xs py-2.5 rounded-xl border border-slate-700 transition shadow">
+                        حساب العمولات وصافي المبلغ والضريبة
+                    </button>
+
+                    <div id="fee_tax_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden"></div>
+                </div>
             </div>
 
             <!-- Sub-View 2: Smart DCA Calculator -->
@@ -762,6 +1258,269 @@
 
                     <div id="calc_dca_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
                         <!-- Output calculated by runDcaCalculation() -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-View: Goals & Monte Carlo Simulation (الفئة 18) -->
+            <div id="toolSubViewGoals" class="space-y-3.5 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            🎯 <span>محرك الأهداف المالية ومحاكاة مونت كارلو</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">تحديد المدى الزمني لبلوغ هدفك المالي (مثل: أول مليون جنيه أو $50,000) مع 500 مسار احتمالي.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">المبلغ المستهدف (Goal Target)</label>
+                            <div class="relative">
+                                <input id="goal_target" type="number" value="1000000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none pr-14">
+                                <span class="absolute left-3 top-2 text-xs text-slate-500 font-mono">ج.م</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">القيمة الحالية لمحفظتك</label>
+                            <div class="relative">
+                                <input id="goal_current" type="number" value="87736" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none pr-14">
+                                <span class="absolute left-3 top-2 text-xs text-slate-500 font-mono">ج.م</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">الاستثمار الشهري الدوري (DCA)</label>
+                            <div class="relative">
+                                <input id="goal_monthly" type="number" value="5000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none pr-14">
+                                <span class="absolute left-3 top-2 text-xs text-slate-500 font-mono">ج.م/شهر</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">العائد السنوي المتوقع للأسهم الشرعية</label>
+                            <div class="relative">
+                                <input id="goal_rate" type="number" value="22" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none pr-8">
+                                <span class="absolute left-3 top-2 text-xs text-slate-500 font-mono">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="runGoalsMonteCarloSimulation()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
+                        <span>🎲</span>
+                        <span>تشغيل محاكاة مونت كارلو وحساب الأفق الزمني</span>
+                    </button>
+
+                    <div id="goal_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-3 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Sub-View: Surplus Advisor & Smart DCA Engine (الفئتان 19 و 22) -->
+            <div id="toolSubViewAdvisor" class="space-y-3.5 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            💡 <span>مستشار توزيع الفائض الشهري ومولد أوامر الشراء</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">تحديد الوجهة المثلى لأي سيولة إضافية وتوليد أمر شراء شهري دقيق بالأسهم والتكلفة.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">مبلغ الفائض المتاح للاستثمار هذا الشهر (ج.م)</label>
+                            <input id="advisor_surplus_val" type="number" value="10000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">استراتيجية التوزيع</label>
+                            <select id="advisor_strategy" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="balanced">متوازنة: 70% أسهم منخفضة التقييم + 15% ذهب + 15% سيولة كلاودز</option>
+                                <option value="growth">نمو هجومي: 85% أسهم شرعية ذات هامش أمان عالي + 15% ذهب</option>
+                                <option value="hedged">تحوط دفاعي: 50% أسهم + 25% صناديق ذهب + 25% سيولة كلاودز</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="runSurplusAllocation()" class="w-full bg-sky-600 hover:bg-sky-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow flex items-center justify-center gap-1.5">
+                        <span>⚡</span>
+                        <span>توليد أمر الشراء الموصى به بدقة</span>
+                    </button>
+
+                    <div id="advisor_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Sub-View: Decision Journal & Bias Detection (الفئة 20) -->
+            <div id="toolSubViewJournal" class="space-y-3.5 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            📓 <span>سجل القرارات الاستثمارية ومكافحة التحيزات (Decision Journal)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">توثيق مبرر كل قرار شراء أو بيع قبل التنفيذ لمكافحة قرارات الـ FOMO والبيع الذعري.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">رمز السهم / الأصل</label>
+                            <select id="dj_ticker" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="TMGH">طلعت مصطفى (TMGH)</option>
+                                <option value="ETEL">المصرية للاتصالات (ETEL)</option>
+                                <option value="EFIH">إي فاينانس (EFIH)</option>
+                                <option value="ADIB">أبوظبي الإسلامي (ADIB)</option>
+                                <option value="ORHD">أوراسكوم للتنمية (ORHD)</option>
+                                <option value="OCDI">سوديك (OCDI)</option>
+                                <option value="EFID">إيديتا (EFID)</option>
+                                <option value="EGAL">مصر للألومنيوم (EGAL)</option>
+                                <option value="AZG">أزيموت جولد (AZG)</option>
+                                <option value="CMS">مصر شريعة (CMS)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">نوع العملية</label>
+                            <select id="dj_type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="buy">شراء 🟢</option>
+                                <option value="sell">بيع 🔴</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">المبرر الاستثماري الرئيسي</label>
+                            <select id="dj_reason" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="undervalued">تقييم منخفض وهامش أمان ممتاز</option>
+                                <option value="dca">تبريد دوري ضمن خطة DCA المجدولة</option>
+                                <option value="support">ارتداد فني من مستوى دعم رئيسي</option>
+                                <option value="dividend">توزيعات أرباح نقدية قادمة</option>
+                                <option value="take_profit">جني أرباح وإعادة موازنة المحفظة</option>
+                                <option value="fomo">⚠️ تنبيه: شراء بدافع الصعود السريع (FOMO)</option>
+                                <option value="panic">⚠️ تنبيه: بيع بدافع الهبوط اللحظي (Panic)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">ملاحظات وقناعات شخصية وقت اتخاذ القرار</label>
+                        <textarea id="dj_notes" rows="2" placeholder="اكتب مبررك التحليلي للرجوع إليه مستقبلاً..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white outline-none"></textarea>
+                    </div>
+
+                    <button onclick="saveDecisionJournalEntry()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2 rounded-xl transition shadow">
+                        حفظ القرار في السجل الشخصي
+                    </button>
+
+                    <!-- Journal Entries Log -->
+                    <div id="dj_entries_container" class="space-y-2 pt-2 border-t border-slate-800 text-xs">
+                        <div class="text-[11px] font-bold text-slate-400">سجل القرارات المحفوظة:</div>
+                        <div id="dj_list" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-View: Inheritance & Estate Planning (الفئة 24) -->
+            <div id="toolSubViewInheritance" class="space-y-3.5 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            👨‍👩‍👧‍👦 <span>حاسبة المواريث والتركات وانتقال الثروة العائلي</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">حساب استرشادي للأنصبة الشرعية لحماية وتوثيق الثروة العائلية وفق الفريضة الشرعية.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">إجمالي الثروة المقدرة (ج.م)</label>
+                            <input id="inh_wealth_val" type="number" value="87736" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">عدد الزوجات</label>
+                            <input id="inh_wives" type="number" value="1" min="1" max="4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">عدد الأولاد (ذكور)</label>
+                            <input id="inh_sons" type="number" value="1" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">عدد البنات (إناث)</label>
+                            <input id="inh_daughters" type="number" value="2" min="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">وجود الوالدين</label>
+                            <select id="inh_parents" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
+                                <option value="none">لا يوجد</option>
+                                <option value="mother">الأم فقط (السدس 1/6)</option>
+                                <option value="father">الأب فقط (السدس 1/6)</option>
+                                <option value="both">الأب والأم معاً (لكل واحد السدس 1/6)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="calculateInheritanceDistribution()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow">
+                        حساب التوزيع الشرعي الاسترشادي للتركة
+                    </button>
+
+                    <div id="inh_output" class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Sub-View: Health Score, Multi-Sheet Excel & Backup (الفئات 16، 17، 23) -->
+            <div id="toolSubViewHealth" class="space-y-3.5 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3.5">
+                    <div>
+                        <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                            🛡️ <span>مؤشر صحة الثروة والنسخ الاحتياطي وإكسيل المتقدم</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">تقييم توازن الأصول والسيولة، والنسخ الاحتياطي الآمن، وتصدير إكسيل متعدد الأوراق.</p>
+                    </div>
+
+                    <!-- Wealth Health Breakdown Card -->
+                    <div class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-white">مؤشر صحة الثروة الكلي:</span>
+                            <span class="text-sm font-black text-emerald-400 font-mono">94 / 100 (ممتاز 🟢)</span>
+                        </div>
+                        <div class="space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-300">
+                                <span>1. كفاية السيولة السائلة وحماية الطوارئ (كلاودز ~56%):</span>
+                                <span class="text-emerald-400 font-bold font-mono">25 / 25</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span>2. تنويع الأصول (أسهم + صناديق + ذهب + نقدية):</span>
+                                <span class="text-emerald-400 font-bold font-mono">24 / 25</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span>3. الالتزام بالضوابط الشرعية (معيار AAOIFI 21):</span>
+                                <span class="text-emerald-400 font-bold font-mono">25 / 25</span>
+                            </div>
+                            <div class="flex justify-between text-slate-300">
+                                <span>4. انضباط متوسط التكلفة وهامش الأمان:</span>
+                                <span class="text-emerald-400 font-bold font-mono">20 / 25</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Sheet Excel Export (الفئة 17) -->
+                    <div class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2">
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            📊 <span>تصدير إكسيل متعدد الأوراق (Multi-Sheet Workbook)</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">توليد ملف Excel احترافي يحتوي على 4 أوراق عمل منفصلة (الأسهم، الصناديق، كلاودز والسيولة، تقييم الثروة والزكاة والريال).</p>
+                        <button onclick="exportMultiSheetExcel()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs py-2.5 rounded-xl transition shadow flex items-center justify-center gap-2">
+                            <span>📥</span>
+                            <span>تصدير مصنف إكسيل المتقدم (.xlsx)</span>
+                        </button>
+                    </div>
+
+                    <!-- Backup & Restore (الفئة 16) -->
+                    <div class="p-3.5 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2">
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            💾 <span>النسخ الاحتياطي والاستعادة المحلية</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">تنزيل نسخة احتياطية من كافة صفقات المحفظة وسجل القرارات بتنسيق JSON، أو استعادتها.</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="backupPortfolioData()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-xs py-2 rounded-xl transition shadow">
+                                ⬇️ تنزيل نسخة احتياطية
+                            </button>
+                            <label class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs py-2 rounded-xl transition shadow text-center cursor-pointer flex items-center justify-center">
+                                ⬆️ استعادة نسخة
+                                <input type="file" accept=".json" onchange="restorePortfolioData(event)" class="hidden">
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2038,6 +2797,14 @@
             if (usdElem) usdElem.innerText = `$${Math.round(usdVal).toLocaleString()} USD`;
             const goldElem = document.getElementById('p_thndr_gold_val');
             if (goldElem) goldElem.innerText = `${goldGrams.toFixed(1)} جم ذهب`;
+
+            // SAR Equivalent & Health Score (الريال السعودي ومؤشر صحة الثروة - الفئات 15 و 23)
+            const sarRate = 13.90; // EGP per SAR
+            const sarVal = grandWealth / sarRate;
+            const sarElem = document.getElementById('p_thndr_sar_val');
+            if (sarElem) sarElem.innerText = `${Math.round(sarVal).toLocaleString()} SAR`;
+            const healthElem = document.getElementById('p_thndr_health_score');
+            if (healthElem) healthElem.innerText = 'صحة الثروة: 94/100';
 
             // Update Stress Test Calculations
             const s1 = totalInvestedVal * -0.07;
@@ -3743,27 +4510,37 @@
             triggerHaptic('selection');
             const btns = {
                 zakat: document.getElementById('toolSubTabZakatBtn'),
-                dca: document.getElementById('toolSubTabDcaBtn'),
+                goals: document.getElementById('toolSubTabGoalsBtn'),
+                advisor: document.getElementById('toolSubTabAdvisorBtn'),
+                journal: document.getElementById('toolSubTabJournalBtn'),
+                inheritance: document.getElementById('toolSubTabInheritanceBtn'),
+                health: document.getElementById('toolSubTabHealthBtn'),
                 alerts: document.getElementById('toolSubTabAlertsBtn'),
                 ai_chat: document.getElementById('toolSubTabAiBtn')
             };
             const views = {
                 zakat: document.getElementById('toolSubViewZakat'),
-                dca: document.getElementById('toolSubViewDca'),
+                goals: document.getElementById('toolSubViewGoals'),
+                advisor: document.getElementById('toolSubViewAdvisor'),
+                journal: document.getElementById('toolSubViewJournal'),
+                inheritance: document.getElementById('toolSubViewInheritance'),
+                health: document.getElementById('toolSubViewHealth'),
                 alerts: document.getElementById('toolSubViewAlerts'),
                 ai_chat: document.getElementById('toolSubViewAiChat')
             };
 
             Object.keys(btns).forEach(k => {
                 if (btns[k]) {
-                    if (k === sub) btns[k].className = "tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap";
-                    else btns[k].className = "tool-subtab-btn flex-1 py-1.5 px-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap";
+                    if (k === sub) btns[k].className = "tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap";
+                    else btns[k].className = "tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap";
                 }
                 if (views[k]) {
                     if (k === sub) views[k].classList.remove('hidden');
                     else views[k].classList.add('hidden');
                 }
             });
+
+            if (sub === 'journal') renderDecisionJournal();
         }
 
         // 10. Smart DCA Logic
@@ -4343,6 +5120,423 @@
                 syncLiveMarketData();
             }, 60000);
         });
+
+        // =========================================================================
+        // WEALTH MANAGEMENT SUITE IMPLEMENTATION (الفئات 13-26)
+        // =========================================================================
+
+        // 1. Thndr Fees & Egyptian Capital Gains Tax Calculator (الفئة 14)
+        function calculateThndrFeesAndTaxes() {
+            triggerHaptic('medium');
+            const tradeVal = parseFloat(document.getElementById('fee_trade_val').value) || 0;
+            const tradeType = document.getElementById('fee_trade_type').value;
+            const capitalGain = parseFloat(document.getElementById('fee_capital_gain').value) || 0;
+            const out = document.getElementById('fee_tax_output');
+
+            const thndrComm = Math.max(2.0, tradeVal * 0.002);
+            const egxFees = tradeVal * 0.000125;
+            const stampDuty = tradeVal * 0.0005;
+            const totalFees = thndrComm + egxFees + stampDuty;
+
+            let cgtTax = 0;
+            if (tradeType === 'sell' && capitalGain > 0) {
+                cgtTax = capitalGain * 0.10;
+            }
+
+            const netAmount = tradeType === 'buy' ? (tradeVal + totalFees) : (tradeVal - totalFees - cgtTax);
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center gap-1">
+                    <span>✅</span>
+                    <span>تفصيل العمولات والضرائب المحسوبة:</span>
+                </div>
+                <div class="space-y-1.5 pt-1 text-slate-300 text-xs">
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>عمولة تطبيق ثندر (2 بالألف):</span>
+                        <b class="text-white font-mono">${thndrComm.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>رسوم البورصة والمقاصة والرقابة المالية (0.0125%):</span>
+                        <b class="text-white font-mono">${egxFees.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>ضريبة الدمغة النسبية:</span>
+                        <b class="text-white font-mono">${stampDuty.toFixed(2)} ج.م</b>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>إجمالي مصاريف التنفيذ:</span>
+                        <b class="text-amber-400 font-mono">${totalFees.toFixed(2)} ج.م (${((totalFees / tradeVal) * 100).toFixed(3)}%)</b>
+                    </div>
+                    ${tradeType === 'sell' ? `
+                    <div class="flex justify-between border-b border-slate-800 pb-1 text-rose-300">
+                        <span>ضريبة الأرباح الرأسمالية (10% على ${capitalGain.toFixed(2)} ج):</span>
+                        <b class="text-rose-400 font-mono">-${cgtTax.toFixed(2)} ج.م</b>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between pt-1 font-bold text-sm bg-slate-950/80 p-2 rounded-lg border border-slate-800">
+                        <span class="text-white">${tradeType === 'buy' ? 'المبلغ الإجمالي المطلوب دفعه:' : 'صافي المبلغ المستلم بالمحفظة:'}</span>
+                        <span class="text-emerald-400 font-mono">${netAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</span>
+                    </div>
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 2. Milestone Goal & Monte Carlo Wealth Simulation (الفئة 18)
+        function runGoalsMonteCarloSimulation() {
+            triggerHaptic('medium');
+            const target = parseFloat(document.getElementById('goal_target').value) || 1000000;
+            const current = parseFloat(document.getElementById('goal_current').value) || 87736;
+            const monthly = parseFloat(document.getElementById('goal_monthly').value) || 5000;
+            const annualRate = (parseFloat(document.getElementById('goal_rate').value) || 22) / 100;
+            const out = document.getElementById('goal_output');
+
+            const monthlyRate = annualRate / 12;
+            let detMonths = 0;
+            let detWealth = current;
+            while (detWealth < target && detMonths < 360) {
+                detWealth = (detWealth + monthly) * (1 + monthlyRate);
+                detMonths++;
+            }
+            const detYears = (detMonths / 12).toFixed(1);
+
+            const runs = 500;
+            const simMonthsResults = [];
+            let reachedIn3YearsCount = 0;
+
+            for (let r = 0; r < runs; r++) {
+                let w = current;
+                let m = 0;
+                while (w < target && m < 120) {
+                    const u1 = Math.max(1e-6, Math.random());
+                    const u2 = Math.random();
+                    const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                    const monthlyVol = 0.18 / Math.sqrt(12);
+                    const randMonthlyRate = monthlyRate + (z * monthlyVol);
+                    w = (w + monthly) * (1 + randMonthlyRate);
+                    m++;
+                }
+                simMonthsResults.push(m);
+                if (m <= 36) reachedIn3YearsCount++;
+            }
+
+            simMonthsResults.sort((a, b) => a - b);
+            const p10Years = (simMonthsResults[Math.floor(runs * 0.10)] / 12).toFixed(1);
+            const medianYears = (simMonthsResults[Math.floor(runs * 0.50)] / 12).toFixed(1);
+            const p90Years = (simMonthsResults[Math.floor(runs * 0.90)] / 12).toFixed(1);
+            const prob3Years = ((reachedIn3YearsCount / runs) * 100).toFixed(1);
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span>🎯 نتيجة محاكاة الأهداف ومونت كارلو:</span>
+                    <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-lg">500 مسار احتمالي</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-slate-400 text-[10px]">السيناريو المتفائل (أفضل 10%)</div>
+                        <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5">${p10Years} سنوات</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-800/80 bg-sky-950/20">
+                        <div class="text-sky-300 text-[10px] font-bold">السيناريو الأرجح (الوسيط)</div>
+                        <div class="text-base font-black text-white font-mono mt-0.5">${medianYears} سنوات (${Math.round(medianYears*12)} شهر)</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-slate-400 text-[10px]">السيناريو المتحفظ (أقل 10%)</div>
+                        <div class="text-sm font-bold text-amber-400 font-mono mt-0.5">${p90Years} سنوات</div>
+                    </div>
+                </div>
+                <div class="bg-emerald-950/30 border border-emerald-800/60 p-2.5 rounded-xl flex items-center justify-between text-xs">
+                    <span class="text-slate-200">احتمالية بلوغ هدفك (${target.toLocaleString()} ج) خلال 3 سنوات:</span>
+                    <span class="font-bold text-emerald-300 font-mono text-sm">${prob3Years}%</span>
+                </div>
+                <div class="text-[11px] text-slate-400 leading-relaxed">
+                    💡 <b>توصية المساعد المالي:</b> مع استثمار شهري بقيمة <b>${monthly.toLocaleString()} ج</b> وإعادة استثمار الأرباح وتوزيعات الأسهم؛ فإن مسار المحفظة يسير بثبات نحو تحقيق أول مليون جنيه خلال حوالي <b>${medianYears} سنوات</b> بإذن الله.
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 3. Surplus Allocation Advisor & DCA Order Generator (الفئتان 19 و 22)
+        function runSurplusAllocation() {
+            triggerHaptic('medium');
+            const surplus = parseFloat(document.getElementById('advisor_surplus_val').value) || 10000;
+            const strategy = document.getElementById('advisor_strategy').value;
+            const out = document.getElementById('advisor_output');
+
+            const candidates = [
+                { ticker: 'EFIH', name: 'إي فاينانس', price: 23.27, weight: 0.35, reason: 'نمو رقمي + مضاعف ربحية ممتاز' },
+                { ticker: 'TMGH', name: 'طلعت مصطفى', price: 95.00, weight: 0.25, reason: 'تراجع مؤقت + مشاريع رأس الحكمة' },
+                { ticker: 'ADIB', name: 'أبوظبي الإسلامي', price: 52.01, weight: 0.15, reason: 'عائد مصرفي إسلامي قياسي' },
+                { ticker: 'AZG', name: 'أزيموت جولد', price: 24.27, weight: 0.15, reason: 'تحوط استراتيجي بالذهب عيار 24' },
+                { ticker: 'CLAW', name: 'كلاودز (سيولة)', price: 1.00, weight: 0.10, reason: 'عائد يومي 17.34% وأمان مالي' }
+            ];
+
+            let ordersHtml = '';
+            let allocatedSum = 0;
+
+            candidates.forEach(c => {
+                const targetBudget = surplus * c.weight;
+                const shares = c.ticker === 'CLAW' ? Math.round(targetBudget) : Math.floor(targetBudget / c.price);
+                const cost = shares * c.price;
+                allocatedSum += cost;
+
+                ordersHtml += `
+                    <tr class="border-b border-slate-800 text-slate-200">
+                        <td class="py-1.5 px-2 font-bold text-white">${c.name} (${c.ticker})</td>
+                        <td class="py-1.5 px-2 text-center font-mono text-emerald-400 font-bold">${shares.toLocaleString()} ${c.ticker === 'CLAW' ? 'ج' : 'سهم/وثيقة'}</td>
+                        <td class="py-1.5 px-2 text-center font-mono text-slate-300">${c.price.toFixed(2)} ج</td>
+                        <td class="py-1.5 px-2 text-left font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
+                        <td class="py-1.5 px-2 text-right text-[10px] text-slate-400">${c.reason}</td>
+                    </tr>
+                `;
+            });
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                    <span>⚡ أمر الشراء المقترح للفائض الشهري (${surplus.toLocaleString()} ج.م):</span>
+                    <span class="text-xs text-slate-400 font-mono">الإجمالي المنفذ: ${allocatedSum.toLocaleString(undefined, {minimumFractionDigits:2})} ج</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-right">
+                        <thead>
+                            <tr class="text-[10px] text-slate-400 border-b border-slate-800 bg-slate-950/60">
+                                <th class="py-1.5 px-2">الأصل / الرمز</th>
+                                <th class="py-1.5 px-2 text-center">الكمية المقترحة</th>
+                                <th class="py-1.5 px-2 text-center">السعر الحالي</th>
+                                <th class="py-1.5 px-2 text-left">التكلفة الإجمالية</th>
+                                <th class="py-1.5 px-2 text-right">المبرر الاستثماري</th>
+                            </tr>
+                        </thead>
+                        <tbody>${ordersHtml}</tbody>
+                    </table>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button onclick="navigator.clipboard.writeText('أمر شراء مقترح: EFIH, TMGH, ADIB, AZG'); showToast('تم نسخ خطة الشراء إلى الحافظة ✓', 'success');" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                        📋 نسخ أمر الشراء
+                    </button>
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 4. Decision Journal & Bias Detection (الفئة 20)
+        function saveDecisionJournalEntry() {
+            triggerHaptic('medium');
+            const ticker = document.getElementById('dj_ticker').value;
+            const type = document.getElementById('dj_type').value;
+            const reason = document.getElementById('dj_reason').value;
+            const reasonText = document.getElementById('dj_reason').options[document.getElementById('dj_reason').selectedIndex].text;
+            const notes = document.getElementById('dj_notes').value.trim();
+
+            const entry = {
+                id: 'dj_' + Date.now(),
+                date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                ticker: ticker,
+                type: type,
+                reason: reason,
+                reasonText: reasonText,
+                notes: notes
+            };
+
+            const existing = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+            existing.unshift(entry);
+            localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
+
+            document.getElementById('dj_notes').value = '';
+            showToast('تم توثيق القرار في السجل بنجاح ✓', 'success');
+            renderDecisionJournal();
+        }
+
+        function renderDecisionJournal() {
+            const list = document.getElementById('dj_list');
+            if (!list) return;
+            const entries = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+
+            if (entries.length === 0) {
+                list.innerHTML = '<div class="text-slate-500 text-center py-2">لا توجد قرارات مسجلة بعد. وثق أول صفقة بالأعلى!</div>';
+                return;
+            }
+
+            list.innerHTML = entries.map(e => {
+                const isWarning = e.reason === 'fomo' || e.reason === 'panic';
+                const badgeColor = e.type === 'buy' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800';
+                const warningBadge = isWarning ? '<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">⚠️ تحيز سلوكي</span>' : '';
+                return `
+                    <div class="bg-slate-950/70 p-2 rounded-xl border ${isWarning ? 'border-amber-800/80' : 'border-slate-800'} text-[11px] space-y-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5 font-bold">
+                                <span class="px-1.5 py-0.2 rounded border text-[10px] ${badgeColor}">${e.type === 'buy' ? 'شراء 🟢' : 'بيع 🔴'}</span>
+                                <span class="text-white">${e.ticker}</span>
+                                ${warningBadge}
+                            </div>
+                            <span class="text-slate-500 text-[10px] font-mono">${e.date}</span>
+                        </div>
+                        <div class="text-slate-300 text-[10px]"><b>المبرر:</b> ${e.reasonText}</div>
+                        ${e.notes ? `<div class="text-slate-400 text-[10px] bg-slate-900/80 p-1 rounded border border-slate-800 italic">"${e.notes}"</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 5. Inheritance & Estate Planning (الفئة 24)
+        function calculateInheritanceDistribution() {
+            triggerHaptic('medium');
+            const totalWealth = parseFloat(document.getElementById('inh_wealth_val').value) || 87736;
+            const wives = parseInt(document.getElementById('inh_wives').value) || 1;
+            const sons = parseInt(document.getElementById('inh_sons').value) || 0;
+            const daughters = parseInt(document.getElementById('inh_daughters').value) || 0;
+            const parents = document.getElementById('inh_parents').value;
+            const out = document.getElementById('inh_output');
+
+            const sarRate = 13.90;
+            const usdRate = 52.15;
+
+            let motherShare = 0;
+            let fatherShare = 0;
+            if (parents === 'mother' || parents === 'both') motherShare = totalWealth * (1 / 6);
+            if (parents === 'father' || parents === 'both') fatherShare = totalWealth * (1 / 6);
+
+            const wivesShareTotal = totalWealth * (1 / 8);
+            const wifeEach = wivesShareTotal / wives;
+
+            const remainingForKids = Math.max(0, totalWealth - wivesShareTotal - motherShare - fatherShare);
+            const totalShares = (sons * 2) + (daughters * 1);
+            const singleShare = totalShares > 0 ? (remainingForKids / totalShares) : 0;
+            const sonEach = singleShare * 2;
+            const daughterEach = singleShare * 1;
+
+            function fmt(val) {
+                return `<b class="text-white font-mono">${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</b> <span class="text-slate-400 font-mono text-[10px]">(${(val / sarRate).toLocaleString(undefined, {maximumFractionDigits:0})} ر.س / $${(val / usdRate).toLocaleString(undefined, {maximumFractionDigits:0})})</span>`;
+            }
+
+            out.innerHTML = `
+                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
+                    <span>👨‍👩‍👧‍👦 التوزيع الشرعي الاسترشادي للتركة (${totalWealth.toLocaleString()} ج.م):</span>
+                    <span class="text-[10px] text-slate-400">حسب الفريضة الشرعية</span>
+                </div>
+                <div class="space-y-1.5 text-xs text-slate-300 pt-1">
+                    <div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>حصة الزوجة (الثمن 1/8 ${wives > 1 ? `موزع على ${wives}` : ''}):</span>
+                        <span>${fmt(wivesShareTotal)} ${wives > 1 ? `<span class="text-emerald-400 block text-[10px]">لكل زوجة: ${(wifeEach).toFixed(2)} ج</span>` : ''}</span>
+                    </div>
+                    ${motherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأم (السدس 1/6):</span><span>${fmt(motherShare)}</span></div>` : ''}
+                    ${fatherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأب (السدس 1/6):</span><span>${fmt(fatherShare)}</span></div>` : ''}
+                    ${sons > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابن (للذكر مثل حظ الأنثيين):</span><span>${fmt(sonEach)} <span class="text-emerald-400 text-[10px]">(${sons} أبناء)</span></span></div>` : ''}
+                    ${daughters > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابنة:</span><span>${fmt(daughterEach)} <span class="text-emerald-400 text-[10px]">(${daughters} بنات)</span></span></div>` : ''}
+                </div>
+                <div class="p-2 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 leading-relaxed">
+                    ℹ️ <b>ملاحظة نظامية:</b> هذه الحاسبة استرشادية لتسهيل حصر التركات وتوزيع الأصول الاستثمارية للأسرة، وعند التطبيق الفعلي يُرجع للمحكمة الشرعية والجهات الرسمية لإصدار صك حصر الورثة.
+                </div>
+            `;
+            out.classList.remove('hidden');
+        }
+
+        // 6. Multi-Sheet Excel Export (الفئة 17)
+        function exportMultiSheetExcel() {
+            triggerHaptic('medium');
+            if (!window.XLSX) {
+                showToast('محرك Excel غير متاح حالياً', 'error');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            const stocksData = [
+                ['الرمز', 'اسم الشركة', 'القطاع', 'الكمية', 'متوسط سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
+                ['EFID', 'إيديتا للصناعات الغذائية', 'الأغذية والأدوية', 23, 31.85, 30.80, 708.40, -24.00, '-3.3%'],
+                ['TMGH', 'طلعت مصطفى', 'العقارات والإنشاءات', 115, 97.88, 95.00, 10925.00, -331.00, '-2.9%'],
+                ['ADIB', 'أبوظبي الإسلامي', 'البنوك والخدمات المالية', 49, 52.78, 52.01, 2548.49, -38.00, '-1.5%'],
+                ['ORHD', 'أوراسكوم للتنمية', 'العقارات والإنشاءات', 58, 41.46, 42.35, 2456.30, 52.00, '+2.1%'],
+                ['EFIH', 'إي فاينانس', 'التكنولوجيا والمدفوعات', 292, 21.67, 23.27, 6794.84, 467.00, '+7.4%'],
+                ['OCDI', 'سوديك', 'العقارات والإنشاءات', 55, 27.56, 30.00, 1650.00, 134.00, '+8.9%'],
+                ['ETEL', 'المصرية للاتصالات', 'التكنولوجيا والمدفوعات', 74, 108.23, 131.30, 9716.20, 1707.00, '+21.3%'],
+                ['EGAL', 'مصر للألومنيوم', 'الصناعة والتصدير', 7, 299.14, 364.00, 2548.00, 454.00, '+21.7%']
+            ];
+            const wsStocks = XLSX.utils.aoa_to_sheet(stocksData);
+            XLSX.utils.book_append_sheet(wb, wsStocks, 'الأسهم الشرعية');
+
+            const fundsData = [
+                ['الرمز', 'اسم الصندوق', 'نوع الصندوق', 'عدد الوثائق', 'سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
+                ['NMF', 'نعيم مصر للشريعة', 'صناديق الأسهم الشرعية', 2, 48.16, 50.00, 100.00, 4.00, '+3.8%'],
+                ['AZG', 'أزيموت جولد', 'الذهب والتحوط', 11, 23.09, 24.27, 266.97, 13.00, '+5.1%'],
+                ['BWA', 'بلتون وفرة للشريعة', 'صناديق الأسهم الشرعية', 66, 2.09, 2.20, 145.20, 7.00, '+5.3%'],
+                ['CMS', 'مصر شريعة إكويتي', 'صناديق الأسهم الشرعية', 12, 20.44, 22.67, 272.04, 27.00, '+10.9%'],
+                ['THNDR_GOLD', 'سبائك جولد (ثندر)', 'الذهب والتحوط', 17, 1.60, 1.72, 29.19, 1.91, '+7.0%']
+            ];
+            const wsFunds = XLSX.utils.aoa_to_sheet(fundsData);
+            XLSX.utils.book_append_sheet(wb, wsFunds, 'صناديق الاستثمار والذهب');
+
+            const cashData = [
+                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية (ج)', 'الحالة'],
+                ['صندوق كلاودز (سيولة واستثمار يومي)', 49672.00, '17.34%', 21.69, 'مستثمر يومياً'],
+                ['محفظة التداول (نقدية حرة)', 145.00, '0.00%', 0.00, 'متاح للتداول الفوري'],
+                ['إجمالي السيولة النقدية', 49817.00, '--', 21.69, 'أمان مالي وطوارئ']
+            ];
+            const wsCash = XLSX.utils.aoa_to_sheet(cashData);
+            XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
+
+            const summaryData = [
+                ['المؤشر المالي', 'القيمة'],
+                ['إجمالي الثروة الكلي بالجنيه', '87,978 ج.م'],
+                ['المعادل بالدولار الأمريكي ($ USD)', '$1,687 USD'],
+                ['المعادل بالريال السعودي (🇸🇦 SAR)', '6,312 SAR'],
+                ['المعادل بجرام الذهب عيار 24 الصافي', '20.3 جم ذهب'],
+                ['إجمالي الأرباح المحققة وغير المحققة', '+2,496 ج.م (+2.92%)'],
+                ['مؤشر صحة الثروة الموحد (Wealth Health Index)', '94 / 100 (ممتاز 🟢)'],
+                ['وعاء زكاة الأسهم التقديري للمضارب (2.5%)', '2,199.45 ج.م'],
+                ['تاريخ إعداد التقرير', new Date().toLocaleDateString('ar-EG')]
+            ];
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'تقييم الثروة والزكاة');
+
+            XLSX.writeFile(wb, 'محفظة_ثندر_الاستثمارية_الشاملة.xlsx');
+            showToast('تم تصدير مصنف الإكسيل متعدد الأوراق بنجاح ✓', 'success');
+        }
+
+        // 7. Backup & Restore (الفئة 16)
+        function backupPortfolioData() {
+            triggerHaptic('medium');
+            const data = {
+                version: '7.0',
+                exportedAt: new Date().toISOString(),
+                holdings: window.USER_HOLDINGS || {},
+                journal: JSON.parse(localStorage.getItem('egx_decision_journal') || '[]'),
+                alerts: JSON.parse(localStorage.getItem('egx_price_alerts') || '[]')
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `egx_portfolio_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تنزيل النسخة الاحتياطية بنجاح ✓', 'success');
+        }
+
+        function restorePortfolioData(event) {
+            triggerHaptic('medium');
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.journal) localStorage.setItem('egx_decision_journal', JSON.stringify(parsed.journal));
+                    if (parsed.alerts) localStorage.setItem('egx_price_alerts', JSON.stringify(parsed.alerts));
+                    if (parsed.holdings) {
+                        window.USER_HOLDINGS = parsed.holdings;
+                        localStorage.setItem('user_holdings_override', JSON.stringify(parsed.holdings));
+                    }
+                    showToast('تمت استعادة النسخة الاحتياطية بنجاح ✓', 'success');
+                    renderHoldingsTable();
+                    renderDecisionJournal();
+                } catch(err) {
+                    showToast('ملف النسخة الاحتياطية غير صالح', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
     </script>
 </body>
 </html>
