@@ -840,6 +840,23 @@
                 </div>
             </div>
 
+                        <!-- Mobile vs Table View Mode Switcher -->
+            <div class="flex items-center justify-between pb-1 px-1">
+                <div class="flex items-center gap-1.5 text-xs text-slate-300">
+                    <span class="font-bold">طريقة عرض أصول المحفظة:</span>
+                </div>
+                <div class="inline-flex bg-slate-900 dark:bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px]">
+                    <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="كروت الجوال الذكية المريحة">
+                        <span>📱</span>
+                        <span>كروت الجوال</span>
+                    </button>
+                    <button id="viewModeTableBtn" onclick="setPortfolioViewMode('table')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="عرض جدول البيانات الكامل">
+                        <span>📊</span>
+                        <span>جدول مفصل</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- 1. SECTION: STOCKS (الأسهم في الأعلى) -->
             <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40">
                 <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
@@ -858,8 +875,14 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
+                <!-- Stocks Mobile Cards View -->
+                <div id="stocksHoldingsCardsContainer" class="space-y-2.5">
+                    <!-- Populated dynamically with Mobile Cards -->
+                </div>
+
+                <!-- Stocks Full Table View (Horizontal Scrollable) -->
+                <div id="stocksHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
+                    <table class="w-full text-right text-xs min-w-[580px]">
                         <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
                             <tr>
                                 <th class="pb-2">السهم</th>
@@ -893,8 +916,14 @@
                     <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">813 ج.م (+7.0%)</span>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-right text-xs">
+                <!-- Funds Mobile Cards View -->
+                <div id="fundsHoldingsCardsContainer" class="space-y-2.5">
+                    <!-- Populated dynamically with Mobile Cards -->
+                </div>
+
+                <!-- Funds Full Table View (Horizontal Scrollable) -->
+                <div id="fundsHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
+                    <table class="w-full text-right text-xs min-w-[580px]">
                         <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
                             <tr>
                                 <th class="pb-2">الصندوق / الأصل</th>
@@ -1592,50 +1621,62 @@
         </div>
     </nav>
 
-        <!-- Interactive Advanced Stock Hub Modal -->
-    <div id="stockChartModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-2 sm:p-4 hidden">
-        <div class="glass-card w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl p-3.5 sm:p-5 space-y-3 border border-slate-700 bg-slate-900/95 shadow-2xl overflow-hidden">
+        <!-- Interactive Advanced Stock Hub Modal (Full-Screen on Mobile, Card on Desktop) -->
+    <div id="stockChartModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+        <div class="glass-card w-full max-w-3xl h-[95vh] sm:h-auto max-h-[95vh] flex flex-col rounded-t-3xl sm:rounded-3xl p-3.5 sm:p-5 space-y-2.5 border border-slate-700 bg-slate-900/98 shadow-2xl overflow-hidden">
             
-            <!-- Modal Header: Ticker, Name, Sector, Sharia, Live Price & Quick Actions -->
-            <div class="flex items-start justify-between border-b border-slate-800 pb-2.5 shrink-0">
-                <div class="flex items-center gap-2.5 sm:gap-3">
-                    <div id="modalHeaderIcon" class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-sky-500/20 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/30 shrink-0">
-                        📈
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h3 id="modalChartTitle" class="text-sm sm:text-base font-bold text-white">تفاصيل وتحليل السهم</h3>
-                            <span id="modalShariaBadge" class="text-[10px] bg-emerald-950/90 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-md font-bold">متوافق 100% 🕌</span>
+            <!-- Mobile Drag Indicator -->
+            <div class="w-12 h-1.5 bg-slate-600 rounded-full mx-auto sm:hidden -mt-1 mb-1 shrink-0"></div>
+
+            <!-- Modal Header: Asset, Name, Sharia, Live Price & Action Suite -->
+            <div class="border-b border-slate-800 pb-2 shrink-0 space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div id="modalHeaderIcon" class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/20 to-sky-500/20 text-emerald-400 flex items-center justify-center font-bold text-base border border-emerald-500/30 shrink-0">
+                            📈
                         </div>
-                        <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5 flex-wrap">
-                            <span id="modalStockSector" class="text-slate-300 font-medium">القطاع</span>
-                            <span>•</span>
-                            <span id="modalChartPrice" class="font-bold text-white text-sm">0.00 ج.م</span>
-                            <span id="modalChartChg" class="text-[10px] font-bold px-1.5 py-0.2 rounded border bg-emerald-950 text-emerald-400 border-emerald-800">+0.00%</span>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <h3 id="modalChartTitle" class="text-sm sm:text-base font-bold text-white truncate">تفاصيل وتحليل السهم</h3>
+                                <span id="modalShariaBadge" class="text-[9px] sm:text-[10px] bg-emerald-950/90 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-md font-bold shrink-0">متوافق 100% 🕌</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+                                <span id="modalStockSector" class="text-slate-300 font-medium">القطاع</span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Close Button (Big Thumb Target) -->
+                    <button onclick="closeChartModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-base transition shrink-0 active:scale-90" title="إغلاق النافذة">✕</button>
                 </div>
 
-                <!-- Quick Actions & Close (شراء، بيع، تبريد، إغلاق) -->
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'buy');" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="شراء للسهم / زيادة كمية">
-                        <span>🟢</span>
-                        <span class="hidden xs:inline">شراء</span>
-                    </button>
-                    <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'sell');" class="bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-800/80 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="بيع من السهم / تخفيض كمية">
-                        <span>🔴</span>
-                        <span class="hidden xs:inline">بيع</span>
-                    </button>
-                    <button onclick="quickDcaFromModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold px-2 py-1.5 rounded-xl transition flex items-center gap-1 active:scale-95" title="حساب التبريد الذكي">
-                        <span>📉</span>
-                        <span class="hidden sm:inline">تبريد</span>
-                    </button>
-                    <button onclick="closeChartModal()" class="text-slate-400 hover:text-white p-1 text-lg rounded-lg hover:bg-slate-800 transition" title="إغلاق النافذة">✕</button>
+                <!-- Price & Action Toolbar Row -->
+                <div class="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <span id="modalChartPrice" class="font-bold text-white text-lg sm:text-xl font-mono">0.00 ج.م</span>
+                        <span id="modalChartChg" class="text-[11px] font-bold px-2 py-0.5 rounded-md border bg-emerald-950 text-emerald-400 border-emerald-800 font-mono">+0.00%</span>
+                    </div>
+
+                    <!-- Action Suite -->
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'buy');" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="شراء للسهم / زيادة كمية">
+                            <span>🟢</span>
+                            <span>شراء</span>
+                        </button>
+                        <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'sell');" class="bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="بيع من السهم / تخفيض كمية">
+                            <span>🔴</span>
+                            <span>بيع</span>
+                        </button>
+                        <button onclick="quickDcaFromModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 active:scale-95" title="حساب التبريد الذكي DCA">
+                            <span>📉</span>
+                            <span class="hidden xs:inline">تبريد</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- 4 Organized Modal Sub-Tabs -->
-            <div class="flex border-b border-slate-800 text-xs gap-1 sm:gap-3 shrink-0 overflow-x-auto no-scrollbar">
+            <div class="flex border-b border-slate-800 text-xs gap-2 shrink-0 overflow-x-auto no-scrollbar pb-1">
                 <button id="modalTabChartBtn" onclick="switchModalSubTab('chart')" class="modal-subtab-btn pb-2 font-bold text-emerald-400 border-b-2 border-emerald-500 transition flex items-center gap-1.5 whitespace-nowrap active:scale-95">
                     <span>📈</span>
                     <span>الشارت الفني التفاعلي</span>
@@ -1684,7 +1725,7 @@
                     </div>
 
                     <!-- Chart Canvas Container -->
-                    <div class="relative w-full h-64 sm:h-72 bg-slate-950/90 rounded-xl p-1.5 border border-slate-800 select-none touch-none">
+                    <div class="relative w-full h-72 sm:h-80 bg-slate-950/90 rounded-xl p-1.5 border border-slate-800 select-none touch-none">
                         <canvas id="candlestickCanvas" class="w-full h-full block"></canvas>
                     </div>
 
@@ -2305,7 +2346,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.3')
+                navigator.serviceWorker.register('sw.js?v=7.4')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -2781,13 +2822,152 @@
             }
         }
 
+        
+        // =========================================================================
+        // PORTFOLIO VIEW MODE CONTROLLER (Cards vs Table)
+        // =========================================================================
+        let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode') || 'cards';
+
+        function setPortfolioViewMode(mode) {
+            triggerHaptic('selection');
+            portfolioViewMode = mode;
+            localStorage.setItem('egx_portfolio_view_mode', mode);
+            updatePortfolioViewModeUI();
+        }
+
+        function updatePortfolioViewModeUI() {
+            const isCards = portfolioViewMode === 'cards';
+            const btnCards = document.getElementById('viewModeCardsBtn');
+            const btnTable = document.getElementById('viewModeTableBtn');
+
+            if (btnCards && btnTable) {
+                if (isCards) {
+                    btnCards.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
+                    btnTable.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
+                } else {
+                    btnTable.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
+                    btnCards.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
+                }
+            }
+
+            const sCards = document.getElementById('stocksHoldingsCardsContainer');
+            const sTable = document.getElementById('stocksHoldingsTableContainer');
+            const fCards = document.getElementById('fundsHoldingsCardsContainer');
+            const fTable = document.getElementById('fundsHoldingsTableContainer');
+
+            if (sCards && sTable) {
+                if (isCards) {
+                    sCards.classList.remove('hidden');
+                    sTable.classList.add('hidden');
+                } else {
+                    sCards.classList.add('hidden');
+                    sTable.classList.remove('hidden');
+                }
+            }
+
+            if (fCards && fTable) {
+                if (isCards) {
+                    fCards.classList.remove('hidden');
+                    fTable.classList.add('hidden');
+                } else {
+                    fCards.classList.add('hidden');
+                    fTable.classList.remove('hidden');
+                }
+            }
+        }
+
+        function createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFund) {
+            const card = document.createElement('div');
+            card.className = "p-3 sm:p-3.5 bg-slate-900/90 dark:bg-slate-900/90 border border-slate-700/80 rounded-2xl hover:border-emerald-500/60 active:scale-[0.99] transition cursor-pointer shadow-sm select-none space-y-2.5";
+            card.onclick = (e) => {
+                if (e.target.closest('button')) return;
+                openStockChart(h.ticker);
+            };
+
+            const icon = isFund ? (h.ticker.includes('GOLD') || h.ticker === 'AZG' ? '🪙' : '🏦') : '📈';
+            const typeLabel = isFund ? 'وثيقة' : 'سهم';
+
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-base shrink-0">
+                            ${icon}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap leading-snug">
+                                <span>${h.name}</span>
+                                <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-300 font-bold bg-emerald-500/15 border border-emerald-500/30 px-1.5 py-0.2 rounded">${h.ticker}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
+                                <span>${h.sector || 'سوق المال المصري'}</span>
+                                <span>•</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 font-medium">متوافق شرعاً 🕌</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-left shrink-0">
+                        <div class="font-mono font-bold text-sm text-slate-900 dark:text-white">
+                            ${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} <span class="text-[10px] font-normal text-slate-400">ج.م</span>
+                        </div>
+                        <div class="text-[11px] font-mono font-bold mt-0.5 flex items-center justify-end gap-1 ${isP ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                            <span>${isP ? '▲ +' : '▼ '}${pnl.toFixed(0)} ج</span>
+                            <span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${isP ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300' : 'bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300'}">
+                                ${isP ? '+' : ''}${pnlPct.toFixed(1)}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-1.5 bg-slate-950/50 dark:bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 text-[11px]">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block">الكمية المملوكة</span>
+                        <b class="font-mono text-slate-900 dark:text-slate-200 mt-0.5 block">${h.qty.toLocaleString()} <span class="text-[9px] font-normal text-slate-400">${typeLabel}</span></b>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-400 block">متوسط الشراء</span>
+                        <b class="font-mono text-slate-700 dark:text-slate-300 mt-0.5 block">${h.buy.toFixed(2)} ج</b>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[10px] text-slate-400 block">السعر اللحظي</span>
+                        <b class="font-mono text-slate-900 dark:text-white mt-0.5 block font-bold">${h.cur.toFixed(2)} ج</b>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 pt-0.5" onclick="event.stopPropagation()">
+                    <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm active:scale-95">
+                        <span>📈</span>
+                        <span>الشارت والتحليل</span>
+                    </button>
+
+                    <div class="flex items-center gap-1.5">
+                        <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="text-xs bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-700 dark:text-emerald-300 font-bold px-2.5 py-1.5 rounded-xl border border-emerald-500/30 transition active:scale-95 flex items-center gap-1" title="شراء المزيد (زيادة كمية)">
+                            <span>🟢</span>
+                            <span class="text-[10px]">شراء</span>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="text-xs bg-rose-500/15 hover:bg-rose-500/25 text-rose-700 dark:text-rose-300 font-bold px-2.5 py-1.5 rounded-xl border border-rose-500/30 transition active:scale-95 flex items-center gap-1" title="بيع وتسييل (تخفيض كمية)">
+                            <span>🔴</span>
+                            <span class="text-[10px]">بيع</span>
+                        </button>
+                        <button type="button" onclick="event.stopPropagation(); deleteHolding(${idx})" class="text-xs bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-400 border border-slate-700 p-1.5 rounded-xl transition active:scale-90" title="حذف من المحفظة">
+                            <span>🗑️</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
         function renderHoldingsTable() {
             const stocksTbody = document.getElementById('stocksHoldingsTableBody');
             const fundsTbody = document.getElementById('fundsHoldingsTableBody');
-            if (!stocksTbody && !fundsTbody) return;
+            const stocksCards = document.getElementById('stocksHoldingsCardsContainer');
+            const fundsCards = document.getElementById('fundsHoldingsCardsContainer');
 
             if (stocksTbody) stocksTbody.innerHTML = '';
             if (fundsTbody) fundsTbody.innerHTML = '';
+            if (stocksCards) stocksCards.innerHTML = '';
+            if (fundsCards) fundsCards.innerHTML = '';
 
             let totalStocksVal = 0;
             let totalStocksCost = 0;
@@ -2853,14 +3033,18 @@
                     </td>
                 `;
 
+                const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFundAsset(h));
+
                 if (isFundAsset(h)) {
                     totalFundsVal += mVal;
                     totalFundsCost += cost;
                     if (fundsTbody) fundsTbody.appendChild(tr);
+                    if (fundsCards) fundsCards.appendChild(mobileCard);
                 } else {
                     totalStocksVal += mVal;
                     totalStocksCost += cost;
                     if (stocksTbody) stocksTbody.appendChild(tr);
+                    if (stocksCards) stocksCards.appendChild(mobileCard);
                 }
             });
 
@@ -2928,6 +3112,13 @@
             const s3 = totalInvestedVal * 0.041;
             const st1 = document.getElementById('stress_shock_1');
             if (st1) st1.innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+
+            // Update Active Holdings Count Badge
+            const activeCountBadge = document.getElementById('portfolioActiveCountBadge');
+            if (activeCountBadge) activeCountBadge.innerText = `${userHoldings.length} أصل`;
+
+            // Apply view mode visibility (cards vs table)
+            updatePortfolioViewModeUI();
             const st2 = document.getElementById('stress_shock_2');
             if (st2) st2.innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
             const st3 = document.getElementById('stress_shock_3');
@@ -3980,9 +4171,9 @@
             const candles = generateTimeframeCandles(data, data, activeChartTimeframe);
             cachedChartCandles = candles;
 
-            // Geometry calculations
+            // Geometry calculations with expanded price axis
             const numCandles = candles.length;
-            const rightMargin = 45;
+            const rightMargin = 58; // Increased margin for crystal-clear price tags
             const leftMargin = 10;
             const chartTop = 15;
             const volumeHeight = h * 0.18;
@@ -3997,8 +4188,110 @@
                 return chartBottom - ((p - minP) / rangeP) * chartHeight;
             }
 
-            // Draw Background Grid
             const isDarkChart = document.documentElement.classList.contains('dark');
+
+            // Draw Right Price Axis Column Background
+            ctx.fillStyle = isDarkChart ? 'rgba(15, 23, 42, 0.5)' : 'rgba(241, 245, 249, 0.7)';
+            ctx.fillRect(w - rightMargin, 0, rightMargin, h);
+            ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(w - rightMargin, 0);
+            ctx.lineTo(w - rightMargin, h);
+            ctx.stroke();
+
+            // Anti-Collision Price Registry
+            const occupiedY = [];
+            function canDrawPriceLabel(yTarget, minDistance = 16) {
+                for (const occY of occupiedY) {
+                    if (Math.abs(occY - yTarget) < minDistance) return false;
+                }
+                return true;
+            }
+
+            const pillW = rightMargin - 6;
+            const pillH = 15;
+            const pillX = w - rightMargin + 3;
+
+            // 1. Draw Resistance Line & High-Visibility Pill (Top Priority)
+            const yRes = getY(data.resistance);
+            ctx.strokeStyle = 'rgba(244, 63, 94, 0.85)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(leftMargin, yRes);
+            ctx.lineTo(w - rightMargin, yRes);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#f43f5e';
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(pillX, yRes - 7.5, pillW, pillH, 3);
+                ctx.fill();
+            } else {
+                ctx.fillRect(pillX, yRes - 7.5, pillW, pillH);
+            }
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 9px Cairo, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`م ${data.resistance.toFixed(1)}`, pillX + pillW / 2, yRes + 3.5);
+            occupiedY.push(yRes);
+
+            // 2. Draw Support Line & High-Visibility Pill (Top Priority)
+            const ySup = getY(data.support);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.85)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(leftMargin, ySup);
+            ctx.lineTo(w - rightMargin, ySup);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = '#10b981';
+            if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(pillX, ySup - 7.5, pillW, pillH, 3);
+                ctx.fill();
+            } else {
+                ctx.fillRect(pillX, ySup - 7.5, pillW, pillH);
+            }
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 9px Cairo, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`د ${data.support.toFixed(1)}`, pillX + pillW / 2, ySup + 3.5);
+            occupiedY.push(ySup);
+
+            // 3. Draw Live Current Price Line & Blue Pill (TradingView Style)
+            const lastCandle = candles[candles.length - 1];
+            const yCur = getY(lastCandle.close);
+            ctx.strokeStyle = isDarkChart ? 'rgba(56, 189, 248, 0.75)' : 'rgba(2, 132, 199, 0.75)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.beginPath();
+            ctx.moveTo(leftMargin, yCur);
+            ctx.lineTo(w - rightMargin, yCur);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (canDrawPriceLabel(yCur, 15)) {
+                ctx.fillStyle = isDarkChart ? '#0284c7' : '#0369a1';
+                if (ctx.roundRect) {
+                    ctx.beginPath();
+                    ctx.roundRect(pillX, yCur - 7.5, pillW, pillH, 3);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(pillX, yCur - 7.5, pillW, pillH);
+                }
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 9px Cairo, monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(lastCandle.close.toFixed(2), pillX + pillW / 2, yCur + 3.5);
+                occupiedY.push(yCur);
+            }
+
+            // 4. Draw Background Grid Lines with Anti-Collision on Axis Labels
             ctx.strokeStyle = isDarkChart ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.07)';
             ctx.lineWidth = 1;
             for (let k = 0; k <= 4; k++) {
@@ -4008,35 +4301,15 @@
                 ctx.lineTo(w - rightMargin, yG);
                 ctx.stroke();
 
-                const pVal = maxP - (rangeP / 4) * k;
-                ctx.fillStyle = isDarkChart ? '#64748b' : '#475569';
-                ctx.font = '9px Cairo, sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText(pVal.toFixed(2), w - 5, yG + 3);
+                if (canDrawPriceLabel(yG, 14)) {
+                    const pVal = maxP - (rangeP / 4) * k;
+                    ctx.fillStyle = isDarkChart ? '#94a3b8' : '#475569';
+                    ctx.font = '9px Cairo, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(pVal.toFixed(2), pillX + pillW / 2, yG + 3);
+                    occupiedY.push(yG);
+                }
             }
-
-            // Draw Support & Resistance Dashed Lines
-            ctx.setLineDash([4, 4]);
-            // Support
-            const ySup = getY(data.support);
-            ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
-            ctx.beginPath();
-            ctx.moveTo(leftMargin, ySup);
-            ctx.lineTo(w - rightMargin, ySup);
-            ctx.stroke();
-            ctx.fillStyle = '#10b981';
-            ctx.fillText(`د: ${data.support.toFixed(1)}`, w - 5, ySup + 3);
-
-            // Resistance
-            const yRes = getY(data.resistance);
-            ctx.strokeStyle = 'rgba(244, 63, 94, 0.8)';
-            ctx.beginPath();
-            ctx.moveTo(leftMargin, yRes);
-            ctx.lineTo(w - rightMargin, yRes);
-            ctx.stroke();
-            ctx.fillStyle = '#f43f5e';
-            ctx.fillText(`م: ${data.resistance.toFixed(1)}`, w - 5, yRes + 3);
-            ctx.setLineDash([]);
 
             // Draw Candle Step Coordinates
             const candleAreaWidth = w - rightMargin - leftMargin;
