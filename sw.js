@@ -1,104 +1,81 @@
 // EGX Sharia Portal - Advanced PWA Service Worker
-const CACHE_NAME = 'egx-sharia-v7.0';
+const CACHE_NAME = 'egx-sharia-v7.1';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './market_data.json',
   './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png'
+  './icon-512.png'
 ];
 
+// Install Event: Pre-cache core shell assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching shell assets');
-      return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('[SW] Caching failed during install:', err);
-      });
-    })
+      console.log('[ServiceWorker] Pre-caching core PWA shell v7.1');
+      return cache.addAll(STATIC_ASSETS);
+    }).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
+// Activate Event: Clear legacy caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then((keyList) => {
       return Promise.all(
-        keys.map((key) => {
+        keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('[SW] Removing old cache:', key);
+            console.log('[ServiceWorker] Removing legacy cache:', key);
             return caches.delete(key);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
+// Fetch Event: Stale-While-Revalidate for market data & HTML, Cache-First for static assets
 self.addEventListener('fetch', (event) => {
-  // Always fetch live market data and HTML network-first for fresh prices
-  if (event.request.url.includes('market_data.json') || event.request.mode === 'navigate') {
+  const url = new URL(event.request.url);
+
+  // Exclude non-GET and cross-origin external API calls
+  if (event.request.method !== 'GET') return;
+
+  // Stale-While-Revalidate for index.html and market_data.json
+  if (url.pathname.endsWith('index.html') || url.pathname.endsWith('/') || url.pathname.endsWith('market_data.json')) {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cachedResponse = await cache.match(event.request);
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            cache.put(event.request, networkResponse.clone());
+          }
           return networkResponse;
-        })
-        .catch(() => caches.match(event.request))
+        }).catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
+      })
     );
     return;
   }
 
-  // Cache-first for images and static assets
+  // Cache-First strategy for images, icons, fonts
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request);
-    })
-  );
-});
-
-// Push notification listener
-self.addEventListener('push', (event) => {
-  let data = { title: 'منظومة الأسهم الشرعية', body: 'تحديث جديد في حركة السوق والأسهم' };
-  if (event.data) {
-    try {
-      data = event.data.json();
-    } catch(e) {
-      data.body = event.data.text();
-    }
-  }
-
-  const options = {
-    body: data.body,
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
-    vibrate: [200, 100, 200],
-    data: { url: './index.html' },
-    dir: 'rtl',
-    lang: 'ar'
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url.includes('index.html') && 'focus' in client) {
-          return client.focus();
+      return cached || fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
         }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow('./index.html');
-      }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+        return response;
+      });
+    }).catch(() => {
+      // Fallback if offline
+      return caches.match('./index.html');
     })
   );
 });
