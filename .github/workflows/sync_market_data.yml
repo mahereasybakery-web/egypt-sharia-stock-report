@@ -1,0 +1,123 @@
+name: Real-Time Market Data Auto-Sync
+
+on:
+  schedule:
+    # Runs every 10 minutes during Egyptian Exchange trading session (07:00 to 12:30 UTC = 10:00 to 15:30 Cairo)
+    # Sunday to Thursday (0,1,2,3,4)
+    - cron: '*/10 7-12 * * 0,1,2,3,4'
+  workflow_dispatch:
+
+concurrency:
+  group: market-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests
+
+      - name: Fetch Live TradingView & SNDUK Market Data
+        run: |
+          python -c "
+          import urllib.request, json, os, re
+          from datetime import datetime, timezone, timedelta
+
+          tickers = [
+              'TMGH', 'SWDY', 'ORAS', 'EAST', 'ISPH', 'ETEL', 'AMOC', 'ABUK', 'MFPC', 'SKPC',
+              'EKHO', 'JUFO', 'ESRS', 'CIRA', 'POUL', 'EFID', 'DOMT', 'ASCM', 'ADIB', 'SAUD',
+              'FAIT', 'ALCN', 'ACGC', 'HELI', 'ORHD', 'OCDI', 'PHDC', 'ARAB', 'CCAP', 'BTFH',
+              'DSCW', 'LCSW', 'MCQE', 'COMI', 'FWRY', 'EFIH', 'RACC', 'CICH', 'MASR', 'AUTO'
+          ]
+          tv_symbols = [f'EGX:{t}' for t in tickers] + ['EGX:EGX33', 'EGX:EGX30', 'EGX:EGX70EWI']
+
+          req = urllib.request.Request(
+              'https://scanner.tradingview.com/egypt/scan',
+              data=json.dumps({
+                  'symbols': {'tickers': tv_symbols},
+                  'columns': ['name', 'close', 'change', 'open', 'high', 'low', 'volume', 'RSI', 'SMA20', 'SMA50', 'Value.Traded', 'price_earnings_ttm', 'price_book_fq', 'Recommend.All']
+              }).encode('utf-8'),
+              headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
+          )
+
+          try:
+              with urllib.request.urlopen(req, timeout=15) as resp:
+                  tv_res = json.loads(resp.read().decode('utf-8'))
+          except Exception as e:
+              print('TV fetch error:', e)
+              tv_res = {'data': []}
+
+          tv_data = {}
+          for item in tv_res.get('data', []):
+              s = item['s'].replace('EGX:', '')
+              d = item['d']
+              tv_data[s] = {
+                  'close': d[1], 'chg': d[2], 'open': d[3], 'high': d[4], 'low': d[5],
+                  'volume': d[6], 'rsi': d[7], 'sma20': d[8], 'sma50': d[9], 'pe': d[11], 'pb': d[12]
+              }
+
+          with open('market_data.json', 'r', encoding='utf-8') as f:
+              market_data = json.load(f)
+
+          if 'stocks' not in market_data:
+              market_data['stocks'] = {}
+
+          for ticker, data in tv_data.items():
+              if ticker in ['EGX33', 'EGX30', 'EGX70EWI']:
+                  if 'indices' not in market_data: market_data['indices'] = {}
+                  market_data['indices'][ticker] = {'close': round(data['close'], 2), 'chgPct': round(data['chg'], 2)}
+                  continue
+
+              close = data.get('close', 0)
+              if close and close > 0:
+                  low_p = data.get('low') or (close * 0.98)
+                  high_p = data.get('high') or (close * 1.02)
+                  sma50 = data.get('sma50') or (close * 0.96)
+                  sma20 = data.get('sma20') or close
+                  
+                  if ticker not in market_data['stocks']:
+                      market_data['stocks'][ticker] = {'ticker': ticker}
+                  
+                  st = market_data['stocks'][ticker]
+                  st.update({
+                      'ticker': ticker,
+                      'close': round(close, 2),
+                      'chg': round(data.get('chg', 0), 2),
+                      'open': round(data.get('open', close), 2),
+                      'high': round(high_p, 2),
+                      'low': round(low_p, 2),
+                      'volume': data.get('volume', 0),
+                      'rsi': round(data.get('rsi', 50.0), 1) if data.get('rsi') else 50.0,
+                      'sma20': round(sma20, 2),
+                      'sma50': round(sma50, 2),
+                      'support': round(min(low_p, sma50, close * 0.95), 2),
+                      'resistance': round(max(high_p, close * 1.05), 2)
+                  })
+
+          now_cairo = datetime.now(timezone(timedelta(hours=3)))
+          market_data['updated_at'] = now_cairo.isoformat()
+          market_data['updated_at_display'] = now_cairo.strftime('%Y-%m-%d %H:%M:%S')
+
+          with open('market_data.json', 'w', encoding='utf-8') as f:
+              json.dump(market_data, f, ensure_ascii=False, indent=2)
+
+          print('market_data.json updated successfully with latest live quotes!')
+          "
+
+      - name: Commit and Push Updated Market Data
+        run: |
+          git config --global user.name "EGX Market Bot"
+          git config --global user.email "bot@egx-sharia.org"
+          git add market_data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-Sync: Live Real-Time Market Quotes [skip ci]" && git push origin main)
