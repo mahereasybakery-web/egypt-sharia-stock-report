@@ -4283,6 +4283,21 @@
             document.getElementById('modalChartRsi').innerText = `${data.rsi.toFixed(1)}`;
             document.getElementById('modalChartVolumeStatus').innerText = data.rsi >= 50 ? 'تجميع شرائي نشط' : 'استقرار وتماسك';
 
+            // ── Fill Price Action Strip immediately (before canvas renders) ──
+            const _paO = document.getElementById('paOpenVal');
+            const _paH = document.getElementById('paHighVal');
+            const _paL = document.getElementById('paLowVal');
+            const _paC = document.getElementById('paCloseVal');
+            const _paG = document.getElementById('paChangeVal');
+            const _paV = document.getElementById('paVolVal');
+            const _ip  = data.chg >= 0;
+            if (_paO) _paO.textContent = (data.open  || data.close).toFixed(2);
+            if (_paH) _paH.textContent = (data.high  || data.close).toFixed(2);
+            if (_paL) _paL.textContent = (data.low   || data.close).toFixed(2);
+            if (_paC) { _paC.textContent = data.close.toFixed(2); _paC.className = _ip ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'; }
+            if (_paG) { _paG.textContent = (_ip ? '+' : '') + data.chg.toFixed(2) + '%'; _paG.className = _ip ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'; }
+            if (_paV) { const vol = data.volume || 0; _paV.textContent = vol >= 1e6 ? `${(vol/1e6).toFixed(1)}M` : `${(vol/1000).toFixed(0)}K`; }
+
             // Populate Sub-Tab 2: Indicators
             const isBullish = data.close >= data.support && data.rsi >= 48;
             document.getElementById('indTechnicalStatusBadge').innerText = isBullish ? 'إشارات إيجابية صاعدة 🟢' : 'منطقة تماسك وترقب 🟡';
