@@ -285,7 +285,11 @@
                         <option value="AMOC">الإسكندرية للزيوت المعدنية (AMOC)</option>
                         <option value="SWDY">السويدي إليكتريك (SWDY)</option>
                         <option value="ETEL">المصرية للاتصالات (ETEL)</option>
-                        <option value="AZG">صندوق أزيموت للذهب (AZG)</option>
+                        <option value="AZG">أزيموت جولد للذهب (AZG)</option>
+                        <option value="THNDR_GOLD">سبائك جولد - ثندر (THNDR_GOLD)</option>
+                        <option value="CMS">مصر شريعة إكويتي (CMS)</option>
+                        <option value="BWA">بلتون وفرة للشريعة (BWA)</option>
+                        <option value="NMF">نعيم مصر للشريعة (NMF)</option>
                     </select>
 
                     <div id="valuationCardContainer">
@@ -370,6 +374,7 @@
                 <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
                     <button onclick="setNewsCategory('all', this)" class="news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل 📰</button>
                     <button onclick="setNewsCategory('corporate', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">إفصاحات الشركات 🏢</button>
+                    <button onclick="setNewsCategory('funds', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">صناديق الاستثمار 📊</button>
                     <button onclick="setNewsCategory('gold', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">صناديق الذهب 🪙</button>
                     <button onclick="setNewsCategory('macro', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">الفائدة والعملات 💵</button>
                     <button onclick="setNewsCategory('dividends', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">توزيعات وأرباح 💰</button>
@@ -408,7 +413,7 @@
             <div class="flex items-center justify-between gap-2">
                 <button onclick="openAddHoldingModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow active:scale-95">
                     <span>➕</span>
-                    <span>إضافة سهم للمحفظة</span>
+                    <span>إضافة سهم / صندوق للمحفظة</span>
                 </button>
                 <div class="flex items-center gap-1.5">
                     <button onclick="exportPortfolioToCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-2 rounded-xl transition flex items-center gap-1 active:scale-95" title="تصدير إكسل">
@@ -439,7 +444,7 @@
             <div class="glass-card rounded-2xl p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                        📜 <span>أسهم محفظتك المحفوظة محلياً بخصوصية تامة</span>
+                        📜 <span>أصول محفظتك (الأسهم والصناديق الشرعية) بخصوصية تامة</span>
                     </h3>
                     <button onclick="resetPortfolioToDefault()" class="text-[10px] text-slate-400 hover:text-slate-200 underline">استعادة الافتراضي</button>
                 </div>
@@ -447,10 +452,10 @@
                     <table class="w-full text-right text-xs">
                         <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
                             <tr>
-                                <th class="pb-2">السهم</th>
-                                <th class="pb-2">الكمية</th>
-                                <th class="pb-2">الشراء</th>
-                                <th class="pb-2">الحالي</th>
+                                <th class="pb-2">الأصل / السهم</th>
+                                <th class="pb-2">الكمية / الوثائق</th>
+                                <th class="pb-2">سعر الشراء</th>
+                                <th class="pb-2">السعر الحالي</th>
                                 <th class="pb-2">الربح/الخسارة</th>
                                 <th class="pb-2 text-center">إجراء</th>
                             </tr>
@@ -667,6 +672,10 @@
                             <option value="SWDY">السويدي إليكتريك (SWDY)</option>
                             <option value="ETEL">المصرية للاتصالات (ETEL)</option>
                             <option value="AZG">أزيموت للذهب (AZG)</option>
+                            <option value="THNDR_GOLD">سبائك جولد (THNDR_GOLD)</option>
+                            <option value="CMS">مصر شريعة إكويتي (CMS)</option>
+                            <option value="BWA">بلتون وفرة (BWA)</option>
+                            <option value="NMF">نعيم مصر للشريعة (NMF)</option>
                         </select>
                         <select id="alertConditionSelect" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
                             <option value="price_below">السعر هبط دون (&lt;)</option>
@@ -1060,26 +1069,26 @@
     <div id="holdingModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
         <div class="glass-card w-full max-w-sm rounded-2xl p-4 space-y-3.5 border border-slate-700 bg-slate-900 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h3 id="holdingModalTitle" class="text-sm font-bold text-white">إضافة سهم لمحفظتك</h3>
+                <h3 id="holdingModalTitle" class="text-sm font-bold text-white">إضافة سهم / صندوق لمحفظتك</h3>
                 <button onclick="closeHoldingModal()" class="text-slate-400 hover:text-white text-base">✕</button>
             </div>
 
             <input type="hidden" id="modalHoldingIndex" value="-1">
 
             <div>
-                <label class="block text-[11px] text-slate-400 mb-1">اختر السهم</label>
+                <label class="block text-[11px] text-slate-400 mb-1">اختر السهم أو الصندوق</label>
                 <select id="modalHoldingStock" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
                     <!-- Populated dynamically -->
                 </select>
             </div>
 
             <div>
-                <label class="block text-[11px] text-slate-400 mb-1">الكمية (عدد الأسهم)</label>
+                <label class="block text-[11px] text-slate-400 mb-1">الكمية (عدد الأسهم أو الوثائق)</label>
                 <input id="modalHoldingQty" type="number" value="100" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
             </div>
 
             <div>
-                <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء (ج.م)</label>
+                <label class="block text-[11px] text-slate-400 mb-1">متوسط سعر الشراء أو الوثيقة (ج.م)</label>
                 <input id="modalHoldingBuyPrice" type="number" step="0.01" value="50.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none">
             </div>
 
@@ -1318,9 +1327,9 @@
             { ticker: "CIRA", name: "سيرا للتعليم", close: 39.00, chg: -2.03, rsi: 60.0, pe: 12.1, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
             { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.45, rsi: 55.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
             { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.30, rsi: 54.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "الذهب وصناديق التحوط" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "الذهب وصناديق التحوط" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "الذهب وصناديق التحوط" }
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
         ];
 
         // 3. Valuation Scenarios Database
@@ -1454,6 +1463,71 @@
                 support: 118.00,
                 resistance: 132.00,
                 analysis: "توسع إقليمي ضخم في مشروعات الطاقة والبنية التحتية في الخليج وإفريقيا."
+            },
+            "AZG": {
+                name: "أزيموت جولد (AZG)",
+                current: 23.96,
+                bull: 30.00,
+                base: 27.50,
+                bear: 22.00,
+                margin: 14.8,
+                pe: null,
+                pb: null,
+                support: 23.00,
+                resistance: 25.50,
+                analysis: "أداة تحوط ذهبية شرعية ممتازة ترتبط مباشرة بأسعار الذهب عيار 24 الصافي وتوفر حماية كاملة ضد التضخم وتقلبات العملة."
+            },
+            "THNDR_GOLD": {
+                name: "سبائك جولد (Thndr)",
+                current: 1.68,
+                bull: 2.15,
+                base: 1.95,
+                bear: 1.55,
+                margin: 16.1,
+                pe: null,
+                pb: null,
+                support: 1.60,
+                resistance: 1.80,
+                analysis: "صندوق استثمار في الذهب عيار 24 من بلتون كابيتال يتيح الاستثمار المباشر في الذهب الفيزيائي المودع في خزائن مؤمنة ومعتمدة من الرقابة المالية."
+            },
+            "CMS": {
+                name: "مصر شريعة إكويتي (CMS)",
+                current: 22.72,
+                bull: 29.00,
+                base: 26.00,
+                bear: 20.50,
+                margin: 14.4,
+                pe: null,
+                pb: null,
+                support: 21.50,
+                resistance: 24.50,
+                analysis: "صندوق مصر للتأمين التكافلي / مصر شريعة إكويتي يتبع مؤشر EGX33 Shariah ويستثمر في نخبة الشركات المصرية المتوافقة مع الشريعة الإسلامية بتوزيع مخاطر متوازن."
+            },
+            "BWA": {
+                name: "بلتون وفرة (BWA)",
+                current: 2.21,
+                bull: 3.10,
+                base: 2.70,
+                bear: 1.95,
+                margin: 22.2,
+                pe: null,
+                pb: null,
+                support: 2.05,
+                resistance: 2.45,
+                analysis: "صندوق بلتون وفرة للأسهم الشرعية يستهدف تحقيق عوائد رأسمالية طويلة الأجل من خلال الاستثمار الفعّال في الأسهم المتوافقة مع الشريعة الإسلامية ذات النمو السريع."
+            },
+            "NMF": {
+                name: "نعيم مصر للشريعة (NMF)",
+                current: 50.19,
+                bull: 64.00,
+                base: 58.00,
+                bear: 45.00,
+                margin: 15.6,
+                pe: null,
+                pb: null,
+                support: 47.50,
+                resistance: 54.00,
+                analysis: "صندوق نعيم مصر للاستثمار في الأسهم المتوافقة مع الشريعة الإسلامية، يدار بحصافة مع تنويع استثماري عالي عبر القطاعات الصناعية والتكنولوجية والاستهلاكية."
             }
         };
 
@@ -1468,7 +1542,11 @@
             { ticker: "OCDI", name: "سوديك", qty: 51, buy: 27.76, cur: 30.00, sector: "العقارات والإنشاءات" },
             { ticker: "EFID", name: "إيديتا", qty: 23, buy: 31.82, cur: 30.80, sector: "الأغذية والأدوية" },
             { ticker: "FWRY", name: "فوري", qty: 7, buy: 19.91, cur: 18.88, sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "AZG", name: "أزيموت جولد", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" }
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 500, buy: 1.62, cur: 1.68, sector: "الذهب وصناديق التحوط" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 150, buy: 21.80, cur: 22.72, sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 1000, buy: 2.10, cur: 2.21, sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 60, buy: 48.50, cur: 50.19, sector: "صناديق الأسهم الشرعية" }
         ];
 
         let userHoldings = [];
@@ -1486,14 +1564,44 @@
                 userHoldings = JSON.parse(JSON.stringify(DEFAULT_HOLDINGS));
                 saveUserPortfolio();
             }
-            // Update live prices for user holdings from STOCKS_DATA
+
+            // Subscribed Funds definition for auto-merge
+            const subscribedFunds = [
+                { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 100, buy: 22.50, cur: 23.96, sector: "الذهب وصناديق التحوط" },
+                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 500, buy: 1.62, cur: 1.68, sector: "الذهب وصناديق التحوط" },
+                { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 150, buy: 21.80, cur: 22.72, sector: "صناديق الأسهم الشرعية" },
+                { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 1000, buy: 2.10, cur: 2.21, sector: "صناديق الأسهم الشرعية" },
+                { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 60, buy: 48.50, cur: 50.19, sector: "صناديق الأسهم الشرعية" }
+            ];
+
+            let modified = false;
+            // One-time auto-merge of user's subscribed funds into portfolio
+            if (!localStorage.getItem('egx_sharia_funds_merged_v2')) {
+                subscribedFunds.forEach(fund => {
+                    const exists = userHoldings.some(h => h.ticker === fund.ticker);
+                    if (!exists) {
+                        userHoldings.push(fund);
+                        modified = true;
+                    }
+                });
+                localStorage.setItem('egx_sharia_funds_merged_v2', 'true');
+            }
+
+            // Update live prices and sector metadata for user holdings from STOCKS_DATA
             userHoldings.forEach(h => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (stock) {
                     h.cur = stock.close;
-                    if (!h.sector && stock.sector) h.sector = stock.sector;
+                    if (!h.sector || h.sector === 'أخرى' || stock.sector) h.sector = stock.sector;
+                    if (stock.name && (!h.name || h.name.includes(h.ticker))) h.name = stock.name;
                 }
             });
+
+            if (modified) {
+                saveUserPortfolio();
+            } else {
+                renderHoldingsTable();
+            }
         }
 
         function saveUserPortfolio() {
@@ -1622,7 +1730,7 @@
         // Add / Edit Holding Modals
         function openAddHoldingModal() {
             triggerHaptic('medium');
-            document.getElementById('holdingModalTitle').innerText = "إضافة سهم لمحفظتك";
+            document.getElementById('holdingModalTitle').innerText = "إضافة سهم / صندوق لمحفظتك";
             document.getElementById('modalHoldingIndex').value = "-1";
             
             const select = document.getElementById('modalHoldingStock');
@@ -1649,7 +1757,7 @@
             const h = userHoldings[idx];
             if (!h) return;
 
-            document.getElementById('holdingModalTitle').innerText = `تعديل سهم ${h.name}`;
+            document.getElementById('holdingModalTitle').innerText = `تعديل ${h.name}`;
             document.getElementById('modalHoldingIndex').value = idx;
 
             const select = document.getElementById('modalHoldingStock');
@@ -1696,12 +1804,12 @@
                 } else {
                     userHoldings.push({ ticker, name, qty, buy, cur, sector });
                 }
-                showToast(`تمت إضافة سهم ${name} للمحفظة بنجاح`, 'success');
+                showToast(`تمت إضافة ${name} للمحفظة بنجاح`, 'success');
             } else {
                 userHoldings[idx].qty = qty;
                 userHoldings[idx].buy = buy;
                 userHoldings[idx].cur = cur;
-                showToast(`تم تحديث سهم ${name}`, 'success');
+                showToast(`تم تحديث ${name}`, 'success');
             }
 
             closeHoldingModal();
@@ -1712,10 +1820,10 @@
             triggerHaptic('medium');
             const h = userHoldings[idx];
             if (!h) return;
-            if (confirm(`هل أنت متأكد من حذف سهم ${h.name} من المحفظة؟`)) {
+            if (confirm(`هل أنت متأكد من حذف ${h.name} من المحفظة؟`)) {
                 userHoldings.splice(idx, 1);
                 saveUserPortfolio();
-                showToast(`تم حذف سهم ${h.name}`, 'warning');
+                showToast(`تم حذف ${h.name}`, 'warning');
             }
         }
 
@@ -1812,8 +1920,8 @@
             // Fundamentals
             document.getElementById('indFairPriceVal').innerText = `${data.base.toFixed(2)} ج.م`;
             document.getElementById('indMarginVal').innerText = `هامش أمان: +${data.margin}%`;
-            document.getElementById('indPeVal').innerText = `${data.pe}x`;
-            document.getElementById('indPbVal').innerText = `${data.pb}x`;
+            document.getElementById('indPeVal').innerText = data.pe ? `${data.pe}x` : 'وثيقة صندوق';
+            document.getElementById('indPbVal').innerText = data.pb ? `${data.pb}x` : 'NAV مرن';
             document.getElementById('indDivYieldVal').innerText = `${data.divYield.toFixed(1)}% سنوياً`;
 
             // Populate Sub-Tab 3: Targets & Forecasts
@@ -3120,6 +3228,54 @@
                 impact: "positive",
                 impact_label: "سيولة نقدية ضخمة 🟢",
                 summary: "دخول سيولة نقدية مباشرة بخزينة الشركة من عوائد فودافون تسهم في خفض تكلفة الديون وتحسين صافي الربح السنوي."
+            },
+            {
+                id: "n10",
+                ticker: "CMS",
+                stock_name: "مصر شريعة إكويتي (CMS)",
+                category: "funds",
+                title: "صندوق مصر شريعة إكويتي يسجل نمواً بنسبة 28% في صافي أصوله تزامناً مع أداء EGX33 الشريعة",
+                source: "صناديق الاستثمار",
+                time: "اليوم",
+                impact: "positive",
+                impact_label: "أداء قياسي 🟢",
+                summary: "تسجيل صافي قيمة أصول قياسي لوثائق صندوق مصر شريعة إكويتي مع زيادة إقبال المؤسسات والأفراد على الاستثمار المؤسسي المتوافق مع الشريعة الإسلامية."
+            },
+            {
+                id: "n11",
+                ticker: "BWA",
+                stock_name: "بلتون وفرة (BWA)",
+                category: "funds",
+                title: "صندوق بلتون وفرة للشريعة يرفع أوزانه في أسهم التكنولوجيا والصناعات التصديرية",
+                source: "بلتون المالية",
+                time: "منذ 3 ساعات",
+                impact: "positive",
+                impact_label: "إعادة هيكلة إيجابية 🟢",
+                summary: "إدارة الصندوق تعيد توزيع المحفظة لتعظيم العوائد الرأسمالية مع التركيز على الأسهم المقيدة بمؤشر الشريعة ذات التوزيعات النقدية والنمو التشغيلي المرتفع."
+            },
+            {
+                id: "n12",
+                ticker: "NMF",
+                stock_name: "نعيم مصر للشريعة (NMF)",
+                category: "funds",
+                title: "صندوق نعيم مصر للأسهم الشرعية يحافظ على صدارته في تصنيف الصناديق الإسلامية المتوازنة",
+                source: "النعيم القابضة",
+                time: "أمس",
+                impact: "positive",
+                impact_label: "تصنيف ممتاز 🟢",
+                summary: "تحقيق عائد دوري متفوق يعكس الإدارة النشطة وانتقاء الأسهم المتوافقة مع أحكام الشريعة ذات هوامش الأمان العالية."
+            },
+            {
+                id: "n13",
+                ticker: "THNDR_GOLD",
+                stock_name: "سبائك جولد (Thndr)",
+                category: "gold",
+                title: "صندوق سبائك الذهب (ثندر) يرفع حيازته من الذهب الفيزيائي عيار 24 تزامناً مع الطلب الاستثماري",
+                source: "تقرير الذهب اليومي",
+                time: "منذ 4 ساعات",
+                impact: "positive",
+                impact_label: "أمان وتحوط 🟡",
+                summary: "زيادة حجم الذهب الفيزيائي المودع في الخزائن المؤمنة لتغطية طلبات الاكتتاب المستمرة في وثائق الصندوق كأداة تحوط سهلة ومباشرة عبر تطبيق ثندر."
             }
         ];
 
