@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker
-const CACHE_NAME = 'egx-sharia-v7.1';
+// EGX Sharia Portal - Advanced PWA Service Worker v7.2
+const CACHE_NAME = 'egx-sharia-v7.2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -9,17 +9,18 @@ const STATIC_ASSETS = [
   './icon-512.png'
 ];
 
-// Install Event: Pre-cache core shell assets
+// Install Event: Pre-cache core shell assets and skip waiting immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[ServiceWorker] Pre-caching core PWA shell v7.1');
+      console.log('[ServiceWorker] Pre-caching core PWA shell v7.2');
       return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Activate Event: Clear legacy caches
+// Activate Event: Delete ALL older caches and claim clients immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keyList) => {
@@ -35,32 +36,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event: Stale-While-Revalidate for market data & HTML, Cache-First for static assets
+// Fetch Event: Network-First for HTML/Data to ensure immediate updates, Cache-First for static media
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Exclude non-GET and cross-origin external API calls
   if (event.request.method !== 'GET') return;
 
-  // Stale-While-Revalidate for index.html and market_data.json
-  if (url.pathname.endsWith('index.html') || url.pathname.endsWith('/') || url.pathname.endsWith('market_data.json')) {
+  // 1. Network-First for HTML and market data (Bypasses stale cache immediately)
+  if (url.pathname.endsWith('index.html') || url.pathname.endsWith('/') || url.pathname === '' || url.pathname.endsWith('market_data.json')) {
     event.respondWith(
-      caches.open(CACHE_NAME).then(async (cache) => {
-        const cachedResponse = await cache.match(event.request);
-        const fetchPromise = fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            cache.put(event.request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch(() => cachedResponse);
-
-        return cachedResponse || fetchPromise;
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const resClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+        }
+        return networkResponse;
+      }).catch(async () => {
+        // Fallback to cache only if device is offline
+        const cached = await caches.match(event.request);
+        return cached || caches.match('./index.html');
       })
     );
     return;
   }
 
-  // Cache-First strategy for images, icons, fonts
+  // 2. Cache-First strategy for images, icons, fonts
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return cached || fetch(event.request).then((response) => {
@@ -74,7 +75,6 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     }).catch(() => {
-      // Fallback if offline
       return caches.match('./index.html');
     })
   );
