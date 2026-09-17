@@ -33,91 +33,121 @@ jobs:
         run: |
           pip install requests
 
-      - name: Fetch Live TradingView & SNDUK Market Data
+      - name: Fetch Live Market Data from Mubasher.info & Backup
         run: |
           python -c "
-          import urllib.request, json, os, re
+          import urllib.request, json, os, re, time
           from datetime import datetime, timezone, timedelta
+          from concurrent.futures import ThreadPoolExecutor
+
+          cairo_tz = timezone(timedelta(hours=3))
+          now_cairo = datetime.now(cairo_tz)
+          print(f'Starting Mubasher Sync at {now_cairo.strftime(\"%Y-%m-%d %H:%M:%S\")}')
+
+          headers = {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+              'Accept-Language': 'en-US,en;q=0.9',
+              'Referer': 'https://english.mubasher.info/'
+          }
 
           tickers = [
               'TMGH', 'SWDY', 'ORAS', 'EAST', 'ISPH', 'ETEL', 'AMOC', 'ABUK', 'MFPC', 'SKPC',
-              'EKHO', 'JUFO', 'ESRS', 'CIRA', 'POUL', 'EFID', 'DOMT', 'ASCM', 'ADIB', 'SAUD',
-              'FAIT', 'ALCN', 'ACGC', 'HELI', 'ORHD', 'OCDI', 'PHDC', 'ARAB', 'CCAP', 'BTFH',
-              'DSCW', 'LCSW', 'MCQE', 'COMI', 'FWRY', 'EFIH', 'RACC', 'CICH', 'MASR', 'AUTO'
+              'JUFO', 'CIRA', 'EFID', 'ADIB', 'SAUD', 'FAIT', 'ACGC', 'ORHD', 'OCDI', 'PHDC',
+              'LCSW', 'MCQE', 'COMI', 'FWRY', 'EFIH', 'MASR', 'EGAL', 'CERA', 'ARCC', 'ATQA',
+              'ORWE', 'RMDA', 'GBCO', 'MCRO'
           ]
-          tv_symbols = [f'EGX:{t}' for t in tickers] + ['EGX:EGX33', 'EGX:EGX30', 'EGX:EGX70EWI']
 
-          req = urllib.request.Request(
-              'https://scanner.tradingview.com/egypt/scan',
-              data=json.dumps({
-                  'symbols': {'tickers': tv_symbols},
-                  'columns': ['name', 'close', 'change', 'open', 'high', 'low', 'volume', 'RSI', 'SMA20', 'SMA50', 'Value.Traded', 'price_earnings_ttm', 'price_book_fq', 'Recommend.All']
-              }).encode('utf-8'),
-              headers={'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0'}
-          )
+          def fetch_stock(ticker):
+              url = f'https://english.mubasher.info/markets/EGX/stocks/{ticker}/'
+              try:
+                  req = urllib.request.Request(url, headers=headers)
+                  with urllib.request.urlopen(req, timeout=8) as resp:
+                      html = resp.read().decode('utf-8', errors='ignore')
+                  
+                  price_m = re.search(r'<div class=\"market-summary__last-price[^\"]*\">([^<]+)</div>', html)
+                  chg_pct_m = re.search(r'<div class=\"market-summary__change-percentage[^\"]*\">([^<]+)</div>', html)
+                  date_m = re.search(r'<div class=\"market-summary__date\">([^<]+)</div>', html)
+                  vol_m = re.search(r'<span class=\"market-summary__block-text\">Volume</span>\\s*<span class=\"market-summary__block-number\">([^<]+)</span>', html)
+                  open_m = re.search(r'<span class=\"market-summary__block-text\">Open</span>\\s*<span class=\"market-summary__block-number\">([^<]+)</span>', html)
+                  high_m = re.search(r'<span class=\"market-summary__block-text\">High</span>\\s*<span class=\"market-summary__block-number\">([^<]+)</span>', html)
+                  low_m = re.search(r'<span class=\"market-summary__block-text\">Low</span>\\s*<span class=\"market-summary__block-number\">([^<]+)</span>', html)
 
-          try:
-              with urllib.request.urlopen(req, timeout=15) as resp:
-                  tv_res = json.loads(resp.read().decode('utf-8'))
-          except Exception as e:
-              print('TV fetch error:', e)
-              tv_res = {'data': []}
+                  p_str = price_m.group(1).strip().replace(',', '') if price_m else '0'
+                  chg_str = chg_pct_m.group(1).strip().replace('%', '') if chg_pct_m else '0'
+                  close = float(p_str) if p_str else 0.0
 
-          tv_data = {}
-          for item in tv_res.get('data', []):
-              s = item['s'].replace('EGX:', '')
-              d = item['d']
-              tv_data[s] = {
-                  'close': d[1], 'chg': d[2], 'open': d[3], 'high': d[4], 'low': d[5],
-                  'volume': d[6], 'rsi': d[7], 'sma20': d[8], 'sma50': d[9], 'pe': d[11], 'pb': d[12]
-              }
+                  if close > 0:
+                      return {
+                          'ticker': ticker,
+                          'close': close,
+                          'chg': float(chg_str) if chg_str else 0.0,
+                          'open': float(open_m.group(1).strip().replace(',', '')) if open_m else close,
+                          'high': float(high_m.group(1).strip().replace(',', '')) if high_m else close,
+                          'low': float(low_m.group(1).strip().replace(',', '')) if low_m else close,
+                          'volume': int(vol_m.group(1).strip().replace(',', '')) if vol_m else 0,
+                          'mubasher_time': date_m.group(1).strip() if date_m else '',
+                          'source': 'Mubasher.info'
+                      }
+              except Exception:
+                  pass
+              return None
 
+          results = {}
+          with ThreadPoolExecutor(max_workers=10) as executor:
+              for res in executor.map(fetch_stock, tickers):
+                  if res:
+                      results[res['ticker']] = res
+
+          print(f'Mubasher successfully fetched: {len(results)}/{len(tickers)} stocks')
+
+          # Fetch Mubasher Indices
+          indices = {}
+          for idx_name, idx_slug in [('EGX30', 'EGX30'), ('EGX70EWI', 'EGX70%20EWI')]:
+              try:
+                  url = f'https://english.mubasher.info/markets/EGX/indices/{idx_slug}'
+                  req = urllib.request.Request(url, headers=headers)
+                  with urllib.request.urlopen(req, timeout=6) as resp:
+                      h = resp.read().decode('utf-8', errors='ignore')
+                  pm = re.search(r'<div class=\"market-summary__last-price[^\"]*\">([^<]+)</div>', h)
+                  cm = re.search(r'<div class=\"market-summary__change-percentage[^\"]*\">([^<]+)</div>', h)
+                  if pm:
+                      p = float(pm.group(1).strip().replace(',', ''))
+                      c = float(cm.group(1).strip().replace('%', '')) if cm else 0.0
+                      indices[idx_name] = {'close': p, 'chgPct': c}
+              except Exception:
+                  pass
+
+          # Load market_data.json
           with open('market_data.json', 'r', encoding='utf-8') as f:
               market_data = json.load(f)
 
-          if 'stocks' not in market_data:
-              market_data['stocks'] = {}
-
-          for ticker, data in tv_data.items():
-              if ticker in ['EGX33', 'EGX30', 'EGX70EWI']:
-                  if 'indices' not in market_data: market_data['indices'] = {}
-                  market_data['indices'][ticker] = {'close': round(data['close'], 2), 'chgPct': round(data['chg'], 2)}
-                  continue
-
-              close = data.get('close', 0)
-              if close and close > 0:
-                  low_p = data.get('low') or (close * 0.98)
-                  high_p = data.get('high') or (close * 1.02)
-                  sma50 = data.get('sma50') or (close * 0.96)
-                  sma20 = data.get('sma20') or close
-                  
-                  if ticker not in market_data['stocks']:
-                      market_data['stocks'][ticker] = {'ticker': ticker}
-                  
-                  st = market_data['stocks'][ticker]
-                  st.update({
-                      'ticker': ticker,
-                      'close': round(close, 2),
-                      'chg': round(data.get('chg', 0), 2),
-                      'open': round(data.get('open', close), 2),
-                      'high': round(high_p, 2),
-                      'low': round(low_p, 2),
-                      'volume': data.get('volume', 0),
-                      'rsi': round(data.get('rsi', 50.0), 1) if data.get('rsi') else 50.0,
-                      'sma20': round(sma20, 2),
-                      'sma50': round(sma50, 2),
-                      'support': round(min(low_p, sma50, close * 0.95), 2),
-                      'resistance': round(max(high_p, close * 1.05), 2)
-                  })
-
-          now_cairo = datetime.now(timezone(timedelta(hours=3)))
           market_data['updated_at'] = now_cairo.isoformat()
           market_data['updated_at_display'] = now_cairo.strftime('%Y-%m-%d %H:%M:%S')
+          market_data['data_source'] = 'Mubasher.info Core API'
+
+          if 'indices' not in market_data: market_data['indices'] = {}
+          for k, v in indices.items():
+              market_data['indices'][k] = v
+
+          for ticker, m_data in results.items():
+              if ticker not in market_data['stocks']:
+                  market_data['stocks'][ticker] = {'ticker': ticker}
+              st = market_data['stocks'][ticker]
+              st.update({
+                  'ticker': ticker,
+                  'close': m_data['close'],
+                  'chg': m_data['chg'],
+                  'open': m_data['open'],
+                  'high': m_data['high'],
+                  'low': m_data['low'],
+                  'volume': m_data['volume'],
+                  'source': 'Mubasher.info'
+              })
 
           with open('market_data.json', 'w', encoding='utf-8') as f:
               json.dump(market_data, f, ensure_ascii=False, indent=2)
 
-          print('market_data.json updated successfully with latest live quotes!')
+          print('market_data.json updated with latest Mubasher.info prices!')
           "
 
       - name: Commit and Push Updated Market Data
