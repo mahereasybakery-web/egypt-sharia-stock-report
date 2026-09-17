@@ -798,56 +798,6 @@
                 </div>
             </div>
 
-                        <!-- Interactive Helper Banner for Stock/Fund Chart & Analytics -->
-            <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-teal-950/70 border border-emerald-500/30 rounded-2xl p-3.5 space-y-2.5 shadow-lg select-none">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/30 shrink-0">📊</span>
-                        <div>
-                            <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                                <span>شاشات التداول والتحليل الفني التفاعلية</span>
-                                <span class="text-[9px] bg-emerald-900/90 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">انقر على أي سهم أو صندوق 👆</span>
-                            </div>
-                            <p class="text-[11px] text-slate-300 mt-0.5">
-                                انقر على أي سهم أو صندوق في الجدول أدناه لفتح <b>الشارت الفني التفاعلي (شموع وخطي)</b>، <b>المؤشرات والتقييم العادل</b>، <b>مستهدفات بيوت الأبحاث ووقف الخسارة</b>، و<b>الإفصاحات الحصرية</b> مباشرة مع أزرار الشراء والبيع والتبريد.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Quick Dropdown Selector for immediate one-click opening -->
-                <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2 flex-wrap">
-                    <span class="text-[11px] text-slate-400 font-bold">⚡ فتح مباشر:</span>
-                    <select onchange="if(this.value){ openStockChart(this.value); this.value=''; }" class="bg-slate-900 border border-emerald-800/80 hover:border-emerald-500 text-xs text-emerald-300 font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 flex-1 max-w-md cursor-pointer transition">
-                        <option value="">اختر أي سهم أو صندوق لفتح الشارت والتحليلات فوراً...</option>
-                        <optgroup label="محفظتك الحالية - الأسهم">
-                            <option value="EFID">إيديتا للصناعات الغذائية (EFID)</option>
-                            <option value="TMGH">مجموعة طلعت مصطفى (TMGH)</option>
-                            <option value="ADIB">مصرف أبوظبي الإسلامي (ADIB)</option>
-                            <option value="ORHD">أوراسكوم للتنمية مصر (ORHD)</option>
-                            <option value="EFIH">إي فاينانس للاستثمارات (EFIH)</option>
-                            <option value="OCDI">سوديك للتنمية والاستثمار (OCDI)</option>
-                            <option value="ETEL">المصرية للاتصالات (ETEL)</option>
-                            <option value="EGAL">مصر للألومنيوم (EGAL)</option>
-                        </optgroup>
-                        <optgroup label="محفظتك الحالية - صناديق الاستثمار والذهب">
-                            <option value="AZG">🪙 صندوق أزيموت للذهب عيار 24 (AZG)</option>
-                            <option value="THNDR_GOLD">🪙 سبائك ذهب ثندر (THNDR_GOLD)</option>
-                            <option value="CMS">🕌 صندوق سي آي شريعة مصر (CMS)</option>
-                            <option value="BWA">🕌 صندوق بلتون وفرة (BWA)</option>
-                            <option value="NMF">🕌 صندوق نعيم مصر للشريعة (NMF)</option>
-                        </optgroup>
-                        <optgroup label="باقي أسهم مؤشر الشريعة EGX33">
-                            <option value="FWRY">فوري للمدفوعات (FWRY)</option>
-                            <option value="ABUK">أبو قير للأسمدة (ABUK)</option>
-                            <option value="MFPC">موبكو للأسمدة (MFPC)</option>
-                            <option value="SKPC">سيدي كرير للبتروكيماويات (SKPC)</option>
-                            <option value="AMOC">أموك للبترول (AMOC)</option>
-                            <option value="PHDC">بالم هيلز للتعمير (PHDC)</option>
-                            <option value="SWDY">السويدي إليكتريك (SWDY)</option>
-                        </optgroup>
-                    </select>
-                </div>
-            </div>
 
                         <!-- Mobile vs Table View Mode Switcher -->
             <div class="flex items-center justify-between pb-1 px-1">
@@ -4541,7 +4491,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v8.0',
+                appVersion: 'egx-sharia-v8.1',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
