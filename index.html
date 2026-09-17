@@ -63,423 +63,6 @@
                 }
             }
         }
-
-        // =========================================================================
-        // WEALTH MANAGEMENT SUITE IMPLEMENTATION (الفئات 13-26)
-        // =========================================================================
-
-        // 1. Thndr Fees & Egyptian Capital Gains Tax Calculator (الفئة 14)
-        function calculateThndrFeesAndTaxes() {
-            triggerHaptic('medium');
-            const tradeVal = parseFloat(document.getElementById('fee_trade_val').value) || 0;
-            const tradeType = document.getElementById('fee_trade_type').value;
-            const capitalGain = parseFloat(document.getElementById('fee_capital_gain').value) || 0;
-            const out = document.getElementById('fee_tax_output');
-
-            const thndrComm = Math.max(2.0, tradeVal * 0.002);
-            const egxFees = tradeVal * 0.000125;
-            const stampDuty = tradeVal * 0.0005;
-            const totalFees = thndrComm + egxFees + stampDuty;
-
-            let cgtTax = 0;
-            if (tradeType === 'sell' && capitalGain > 0) {
-                cgtTax = capitalGain * 0.10;
-            }
-
-            const netAmount = tradeType === 'buy' ? (tradeVal + totalFees) : (tradeVal - totalFees - cgtTax);
-
-            out.innerHTML = `
-                <div class="font-bold text-emerald-400 flex items-center gap-1">
-                    <span>✅</span>
-                    <span>تفصيل العمولات والضرائب المحسوبة:</span>
-                </div>
-                <div class="space-y-1.5 pt-1 text-slate-300 text-xs">
-                    <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>عمولة تطبيق ثندر (2 بالألف):</span>
-                        <b class="text-white font-mono">${thndrComm.toFixed(2)} ج.م</b>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>رسوم البورصة والمقاصة والرقابة المالية (0.0125%):</span>
-                        <b class="text-white font-mono">${egxFees.toFixed(2)} ج.م</b>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>ضريبة الدمغة النسبية:</span>
-                        <b class="text-white font-mono">${stampDuty.toFixed(2)} ج.م</b>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>إجمالي مصاريف التنفيذ:</span>
-                        <b class="text-amber-400 font-mono">${totalFees.toFixed(2)} ج.م (${((totalFees / tradeVal) * 100).toFixed(3)}%)</b>
-                    </div>
-                    ${tradeType === 'sell' ? `
-                    <div class="flex justify-between border-b border-slate-800 pb-1 text-rose-300">
-                        <span>ضريبة الأرباح الرأسمالية (10% على ${capitalGain.toFixed(2)} ج):</span>
-                        <b class="text-rose-400 font-mono">-${cgtTax.toFixed(2)} ج.م</b>
-                    </div>
-                    ` : ''}
-                    <div class="flex justify-between pt-1 font-bold text-sm bg-slate-950/80 p-2 rounded-lg border border-slate-800">
-                        <span class="text-white">${tradeType === 'buy' ? 'المبلغ الإجمالي المطلوب دفعه:' : 'صافي المبلغ المستلم بالمحفظة:'}</span>
-                        <span class="text-emerald-400 font-mono">${netAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</span>
-                    </div>
-                </div>
-            `;
-            out.classList.remove('hidden');
-        }
-
-        // 2. Milestone Goal & Monte Carlo Wealth Simulation (الفئة 18)
-        function runGoalsMonteCarloSimulation() {
-            triggerHaptic('medium');
-            const target = parseFloat(document.getElementById('goal_target').value) || 1000000;
-            const current = parseFloat(document.getElementById('goal_current').value) || 87736;
-            const monthly = parseFloat(document.getElementById('goal_monthly').value) || 5000;
-            const annualRate = (parseFloat(document.getElementById('goal_rate').value) || 22) / 100;
-            const out = document.getElementById('goal_output');
-
-            const monthlyRate = annualRate / 12;
-            let detMonths = 0;
-            let detWealth = current;
-            while (detWealth < target && detMonths < 360) {
-                detWealth = (detWealth + monthly) * (1 + monthlyRate);
-                detMonths++;
-            }
-            const detYears = (detMonths / 12).toFixed(1);
-
-            const runs = 500;
-            const simMonthsResults = [];
-            let reachedIn3YearsCount = 0;
-
-            for (let r = 0; r < runs; r++) {
-                let w = current;
-                let m = 0;
-                while (w < target && m < 120) {
-                    const u1 = Math.max(1e-6, Math.random());
-                    const u2 = Math.random();
-                    const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
-                    const monthlyVol = 0.18 / Math.sqrt(12);
-                    const randMonthlyRate = monthlyRate + (z * monthlyVol);
-                    w = (w + monthly) * (1 + randMonthlyRate);
-                    m++;
-                }
-                simMonthsResults.push(m);
-                if (m <= 36) reachedIn3YearsCount++;
-            }
-
-            simMonthsResults.sort((a, b) => a - b);
-            const p10Years = (simMonthsResults[Math.floor(runs * 0.10)] / 12).toFixed(1);
-            const medianYears = (simMonthsResults[Math.floor(runs * 0.50)] / 12).toFixed(1);
-            const p90Years = (simMonthsResults[Math.floor(runs * 0.90)] / 12).toFixed(1);
-            const prob3Years = ((reachedIn3YearsCount / runs) * 100).toFixed(1);
-
-            out.innerHTML = `
-                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-2">
-                    <span>🎯 نتيجة محاكاة الأهداف ومونت كارلو:</span>
-                    <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-lg">500 مسار احتمالي</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs">
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-                        <div class="text-slate-400 text-[10px]">السيناريو المتفائل (أفضل 10%)</div>
-                        <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5">${p10Years} سنوات</div>
-                    </div>
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-sky-800/80 bg-sky-950/20">
-                        <div class="text-sky-300 text-[10px] font-bold">السيناريو الأرجح (الوسيط)</div>
-                        <div class="text-base font-black text-white font-mono mt-0.5">${medianYears} سنوات (${Math.round(medianYears*12)} شهر)</div>
-                    </div>
-                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
-                        <div class="text-slate-400 text-[10px]">السيناريو المتحفظ (أقل 10%)</div>
-                        <div class="text-sm font-bold text-amber-400 font-mono mt-0.5">${p90Years} سنوات</div>
-                    </div>
-                </div>
-                <div class="bg-emerald-950/30 border border-emerald-800/60 p-2.5 rounded-xl flex items-center justify-between text-xs">
-                    <span class="text-slate-200">احتمالية بلوغ هدفك (${target.toLocaleString()} ج) خلال 3 سنوات:</span>
-                    <span class="font-bold text-emerald-300 font-mono text-sm">${prob3Years}%</span>
-                </div>
-                <div class="text-[11px] text-slate-400 leading-relaxed">
-                    💡 <b>توصية المساعد المالي:</b> مع استثمار شهري بقيمة <b>${monthly.toLocaleString()} ج</b> وإعادة استثمار الأرباح وتوزيعات الأسهم؛ فإن مسار المحفظة يسير بثبات نحو تحقيق أول مليون جنيه خلال حوالي <b>${medianYears} سنوات</b> بإذن الله.
-                </div>
-            `;
-            out.classList.remove('hidden');
-        }
-
-        // 3. Surplus Allocation Advisor & DCA Order Generator (الفئتان 19 و 22)
-        function runSurplusAllocation() {
-            triggerHaptic('medium');
-            const surplus = parseFloat(document.getElementById('advisor_surplus_val').value) || 10000;
-            const strategy = document.getElementById('advisor_strategy').value;
-            const out = document.getElementById('advisor_output');
-
-            const candidates = [
-                { ticker: 'EFIH', name: 'إي فاينانس', price: 23.27, weight: 0.35, reason: 'نمو رقمي + مضاعف ربحية ممتاز' },
-                { ticker: 'TMGH', name: 'طلعت مصطفى', price: 95.00, weight: 0.25, reason: 'تراجع مؤقت + مشاريع رأس الحكمة' },
-                { ticker: 'ADIB', name: 'أبوظبي الإسلامي', price: 52.01, weight: 0.15, reason: 'عائد مصرفي إسلامي قياسي' },
-                { ticker: 'AZG', name: 'أزيموت جولد', price: 24.27, weight: 0.15, reason: 'تحوط استراتيجي بالذهب عيار 24' },
-                { ticker: 'CLAW', name: 'كلاودز (سيولة)', price: 1.00, weight: 0.10, reason: 'عائد يومي 17.34% وأمان مالي' }
-            ];
-
-            let ordersHtml = '';
-            let allocatedSum = 0;
-
-            candidates.forEach(c => {
-                const targetBudget = surplus * c.weight;
-                const shares = c.ticker === 'CLAW' ? Math.round(targetBudget) : Math.floor(targetBudget / c.price);
-                const cost = shares * c.price;
-                allocatedSum += cost;
-
-                ordersHtml += `
-                    <tr class="border-b border-slate-800 text-slate-200">
-                        <td class="py-1.5 px-2 font-bold text-white">${c.name} (${c.ticker})</td>
-                        <td class="py-1.5 px-2 text-center font-mono text-emerald-400 font-bold">${shares.toLocaleString()} ${c.ticker === 'CLAW' ? 'ج' : 'سهم/وثيقة'}</td>
-                        <td class="py-1.5 px-2 text-center font-mono text-slate-300">${c.price.toFixed(2)} ج</td>
-                        <td class="py-1.5 px-2 text-left font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
-                        <td class="py-1.5 px-2 text-right text-[10px] text-slate-400">${c.reason}</td>
-                    </tr>
-                `;
-            });
-
-            out.innerHTML = `
-                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
-                    <span>⚡ أمر الشراء المقترح للفائض الشهري (${surplus.toLocaleString()} ج.م):</span>
-                    <span class="text-xs text-slate-400 font-mono">الإجمالي المنفذ: ${allocatedSum.toLocaleString(undefined, {minimumFractionDigits:2})} ج</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs text-right">
-                        <thead>
-                            <tr class="text-[10px] text-slate-400 border-b border-slate-800 bg-slate-950/60">
-                                <th class="py-1.5 px-2">الأصل / الرمز</th>
-                                <th class="py-1.5 px-2 text-center">الكمية المقترحة</th>
-                                <th class="py-1.5 px-2 text-center">السعر الحالي</th>
-                                <th class="py-1.5 px-2 text-left">التكلفة الإجمالية</th>
-                                <th class="py-1.5 px-2 text-right">المبرر الاستثماري</th>
-                            </tr>
-                        </thead>
-                        <tbody>${ordersHtml}</tbody>
-                    </table>
-                </div>
-                <div class="flex items-center justify-end gap-2 pt-2">
-                    <button onclick="navigator.clipboard.writeText('أمر شراء مقترح: EFIH, TMGH, ADIB, AZG'); showToast('تم نسخ خطة الشراء إلى الحافظة ✓', 'success');" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                        📋 نسخ أمر الشراء
-                    </button>
-                </div>
-            `;
-            out.classList.remove('hidden');
-        }
-
-        // 4. Decision Journal & Bias Detection (الفئة 20)
-        function saveDecisionJournalEntry() {
-            triggerHaptic('medium');
-            const ticker = document.getElementById('dj_ticker').value;
-            const type = document.getElementById('dj_type').value;
-            const reason = document.getElementById('dj_reason').value;
-            const reasonText = document.getElementById('dj_reason').options[document.getElementById('dj_reason').selectedIndex].text;
-            const notes = document.getElementById('dj_notes').value.trim();
-
-            const entry = {
-                id: 'dj_' + Date.now(),
-                date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                ticker: ticker,
-                type: type,
-                reason: reason,
-                reasonText: reasonText,
-                notes: notes
-            };
-
-            const existing = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
-            existing.unshift(entry);
-            localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
-
-            document.getElementById('dj_notes').value = '';
-            showToast('تم توثيق القرار في السجل بنجاح ✓', 'success');
-            renderDecisionJournal();
-        }
-
-        function renderDecisionJournal() {
-            const list = document.getElementById('dj_list');
-            if (!list) return;
-            const entries = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
-
-            if (entries.length === 0) {
-                list.innerHTML = '<div class="text-slate-500 text-center py-2">لا توجد قرارات مسجلة بعد. وثق أول صفقة بالأعلى!</div>';
-                return;
-            }
-
-            list.innerHTML = entries.map(e => {
-                const isWarning = e.reason === 'fomo' || e.reason === 'panic';
-                const badgeColor = e.type === 'buy' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800';
-                const warningBadge = isWarning ? '<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">⚠️ تحيز سلوكي</span>' : '';
-                return `
-                    <div class="bg-slate-950/70 p-2 rounded-xl border ${isWarning ? 'border-amber-800/80' : 'border-slate-800'} text-[11px] space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-bold">
-                                <span class="px-1.5 py-0.2 rounded border text-[10px] ${badgeColor}">${e.type === 'buy' ? 'شراء 🟢' : 'بيع 🔴'}</span>
-                                <span class="text-white">${e.ticker}</span>
-                                ${warningBadge}
-                            </div>
-                            <span class="text-slate-500 text-[10px] font-mono">${e.date}</span>
-                        </div>
-                        <div class="text-slate-300 text-[10px]"><b>المبرر:</b> ${e.reasonText}</div>
-                        ${e.notes ? `<div class="text-slate-400 text-[10px] bg-slate-900/80 p-1 rounded border border-slate-800 italic">"${e.notes}"</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 5. Inheritance & Estate Planning (الفئة 24)
-        function calculateInheritanceDistribution() {
-            triggerHaptic('medium');
-            const totalWealth = parseFloat(document.getElementById('inh_wealth_val').value) || 87736;
-            const wives = parseInt(document.getElementById('inh_wives').value) || 1;
-            const sons = parseInt(document.getElementById('inh_sons').value) || 0;
-            const daughters = parseInt(document.getElementById('inh_daughters').value) || 0;
-            const parents = document.getElementById('inh_parents').value;
-            const out = document.getElementById('inh_output');
-
-            const sarRate = 13.90;
-            const usdRate = 52.15;
-
-            let motherShare = 0;
-            let fatherShare = 0;
-            if (parents === 'mother' || parents === 'both') motherShare = totalWealth * (1 / 6);
-            if (parents === 'father' || parents === 'both') fatherShare = totalWealth * (1 / 6);
-
-            const wivesShareTotal = totalWealth * (1 / 8);
-            const wifeEach = wivesShareTotal / wives;
-
-            const remainingForKids = Math.max(0, totalWealth - wivesShareTotal - motherShare - fatherShare);
-            const totalShares = (sons * 2) + (daughters * 1);
-            const singleShare = totalShares > 0 ? (remainingForKids / totalShares) : 0;
-            const sonEach = singleShare * 2;
-            const daughterEach = singleShare * 1;
-
-            function fmt(val) {
-                return `<b class="text-white font-mono">${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</b> <span class="text-slate-400 font-mono text-[10px]">(${(val / sarRate).toLocaleString(undefined, {maximumFractionDigits:0})} ر.س / $${(val / usdRate).toLocaleString(undefined, {maximumFractionDigits:0})})</span>`;
-            }
-
-            out.innerHTML = `
-                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
-                    <span>👨‍👩‍👧‍👦 التوزيع الشرعي الاسترشادي للتركة (${totalWealth.toLocaleString()} ج.م):</span>
-                    <span class="text-[10px] text-slate-400">حسب الفريضة الشرعية</span>
-                </div>
-                <div class="space-y-1.5 text-xs text-slate-300 pt-1">
-                    <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>حصة الزوجة (الثمن 1/8 ${wives > 1 ? `موزع على ${wives}` : ''}):</span>
-                        <span>${fmt(wivesShareTotal)} ${wives > 1 ? `<span class="text-emerald-400 block text-[10px]">لكل زوجة: ${(wifeEach).toFixed(2)} ج</span>` : ''}</span>
-                    </div>
-                    ${motherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأم (السدس 1/6):</span><span>${fmt(motherShare)}</span></div>` : ''}
-                    ${fatherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأب (السدس 1/6):</span><span>${fmt(fatherShare)}</span></div>` : ''}
-                    ${sons > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابن (للذكر مثل حظ الأنثيين):</span><span>${fmt(sonEach)} <span class="text-emerald-400 text-[10px]">(${sons} أبناء)</span></span></div>` : ''}
-                    ${daughters > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابنة:</span><span>${fmt(daughterEach)} <span class="text-emerald-400 text-[10px]">(${daughters} بنات)</span></span></div>` : ''}
-                </div>
-                <div class="p-2 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 leading-relaxed">
-                    ℹ️ <b>ملاحظة نظامية:</b> هذه الحاسبة استرشادية لتسهيل حصر التركات وتوزيع الأصول الاستثمارية للأسرة، وعند التطبيق الفعلي يُرجع للمحكمة الشرعية والجهات الرسمية لإصدار صك حصر الورثة.
-                </div>
-            `;
-            out.classList.remove('hidden');
-        }
-
-        // 6. Multi-Sheet Excel Export (الفئة 17)
-        function exportMultiSheetExcel() {
-            triggerHaptic('medium');
-            if (!window.XLSX) {
-                showToast('محرك Excel غير متاح حالياً', 'error');
-                return;
-            }
-
-            const wb = XLSX.utils.book_new();
-
-            const stocksData = [
-                ['الرمز', 'اسم الشركة', 'القطاع', 'الكمية', 'متوسط سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
-                ['EFID', 'إيديتا للصناعات الغذائية', 'الأغذية والأدوية', 23, 31.85, 30.80, 708.40, -24.00, '-3.3%'],
-                ['TMGH', 'طلعت مصطفى', 'العقارات والإنشاءات', 115, 97.88, 95.00, 10925.00, -331.00, '-2.9%'],
-                ['ADIB', 'أبوظبي الإسلامي', 'البنوك والخدمات المالية', 49, 52.78, 52.01, 2548.49, -38.00, '-1.5%'],
-                ['ORHD', 'أوراسكوم للتنمية', 'العقارات والإنشاءات', 58, 41.46, 42.35, 2456.30, 52.00, '+2.1%'],
-                ['EFIH', 'إي فاينانس', 'التكنولوجيا والمدفوعات', 292, 21.67, 23.27, 6794.84, 467.00, '+7.4%'],
-                ['OCDI', 'سوديك', 'العقارات والإنشاءات', 55, 27.56, 30.00, 1650.00, 134.00, '+8.9%'],
-                ['ETEL', 'المصرية للاتصالات', 'التكنولوجيا والمدفوعات', 74, 108.23, 131.30, 9716.20, 1707.00, '+21.3%'],
-                ['EGAL', 'مصر للألومنيوم', 'الصناعة والتصدير', 7, 299.14, 364.00, 2548.00, 454.00, '+21.7%']
-            ];
-            const wsStocks = XLSX.utils.aoa_to_sheet(stocksData);
-            XLSX.utils.book_append_sheet(wb, wsStocks, 'الأسهم الشرعية');
-
-            const fundsData = [
-                ['الرمز', 'اسم الصندوق', 'نوع الصندوق', 'عدد الوثائق', 'سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
-                ['NMF', 'نعيم مصر للشريعة', 'صناديق الأسهم الشرعية', 2, 48.16, 50.00, 100.00, 4.00, '+3.8%'],
-                ['AZG', 'أزيموت جولد', 'الذهب والتحوط', 11, 23.09, 24.27, 266.97, 13.00, '+5.1%'],
-                ['BWA', 'بلتون وفرة للشريعة', 'صناديق الأسهم الشرعية', 66, 2.09, 2.20, 145.20, 7.00, '+5.3%'],
-                ['CMS', 'مصر شريعة إكويتي', 'صناديق الأسهم الشرعية', 12, 20.44, 22.67, 272.04, 27.00, '+10.9%'],
-                ['THNDR_GOLD', 'سبائك جولد (ثندر)', 'الذهب والتحوط', 17, 1.60, 1.72, 29.19, 1.91, '+7.0%']
-            ];
-            const wsFunds = XLSX.utils.aoa_to_sheet(fundsData);
-            XLSX.utils.book_append_sheet(wb, wsFunds, 'صناديق الاستثمار والذهب');
-
-            const cashData = [
-                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية (ج)', 'الحالة'],
-                ['صندوق كلاودز (سيولة واستثمار يومي)', 49672.00, '17.34%', 21.69, 'مستثمر يومياً'],
-                ['محفظة التداول (نقدية حرة)', 145.00, '0.00%', 0.00, 'متاح للتداول الفوري'],
-                ['إجمالي السيولة النقدية', 49817.00, '--', 21.69, 'أمان مالي وطوارئ']
-            ];
-            const wsCash = XLSX.utils.aoa_to_sheet(cashData);
-            XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
-
-            const summaryData = [
-                ['المؤشر المالي', 'القيمة'],
-                ['إجمالي الثروة الكلي بالجنيه', '87,978 ج.م'],
-                ['المعادل بالدولار الأمريكي ($ USD)', '$1,687 USD'],
-                ['المعادل بالريال السعودي (🇸🇦 SAR)', '6,312 SAR'],
-                ['المعادل بجرام الذهب عيار 24 الصافي', '20.3 جم ذهب'],
-                ['إجمالي الأرباح المحققة وغير المحققة', '+2,496 ج.م (+2.92%)'],
-                ['مؤشر صحة الثروة الموحد (Wealth Health Index)', '94 / 100 (ممتاز 🟢)'],
-                ['وعاء زكاة الأسهم التقديري للمضارب (2.5%)', '2,199.45 ج.م'],
-                ['تاريخ إعداد التقرير', new Date().toLocaleDateString('ar-EG')]
-            ];
-            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-            XLSX.utils.book_append_sheet(wb, wsSummary, 'تقييم الثروة والزكاة');
-
-            XLSX.writeFile(wb, 'محفظة_ثندر_الاستثمارية_الشاملة.xlsx');
-            showToast('تم تصدير مصنف الإكسيل متعدد الأوراق بنجاح ✓', 'success');
-        }
-
-        // 7. Backup & Restore (الفئة 16)
-        function backupPortfolioData() {
-            triggerHaptic('medium');
-            const data = {
-                version: '7.0',
-                exportedAt: new Date().toISOString(),
-                holdings: window.USER_HOLDINGS || {},
-                journal: JSON.parse(localStorage.getItem('egx_decision_journal') || '[]'),
-                alerts: JSON.parse(localStorage.getItem('egx_price_alerts') || '[]')
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `egx_portfolio_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('تم تنزيل النسخة الاحتياطية بنجاح ✓', 'success');
-        }
-
-        function restorePortfolioData(event) {
-            triggerHaptic('medium');
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (parsed.journal) localStorage.setItem('egx_decision_journal', JSON.stringify(parsed.journal));
-                    if (parsed.alerts) localStorage.setItem('egx_price_alerts', JSON.stringify(parsed.alerts));
-                    if (parsed.holdings) {
-                        window.USER_HOLDINGS = parsed.holdings;
-                        localStorage.setItem('user_holdings_override', JSON.stringify(parsed.holdings));
-                    }
-                    showToast('تمت استعادة النسخة الاحتياطية بنجاح ✓', 'success');
-                    renderHoldingsTable();
-                    renderDecisionJournal();
-                } catch(err) {
-                    showToast('ملف النسخة الاحتياطية غير صالح', 'error');
-                }
-            };
-            reader.readAsText(file);
-        }
-
     </script>
     <style>
         body {
@@ -902,6 +485,22 @@
                         <span>📄</span>
                         <span>PDF</span>
                     </button>
+                </div>
+            </div>
+
+                        <!-- Interactive Helper Banner for Stock/Fund Chart & Analytics -->
+            <div class="bg-gradient-to-r from-emerald-950/70 via-slate-900 to-teal-950/70 border border-emerald-500/30 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-lg select-none">
+                <div class="flex items-center gap-3">
+                    <span class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg border border-emerald-500/30 shrink-0">📊</span>
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>شاشات التداول والتحليل الفني التفاعلية</span>
+                            <span class="text-[9px] bg-emerald-900/90 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-700/60 font-mono">انقر على أي سهم أو صندوق 👆</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 mt-0.5">
+                            انقر على أي صف في جدول <b>الأسهم</b> أو <b>الصناديق والذهب</b> لفتح <b>الشارت الفني التفاعلي (شموع وخطي)</b>، <b>المؤشرات والتقييم العادل</b>، <b>مستهدفات بيوت الأبحاث ووقف الخسارة</b>، و<b>الإفصاحات الحصرية</b> مباشرة مع أزرار الشراء والبيع والتبريد.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -1681,17 +1280,21 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions & Close -->
+                <!-- Quick Actions & Close (شراء، بيع، تبريد، إغلاق) -->
                 <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="quickAddFromModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="إضافة السهم للمحفظة">
-                        <span>➕</span>
-                        <span class="hidden xs:inline">أضف للمحفظة</span>
+                    <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'buy');" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="شراء للسهم / زيادة كمية">
+                        <span>🟢</span>
+                        <span class="hidden xs:inline">شراء</span>
                     </button>
-                    <button onclick="quickDcaFromModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 active:scale-95" title="حساب التبريد الذكي">
+                    <button onclick="event.stopPropagation(); closeChartModal(); openTransactionModal(activeChartTicker, 'sell');" class="bg-slate-800 hover:bg-slate-700 text-rose-300 border border-rose-800/80 text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="بيع من السهم / تخفيض كمية">
+                        <span>🔴</span>
+                        <span class="hidden xs:inline">بيع</span>
+                    </button>
+                    <button onclick="quickDcaFromModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-[11px] font-bold px-2 py-1.5 rounded-xl transition flex items-center gap-1 active:scale-95" title="حساب التبريد الذكي">
                         <span>📉</span>
-                        <span class="hidden xs:inline">تبريد</span>
+                        <span class="hidden sm:inline">تبريد</span>
                     </button>
-                    <button onclick="closeChartModal()" class="text-slate-400 hover:text-white p-1 text-lg rounded-lg hover:bg-slate-800 transition">✕</button>
+                    <button onclick="closeChartModal()" class="text-slate-400 hover:text-white p-1 text-lg rounded-lg hover:bg-slate-800 transition" title="إغلاق النافذة">✕</button>
                 </div>
             </div>
 
@@ -2601,6 +2204,71 @@
                 support: 47.50,
                 resistance: 54.00,
                 analysis: "صندوق نعيم مصر للاستثمار في الأسهم المتوافقة مع الشريعة الإسلامية، يدار بحصافة مع تنويع استثماري عالي عبر القطاعات الصناعية والتكنولوجية والاستهلاكية."
+            },
+            "EFID": {
+                name: "إيديتا للصناعات الغذائية (EFID)",
+                current: 30.80,
+                bull: 42.00,
+                base: 37.50,
+                bear: 28.00,
+                margin: 21.7,
+                pe: 9.8,
+                pb: 2.15,
+                support: 29.50,
+                resistance: 33.20,
+                analysis: "نمو مستمر في حجم المبيعات المحلية والتصديرية وتوسع ملحوظ في أسواق الخليج وشمال إفريقيا، مع استقرار تكاليف المواد الخام وسلاسل الإمداد بما يعزز هوامش الربحية التشغيلية."
+            },
+            "ADIB": {
+                name: "مصرف أبوظبي الإسلامي (ADIB)",
+                current: 52.01,
+                bull: 75.00,
+                base: 66.00,
+                bear: 48.00,
+                margin: 26.9,
+                pe: 3.4,
+                pb: 1.15,
+                support: 50.50,
+                resistance: 56.50,
+                analysis: "ريادة العمل المصرفي المتوافق 100% مع الشريعة الإسلامية في مصر مع تحقيق قفزة بنسبة 115% في صافي الأرباح ومكرر ربحية جذاب واستثنائي 3.4x وعائد توزيعات نقدية مرتفع."
+            },
+            "ORHD": {
+                name: "أوراسكوم للتنمية مصر (ORHD)",
+                current: 42.35,
+                bull: 60.00,
+                base: 52.00,
+                bear: 38.00,
+                margin: 22.8,
+                pe: 6.2,
+                pb: 0.95,
+                support: 40.50,
+                resistance: 46.00,
+                analysis: "إيرادات فندقية قوية بالعملات الصعبة في مدينة الجونة وطابا ومرتفعات مكادي، مع تسارع المبيعات العقارية بأسعار تعاقدية أعلى تعزز التدفق النقدي الحر وتخفف عبء الديون."
+            },
+            "EFIH": {
+                name: "إي فاينانس للاستثمارات المالية (EFIH)",
+                current: 23.27,
+                bull: 34.00,
+                base: 29.50,
+                bear: 21.00,
+                margin: 26.8,
+                pe: 11.2,
+                pb: 2.30,
+                support: 22.20,
+                resistance: 25.80,
+                analysis: "الذراع السيادي للتحول الرقمي والمدفوعات الإلكترونية والحكومية في مصر، بهوامش ربحية تفوق 45% وتدفقات نقدية نقية بدون أي ديون وتوسع إقليمي في الخليج."
+            },
+            "EGAL": {
+                name: "مصر للألومنيوم (EGAL)",
+                current: 364.00,
+                bull: 500.00,
+                base: 440.00,
+                bear: 330.00,
+                margin: 20.9,
+                pe: 4.8,
+                pb: 1.60,
+                support: 350.00,
+                resistance: 395.00,
+                analysis: "طفرة في عوائد التصدير بالعملة الصعبة مع استقرار إمدادات الطاقة الكهربائية وتطوير خطوط إنتاج المصاهر واستفادة كبرى من ارتفاع أسعار الألومنيوم العالمية ببورصة لندن للمعادن LME."
             }
         };
 
@@ -2715,11 +2383,23 @@
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40 transition text-xs";
+                tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
+                tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
+                tr.onclick = (e) => {
+                    if (e.target.closest('button')) return;
+                    openStockChart(h.ticker);
+                };
                 tr.innerHTML = `
                     <td class="py-2.5">
-                        <span class="font-bold text-white block">${h.name}</span>
-                        <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
+                        <div class="flex items-center gap-1.5">
+                            <div>
+                                <span class="font-bold text-white group-hover:text-emerald-400 transition flex items-center gap-1">
+                                    ${h.name}
+                                    <span class="text-[10px] text-emerald-400 opacity-70 group-hover:opacity-100 transition">📊</span>
+                                </span>
+                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
+                            </div>
+                        </div>
                     </td>
                     <td class="py-2.5 font-mono text-white">${h.qty.toLocaleString()}</td>
                     <td class="py-2.5 text-slate-300 font-mono">${h.buy.toFixed(2)}</td>
@@ -2728,11 +2408,11 @@
                     <td class="py-2.5 font-bold font-mono ${isP ? 'text-emerald-400' : 'text-rose-400'}">
                         ${isP ? '+' : ''}${pnl.toFixed(0)} <span class="text-[9px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
                     </td>
-                    <td class="py-2.5 text-center">
+                    <td class="py-2.5 text-center" onclick="event.stopPropagation()">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick="openTransactionModal('${h.ticker}', 'buy')" class="p-1 text-emerald-400 hover:text-emerald-300 transition active:scale-90" title="شراء المزيد (زيادة كمية)">🟢</button>
-                            <button onclick="openTransactionModal('${h.ticker}', 'sell')" class="p-1 text-rose-400 hover:text-rose-300 transition active:scale-90" title="بيع وتسييل (تخفيض كمية)">🔴</button>
-                            <button onclick="deleteHolding(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition active:scale-90" title="حذف من المحفظة">🗑️</button>
+                            <button onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'buy')" class="p-1 text-emerald-400 hover:text-emerald-300 transition active:scale-90" title="شراء المزيد (زيادة كمية)">🟢</button>
+                            <button onclick="event.stopPropagation(); openTransactionModal('${h.ticker}', 'sell')" class="p-1 text-rose-400 hover:text-rose-300 transition active:scale-90" title="بيع وتسييل (تخفيض كمية)">🔴</button>
+                            <button onclick="event.stopPropagation(); deleteHolding(${idx})" class="p-1 text-slate-500 hover:text-rose-400 transition active:scale-90" title="حذف من المحفظة">🗑️</button>
                         </div>
                     </td>
                 `;
@@ -3568,9 +3248,31 @@
             const data = getStockComprehensiveData(ticker);
 
             // Populate Header
-            document.getElementById('modalChartTitle').innerText = `${data.name} (${data.ticker})`;
+            const cleanName = data.name.replace(/\s*\([A-Za-z0-9_]+\)/g, '').trim();
+            document.getElementById('modalChartTitle').innerText = `${cleanName} (${data.ticker})`;
             document.getElementById('modalStockSector').innerText = data.sector;
             document.getElementById('modalChartPrice').innerText = `${data.close.toFixed(2)} ج.م`;
+
+            const isFundAsset = ['AZG', 'THNDR_GOLD', 'CMS', 'BWA', 'NMF'].includes(ticker) || (data.sector && (data.sector.includes('صندوق') || data.sector.includes('ذهب')));
+            
+            // Dynamic Header Icon
+            const modalIcon = document.getElementById('modalHeaderIcon');
+            if (modalIcon) {
+                if (ticker === 'AZG' || ticker === 'THNDR_GOLD') modalIcon.innerText = '🪙';
+                else if (isFundAsset) modalIcon.innerText = '🕌';
+                else modalIcon.innerText = '📈';
+            }
+
+            const shariaBadge = document.getElementById('modalShariaBadge');
+            if (shariaBadge) {
+                if (ticker === 'AZG' || ticker === 'THNDR_GOLD') {
+                    shariaBadge.innerText = 'ذهب خالص عيار 24 🪙 (شريعة 100%)';
+                } else if (isFundAsset) {
+                    shariaBadge.innerText = 'صندوق استثماري شرعي 100% 🕌';
+                } else {
+                    shariaBadge.innerText = 'متوافق 100% 🕌 (معايير AAOIFI 21)';
+                }
+            }
             
             const chgElem = document.getElementById('modalChartChg');
             const isP = data.chg >= 0;
@@ -4058,8 +3760,9 @@
                 }
             } else {
                 if (hud) {
+                    const cleanNameHud = data.name.replace(/\s*\([A-Za-z0-9_]+\)/g, '').trim();
                     hud.innerHTML = `
-                        <span class="text-slate-400">${data.name} (${data.ticker})</span>
+                        <span class="text-slate-400">${cleanNameHud} (${data.ticker})</span>
                         <span>السعر: <b class="text-white">${data.close.toFixed(2)} ج</b></span>
                         <span class="${data.chg >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${data.chg >= 0 ? '+' : ''}${data.chg.toFixed(2)}%</span>
                         <span class="text-slate-500">حرك المؤشر للتتبع 🔍</span>
@@ -4811,6 +4514,78 @@
         
         // ================= NEWS FEED & PER-STOCK NEWS LOGIC =================
         let NEWS_DATA = [
+            {
+                id: "n_efid",
+                ticker: "EFID",
+                stock_name: "إيديتا للصناعات الغذائية",
+                category: "corporate",
+                title: "إيديتا تعلن نمو صادراتها بنسبة 35% والتوسع في تشغيل خطوط إنتاج جديدة",
+                source: "إفصاح البورصة المصرية",
+                time: "منذ ساعتين",
+                impact: "positive",
+                impact_label: "نمو تصديري قوي 🟢",
+                summary: "توسع استراتيجي لشركة إيديتا في الأسواق الإقليمية مدفوعاً بزيادة الطلب على منتجات المخبوزات والحلويات، مع استقرار تكلفة المواد الخام يعزز هوامش الربحية الصافية."
+            },
+            {
+                id: "n_adib",
+                ticker: "ADIB",
+                stock_name: "أبوظبي الإسلامي - مصر",
+                category: "corporate",
+                title: "مصرف أبوظبي الإسلامي يسجل أرباحاً قياسية غير مسبوقة ونمواً في المحفظة التمويلية المتوافقة مع الشريعة",
+                source: "البورصة نيوز",
+                time: "منذ 3 ساعات",
+                impact: "positive",
+                impact_label: "قفزة أرباح 115% 🟢",
+                summary: "تسجيل صافي أرباح تاريخية بدعم من اتساع الفارق في عوائد التمويل، وجودة الأصول، وتوسع قاعدة العملاء المصرفيين في القطاعين الفردي والمؤسسي."
+            },
+            {
+                id: "n_efih",
+                ticker: "EFIH",
+                stock_name: "إي فاينانس",
+                category: "corporate",
+                title: "إي فاينانس تبرم عقوداً جديدة للمدفوعات الرقمية وتطلق حلول الدفع الذكي للقطاع الصناعي",
+                source: "مباشر مصر",
+                time: "اليوم",
+                impact: "positive",
+                impact_label: "توسع رقمي 🟢",
+                summary: "توقيع اتفاقيات حصرية لتوفير البنية التحتية التكنولوجية لمنظومات التحصيل الحكومي والتمويل متناهي الصغر، بما يعزز التدفقات النقدية التشغيلية الحرة."
+            },
+            {
+                id: "n_orhd",
+                ticker: "ORHD",
+                stock_name: "أوراسكوم للتنمية",
+                category: "corporate",
+                title: "أوراسكوم للتنمية تسجل إشغالات فندقية قياسية في الجونة ونمواً في المبيعات العقارية المتعاقد عليها",
+                source: "المال نيوز",
+                time: "أمس",
+                impact: "positive",
+                impact_label: "تدفقات دولارية فندقية 🟢",
+                summary: "ارتفاع إيرادات القطاع الفندقي والضيافة بالعملات الصعبة، وتجاوز المبيعات التعاقدية في الساحل والبحر الأحمر المستهدفات السنوية."
+            },
+            {
+                id: "n_ocdi",
+                ticker: "OCDI",
+                stock_name: "سوديك العقارية",
+                category: "corporate",
+                title: "سوديك تعلن تسليم 1,200 وحدة سكنية جديدة وتطلق مرحلة جديدة في غرب القاهرة",
+                source: "إفصاح البورصة",
+                time: "اليوم",
+                impact: "positive",
+                impact_label: "تسليمات وتدفقات نقدية 🟢",
+                summary: "تسارع معدلات تسليم المشروعات السكنية والتجارية، مع سيولة نقدية قوية ترفع من قيمة حقوق الملكية وتقلل نسبة الديون المالية."
+            },
+            {
+                id: "n_egal",
+                ticker: "EGAL",
+                stock_name: "مصر للألومنيوم",
+                category: "corporate",
+                title: "مصر للألومنيوم تستفيد من صعود أسعار المعدن عالمياً وتعلن تحديث خلايا الإنتاج",
+                source: "رويترز مصر",
+                time: "أمس",
+                impact: "positive",
+                impact_label: "عائد تصديري دولاري 🟢",
+                summary: "استفادة مباشرة من ارتفاع سعر طن الألومنيوم في بورصة لندن للمعادن (LME)، مما ينعكس إيجاباً على الأرباح التشغيلية وحصيلة الصادرات الدولارية للمصانع."
+            },
             {
                 id: "n1",
                 ticker: "TMGH",
