@@ -484,6 +484,12 @@
 
         <!-- Live Ticker Bar (Horizontal Scrollable) -->
         <div id="liveTickerBar" class="flex gap-2 overflow-x-auto no-scrollbar pt-3 text-[11px]">
+            <!-- EGX Market Clock & Session Status Badge -->
+            <div id="egxMarketSessionBadge" class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
+                <span id="marketSessionDot" class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
+                <span id="marketSessionText" class="font-bold">البورصة المصرية: جاري التحقق...</span>
+                <span id="marketClockCairo" class="font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
+            </div>
             <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap">
                 <span class="text-slate-400">الدولار:</span>
                 <span id="ticker_usd" class="font-bold text-white">52.15 ج</span>
@@ -2684,41 +2690,44 @@
 
         // 2. Comprehensive Stocks & Funds Database
         let STOCKS_DATA = [
-            { ticker: "MFPC", name: "موبكو للأسمدة", close: 48.69, chg: 4.71, rsi: 73.2, pe: 6.8, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "AMOC", name: "أموك للبترول", close: 13.45, chg: 2.83, rsi: 66.2, pe: 6.4, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ACGC", name: "العربية للأقطان", close: 14.40, chg: 2.64, rsi: 58.7, pe: 8.2, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
-            { ticker: "MCQE", name: "أسمنت قنا", close: 221.00, chg: 2.42, rsi: 46.2, pe: 5.9, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
-            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23.38, chg: 1.65, rsi: 61.3, pe: 7.1, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89.00, chg: 1.25, rsi: 59.2, pe: 6.5, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.33, chg: 1.00, rsi: 44.6, pe: 5.4, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
-            { ticker: "ARCC", name: "العربية للأسمنت", close: 73.03, chg: 0.90, rsi: 50.6, pe: 7.0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "ORWE", name: "النساجون الشرقيون", close: 26.80, chg: 0.90, rsi: 52.0, pe: 6.9, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
-            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 46.90, chg: 0.90, rsi: 65.2, pe: 4.8, type: "stock", rec: "شراء", sector: "البنوك والخدمات المالية" },
-            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.25, chg: 0.83, rsi: 57.2, pe: 5.8, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ATQA", name: "حديد عتاقة", close: 12.58, chg: 0.64, rsi: 63.8, pe: 6.1, type: "stock", rec: "شراء", sector: "الصناعة والتصدير" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", close: 364.00, chg: 0.39, rsi: 57.4, pe: 5.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
-            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.88, chg: -0.11, rsi: 44.6, pe: 18.2, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 30.00, chg: 0.00, rsi: 40.8, pe: 7.6, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 95.00, chg: -0.98, rsi: 38.5, pe: 9.1, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.77, chg: -0.29, rsi: 31.1, pe: 6.8, type: "stock", rec: "تشبع بيعي حاد", sector: "العقارات والإنشاءات" },
-            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.20, chg: -3.02, rsi: 39.1, pe: 8.0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 131.30, chg: -0.53, rsi: 75.1, pe: 6.0, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 23.27, chg: -1.06, rsi: 46.7, pe: 14.5, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 52.01, chg: -0.15, rsi: 47.0, pe: 4.2, type: "stock", rec: "محايد إيجابي", sector: "البنوك والخدمات المالية" },
-            { ticker: "SAUD", name: "بنك البركة مصر", close: 23.10, chg: -0.43, rsi: 47.4, pe: 4.1, type: "stock", rec: "محايد", sector: "البنوك والخدمات المالية" },
-            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.89, chg: 0.13, rsi: 47.8, pe: 6.5, type: "stock", rec: "محايد", sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 30.80, chg: 1.02, rsi: 49.3, pe: 11.2, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
-            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.14, chg: 0.49, rsi: 51.9, pe: 7.8, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 42.35, chg: -0.28, rsi: 52.9, pe: 8.5, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "SWDY", name: "السويدي إليكتريك", close: 124.45, chg: -0.84, rsi: 53.6, pe: 7.4, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
-            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27.08, chg: 0.30, rsi: 54.1, pe: 9.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
-            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 837.01, chg: -0.96, rsi: 57.1, pe: 7.9, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.00, chg: -2.03, rsi: 60.0, pe: 12.1, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.45, rsi: 55.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.30, rsi: 54.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.65, rsi: 53.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.85, rsi: 52.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.40, rsi: 51.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 50, chg: 2.69, rsi: 76.1, pe: 9.3, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13.8, chg: 2.6, rsi: 69.0, pe: 0, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 14.21, chg: -1.32, rsi: 56.3, pe: 0, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 218.98, chg: -0.91, rsi: 45.0, pe: 0, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 10.0, chg: 0.0, rsi: 50.0, pe: 8.0, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 92.55, chg: 3.99, rsi: 64.3, pe: 0, type: "stock", rec: "شراء وتوزيع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.5, chg: 0.51, rsi: 45.8, pe: 0, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
+            { ticker: "ARCC", name: "العربية للأسمنت", close: 73.44, chg: 0.56, rsi: 51.7, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 28, chg: 4.48, rsi: 59.6, pe: 8.5, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
+            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 47.5, chg: 1.28, rsi: 67.3, pe: 0, type: "stock", rec: "شراء", sector: "البنوك والخدمات المالية" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.5, chg: 1.37, rsi: 60.2, pe: 0, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ATQA", name: "حديد عتاقة", close: 12.69, chg: 0.87, rsi: 65.3, pe: 0, type: "stock", rec: "شراء", sector: "الصناعة والتصدير" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 370, chg: 1.65, rsi: 60.6, pe: 14.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.95, chg: 0.37, rsi: 46.6, pe: 19.8, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 30.5, chg: 1.67, rsi: 44.0, pe: 9.8, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 95.8, chg: 0.84, rsi: 42.5, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.7, chg: -0.51, rsi: 30.2, pe: 9.3, type: "stock", rec: "تشبع بيعي", sector: "العقارات والإنشاءات" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.16, chg: -0.33, rsi: 38.5, pe: 0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 133, chg: 1.29, rsi: 76.7, pe: 10.1, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 23.99, chg: 3.09, rsi: 54.0, pe: 0, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 54, chg: 3.83, rsi: 58.2, pe: 5.2, type: "stock", rec: "زخم قيادي", sector: "البنوك والخدمات المالية" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 23.77, chg: 2.9, rsi: 55.9, pe: 5.1, type: "stock", rec: "محايد", sector: "البنوك والخدمات المالية" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.88, chg: -0.13, rsi: 47.5, pe: 5.5, type: "stock", rec: "محايد", sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 31.2, chg: 1.3, rsi: 51.8, pe: 13.9, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
+            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.22, chg: 1.3, rsi: 54.4, pe: 36.7, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 43.47, chg: 2.64, rsi: 60.0, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 127, chg: 2.05, rsi: 57.3, pe: 0, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27, chg: -0.3, rsi: 53.0, pe: 24.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
+            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 879, chg: 5.02, rsi: 66.1, pe: 8.5, type: "stock", rec: "شراء قوي", sector: "العقارات والإنشاءات" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 40.65, chg: 4.23, rsi: 65.1, pe: 0, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
+            { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.47, chg: 0, rsi: 51.6, pe: 46.2, type: "stock", rec: "قاع استثماري", sector: "الصناعة والتصدير" },
+            { ticker: "EAST", name: "الشرقية للدخان", close: 32.02, chg: -1.63, rsi: 21.8, pe: 10.8, type: "stock", rec: "عائد توزيعات", sector: "الصناعة والتصدير" },
+            { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 31, chg: 1.47, rsi: 56.3, pe: 0, type: "stock", rec: "نمو مستمر", sector: "الصناعة والتصدير" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
         ];
 
         // 3. Valuation Scenarios Database
@@ -2987,17 +2996,17 @@
 
         // 4. User Portfolio State Management (Thndr Actual Holdings)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. الأسهم الشرعية (في الأعلى) - محدثة لحظياً بآخر أسعار التنفيذ في البورصة المصرية
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 31.70, sector: "الأغذية والأدوية", isFund: false },
-            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.64, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 53.00, sector: "البنوك والخدمات المالية", isFund: false },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 41.46, cur: 43.11, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.74, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.24, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 129.96, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير", isFund: false },
+            // 1. أسهم المحفظة (الأسهم القيادية) - أسعار التنفيذ المحدثة لحظياً
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 31.20, sector: "الأغذية والأدوية", isFund: false },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.80, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 54.00, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 43.47, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.99, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.50, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 133.00, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 370.00, sector: "الصناعة والتصدير", isFund: false },
 
-            // 2. صناديق الاستثمار والذهب الشرعية (في الأسفل)
+            // 2. وثائق وصناديق الاستثمار (الذهب والسيولة)
             { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.19, sector: "صناديق الأسهم الشرعية", isFund: true },
             { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.96, sector: "الذهب وصناديق التحوط", isFund: true },
             { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.21, sector: "صناديق الأسهم الشرعية", isFund: true },
@@ -4387,7 +4396,7 @@
 
         
         /* ==========================================================================
-           ULTRA-PRO DUAL ENGINE CHART & LINER AUDIT IMPLEMENTATION (v7.7)
+           ULTRA-PRO DUAL ENGINE CHART & LINER AUDIT IMPLEMENTATION (v7.8)
            ========================================================================== */
         let activeChartEngine = 'canvas';
         activeChartType = 'candles';
@@ -4552,7 +4561,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v7.7',
+                appVersion: 'egx-sharia-v7.8',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
@@ -4988,27 +4997,105 @@
         }
 
         // 7. Live Cloud Auto-Sync via market_data.json
+        // =========================================================================
+        // EGX MARKET CLOCK & SESSION REAL-TIME ENGINE
+        // مراقبة توقيت وحالة جلسة تداول البورصة المصرية بدقة (10:00 ص - 2:30 م بتوقيت القاهرة)
+        // =========================================================================
+        function updateEgxMarketClock() {
+            // توقيت القاهرة UTC+3
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cairoTime = new Date(utc + (3600000 * 3));
+            
+            const hours = cairoTime.getHours();
+            const minutes = cairoTime.getMinutes();
+            const seconds = cairoTime.getSeconds();
+            const day = cairoTime.getDay(); // 0 = Sunday, 1 = Monday ... 4 = Thursday, 5 = Friday, 6 = Saturday
+            
+            const timeFormatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            const clockEl = document.getElementById('marketClockCairo');
+            if (clockEl) clockEl.innerText = `${timeFormatted} بتوقيت مصر`;
+            
+            const badgeEl = document.getElementById('egxMarketSessionBadge');
+            const textEl = document.getElementById('marketSessionText');
+            const dotEl = document.getElementById('marketSessionDot');
+            if (!badgeEl || !textEl || !dotEl) return;
+            
+            // أيام العمل الرسمية: الأحد (0) إلى الخميس (4)
+            const isTradingDay = day >= 0 && day <= 4;
+            const currentMinuteOfDay = hours * 60 + minutes;
+            const openMinute = 10 * 60;       // 10:00 AM
+            const closeMinute = 14 * 60 + 30; // 02:30 PM
+            const auctionMinute = 14 * 60 + 45; // 02:45 PM
+            
+            if (!isTradingDay) {
+                // عطلة أسبوعية
+                textEl.innerText = "البورصة: عطلة أسبوعية رسمية (أسعار الإقفال)";
+                badgeEl.className = "bg-slate-900/90 border border-slate-700 text-slate-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0";
+                dotEl.className = "w-2 h-2 rounded-full bg-slate-400";
+            } else if (currentMinuteOfDay >= openMinute && currentMinuteOfDay < closeMinute) {
+                // جلسة التداول جارية الآن
+                textEl.innerText = "جلسة التداول جارية الآن (بث لحظي مباشر)";
+                badgeEl.className = "bg-emerald-950/90 border border-emerald-600 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0";
+                dotEl.className = "w-2 h-2 rounded-full bg-emerald-400 pulse-live";
+            } else if (currentMinuteOfDay >= closeMinute && currentMinuteOfDay < auctionMinute) {
+                // جلسة المزاد وحساب سعر الإقفال
+                textEl.innerText = "جلسة المزاد وتسوية الإقفال اليومي";
+                badgeEl.className = "bg-amber-950/90 border border-amber-600 text-amber-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0";
+                dotEl.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+            } else if (currentMinuteOfDay < openMinute) {
+                // قبل افتتاح الجلسة
+                textEl.innerText = "قبل الجلسة (افتتاح التداول 10:00 ص)";
+                badgeEl.className = "bg-sky-950/90 border border-sky-700 text-sky-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0";
+                dotEl.className = "w-2 h-2 rounded-full bg-sky-400";
+            } else {
+                // بعد انتهاء التداول
+                textEl.innerText = "السوق مغلق (معتمد بأسعار الإقفال الرسمي)";
+                badgeEl.className = "bg-slate-900/90 border border-slate-700 text-slate-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0";
+                dotEl.className = "w-2 h-2 rounded-full bg-slate-400";
+            }
+        }
+        setInterval(updateEgxMarketClock, 1000);
+        setTimeout(updateEgxMarketClock, 100);
+
+        // =========================================================================
+        // REAL-TIME LIVE MARKET SYNC ENGINE (سحب وتحديث فوري متجاوز للكاش 100%)
+        // =========================================================================
         function syncLiveMarketData(isAutoPoll = false) {
             const icon = document.getElementById('refreshIcon');
             if (icon && !isAutoPoll) icon.classList.add('rotate-180');
             const badge = document.getElementById('syncStatusText');
-            if (badge && !isAutoPoll) badge.innerText = "جاري التحديث اللحظي...";
+            if (badge && !isAutoPoll) badge.innerText = "جاري الاتصال السحابي...";
 
-            fetch('./market_data.json?t=' + Date.now(), { cache: 'no-store' })
+            // طلب كاسر للكاش عبر Timestamp و Random Hash
+            const cacheBuster = Date.now() + '_' + Math.floor(Math.random() * 1000000);
+            fetch('./market_data.json?cb=' + cacheBuster, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            })
                 .then(resp => {
-                    if (!resp.ok) throw new Error('Network response not ok');
+                    if (!resp.ok) throw new Error('Network response not ok: ' + resp.status);
                     return resp.json();
                 })
                 .then(data => {
-                    console.log('[Live Market Sync] Received data at:', data.updated_at);
+                    console.log('[Live Market Sync] Received data generated at:', data.updated_at_display);
 
-                    // 1. تحديث كافة الأسهم اللحظية في STOCKS_DATA
+                    let updatedStocksCount = 0;
+
+                    // 1. تحديث أسعار الأسهم اللحظية في STOCKS_DATA
                     if (data.stocks && typeof data.stocks === 'object') {
                         Object.keys(data.stocks).forEach(ticker => {
                             const live = data.stocks[ticker];
-                            const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                            let local = STOCKS_DATA.find(s => s.ticker === ticker);
                             if (local) {
-                                if (live.close > 0) local.close = live.close;
+                                if (live.close > 0) {
+                                    local.close = live.close;
+                                    updatedStocksCount++;
+                                }
                                 if (live.chg !== undefined) local.chg = live.chg;
                                 if (live.open) local.open = live.open;
                                 if (live.high) local.high = live.high;
@@ -5025,7 +5112,7 @@
                         });
                     }
 
-                    // 2. تحديث وثائق الصناديق الاستثمارية
+                    // 2. تحديث أسعار الصناديق
                     if (data.funds && typeof data.funds === 'object') {
                         Object.keys(data.funds).forEach(ticker => {
                             const live = data.funds[ticker];
@@ -5037,7 +5124,7 @@
                         });
                     }
 
-                    // 3. تحديث أسعار أصول المحفظة اللحظية
+                    // 3. تحديث أسعار محفظة المستخدم فوراً
                     userHoldings.forEach(h => {
                         if (data.stocks && data.stocks[h.ticker] && data.stocks[h.ticker].close > 0) {
                             h.cur = data.stocks[h.ticker].close;
@@ -5049,7 +5136,7 @@
                         }
                     });
 
-                    // 4. تحديث شريط الأسعار الحي (الدولار، الذهب، المؤشرات)
+                    // 4. تحديث شريط المؤشرات (الدولار، الذهب، المؤشر)
                     if (data.fx_gold && data.fx_gold.usd_egp && document.getElementById('ticker_usd')) {
                         document.getElementById('ticker_usd').innerText = `${data.fx_gold.usd_egp.close} ج`;
                     }
@@ -5060,7 +5147,7 @@
                         document.getElementById('ticker_egx33').innerText = `${data.indices.EGX33.close.toLocaleString()}`;
                     }
 
-                    // 5. نبض السوق والتوزيعات
+                    // 5. نبض السوق
                     if (data.ai_pulse && data.ai_pulse.text && document.getElementById('ai_pulse_text')) {
                         document.getElementById('ai_pulse_text').innerText = data.ai_pulse.text;
                     }
@@ -5074,16 +5161,15 @@
                         renderDividendsTable(data.dividends_calendar);
                     }
 
-                    // 6. عرض توقيت التحديث اللحظي الدقيق
-                    const now = new Date();
-                    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    if (badge) badge.innerText = `محدث لحظياً (${timeStr}) ✓`;
+                    // 6. عرض توقيت التحديث اللحظي الدقيق ومصدر البث
+                    const timeDisplay = data.updated_at_display ? data.updated_at_display.split(' ')[1] : new Date().toLocaleTimeString('ar-EG');
+                    if (badge) badge.innerText = `محدث لحظياً (${timeDisplay}) ✓`;
 
                     if (!isAutoPoll) {
-                        showToast("تم تحديث كافة الأسعار لحظة بلحظة بنجاح 🟢", "success");
+                        showToast(`✓ تم تحديث الأسعار لحظياً بنجاح (${updatedStocksCount} سهماً ومؤشراً)`, "success");
                     }
 
-                    // 7. تحديث نافذة الشارت الفني التفاعلي إذا كانت مفتوحة حالياً دون وميض
+                    // 7. تحديث نافذة الشارت الفني إذا كانت مفتوحة حالياً
                     const chartModal = document.getElementById('stockChartModal');
                     if (chartModal && !chartModal.classList.contains('hidden') && typeof activeChartTicker !== 'undefined' && activeChartTicker) {
                         openStockChart(activeChartTicker, false);
