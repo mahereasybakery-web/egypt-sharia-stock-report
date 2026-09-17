@@ -468,10 +468,6 @@
                 <button onclick="requestNotificationPermission()" id="pushNotifyBtn" class="text-[11px] bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 p-2 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تفعيل إشعارات الجوال">
                     <span>🔔</span>
                 </button>
-                <button onclick="openInstallModal()" class="text-[11px] bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تثبيت التطبيق على الجوال">
-                    <span>📲</span>
-                    <span class="hidden sm:inline font-bold">تثبيت</span>
-                </button>
                 <button onclick="forceAppUpdate()" class="text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95" title="تحديث وتنشيط فوري للكاش وحفظ أحدث كود">
                     <span>⚡</span>
                     <span class="hidden sm:inline">تحديث فوري</span>
@@ -541,22 +537,6 @@
             </div>
         </div>
     </header>
-
-        <!-- REGULATORY TRANSPARENCY & HELP BAR (Liner Audit Compliance) -->
-        <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800/90 px-3 py-1.5 flex items-center justify-between text-[10px] text-slate-300">
-            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-                <span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">⚠️ تنويه تنظيمي</span>
-                <span class="text-slate-300 truncate">منصة تحليل ومتابعة شخصية مستقلة، لا تنفذ أوامر تداول بالبورصة وتعتمد معايير مؤشر الشريعة EGX33</span>
-            </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <button onclick="openHelpGlossaryModal()" class="px-2 py-0.5 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-800/80 font-bold flex items-center gap-1 transition-colors">
-                    <span>📖 دليل المستثمر والقاموس المالي</span>
-                </button>
-                <button onclick="openPortfolioBackupModal()" class="px-2 py-0.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 font-bold flex items-center gap-1 transition-colors">
-                    <span>💾 نسخ/استعادة</span>
-                </button>
-            </div>
-        </div>
 
 
 
@@ -4561,7 +4541,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v7.9',
+                appVersion: 'egx-sharia-v8.0',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
