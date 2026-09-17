@@ -2369,7 +2369,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=7.5')
+                navigator.serviceWorker.register('sw.js?v=7.6')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -2923,22 +2923,22 @@
 
         // 4. User Portfolio State Management (Thndr Actual Holdings)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. الأسهم الشرعية (في الأعلى)
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 30.61, sector: "الأغذية والأدوية", isFund: false },
-            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 94.40, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.96, sector: "البنوك والخدمات المالية", isFund: false },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 41.46, cur: 42.50, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.00, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.00, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 130.10, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 363.00, sector: "الصناعة والتصدير", isFund: false },
+            // 1. الأسهم الشرعية (في الأعلى) - محدثة لحظياً بآخر أسعار التنفيذ في البورصة المصرية
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 31.70, sector: "الأغذية والأدوية", isFund: false },
+            { ticker: "TMGH", name: "طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.64, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ADIB", name: "أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 53.00, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية", qty: 58, buy: 41.46, cur: 43.11, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.74, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.24, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 129.96, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير", isFund: false },
 
             // 2. صناديق الاستثمار والذهب الشرعية (في الأسفل)
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.00, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 24.27, sector: "الذهب وصناديق التحوط", isFund: true },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 12, buy: 20.44, cur: 22.67, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.72, sector: "الذهب وصناديق التحوط", isFund: true }
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.19, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.96, sector: "الذهب وصناديق التحوط", isFund: true },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.21, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 12, buy: 20.44, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.68, sector: "الذهب وصناديق التحوط", isFund: true }
         ];
 
         const DEFAULT_HOLDINGS = THNDR_ACTUAL_HOLDINGS;
@@ -2968,12 +2968,11 @@
                 localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             }
 
-            // Sync live prices for stocks from STOCKS_DATA
+            // Sync live prices for stocks & funds from STOCKS_DATA
             userHoldings.forEach(h => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (stock) {
-                    // Update cur if valid
-                    if (!h.cur || h.cur <= 0) h.cur = stock.close;
+                if (stock && stock.close > 0) {
+                    h.cur = stock.close; // دائماً تحديث السعر السوقي اللحظي للأسهم والصناديق
                     if (!h.name) h.name = stock.name;
                     if (!h.sector) h.sector = stock.sector;
                 }
@@ -4728,19 +4727,68 @@
         }
 
         // 7. Live Cloud Auto-Sync via market_data.json
-        function syncLiveMarketData() {
+        function syncLiveMarketData(isAutoPoll = false) {
             const icon = document.getElementById('refreshIcon');
-            if (icon) icon.classList.add('rotate-180');
+            if (icon && !isAutoPoll) icon.classList.add('rotate-180');
             const badge = document.getElementById('syncStatusText');
-            if (badge) badge.innerText = "جاري المزامنة...";
+            if (badge && !isAutoPoll) badge.innerText = "جاري التحديث اللحظي...";
 
-            fetch('./market_data.json?t=' + Date.now())
+            fetch('./market_data.json?t=' + Date.now(), { cache: 'no-store' })
                 .then(resp => {
                     if (!resp.ok) throw new Error('Network response not ok');
                     return resp.json();
                 })
                 .then(data => {
-                    console.log('[Cloud Sync] Received live data:', data);
+                    console.log('[Live Market Sync] Received data at:', data.updated_at);
+
+                    // 1. تحديث كافة الأسهم اللحظية في STOCKS_DATA
+                    if (data.stocks && typeof data.stocks === 'object') {
+                        Object.keys(data.stocks).forEach(ticker => {
+                            const live = data.stocks[ticker];
+                            const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                            if (local) {
+                                if (live.close > 0) local.close = live.close;
+                                if (live.chg !== undefined) local.chg = live.chg;
+                                if (live.open) local.open = live.open;
+                                if (live.high) local.high = live.high;
+                                if (live.low) local.low = live.low;
+                                if (live.volume) local.volume = live.volume;
+                                if (live.rsi) local.rsi = live.rsi;
+                                if (live.sma20) local.sma20 = live.sma20;
+                                if (live.sma50) local.sma50 = live.sma50;
+                                if (live.pe) local.pe = live.pe;
+                                if (live.pb) local.pb = live.pb;
+                                if (live.support) local.support = live.support;
+                                if (live.resistance) local.resistance = live.resistance;
+                            }
+                        });
+                    }
+
+                    // 2. تحديث وثائق الصناديق الاستثمارية
+                    if (data.funds && typeof data.funds === 'object') {
+                        Object.keys(data.funds).forEach(ticker => {
+                            const live = data.funds[ticker];
+                            const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                            if (local && live.close > 0) {
+                                local.close = live.close;
+                                if (live.chg !== undefined) local.chg = live.chg;
+                            }
+                        });
+                    }
+
+                    // 3. تحديث أسعار أصول المحفظة اللحظية
+                    userHoldings.forEach(h => {
+                        if (data.stocks && data.stocks[h.ticker] && data.stocks[h.ticker].close > 0) {
+                            h.cur = data.stocks[h.ticker].close;
+                        } else if (data.funds && data.funds[h.ticker] && data.funds[h.ticker].close > 0) {
+                            h.cur = data.funds[h.ticker].close;
+                        } else {
+                            const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                            if (found && found.close > 0) h.cur = found.close;
+                        }
+                    });
+
+                    // 4. تحديث شريط الأسعار الحي (الدولار، الذهب، المؤشرات)
                     if (data.fx_gold && data.fx_gold.usd_egp && document.getElementById('ticker_usd')) {
                         document.getElementById('ticker_usd').innerText = `${data.fx_gold.usd_egp.close} ج`;
                     }
@@ -4750,6 +4798,8 @@
                     if (data.indices && data.indices.EGX33 && document.getElementById('ticker_egx33')) {
                         document.getElementById('ticker_egx33').innerText = `${data.indices.EGX33.close.toLocaleString()}`;
                     }
+
+                    // 5. نبض السوق والتوزيعات
                     if (data.ai_pulse && data.ai_pulse.text && document.getElementById('ai_pulse_text')) {
                         document.getElementById('ai_pulse_text').innerText = data.ai_pulse.text;
                     }
@@ -4762,24 +4812,58 @@
                     if (data.dividends_calendar) {
                         renderDividendsTable(data.dividends_calendar);
                     }
-                    if (badge) badge.innerText = "محدث سحابياً ✓";
-                    showToast("تمت المزامنة اللحظية مع السحابة بنجاح", "success");
+
+                    // 6. عرض توقيت التحديث اللحظي الدقيق
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    if (badge) badge.innerText = `محدث لحظياً (${timeStr}) ✓`;
+
+                    if (!isAutoPoll) {
+                        showToast("تم تحديث كافة الأسعار لحظة بلحظة بنجاح 🟢", "success");
+                    }
+
+                    // 7. تحديث نافذة الشارت الفني التفاعلي إذا كانت مفتوحة حالياً دون وميض
+                    const chartModal = document.getElementById('stockChartModal');
+                    if (chartModal && !chartModal.classList.contains('hidden') && typeof activeChartTicker !== 'undefined' && activeChartTicker) {
+                        openStockChart(activeChartTicker, false);
+                    }
                 })
                 .catch(err => {
-                    console.warn('[Cloud Sync] Using bundled local state:', err);
-                    if (badge) badge.innerText = "مزامنة محلية";
+                    console.warn('[Live Market Sync] Note:', err);
+                    if (badge && !isAutoPoll) badge.innerText = "مزامنة محلية";
                 })
                 .finally(() => {
                     if (icon) setTimeout(() => icon.classList.remove('rotate-180'), 500);
                     renderStocks();
                     renderHoldingsTable();
+                    if (typeof renderValuationCard === 'function') renderValuationCard();
                 });
         }
 
         function refreshData() {
             triggerHaptic('medium');
-            syncLiveMarketData();
+            syncLiveMarketData(false);
         }
+
+        // =========================================================================
+        // محرك التحديث التلقائي اللحظي المستمر (Auto-Polling Moment-by-Moment)
+        // يتم التحديث كل 15 ثانية تلقائياً أثناء تشغيل التطبيق لضمان دقة الأسعار دائماً
+        // =========================================================================
+        setInterval(() => {
+            if (!document.hidden) {
+                syncLiveMarketData(true);
+            }
+        }, 15000);
+
+        // التحديث الفوري عند عودة المستخدم للتطبيق أو فتح الشاشة
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                syncLiveMarketData(true);
+            }
+        });
+        window.addEventListener('focus', () => {
+            syncLiveMarketData(true);
+        });
 
         // 8. Stocks Radar & Filter Logic
         let currentFilter = 'all';
