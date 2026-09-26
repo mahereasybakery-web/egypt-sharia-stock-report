@@ -127,6 +127,26 @@
             }
         }
 
+
+        /* ── Real-time price flash animations ── */
+        @keyframes flashUp {
+            0%   { background: rgba(16,185,129,0.45); color:#fff; }
+            100% { background: transparent; }
+        }
+        @keyframes flashDown {
+            0%   { background: rgba(244,63,94,0.45); color:#fff; }
+            100% { background: transparent; }
+        }
+        .price-flash-up   { animation: flashUp   1.2s ease-out forwards; border-radius:4px; }
+        .price-flash-down { animation: flashDown 1.2s ease-out forwards; border-radius:4px; }
+
+        /* Live pulse dot */
+        @keyframes livePulse {
+            0%,100% { transform:scale(1); opacity:1; }
+            50%      { transform:scale(1.6); opacity:0.6; }
+        }
+        .pulse-live { animation: livePulse 1.2s ease-in-out infinite; }
+
         /* =========================================================================
            ADVANCED LIGHT & DARK THEME SYSTEM (معايير التباين والجمالية الفائقة)
            ========================================================================= */
@@ -4771,7 +4791,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v8.3',
+                appVersion: 'egx-sharia-v8.4',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
@@ -5478,19 +5498,167 @@
             }
         }
 
-        // تشغيل المزامنة المباشرة كل 30 ثانية (أسرع من الـ cloud JSON الذي هو كل 15 ثانية)
-        setInterval(() => {
-            if (!document.hidden) syncMubasherDirectAll();
-        }, 30000);
-        // وكذلك عند فتح الصفحة
-        setTimeout(syncMubasherDirectAll, 3000);
+        // ── Ultra-fast polling: 5s during trading, 30s outside ─────
+        (function startSmartPolling() {
+            let lastHash = '';
 
+            async function ultraFastSync() {
+                if (document.hidden) return;
 
-        setInterval(() => {
-            if (!document.hidden) {
-                syncLiveMarketData(true);
+                // Check if within trading session (Cairo UTC+3: 10:00-14:45 Sun-Thu)
+                const now = new Date();
+                const cairoH   = (now.getUTCHours() + 3) % 24;
+                const cairoMin = now.getUTCMinutes();
+                const dow      = now.getUTCDay(); // 0=Sun..4=Thu
+                const totalMin = cairoH * 60 + cairoMin;
+                const inSession = dow >= 0 && dow <= 4 && totalMin >= 600 && totalMin < 885;
+
+                // Fetch market_data.json with cache-bust
+                try {
+                    const cb   = Date.now();
+                    const resp = await fetch('./market_data.json?cb=' + cb, {
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                    });
+                    if (!resp.ok) return;
+
+                    // ETag / content-hash to skip re-processing identical files
+                    const etag = resp.headers.get('ETag') || resp.headers.get('Last-Modified') || '';
+
+                    const data = await resp.json();
+                    const newHash = (data.updated_at || '') + (data.sync_count || '');
+                    if (newHash && newHash === lastHash) return; // No change
+                    lastHash = newHash;
+
+                    let updated = 0;
+
+                    // ── Update STOCKS_DATA ─────────────────────────────────
+                    if (data.stocks && typeof data.stocks === 'object') {
+                        Object.entries(data.stocks).forEach(([ticker, live]) => {
+                            const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                            if (!local || !live.close || live.close <= 0) return;
+
+                            const prevClose = local.close;
+                            local.close  = live.close;
+                            local.chg    = live.chg   ?? local.chg;
+                            local.open   = live.open  || local.open;
+                            local.high   = live.high  || local.high;
+                            local.low    = live.low   || local.low;
+                            local.volume = live.volume || local.volume;
+                            if (live.rsi)        local.rsi        = live.rsi;
+                            if (live.sma20)      local.sma20      = live.sma20;
+                            if (live.sma50)      local.sma50      = live.sma50;
+                            if (live.support)    local.support    = live.support;
+                            if (live.resistance) local.resistance = live.resistance;
+
+                            // Flash animation if price changed
+                            if (prevClose !== live.close) {
+                                const isUp = live.close > prevClose;
+                                document.querySelectorAll(`[data-ticker="${ticker}"] .live-price`).forEach(el => {
+                                    el.classList.remove('price-flash-up','price-flash-down');
+                                    void el.offsetWidth; // reflow
+                                    el.classList.add(isUp ? 'price-flash-up' : 'price-flash-down');
+                                });
+                            }
+                            updated++;
+                        });
+                    }
+
+                    // ── Update Funds ───────────────────────────────────────
+                    if (data.funds && typeof data.funds === 'object') {
+                        Object.entries(data.funds).forEach(([ticker, live]) => {
+                            const local = STOCKS_DATA.find(s => s.ticker === ticker);
+                            if (local && live.close > 0) {
+                                local.close = live.close;
+                                if (live.chg !== undefined) local.chg = live.chg;
+                            }
+                        });
+                    }
+
+                    // ── Update Portfolio Holdings ──────────────────────────
+                    userHoldings.forEach(h => {
+                        const live = (data.stocks?.[h.ticker] || data.funds?.[h.ticker]);
+                        if (live?.close > 0) h.cur = live.close;
+                        else {
+                            const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                            if (found?.close > 0) h.cur = found.close;
+                        }
+                    });
+
+                    // ── Update Ticker Bar ──────────────────────────────────
+                    if (data.fx_gold?.usd_egp)   { const el=document.getElementById('ticker_usd');   if(el) el.innerText=data.fx_gold.usd_egp.close+' ج'; }
+                    if (data.fx_gold?.gold_24k)  { const el=document.getElementById('ticker_gold');  if(el) el.innerText=data.fx_gold.gold_24k.close.toLocaleString()+' ج'; }
+                    if (data.indices?.EGX33)     { const el=document.getElementById('ticker_egx33'); if(el) el.innerText=data.indices.EGX33.close.toLocaleString(); }
+                    if (data.indices?.EGX30)     { const el=document.getElementById('ticker_egx30'); if(el) el.innerText=data.indices.EGX30.close.toLocaleString(); }
+
+                    // ── Update AI pulse ────────────────────────────────────
+                    if (data.ai_pulse?.text)        { const el=document.getElementById('ai_pulse_text');  if(el) el.innerText=data.ai_pulse.text; }
+                    if (data.dividends_calendar)    renderDividendsTable(data.dividends_calendar);
+
+                    // ── Status badge ───────────────────────────────────────
+                    const timeStr = data.updated_at_display
+                        ? data.updated_at_display.split(' ')[1]
+                        : new Date().toLocaleTimeString('ar-EG');
+                    const badge = document.getElementById('syncStatusText');
+                    if (badge) {
+                        badge.innerText = inSession
+                            ? `🟢 بث لحظي (${timeStr}) — ${updated} سهم`
+                            : `✓ محدث (${timeStr})`;
+                    }
+
+                    // ── Render UI if data actually changed ─────────────────
+                    if (updated > 0) {
+                        renderStocks();
+                        renderHoldingsTable();
+                        if (typeof renderValuationCard === 'function') renderValuationCard();
+
+                        // Update open chart if visible
+                        const cm = document.getElementById('stockChartModal');
+                        if (cm && !cm.classList.contains('hidden') && activeChartTicker && activeChartEngine === 'canvas') {
+                            drawAdvancedChart();
+                        }
+                    }
+
+                } catch (e) {
+                    console.warn('[UltraFast] fetch error:', e.message);
+                }
             }
-        }, 15000);
+
+            // ── Adaptive interval: 5s during session, 30s outside ───────
+            let pollInterval = null;
+            function startPolling() {
+                const now = new Date();
+                const cairoH   = (now.getUTCHours() + 3) % 24;
+                const cairoMin = now.getUTCMinutes();
+                const dow      = now.getUTCDay();
+                const totalMin = cairoH * 60 + cairoMin;
+                const inSession = dow >= 0 && dow <= 4 && totalMin >= 600 && totalMin < 885;
+                const interval  = inSession ? 5000 : 30000;
+
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(ultraFastSync, interval);
+
+                const badge = document.getElementById('syncStatusText');
+                if (badge && !badge.innerText.includes('بث')) {
+                    badge.innerText = inSession ? '🟢 بث لحظي كل 5 ثوانٍ' : '⏱ تحديث كل 30 ثانية';
+                }
+            }
+
+            // Start immediately
+            ultraFastSync();
+            startPolling();
+
+            // Re-evaluate interval every 5 minutes (session transitions)
+            setInterval(startPolling, 300000);
+
+            // Also sync when tab becomes visible
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) { ultraFastSync(); startPolling(); }
+            });
+        })();
+
+
+        // Legacy 15s interval replaced by ultra-fast 5s adaptive polling above
 
         // التحديث الفوري عند عودة المستخدم للتطبيق أو فتح الشاشة
         document.addEventListener('visibilitychange', () => {
