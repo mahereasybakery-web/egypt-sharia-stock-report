@@ -3597,8 +3597,7 @@
                 grandReturnElem.innerText = `(${sign}${grandReturnPct.toFixed(2)}%)`;
             }
 
-            const investedElem = document.getElementById('p_thndr_invested');
-            if (investedElem) investedElem.innerText = `${(totalInvestedVal / 1000).toFixed(2)}k ج`;
+// investedElem already updated above
 
             // USD Equivalent & Gold Benchmark (المعيار المالي بالدولار والذهب)
             const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
@@ -4919,7 +4918,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v8.7',
+                appVersion: 'egx-sharia-v8.8',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
