@@ -1,0 +1,35 @@
+name: Automated EGX & Funds Market Data Sync
+
+on:
+  schedule:
+    # Run every 30 minutes between 07:00 and 13:00 UTC (10:00 - 16:00 Cairo time) on Sun, Mon, Tue, Wed, Thu
+    - cron: '*/30 7-13 * * 0,1,2,3,4'
+    # Run once at 16:00 UTC (19:00 Cairo time) for evening Mutual Fund NAV updates
+    - cron: '0 16 * * 0,1,2,3,4'
+  workflow_dispatch:
+
+jobs:
+  sync-market-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch Live Market Quotes & Update JSON
+        run: |
+          python update_market_data_cloud.py
+
+      - name: Commit and Push Updated Market Data
+        run: |
+          git config --global user.name "EGX-Sharia-AutoSync[bot]"
+          git config --global user.email "auto-sync@mahereasybakery.internal"
+          git add market_data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: automated market data sync [skip ci]" && git push)
