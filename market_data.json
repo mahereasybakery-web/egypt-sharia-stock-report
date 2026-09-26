@@ -1,12 +1,12 @@
 {
-  "updated_at": "2026-09-24T15:01:13.244877+03:00",
+  "updated_at": "2026-09-26T12:40:01.999379+03:00",
   "indices": {
     "EGX33": {
       "close": 3380.45,
       "chgPct": 1.15
     },
     "EGX30": {
-      "close": 53776.7,
+      "close": 53776.69,
       "chgPct": -0.83
     },
     "EGX33 الشريعة": {
@@ -20,6 +20,10 @@
     "EGX100 EWI": {
       "close": 26233.0,
       "chgPct": -1.7
+    },
+    "EGX70": {
+      "close": 19834.95,
+      "chgPct": -1.92
     }
   },
   "fx_gold": {
@@ -37,5 +41,351 @@
     "score": 78,
     "lead_sector": "الأسمدة والبتروكيماويات والتصدير",
     "text": "📊 <b>تقرير ختام الأسبوع: ملخص حركة اليوم وخريطة الجلسة القادمة (الأحد - افتتاح الأسبوع الجديد)</b>\n\nأهلاً بكم زملائي المستثمرين وعملاءنا الكرام. بصفتي كبير المحللين الماليين واستراتيجي التداول، أقدم لكم التقرير الختامي الشامل لجلسة يوم الخميس (نهاية الأسبوع)، مع رسم خارطة الطريق الفنية والمالية لجلسة افتتاح الأسبوع الجديد يوم الأحد القادم، لمساعدتكم في اتخاذ قرارات استثمارية مدروسة ومبنية على أسس "
-  }
+  },
+  "stocks": {
+    "TMGH": {
+      "ticker": "TMGH",
+      "close": 91.85,
+      "chg": -1.08,
+      "open": 92.8,
+      "high": 92.8,
+      "low": 90.0,
+      "volume": 2737494,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "SWDY": {
+      "ticker": "SWDY",
+      "close": 118.74,
+      "chg": -4.44,
+      "open": 124.0,
+      "high": 124.98,
+      "low": 116.5,
+      "volume": 1241720,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ORAS": {
+      "ticker": "ORAS",
+      "close": 818.44,
+      "chg": -1.4,
+      "open": 835.72,
+      "high": 835.7,
+      "low": 802.0,
+      "volume": 195601,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ISPH": {
+      "ticker": "ISPH",
+      "close": 11.65,
+      "chg": -2.91,
+      "open": 12.02,
+      "high": 12.1,
+      "low": 11.5,
+      "volume": 7380193,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ETEL": {
+      "ticker": "ETEL",
+      "close": 134.5,
+      "chg": -1.5,
+      "open": 138.06,
+      "high": 139.09,
+      "low": 130.2,
+      "volume": 1087102,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "AMOC": {
+      "ticker": "AMOC",
+      "close": 13.31,
+      "chg": 0.0,
+      "open": 13.4,
+      "high": 13.64,
+      "low": 13.07,
+      "volume": 7960429,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ABUK": {
+      "ticker": "ABUK",
+      "close": 90.7,
+      "chg": -2.56,
+      "open": 92.88,
+      "high": 92.88,
+      "low": 89.01,
+      "volume": 951372,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "MFPC": {
+      "ticker": "MFPC",
+      "close": 47.01,
+      "chg": -1.05,
+      "open": 47.5,
+      "high": 48.19,
+      "low": 46.59,
+      "volume": 1073180,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "SKPC": {
+      "ticker": "SKPC",
+      "close": 17.06,
+      "chg": -2.56,
+      "open": 17.6,
+      "high": 17.69,
+      "low": 16.8,
+      "volume": 7236033,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "JUFO": {
+      "ticker": "JUFO",
+      "close": 25.82,
+      "chg": -3.17,
+      "open": 26.83,
+      "high": 26.8,
+      "low": 25.5,
+      "volume": 1369861,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "EFID": {
+      "ticker": "EFID",
+      "close": 29.43,
+      "chg": -2.64,
+      "open": 30.3,
+      "high": 30.25,
+      "low": 28.56,
+      "volume": 2112751,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ADIB": {
+      "ticker": "ADIB",
+      "close": 51.46,
+      "chg": -1.58,
+      "open": 51.82,
+      "high": 51.89,
+      "low": 49.0,
+      "volume": 2367726,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "SAUD": {
+      "ticker": "SAUD",
+      "close": 23.29,
+      "chg": -5.25,
+      "open": 24.58,
+      "high": 24.96,
+      "low": 22.75,
+      "volume": 1106497,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "OCDI": {
+      "ticker": "OCDI",
+      "close": 28.0,
+      "chg": -0.6,
+      "open": 28.17,
+      "high": 28.37,
+      "low": 27.4,
+      "volume": 2489075,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "PHDC": {
+      "ticker": "PHDC",
+      "close": 13.18,
+      "chg": 0.3,
+      "open": 13.46,
+      "high": 13.5,
+      "low": 12.71,
+      "volume": 7227092,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "COMI": {
+      "ticker": "COMI",
+      "close": 128.58,
+      "chg": 0.08,
+      "open": 128.1,
+      "high": 128.73,
+      "low": 126.81,
+      "volume": 4385761,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "FWRY": {
+      "ticker": "FWRY",
+      "close": 18.8,
+      "chg": -0.79,
+      "open": 18.9,
+      "high": 19.0,
+      "low": 17.5,
+      "volume": 7320982,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "EFIH": {
+      "ticker": "EFIH",
+      "close": 22.87,
+      "chg": -1.46,
+      "open": 23.32,
+      "high": 23.3,
+      "low": 22.5,
+      "volume": 2493805,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "EGAL": {
+      "ticker": "EGAL",
+      "close": 355.82,
+      "chg": -1.07,
+      "open": 360.81,
+      "high": 360.81,
+      "low": 340.0,
+      "volume": 146276,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ORHD": {
+      "ticker": "ORHD",
+      "close": 40.72,
+      "chg": 0.42,
+      "open": 40.5,
+      "high": 41.0,
+      "low": 39.1,
+      "volume": 4565377,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "MCQE": {
+      "ticker": "MCQE",
+      "close": 200.84,
+      "chg": 1.74,
+      "open": 203.0,
+      "high": 206.54,
+      "low": 197.51,
+      "volume": 62058,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ACGC": {
+      "ticker": "ACGC",
+      "close": 14.28,
+      "chg": 2.07,
+      "open": 13.99,
+      "high": 14.3,
+      "low": 13.82,
+      "volume": 1567296,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ARCC": {
+      "ticker": "ARCC",
+      "close": 66.57,
+      "chg": -2.25,
+      "open": 68.54,
+      "high": 68.9,
+      "low": 66.12,
+      "volume": 388742,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ATQA": {
+      "ticker": "ATQA",
+      "close": 12.54,
+      "chg": -2.17,
+      "open": 12.89,
+      "high": 12.8,
+      "low": 12.05,
+      "volume": 4121467,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "RMDA": {
+      "ticker": "RMDA",
+      "close": 5.79,
+      "chg": -1.54,
+      "open": 5.86,
+      "high": 5.93,
+      "low": 5.61,
+      "volume": 9651087,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "GBCO": {
+      "ticker": "GBCO",
+      "close": 30.41,
+      "chg": -1.58,
+      "open": 31.11,
+      "high": 31.19,
+      "low": 27.0,
+      "volume": 2390797,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "LCSW": {
+      "ticker": "LCSW",
+      "close": 31.81,
+      "chg": -2.88,
+      "open": 32.27,
+      "high": 32.3,
+      "low": 31.0,
+      "volume": 453433,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "CLHO": {
+      "ticker": "CLHO",
+      "close": 15.5,
+      "chg": -1.9,
+      "open": 15.8,
+      "high": 15.8,
+      "low": 15.35,
+      "volume": 2032280,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "HELI": {
+      "ticker": "HELI",
+      "close": 7.85,
+      "chg": -1.01,
+      "open": 7.9,
+      "high": 7.93,
+      "low": 7.59,
+      "volume": 9873825,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "CIEB": {
+      "ticker": "CIEB",
+      "close": 24.07,
+      "chg": -2.87,
+      "open": 24.78,
+      "high": 24.77,
+      "low": 23.9,
+      "volume": 703828,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    },
+    "ESRS": {
+      "ticker": "ESRS",
+      "close": 141.0,
+      "chg": 0.0,
+      "open": 141.0,
+      "high": 141.0,
+      "low": 141.0,
+      "volume": 4215,
+      "source": "mubasher.info",
+      "ts": "12:40:01"
+    }
+  },
+  "updated_at_display": "2026-09-26 12:40:01",
+  "data_source": "Mubasher.info Live",
+  "sync_count": 31
 }
