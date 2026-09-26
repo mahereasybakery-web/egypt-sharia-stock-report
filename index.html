@@ -6699,11 +6699,11 @@
             ]);
 
             // Attempt Cloud Live Sync immediately
-            syncLiveMarketData();
+            syncLiveMarketData(true);
 
             // Periodic auto-sync every 60 seconds
             setInterval(() => {
-                syncLiveMarketData();
+                syncLiveMarketData(true);
             }, 60000);
         });
 
