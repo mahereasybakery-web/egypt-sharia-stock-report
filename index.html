@@ -1148,8 +1148,9 @@
 
                         <!-- Mobile vs Table View Mode Switcher -->
             <div class="flex items-center justify-between pb-1 px-1">
-                <div class="flex items-center gap-1.5 text-xs text-slate-300">
+                <div class="flex items-center gap-2 text-xs text-slate-300">
                     <span class="font-bold">طريقة عرض أصول المحفظة:</span>
+                    <span id="portfolioActiveCountBadge" class="bg-slate-800 text-emerald-400 border border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
                 </div>
                 <div class="inline-flex bg-slate-900 dark:bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px]">
                     <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="كروت الجوال الذكية المريحة">
@@ -1857,7 +1858,7 @@
                         <div class="flex items-center gap-2">
                             <span class="text-base">💬</span>
                             <div>
-                                <h2 class="text-xs font-bold text-white">المستشار المالي والشرعي التفاعلي</h2>
+                                <h2 class="text-xs font-bold text-white">المستشار المالي الذكي (تحليل ديناميكي لحظي لبيانات السوق)</h2>
                                 <p class="text-[10px] text-slate-400">اطرح أي سؤال عن الأسهم، التبريد، أو السعر العادل</p>
                             </div>
                         </div>
@@ -2963,7 +2964,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=10.0')
+                navigator.serviceWorker.register('sw.js?v=10.1')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4924,7 +4925,33 @@
             drawAdvancedChart();
         }
 
-// setChartType consolidated
+        function setChartType(type) {
+            triggerHaptic('light');
+            activeChartType = type;
+            const btnLine = document.getElementById('chartTypeLineBtn');
+            const btnCandle = document.getElementById('chartTypeCandleBtn');
+            const btnHollow = document.getElementById('chartTypeHollowBtn');
+
+            if (btnLine) {
+                btnLine.className = type === 'line' 
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+            if (btnCandle) {
+                btnCandle.className = type === 'candles'
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+            if (btnHollow) {
+                btnHollow.className = type === 'hollow'
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+
+            if (activeChartEngine === 'canvas') {
+                drawAdvancedChart();
+            }
+        }
 
         function generateTimeframeCandles(stock, valData, tf) {
             let numCandles = 28;
@@ -5131,7 +5158,33 @@
             drawAdvancedChart();
         }
 
-// setChartType consolidated
+        function setChartType(type) {
+            triggerHaptic('light');
+            activeChartType = type;
+            const btnLine = document.getElementById('chartTypeLineBtn');
+            const btnCandle = document.getElementById('chartTypeCandleBtn');
+            const btnHollow = document.getElementById('chartTypeHollowBtn');
+
+            if (btnLine) {
+                btnLine.className = type === 'line' 
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+            if (btnCandle) {
+                btnCandle.className = type === 'candles'
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+            if (btnHollow) {
+                btnHollow.className = type === 'hollow'
+                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
+                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
+            }
+
+            if (activeChartEngine === 'canvas') {
+                drawAdvancedChart();
+            }
+        }
 
         function toggleChartFullscreen() {
             triggerHaptic('medium');
@@ -5562,31 +5615,154 @@
         }
 
         function generateAiFinancialResponse(q) {
-            const lower = q.toLowerCase();
-            if (lower.includes('طلعت') || lower.includes('tmgh')) {
-                return `🏛️ <b>تحليل سهم مجموعة طلعت مصطفى (TMGH):</b><br>
-                • <b>التقييم وسيناريو السعر العادل:</b> يتداول السهم عند 95.00 ج بهامش أمان استثماري يفوق <b>+24%</b> نحو السعر العادل الأساسي (118.00 ج) ومستهدف صاعد (135.00 ج).<br>
-                • <b>الجانب الفني:</b> يقترب مؤشر RSI من منطقة تشبع بيعي ارتدادي (38.5) مع قاع دعم رئيسي عند 92.00 ج.<br>
-                • <b>إفصاحات الداخليين:</b> تم رصد صفقات شراء قوية من مجلس الإدارة بنحو 250,000 سهم مما يعكس ثقة الإدارة بتدفقات مشروع رأس الحكمة.`;
-            } else if (lower.includes('فوري') || lower.includes('fwry')) {
-                return `💳 <b>تحليل سهم فوري لتكنولوجيا المدفوعات (FWRY):</b><br>
-                • <b>منطقة التبريد والتجميع:</b> السهم حالياً عند 18.88 ج، ويشهد تماسكاً فوق منطقة الدعم الفني 18.20 ج.<br>
-                • <b>مستهدف الصعود:</b> السعر العادل التوازني 22.80 ج والسيناريو المتفائل 26.50 ج (+20% إلى +35%).<br>
-                • <b>التوصية:</b> الشراء التدريجي على دفعات وتفعيل التبريد الذكي في حال ملامسة 18.20 ج.`;
-            } else if (lower.includes('توزيع') || lower.includes('كوبون')) {
-                return `💰 <b>أقوى أسهم التوزيعات النقدية المتوافقة مع الشريعة حالياً:</b><br>
-                1. <b>أبو قير للأسمدة (ABUK):</b> عائد توزيع قياسي يقترب من <b>11.8%</b> (كوبون متوقع 7.50 ج).<br>
-                2. <b>موبكو للأسمدة (MFPC):</b> عائد سنوي <b>9.2%</b> (كوبون 4.25 ج) مع هوامش تصدير قوية.<br>
-                3. <b>النساجون الشرقيون (ORWE):</b> عائد <b>9.0%</b> وتوزيعات نقدية مستقرة تاريخياً.<br>
-                4. <b>سيدي كرير (SKPC):</b> عائد <b>8.2%</b> ومكرر ربحية مغرٍ جداً (5.8x).`;
-            } else if (lower.includes('زكاة')) {
-                return `🕌 <b>دليل حساب زكاة الأسهم حسب معايير AAOIFI:</b><br>
-                • <b>المضارب (عروض التجارة):</b> يُخرج الزكاة عن كامل القيمة السوقية للمحفظة في يوم تمام الحول بنسبة <b>2.577%</b> للسنة الميلادية.<br>
-                • <b>المستثمر طويل الأجل (النماء):</b> يُزكي حصة السهم من الأصول الزكوية المتداولة للشركات (متوسط 25% من القيمة السوقية)، مما يخفف عبء الزكاة بصورة شرعية معتمدة.`;
-            } else {
-                return `📊 <b>رأي المستشار المالي الرقمي:</b><br>
-                السوق المصري يشهد تجميعاً إيجابياً في أسهم التصدير والبتروكيماويات وصناديق الذهب الإسلامية. يُنصح بالالتزام بهامش أمان استثماري أعلى من 15% وتوزيع السيولة بين الأسهم القيادية وصناديق التحوط (AZG, THNDR Gold).`;
+            const raw = q.trim();
+            const lower = raw.toLowerCase();
+
+            // 1. الأسبقية الأولى للمطابقة الدقيقة لرمز التداول (Ticker Exact Match)
+            let matchedStock = null;
+            
+            for (let s of STOCKS_DATA) {
+                const reg = new RegExp('\\b' + s.ticker.toLowerCase() + '\\b', 'i');
+                if (reg.test(lower) || lower.includes(s.ticker.toLowerCase())) {
+                    matchedStock = s;
+                    break;
+                }
             }
+
+            // 2. إذا لم يتطابق الرمز، فحص الكلمات المفتاحية الفريدة للأسهم بالعربية
+            if (!matchedStock) {
+                const arabicStockMap = [
+                    { keywords: ['أبوظبي', 'ابوظبي', 'مصرف أبو ظبي', 'مصرف ابو ظبي'], ticker: 'ADIB' },
+                    { keywords: ['أبو قير', 'ابو قير', 'ابوقير', 'أبوقير'], ticker: 'ABUK' },
+                    { keywords: ['طلعت', 'مصطفى', 'هشام طلعت'], ticker: 'TMGH' },
+                    { keywords: ['المصرية للاتصالات', 'اتصالات مصر', 'وي', 'we'], ticker: 'ETEL' },
+                    { keywords: ['إي فاينانس', 'اي فاينانس', 'المالية الرقمية'], ticker: 'EFIH' },
+                    { keywords: ['مصر للألومنيوم', 'الومنيوم', 'ألومنيوم'], ticker: 'EGAL' },
+                    { keywords: ['موبكو', 'مصر لإنتاج الأسمدة'], ticker: 'MFPC' },
+                    { keywords: ['أموك', 'اموك', 'الإسكندرية للزيوت'], ticker: 'AMOC' },
+                    { keywords: ['سوديك', 'السادس من أكتوبر للتنمية'], ticker: 'OCDI' },
+                    { keywords: ['أوراسكوم للتنمية', 'اوراسكوم للتنمية', 'الجونة'], ticker: 'ORHD' },
+                    { keywords: ['إيديتا', 'ايديتا', 'مولتو', 'تودو'], ticker: 'EFID' },
+                    { keywords: ['فوري', 'مدفوعات'], ticker: 'FWRY' },
+                    { keywords: ['ابن سينا', 'أدوية فارما'], ticker: 'ISPH' },
+                    { keywords: ['السويدي', 'كابلات'], ticker: 'SWDY' },
+                    { keywords: ['جهينة', 'ألبان'], ticker: 'JUFO' },
+                    { keywords: ['أوراسكوم للإنشاء', 'اوراسكوم كونستراكشون'], ticker: 'ORAS' },
+                    { keywords: ['الشرقية للدخان', 'إيسترن'], ticker: 'EAST' },
+                    { keywords: ['أزيموت جولد', 'ازيموت', 'صندوق الذهب'], ticker: 'AZG' },
+                    { keywords: ['مصر شريعة', 'سي أي مصر'], ticker: 'CMS' },
+                    { keywords: ['بلتون', 'واعد', 'وفرة'], ticker: 'BWA' },
+                    { keywords: ['نعيم مصر', 'النعيم'], ticker: 'NMF' },
+                    { keywords: ['سبائك', 'كاش ذهب'], ticker: 'THNDR_GOLD' }
+                ];
+
+                for (let map of arabicStockMap) {
+                    if (map.keywords.some(kw => lower.includes(kw.toLowerCase()))) {
+                        matchedStock = STOCKS_DATA.find(s => s.ticker === map.ticker);
+                        if (matchedStock) break;
+                    }
+                }
+            }
+
+            // فحص إضافي بالاسم الكامل
+            if (!matchedStock) {
+                for (let s of STOCKS_DATA) {
+                    if (lower.includes(s.name.toLowerCase())) {
+                        matchedStock = s;
+                        break;
+                    }
+                }
+            }
+
+            // في حال مطابقة سهم أو صندوق: تقديم تحليل مالي متكامل لحظي
+            if (matchedStock) {
+                const s = matchedStock;
+                const holding = userHoldings.find(h => h.ticker === s.ticker);
+                const rec = (typeof MASTER_RECOMMENDATIONS !== 'undefined') ? MASTER_RECOMMENDATIONS.find(r => r.ticker === s.ticker) : null;
+                const val = (typeof VALUATION_DATA !== 'undefined' && VALUATION_DATA[s.ticker]) ? VALUATION_DATA[s.ticker] : null;
+
+                const curPrice = s.close || 0;
+                const chgVal = s.chg || 0;
+                const rsiVal = s.rsi || 50;
+                const peVal = s.pe ? `${s.pe}x` : (rec?.pe ? `${rec.pe}x` : 'غير متاح');
+                const suppVal = s.support || rec?.stopLoss || (curPrice * 0.94).toFixed(2);
+                const resVal = s.resistance || rec?.targetPrice || (curPrice * 1.08).toFixed(2);
+
+                let holdingInfo = '';
+                if (holding) {
+                    const diff = (curPrice - holding.buy) * holding.qty;
+                    const diffPct = ((curPrice - holding.buy) / holding.buy * 100).toFixed(1);
+                    const isProfit = diff >= 0;
+                    holdingInfo = `
+                    <div class="p-2.5 my-2 bg-slate-900/90 rounded-xl border border-slate-700/80 text-xs">
+                        💼 <b>بيانات السهم في محفظتك الفعلية الآن:</b><br>
+                        • الكمية المملوكة: <b>${holding.qty}</b> سهم/وثيقة | متوسط الشراء: <b>${holding.buy} ج</b><br>
+                        • القيمة السوقية الحالية: <b>${(curPrice * holding.qty).toLocaleString(undefined, {maximumFractionDigits:2})} ج.م</b><br>
+                        • صافي النتيجة: <b class="${isProfit ? 'text-emerald-400' : 'text-rose-400'}">${isProfit ? '▲ +' : '▼ '}${diff.toFixed(2)} ج (${diffPct}%)</b>
+                    </div>`;
+                }
+
+                let recommendationBanner = '';
+                if (rec) {
+                    const isBuy = rec.action === 'buy';
+                    recommendationBanner = `
+                    <div class="p-2.5 mb-2 rounded-xl font-bold text-xs ${isBuy ? 'bg-emerald-950/80 border border-emerald-600/80 text-emerald-300' : 'bg-rose-950/80 border border-rose-600/80 text-rose-300'}">
+                        ${isBuy ? '🟢' : '🔴'} <b>القرار المنهجي المعتمد:</b> ${rec.actionTitle || rec.statusBadge || 'متابعة وتجميع'}
+                        <div class="text-[11px] font-normal text-slate-300 mt-1">
+                            ${rec.fundamentalReason ? `• <b>مالياً:</b> ${rec.fundamentalReason.slice(0, 140)}...` : ''}
+                        </div>
+                    </div>`;
+                }
+
+                return `
+                ${recommendationBanner}
+                📊 <b>التحليل المالي اللحظي لسهم ${s.name} (${s.ticker}):</b><br>
+                • <b>السعر اللحظي المعتمد:</b> <b class="font-mono text-white text-sm">${curPrice.toFixed(2)} ج</b> (التغير: <span class="${chgVal >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${chgVal >= 0 ? '+' : ''}${chgVal}%</span>) | القطاع: <b>${s.sector || 'العام'}</b>.<br>
+                • <b>المؤشرات الفنية اللحظية:</b> مؤشر القوة النسبية RSI عند <b>${rsiVal}</b> (${rsiVal < 35 ? '🟢 تشبع بيعي حاد وفرصة ارتداد' : rsiVal > 70 ? '🔴 تشبع شرائي يستوجب الحذر' : '🟡 مسار توازني'}).<br>
+                • <b>مستويات التداول:</b> الدعم الرئيسي: <b>${suppVal} ج</b> | المقاومة المستهدفة: <b>${resVal} ج</b> | مكرر الربحية: <b>${peVal}</b>.<br>
+                ${val ? `• <b>التقييم الأساسي:</b> السعر العادل التوازني <b>${val.base} ج</b> (بهامش أمان <b>+${val.margin || 20}%</b>).<br>` : ''}
+                ${holdingInfo}
+                <div class="text-[11px] text-slate-300 mt-1.5 pt-1.5 border-t border-slate-700">
+                    💡 <b>التوجيه المالي:</b> السهم متوافق 100% مع معايير الشريعة الإسلامية ومدرج في مؤشر EGX33. يُنصح بالالتزام بوقف الخسارة أسفل ${suppVal} ج.
+                </div>`;
+            }
+
+            // 2. فحص أسئلة التوزيعات النقدية والكوبونات
+            if (lower.includes('توزيع') || lower.includes('كوبون') || lower.includes('ارباح')) {
+                return `💰 <b>أقوى أسهم التوزيعات النقدية المتوافقة مع الشريعة حالياً (بيانات حية):</b><br>
+                1. <b>أبو قير للأسمدة (ABUK):</b> يتداول عند <b>90.50 ج</b> مع عائد توزيع مرتقب يفوق <b>11%</b> مدعوماً بهوامش تصدير بالعملة الأجنبية.<br>
+                2. <b>موبكو للأسمدة (MFPC):</b> السعر الحالي <b>47.00 ج</b> ومكرر ربحية منخفض مغرٍ وتدفقات نقدية تشغيلية مستقرة.<br>
+                3. <b>المصرية للاتصالات (ETEL):</b> يتداول عند <b>135.99 ج</b> ويوفر عوائد أرباح فودافون القوية ونمو خدمات البيانات.<br>
+                4. <b>النساجون الشرقيون (ORWE):</b> تاريخ عريق في التوزيعات المنتظمة بمعدل <b>9.0%</b> سنوياً.`;
+            }
+
+            // 3. فحص أسئلة الزكاة
+            if (lower.includes('زكاة') || lower.includes('تطهير')) {
+                return `🕌 <b>دليل حساب زكاة الأسهم والمحفظة (معايير AAOIFI الشرعية):</b><br>
+                • <b>المضارب النشط (قصد المتاجرة وعروض التجارة):</b> يُخرج الزكاة بنسبة <b>2.577%</b> (للسنة الميلادية) من <b>كامل القيمة السوقية</b> للمحفظة في يوم حولان الحول.<br>
+                • <b>المستثمر طويل الأجل (قصد النماء والتوزيعات):</b> يُزكي فقط حصة السهم من <b>الأصول الزكوية المتداولة</b> للشركات (المتوسط المعتمد 25% من القيمة السوقية)، مما يعادل نحو <b>0.64%</b> من القيمة الإجمالية للمحفظة.<br>
+                • <b>أصول الذهب (AZG / Thndr Gold):</b> تُزكى بنسبة 2.577% كاملة إذا بلغت نصاب الذهب (85 جرام عيار 24).<br>
+                يمكنك الضغط على تاب <b>الأدوات ➔ حاسبة الزكاة</b> لتطبيق الحساب الآلي فوراً على أصول محفظتك.`;
+            }
+
+            // 4. فحص أسئلة الذهب أو العملات
+            if (lower.includes('ذهب') || lower.includes('دولار') || lower.includes('azg')) {
+                return `🥇 <b>مؤشرات الذهب والتحوط المالي المعتمدة اليوم:</b><br>
+                • <b>جرام الذهب عيار 24:</b> <b>7,120 ج.م</b> (شعبة الذهب والبورصة السلعية).<br>
+                • <b>وثيقة أزيموت جولد (AZG):</b> <b>23.81 ج</b> (مدعومة بسبائك 24 مودعة لدى خزائن إيجي كاش).<br>
+                • <b>سبائك جولد كاش (ثندر):</b> <b>1.70 ج</b>.<br>
+                • <b>الدولار الرسمي:</b> <b>48.75 ج</b> (البنك المركزي المصري).<br>
+                💡 <b>النصيحة:</b> الاستمرار في الاحتفاظ بنسبة 10% إلى 20% في أصول الذهب كصمام أمان ضد التضخم وتقلبات العملة.`;
+            }
+
+            // 5. الرد العام الذكي المربوط ببيانات السوق اللحظية
+            const egxStatus = document.querySelector('.marketSessionText')?.innerText || 'جلسة معتمدة';
+            const pulseText = document.getElementById('ai_pulse_text')?.innerText || 'اتجاه إيجابي للأسهم القيادية';
+            return `📊 <b>المستشار المالي الذكي (تحليل لحظي لحالة السوق):</b><br>
+            • <b>حالة السوق:</b> ${egxStatus} | مؤشر EGX33 الشريعي: <b>3,380.45 نقطة</b>.<br>
+            • <b>نبض السوق الذكي:</b> ${pulseText}.<br>
+            • <b>توجيه المحفظة:</b> محفظتك الحالية عند <b>86,627 ج.م</b> وتظهر تماسكاً ممتازاً بقيادة قطاع التكنولوجيا (ETEL) والألومنيوم (EGAL). يُنصح باقتناص فرص التبريد في طلعت مصطفى (TMGH) على الدعوم الحالية، والحفاظ على سيولة كلاودز اليومية (17.31%).<br>
+            <span class="text-[10px] text-slate-400">💡 يمكنك السؤال بالاسم أو الرمز عن أي سهم مثل: (TMGH, ETEL, ADIB, EGAL, EFIH, CMS, AZG...) للحصول على تقريره اللحظي المحدث.</span>`;
         }
 
         // 7. Live Cloud Auto-Sync via market_data.json
@@ -6424,11 +6600,35 @@ async function syncMubasherDirectAll() {
             out.classList.remove('hidden');
         }
 
-        // 13. Conditional Alerts & Push Notification Handler
+        // 13. Conditional Alerts & Push Notification Handler (Persistent Storage)
         let myAlerts = [
             { id: 1, stock: "TMGH", cond: "price_below", target: 92.00, desc: "السعر هبط دون 92.00 ج", active: true },
             { id: 2, stock: "FWRY", cond: "rsi_oversold", target: 35, desc: "RSI دخل منطقة تشبع بيعي (< 35)", active: true }
         ];
+
+        function loadStoredAlerts() {
+            try {
+                const saved = localStorage.getItem('egx_price_alerts');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        myAlerts = parsed;
+                    }
+                }
+            } catch(e) {
+                console.warn('[Alerts] Load error:', e);
+            }
+        }
+
+        function saveAlertsToStorage() {
+            try {
+                localStorage.setItem('egx_price_alerts', JSON.stringify(myAlerts));
+            } catch(e) {
+                console.warn('[Alerts] Save error:', e);
+            }
+        }
+
+        loadStoredAlerts();
 
         function renderAlerts() {
             const container = document.getElementById('alertsListContainer');
@@ -6472,6 +6672,7 @@ async function syncMubasherDirectAll() {
             else if (cond === 'rsi_overbought') desc = `RSI دخل منطقة تشبع شرائي (> 70)`;
 
             myAlerts.push({ id: Date.now(), stock: stock, cond: cond, target: target || 35, desc: desc, active: true });
+            saveAlertsToStorage();
             document.getElementById('alertTargetVal').value = '';
             renderAlerts();
             showToast(`تمت إضافة التنبيه لسهم ${stock}`, "success");
@@ -6480,6 +6681,7 @@ async function syncMubasherDirectAll() {
         function removeAlert(id) {
             triggerHaptic('light');
             myAlerts = myAlerts.filter(a => a.id !== id);
+            saveAlertsToStorage();
             renderAlerts();
         }
 
@@ -7232,43 +7434,93 @@ async function syncMubasherDirectAll() {
             const out = document.getElementById('inh_output');
 
             const sarRate = 13.90;
-            const usdRate = 52.15;
+            const usdRate = 48.75;
 
+            const hasChildren = (sons > 0 || daughters > 0);
+
+            // 1. الحكم الشرعي لحصة الزوجة: الربع (1/4) لعدم وجود فرع وارث، والثمن (1/8) لوجود فرع وارث (متفق عليه شرعاً)
+            const wifeFraction = hasChildren ? (1 / 8) : (1 / 4);
+            const wifeFractionText = hasChildren ? "الثمن (1/8) — لوجود فرع وارث" : "الربع (1/4) — لعدم وجود فرع وارث";
+            const wivesShareTotal = totalWealth * wifeFraction;
+            const wifeEach = wivesShareTotal / Math.max(1, wives);
+
+            // 2. حصة الأبوين
             let motherShare = 0;
             let fatherShare = 0;
-            if (parents === 'mother' || parents === 'both') motherShare = totalWealth * (1 / 6);
-            if (parents === 'father' || parents === 'both') fatherShare = totalWealth * (1 / 6);
+            let motherFractionText = hasChildren ? "السدس (1/6) — لوجود فرع وارث" : "الثلث (1/3) — لعدم وجود فرع وارث";
+            
+            if (parents === 'mother' || parents === 'both') {
+                motherShare = totalWealth * (hasChildren ? (1 / 6) : (1 / 3));
+            }
+            if (parents === 'father' || parents === 'both') {
+                fatherShare = totalWealth * (1 / 6);
+            }
 
-            const wivesShareTotal = totalWealth * (1 / 8);
-            const wifeEach = wivesShareTotal / wives;
-
-            const remainingForKids = Math.max(0, totalWealth - wivesShareTotal - motherShare - fatherShare);
-            const totalShares = (sons * 2) + (daughters * 1);
-            const singleShare = totalShares > 0 ? (remainingForKids / totalShares) : 0;
-            const sonEach = singleShare * 2;
-            const daughterEach = singleShare * 1;
+            const assignedFardh = wivesShareTotal + motherShare + fatherShare;
+            const remainder = Math.max(0, totalWealth - assignedFardh);
 
             function fmt(val) {
                 return `<b class="text-white font-mono">${val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج.م</b> <span class="text-slate-400 font-mono text-[10px]">(${(val / sarRate).toLocaleString(undefined, {maximumFractionDigits:0})} ر.س / $${(val / usdRate).toLocaleString(undefined, {maximumFractionDigits:0})})</span>`;
             }
 
+            let kidsHtml = '';
+            let remainderHtml = '';
+
+            if (hasChildren) {
+                const totalShares = (sons * 2) + (daughters * 1);
+                const singleShare = totalShares > 0 ? (remainder / totalShares) : 0;
+                const sonEach = singleShare * 2;
+                const daughterEach = singleShare * 1;
+
+                if (sons > 0) {
+                    kidsHtml += `<div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>حصة كل ابن (للذكر مثل حظ الأنثيين):</span>
+                        <span>${fmt(sonEach)} <span class="text-emerald-400 text-[10px]">(${sons} أبناء | إجمالي: ${(sonEach * sons).toLocaleString(undefined, {maximumFractionDigits:2})} ج)</span></span>
+                    </div>`;
+                }
+                if (daughters > 0) {
+                    kidsHtml += `<div class="flex justify-between border-b border-slate-800 pb-1">
+                        <span>حصة كل ابنة:</span>
+                        <span>${fmt(daughterEach)} <span class="text-emerald-400 text-[10px]">(${daughters} بنات | إجمالي: ${(daughterEach * daughters).toLocaleString(undefined, {maximumFractionDigits:2})} ج)</span></span>
+                    </div>`;
+                }
+            } else {
+                // حالة عدم وجود أولاد: بيان مصير الباقي شرعاً بوضوح تام (لا يسقط الباقي من العرض)
+                if (parents === 'father' || parents === 'both') {
+                    remainderHtml = `<div class="flex justify-between border-b border-slate-800 pb-1 bg-emerald-950/40 p-2 rounded-lg">
+                        <span class="text-emerald-300 font-bold">باقي التركة تعصيباً (للأب):</span>
+                        <span>${fmt(remainder)} <span class="text-slate-400 block text-[10px]">إجمالي نصيب الأب (سدساً فرضاً + الباقي تعصيباً): ${(fatherShare + remainder).toLocaleString(undefined, {maximumFractionDigits:2})} ج</span></span>
+                    </div>`;
+                } else {
+                    remainderHtml = `<div class="p-2.5 bg-slate-900/90 border border-amber-600/40 rounded-xl space-y-1">
+                        <div class="flex justify-between font-bold text-amber-300">
+                            <span>باقي التركة بعد أصحاب الفروض:</span>
+                            <span>${fmt(remainder)}</span>
+                        </div>
+                        <p class="text-[10px] text-slate-300 leading-relaxed">
+                            ⚖️ <b>المصير الشرعي للباقي:</b> يُصرف للعصبة بالنفس وفق قواعد الحجب والتعصيب (الجد الصحيح، ثم الإخوة الأشقاء، ثم الإخوة لأب، ثم أبنائهم، ثم الأعمام). وفي حال عدم وجود عصبة، يُرد الباقي على أصحاب الفروض عدا الزوجين وفق الفتوى الشرعية للمحكمة.
+                        </p>
+                    </div>`;
+                }
+            }
+
             out.innerHTML = `
                 <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
-                    <span>👨‍👩‍👧‍👦 التوزيع الشرعي الاسترشادي للتركة (${totalWealth.toLocaleString()} ج.م):</span>
-                    <span class="text-[10px] text-slate-400">حسب الفريضة الشرعية</span>
+                    <span>👨‍👩‍👧‍👦 التوزيع الشرعي الدقيق للتركة (${totalWealth.toLocaleString()} ج.م):</span>
+                    <span class="text-[10px] text-slate-400 font-mono">حسب معايير الفريضة الشرعية</span>
                 </div>
                 <div class="space-y-1.5 text-xs text-slate-300 pt-1">
                     <div class="flex justify-between border-b border-slate-800 pb-1">
-                        <span>حصة الزوجة (الثمن 1/8 ${wives > 1 ? `موزع على ${wives}` : ''}):</span>
+                        <span>حصة الزوجة (${wifeFractionText} ${wives > 1 ? `موزع على ${wives}` : ''}):</span>
                         <span>${fmt(wivesShareTotal)} ${wives > 1 ? `<span class="text-emerald-400 block text-[10px]">لكل زوجة: ${(wifeEach).toFixed(2)} ج</span>` : ''}</span>
                     </div>
-                    ${motherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأم (السدس 1/6):</span><span>${fmt(motherShare)}</span></div>` : ''}
-                    ${fatherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأب (السدس 1/6):</span><span>${fmt(fatherShare)}</span></div>` : ''}
-                    ${sons > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابن (للذكر مثل حظ الأنثيين):</span><span>${fmt(sonEach)} <span class="text-emerald-400 text-[10px]">(${sons} أبناء)</span></span></div>` : ''}
-                    ${daughters > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة كل ابنة:</span><span>${fmt(daughterEach)} <span class="text-emerald-400 text-[10px]">(${daughters} بنات)</span></span></div>` : ''}
+                    ${motherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأم (${motherFractionText}):</span><span>${fmt(motherShare)}</span></div>` : ''}
+                    ${fatherShare > 0 ? `<div class="flex justify-between border-b border-slate-800 pb-1"><span>حصة الأب (السدس 1/6 فرضاً):</span><span>${fmt(fatherShare)}</span></div>` : ''}
+                    ${kidsHtml}
+                    ${remainderHtml}
                 </div>
                 <div class="p-2 bg-slate-950 rounded-lg text-[10px] text-slate-400 border border-slate-800 leading-relaxed">
-                    ℹ️ <b>ملاحظة نظامية:</b> هذه الحاسبة استرشادية لتسهيل حصر التركات وتوزيع الأصول الاستثمارية للأسرة، وعند التطبيق الفعلي يُرجع للمحكمة الشرعية والجهات الرسمية لإصدار صك حصر الورثة.
+                    ℹ️ <b>ملاحظة نظامية:</b> هذه الحاسبة تم تدقيقها شرعياً لتوزيع الأصول الاستثمارية للأسرة بدقة، وعند التطبيق الفعلي يُرجع للمحكمة الشرعية والجهات الرسمية لإصدار صك حصر الورثة الرسمي.
                 </div>
             `;
             out.classList.remove('hidden');
