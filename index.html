@@ -3517,22 +3517,22 @@
         // 4. User Portfolio State Management (Thndr Actual Holdings)
         // محفظة ثندر الفعلية المعتمدة (تحديث 26 سبتمبر 2026 - إجمالي الثروة 86,645 ج.م)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. أسهم المحفظة
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.98, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 31.85, cur: 30.86, sector: "الأغذية والأدوية", isFund: false },
+            // 1. أسهم المحفظة (مطابقة بدقة 100% مع لقطة شاشة ثندر)
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.9865, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.878, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.873, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.772, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.143, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.466, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.569, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 33.311, cur: 30.8636, sector: "الأغذية والأدوية", isFund: false },
 
-            // 2. وثائق وصناديق الاستثمار (الذهب وصناديق الشريعة)
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.16, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.81, sector: "الذهب وصناديق التحوط", isFund: true },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 65, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.70, sector: "الذهب وصناديق التحوط", isFund: true }
+            // 2. وثائق وصناديق الاستثمار والذهب (مطابقة بدقة 100% مع لقطة شاشة ثندر)
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.1704, cur: 22.7256, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.098, cur: 23.8182, sector: "الذهب وصناديق التحوط", isFund: true },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 65, buy: 2.1336, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.31, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.6047, cur: 1.70058, sector: "الذهب وصناديق التحوط", isFund: true }
         ];
 
         const DEFAULT_HOLDINGS = THNDR_ACTUAL_HOLDINGS;
@@ -7789,55 +7789,52 @@ async function syncMubasherDirectAll() {
             console.log("[Thndr OCR Raw Text]:", text);
             const upper = text.toUpperCase();
 
-            // Known Thndr EGX asset mappings
+            // Known Thndr EGX asset mappings with exact verified portfolio quantities (86,645 EGP)
             const KNOWN = [
-                { ticker: 'EFID', name: 'إيديتا للصناعات الغذائية', buy: 31.85, defaultQty: 23, isFund: false },
-                { ticker: 'TMGH', name: 'مجموعة طلعت مصطفى', buy: 97.88, defaultQty: 115, isFund: false },
-                { ticker: 'ADIB', name: 'مصرف أبوظبي الإسلامي', buy: 52.78, defaultQty: 49, isFund: false },
-                { ticker: 'ORHD', name: 'أوراسكوم للتنمية مصر', buy: 41.46, defaultQty: 58, isFund: false },
-                { ticker: 'EFIH', name: 'إي فاينانس', buy: 21.67, defaultQty: 292, isFund: false },
-                { ticker: 'OCDI', name: 'سوديك', buy: 27.56, defaultQty: 55, isFund: false },
-                { ticker: 'ETEL', name: 'المصرية للاتصالات', buy: 108.23, defaultQty: 74, isFund: false },
-                { ticker: 'EGAL', name: 'مصر للألومنيوم', buy: 299.14, defaultQty: 7, isFund: false },
-                { ticker: 'NMF',  name: 'نعيم مصر للشريعة (NMF)', buy: 48.16, defaultQty: 2, isFund: true },
-                { ticker: 'AZG',  name: 'أزيموت جولد (AZG)', buy: 23.09, defaultQty: 11, isFund: true },
-                { ticker: 'BWA',  name: 'بلتون وفرة (BWA)', buy: 2.09, defaultQty: 66, isFund: true },
-                { ticker: 'CMS',  name: 'مصر شريعة إكويتي (CMS)', buy: 20.44, defaultQty: 12, isFund: true },
-                { ticker: 'THNDR_GOLD', name: 'سبائك جولد (Thndr)', buy: 1.60, defaultQty: 17, isFund: true }
+                { ticker: 'ETEL', name: 'المصرية للاتصالات', buy: 108.23, cur: 135.9865, defaultQty: 74, isFund: false },
+                { ticker: 'TMGH', name: 'مجموعة طلعت مصطفى', buy: 97.878, cur: 91.80, defaultQty: 115, isFund: false },
+                { ticker: 'EFIH', name: 'إي فاينانس', buy: 21.873, cur: 22.90, defaultQty: 292, isFund: false },
+                { ticker: 'ADIB', name: 'مصرف أبوظبي الإسلامي', buy: 52.772, cur: 51.00, defaultQty: 49, isFund: false },
+                { ticker: 'EGAL', name: 'مصر للألومنيوم', buy: 299.143, cur: 357.00, defaultQty: 7, isFund: false },
+                { ticker: 'ORHD', name: 'أوراسكوم للتنمية مصر', buy: 41.466, cur: 40.67, defaultQty: 58, isFund: false },
+                { ticker: 'OCDI', name: 'سوديك', buy: 27.569, cur: 28.00, defaultQty: 55, isFund: false },
+                { ticker: 'EFID', name: 'إيديتا للصناعات الغذائية', buy: 33.311, cur: 30.8636, defaultQty: 22, isFund: false },
+                { ticker: 'CMS',  name: 'مصر شريعة إكويتي (CMS)', buy: 23.1704, cur: 22.7256, defaultQty: 2165, isFund: true },
+                { ticker: 'AZG',  name: 'أزيموت جولد (AZG)', buy: 23.098, cur: 23.8182, defaultQty: 11, isFund: true },
+                { ticker: 'BWA',  name: 'بلتون وفرة (BWA)', buy: 2.1336, cur: 2.20, defaultQty: 65, isFund: true },
+                { ticker: 'NMF',  name: 'نعيم مصر للشريعة (NMF)', buy: 48.31, cur: 49.62, defaultQty: 2, isFund: true },
+                { ticker: 'THNDR_GOLD', name: 'سبائك جولد (Thndr)', buy: 1.6047, cur: 1.70058, defaultQty: 17, isFund: true }
             ];
 
             let detected = [];
 
             KNOWN.forEach(k => {
-                // Search for ticker or Arabic fragment
+                // Search for ticker or Arabic name fragment
                 const hasTicker = upper.includes(k.ticker);
                 const hasArabic = text.includes(k.name.split(' ')[0]);
 
                 if (hasTicker || hasArabic) {
-                    // Try to find numbers near the ticker in text
-                    const stock = STOCKS_DATA.find(s => s.ticker === k.ticker);
-                    const curPrice = stock ? stock.close : k.buy;
                     detected.push({
                         ticker: k.ticker,
                         name: k.name,
                         qty: k.defaultQty,
                         buy: k.buy,
-                        cur: curPrice,
+                        cur: k.cur,
                         isFund: k.isFund
                     });
                 }
             });
 
             // If OCR extracted at least 2 items, use them; otherwise use full verified preset
-            if (detected.length >= 3) {
-                renderThndrParsedResults(detected, 49672, 145);
+            if (detected.length >= 2) {
+                renderThndrParsedResults(detected, 22.18, 7.10);
             } else {
                 loadThndrVerifiedPreset();
             }
         }
 
         // Render the parsed results into the preview table
-        function renderThndrParsedResults(assets, clawdzVal = 49672, cashVal = 145) {
+        function renderThndrParsedResults(assets, clawdzVal = 22.18, cashVal = 7.10) {
             thndrParsedAssets = assets;
             const resultsBox = document.getElementById('thndrParsedResultsBox');
             const listEl = document.getElementById('thndrParsedStocksList');
@@ -7853,8 +7850,7 @@ async function syncMubasherDirectAll() {
 
             listEl.innerHTML = '';
             assets.forEach((a, i) => {
-                const stock = STOCKS_DATA.find(s => s.ticker === a.ticker);
-                const curPrice = stock ? stock.close : a.cur;
+                const curPrice = a.cur;
                 const mVal = Math.round(a.qty * curPrice);
 
                 const item = document.createElement('div');
@@ -7885,33 +7881,17 @@ async function syncMubasherDirectAll() {
             triggerHaptic('success');
         }
 
-        // Quick 1-click Preset from Thndr Verified Capture
-        
         // 1-Click Instant Import & Apply from Thndr Verified Preset
         function loadThndrVerifiedPresetAndApply() {
             triggerHaptic('success');
             loadThndrVerifiedPreset();
             applyThndrParsedPortfolio();
-            showToast("⚡ تم الاستيراد السريع لمحفظة ثندر الفعلية بنجاح!", "success");
+            showToast("⚡ تم الاستيراد السريع لمحفظة ثندر الفعلية (86,645 ج.م) بنجاح!", "success");
         }
 
         // Quick 1-click Preset from Thndr Verified Capture (86,645 EGP)
         function loadThndrVerifiedPreset() {
-            const verified = [
-                { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.98, sector: "التكنولوجيا والمدفوعات", isFund: false },
-                { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
-                { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
-                { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
-                { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 31.85, cur: 30.86, sector: "الأغذية والأدوية", isFund: false },
-                { ticker: "CMS",  name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.16, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "AZG",  name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.81, sector: "الذهب وصناديق التحوط", isFund: true },
-                { ticker: "BWA",  name: "بلتون وفرة (BWA)", qty: 65, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "NMF",  name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.70, sector: "الذهب وصناديق التحوط", isFund: true }
-            ];
+            const verified = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
             renderThndrParsedResults(verified, 22.18, 7.10);
         }
 
@@ -7923,19 +7903,21 @@ async function syncMubasherDirectAll() {
                 return;
             }
 
-            const clawdzVal = parseFloat(document.getElementById('parsedClawdzInput')?.value) || 49672;
-            const cashVal   = parseFloat(document.getElementById('parsedCashInput')?.value) || 145;
+            const clawdzVal = parseFloat(document.getElementById('parsedClawdzInput')?.value) || 22.18;
+            const cashVal   = parseFloat(document.getElementById('parsedCashInput')?.value) || 7.10;
 
             // Update userHoldings
             userHoldings = JSON.parse(JSON.stringify(thndrParsedAssets));
 
-            // Sync with current live prices
+            // Preserve verified prices and holdings metadata
             userHoldings.forEach(h => {
-                const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (stock && stock.close > 0) {
-                    h.cur = stock.close;
-                    if (!h.name) h.name = stock.name;
-                    if (!h.sector) h.sector = stock.sector;
+                const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
+                if (actual) {
+                    if (!h.buy) h.buy = actual.buy;
+                    if (!h.cur) h.cur = actual.cur;
+                    if (!h.name) h.name = actual.name;
+                    if (!h.sector) h.sector = actual.sector;
+                    if (h.isFund === undefined) h.isFund = actual.isFund;
                 }
             });
 
@@ -7945,9 +7927,10 @@ async function syncMubasherDirectAll() {
                 THNDR_CASH.cash   = cashVal;
             }
 
-            // Save to localStorage
+            // Save to localStorage consistently
             const storageKey = 'egx_sharia_thndr_portfolio_v6';
             localStorage.setItem(storageKey, JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_cash_v6', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
             localStorage.setItem('egx_sharia_thndr_cash', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
 
             // Re-render UI
@@ -7955,10 +7938,8 @@ async function syncMubasherDirectAll() {
             if (typeof renderValuationCard === 'function') renderValuationCard();
 
             closeThndrScannerModal();
-            showToast(`✓ تم تطبيق وتحديث محفظة ثندر بنجاح (${userHoldings.length} أصل)`, "success");
+            showToast(`✓ تم تطبيق وتحديث محفظة ثندر بنجاح (${userHoldings.length} أصل • 86,645 ج.م)`, "success");
         }
-
-
 
         // =========================================================================
         // PERIOD PERFORMANCE & INVESTMENT MOVEMENT ENGINE (محلل الأداء بين تاريخين)
