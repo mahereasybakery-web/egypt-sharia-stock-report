@@ -432,18 +432,24 @@
         /* =========================================================================
            CONTINUOUS RIGHT-TO-LEFT TICKER ANIMATION (حركة شريط التيكر من اليمين لليسار)
            ========================================================================= */
-        @keyframes tickerScrollRTL {
+        /* ── Continuous Left-to-Right Ticker (من اليسار لليمين) ── */
+        @keyframes tickerScrollLTR {
             0% {
-                transform: translateX(0);
+                transform: translateX(-50%);
             }
             100% {
-                transform: translateX(-50%);
+                transform: translateX(0%);
             }
         }
         .ticker-marquee-track {
             display: inline-flex;
             width: max-content;
-            animation: tickerScrollRTL 45s linear infinite;
+            animation: tickerScrollLTR 42s linear infinite;
+            will-change: transform;
+        }
+        .ticker-marquee-track:hover,
+        .ticker-marquee-track:active {
+            animation-play-state: paused;
         }
         .ticker-marquee-track:hover,
         .ticker-marquee-track:active,
@@ -487,11 +493,8 @@
         <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <!-- زر الرجوع الأيمن في الترويسة (يظهر تلقائياً عند الدخول في أي تبويب فرعي للرجوع للمحفظة) -->
-                <button id="headerBackBtn" onclick="navigateBack()" class="hidden items-center gap-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-lg text-xs font-bold transition active:scale-95 shrink-0" title="الرجوع إلى المحفظة" dir="rtl">
-                    <span>←</span>
-                    <span class="hidden sm:inline">رجوع</span>
-                    <span>المحفظة</span>
-                </button>
+                <!-- Back button hidden permanently per user request (uses device native back button) -->
+                <button id="headerBackBtn" style="display:none !important;" class="hidden"></button>
                 <div id="headerMainLogo" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg shrink-0">
                     ☪️
                 </div>
@@ -530,147 +533,192 @@
         </div>
 
         <!-- Live Ticker Bar (شريط التيكر المتحرك تلقائياً من اليمين لليسار) -->
-        <div class="relative overflow-hidden w-full pt-2.5 text-[11px] select-none">
+                <!-- Live Scrolling Ticker Bar (Left-to-Right Continuous Loop: من اليسار لليمين) -->
+        <div class="relative overflow-hidden w-full pt-2.5 text-[11px] select-none" dir="ltr">
             <div id="liveTickerBarTrack" class="ticker-marquee-track flex gap-2 items-center">
-                <!-- ================= Ticker Sequence 1 ================= -->
-                <!-- EGX Market Clock & Session Status Badge -->
+                <!-- Sequence 1 -->
+                <div class="flex gap-2 items-center shrink-0">
+
+                <!-- Item 1: Session Status & Clock -->
                 <div class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
-                    <span id="marketSessionText" class="font-bold">البورصة المصرية: معتمد بأسعار الإقفال</span>
-                    <span id="marketClockCairo" class="font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
+                    <span class="marketSessionText font-bold">البورصة المصرية: مباشر مصر</span>
+                    <span class="marketClockCairo font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
                 </div>
+                <!-- Item 2: USD / EGP -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">الدولار:</span>
-                    <span id="ticker_usd" class="font-bold text-white ticker-usd-val">52.19 ج</span>
+                    <span class="text-slate-400">💵 الدولار:</span>
+                    <span class="font-bold text-white font-mono ticker-usd-val">52.19 ج</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
                 </div>
+                <!-- Item 3: Gold 24k -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">الذهب 24:</span>
-                    <span id="ticker_gold" class="font-bold text-amber-400 ticker-gold-val">4,340.91 ج</span>
+                    <span class="text-slate-400">🥇 الذهب 24:</span>
+                    <span class="font-bold text-amber-400 font-mono ticker-gold-val">4,340.91 ج</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
                 </div>
+                <!-- Item 4: EGX 33 Sharia Index -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX33:</span>
-                    <span id="ticker_egx33" class="font-bold text-emerald-400 ticker-egx33-val">3,380.45</span>
+                    <span class="text-slate-400">📊 مؤشر EGX33:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx33-val">3,380.45</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
                 </div>
+                <!-- Item 5: EGX 30 Index -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX30:</span>
-                    <span class="font-bold text-emerald-400 font-mono">55,498.72</span>
-                    <span class="text-[10px] text-emerald-400 font-bold">+0.82%</span>
+                    <span class="text-slate-400">📈 مؤشر EGX30:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx30-val">53,776.69</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">-0.83%</span>
                 </div>
+                <!-- Item 6: EGX 70 EWI -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX70 EWI:</span>
-                    <span class="font-bold text-emerald-400 font-mono">21,061.13</span>
-                    <span class="text-[10px] text-emerald-400 font-bold">+0.47%</span>
+                    <span class="text-slate-400">📈 مؤشر EGX70:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx70-val">19,834.95</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">-1.92%</span>
                 </div>
+                <!-- Item 7: Azimut Gold (AZG) -->
                 <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
                     <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
                     <span class="font-bold text-amber-400 font-mono">23.96 ج</span>
                     <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 8: Thndr Gold -->
                 <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
                     <span class="text-slate-400">🪙 ثندر جولد:</span>
                     <span class="font-bold text-amber-400 font-mono">1.68 ج</span>
                     <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 9: CI Egypt Sharia (CMS) -->
                 <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
                     <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
                     <span class="font-bold text-sky-400 font-mono">22.72 ج</span>
                     <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 10: Beltone Wafra (BWA) -->
                 <div onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
                     <span class="text-slate-400">🕌 بلتون وفرة (BWA):</span>
                     <span class="font-bold text-emerald-400 font-mono">2.21 ج</span>
                     <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 11: Naeem Misr (NMF) -->
                 <div onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
                     <span class="text-slate-400">🕌 نعيم مصر (NMF):</span>
                     <span class="font-bold text-sky-400 font-mono">50.19 ج</span>
                     <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 12: Saudi Riyal SAR -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
-                    <span id="ticker_sar" class="font-bold text-sky-300 font-mono">13.90 ج</span>
+                    <span class="font-bold text-sky-300 font-mono ticker-sar-val">13.90 ج</span>
                 </div>
+                <!-- Item 13: TASI -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
                     <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
                 </div>
+                <!-- Item 14: S&P 500 -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🇺🇸 S&P 500:</span>
                     <span class="font-bold text-emerald-400 font-mono">5,618.20</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+0.40%</span>
                 </div>
+                <!-- Item 15: CBE Interest -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🏛️ فائدة المركزي (CBE):</span>
                     <span class="font-bold text-amber-300 font-mono">27.25%</span>
                 </div>
+                </div>
+                <!-- Sequence 2 (Identical Clone for Seamless Infinite Loop) -->
+                <div class="flex gap-2 items-center shrink-0">
 
-                <!-- ================= Ticker Sequence 2 (Seamless Infinite Loop Duplicate) ================= -->
+                <!-- Item 1: Session Status & Clock -->
                 <div class="bg-emerald-950/90 border border-emerald-700/80 text-emerald-300 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shadow-sm shrink-0">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
-                    <span class="font-bold">البورصة المصرية: مباشر مصر</span>
+                    <span class="marketSessionText font-bold">البورصة المصرية: مباشر مصر</span>
+                    <span class="marketClockCairo font-mono text-[10px] text-emerald-200 border-r border-emerald-800 pr-1 mr-0.5">--:--:--</span>
                 </div>
+                <!-- Item 2: USD / EGP -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">الدولار:</span>
-                    <span class="font-bold text-white ticker-usd-val">52.19 ج</span>
+                    <span class="text-slate-400">💵 الدولار:</span>
+                    <span class="font-bold text-white font-mono ticker-usd-val">52.19 ج</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+0.46%</span>
                 </div>
+                <!-- Item 3: Gold 24k -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">الذهب 24:</span>
-                    <span class="font-bold text-amber-400 ticker-gold-val">4,340.91 ج</span>
+                    <span class="text-slate-400">🥇 الذهب 24:</span>
+                    <span class="font-bold text-amber-400 font-mono ticker-gold-val">4,340.91 ج</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+1.11%</span>
                 </div>
+                <!-- Item 4: EGX 33 Sharia Index -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX33:</span>
-                    <span class="font-bold text-emerald-400 ticker-egx33-val">3,380.45</span>
+                    <span class="text-slate-400">📊 مؤشر EGX33:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx33-val">3,380.45</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+1.15%</span>
                 </div>
+                <!-- Item 5: EGX 30 Index -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX30:</span>
-                    <span class="font-bold text-emerald-400 font-mono">55,498.72</span>
-                    <span class="text-[10px] text-emerald-400 font-bold">+0.82%</span>
+                    <span class="text-slate-400">📈 مؤشر EGX30:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx30-val">53,776.69</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">-0.83%</span>
                 </div>
+                <!-- Item 6: EGX 70 EWI -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                    <span class="text-slate-400">مؤشر EGX70 EWI:</span>
-                    <span class="font-bold text-emerald-400 font-mono">21,061.13</span>
-                    <span class="text-[10px] text-emerald-400 font-bold">+0.47%</span>
+                    <span class="text-slate-400">📈 مؤشر EGX70:</span>
+                    <span class="font-bold text-emerald-400 font-mono ticker-egx70-val">19,834.95</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">-1.92%</span>
                 </div>
+                <!-- Item 7: Azimut Gold (AZG) -->
                 <div onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
                     <span class="text-slate-400">🪙 أزيموت جولد (AZG):</span>
                     <span class="font-bold text-amber-400 font-mono">23.96 ج</span>
                     <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 8: Thndr Gold -->
                 <div onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
                     <span class="text-slate-400">🪙 ثندر جولد:</span>
                     <span class="font-bold text-amber-400 font-mono">1.68 ج</span>
                     <span class="text-[9px] bg-amber-950 text-amber-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 9: CI Egypt Sharia (CMS) -->
                 <div onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
                     <span class="text-slate-400">🕌 مصر شريعة (CMS):</span>
                     <span class="font-bold text-sky-400 font-mono">22.72 ج</span>
                     <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 10: Beltone Wafra (BWA) -->
                 <div onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
                     <span class="text-slate-400">🕌 بلتون وفرة (BWA):</span>
                     <span class="font-bold text-emerald-400 font-mono">2.21 ج</span>
                     <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 11: Naeem Misr (NMF) -->
                 <div onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
                     <span class="text-slate-400">🕌 نعيم مصر (NMF):</span>
                     <span class="font-bold text-sky-400 font-mono">50.19 ج</span>
                     <span class="text-[9px] bg-sky-950 text-sky-300 px-1 rounded font-mono">شارت</span>
                 </div>
+                <!-- Item 12: Saudi Riyal SAR -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🇸🇦 الريال السعودي:</span>
-                    <span class="font-bold text-sky-300 font-mono">13.90 ج</span>
+                    <span class="font-bold text-sky-300 font-mono ticker-sar-val">13.90 ج</span>
                 </div>
+                <!-- Item 13: TASI -->
                 <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                     <span class="text-slate-400">🇸🇦 تاسي (TASI):</span>
                     <span class="font-bold text-emerald-400 font-mono">12,180.50</span>
                     <span class="text-[10px] text-emerald-400 font-bold">+0.35%</span>
+                </div>
+                <!-- Item 14: S&P 500 -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🇺🇸 S&P 500:</span>
+                    <span class="font-bold text-emerald-400 font-mono">5,618.20</span>
+                    <span class="text-[10px] text-emerald-400 font-bold">+0.40%</span>
+                </div>
+                <!-- Item 15: CBE Interest -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                    <span class="text-slate-400">🏛️ فائدة المركزي (CBE):</span>
+                    <span class="font-bold text-amber-300 font-mono">27.25%</span>
+                </div>
                 </div>
             </div>
         </div>
@@ -2763,13 +2811,8 @@
             // زر الرجوع في الترويسة الرئيسية
             const headerBackBtn = document.getElementById('headerBackBtn');
             if (headerBackBtn) {
-                if (currentActiveTab !== 'portfolio' && !isAnyModalOpen()) {
-                    headerBackBtn.classList.remove('hidden');
-                    headerBackBtn.classList.add('inline-flex');
-                } else {
-                    headerBackBtn.classList.add('hidden');
-                    headerBackBtn.classList.remove('inline-flex');
-                }
+                headerBackBtn.style.display = 'none';
+                headerBackBtn.classList.add('hidden');
             }
 
             // زر الرجوع في تليجرام ويب آب (Telegram WebApp Native Back Button)
@@ -5604,10 +5647,10 @@
                     });
 
                     // ── Update Ticker Bar ──────────────────────────────────
-                    if (data.fx_gold?.usd_egp)   { const el=document.getElementById('ticker_usd');   if(el) el.innerText=data.fx_gold.usd_egp.close+' ج'; }
-                    if (data.fx_gold?.gold_24k)  { const el=document.getElementById('ticker_gold');  if(el) el.innerText=data.fx_gold.gold_24k.close.toLocaleString()+' ج'; }
-                    if (data.indices?.EGX33)     { const el=document.getElementById('ticker_egx33'); if(el) el.innerText=data.indices.EGX33.close.toLocaleString(); }
-                    if (data.indices?.EGX30)     { const el=document.getElementById('ticker_egx30'); if(el) el.innerText=data.indices.EGX30.close.toLocaleString(); }
+                    if (data.fx_gold?.usd_egp)   { const el=document.getElementById('ticker_usd');   if(el) el.innerText=data.fx_gold.usd_egp.close+' ج'; document.querySelectorAll('.ticker-usd-val').forEach(e => e.innerText=data.fx_gold.usd_egp.close+' ج'); }
+                    if (data.fx_gold?.gold_24k)  { const el=document.getElementById('ticker_gold');  if(el) el.innerText=data.fx_gold.gold_24k.close.toLocaleString()+' ج'; document.querySelectorAll('.ticker-gold-val').forEach(e => e.innerText=data.fx_gold.gold_24k.close.toLocaleString()+' ج'); }
+                    if (data.indices?.EGX33)     { const el=document.getElementById('ticker_egx33'); if(el) el.innerText=data.indices.EGX33.close.toLocaleString(); document.querySelectorAll('.ticker-egx33-val').forEach(e => e.innerText=data.indices.EGX33.close.toLocaleString()); }
+                    if (data.indices?.EGX30)     { const el=document.getElementById('ticker_egx30'); if(el) el.innerText=data.indices.EGX30.close.toLocaleString(); document.querySelectorAll('.ticker-egx30-val').forEach(e => e.innerText=data.indices.EGX30.close.toLocaleString()); }
 
                     // ── Update AI pulse ────────────────────────────────────
                     if (data.ai_pulse?.text)        { const el=document.getElementById('ai_pulse_text');  if(el) el.innerText=data.ai_pulse.text; }
