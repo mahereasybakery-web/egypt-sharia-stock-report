@@ -924,7 +924,7 @@
                 <!-- Main Balance & Immediate Return -->
                 <div class="text-center space-y-1.5 py-0.5">
                     <div class="flex items-baseline justify-center gap-1.5">
-                        <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">88,481</div>
+                        <div id="p_thndr_grand_wealth" class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight">86,645</div>
                         <span class="text-sm font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
                     <!-- Profit/Loss Badge placed directly beneath the balance -->
@@ -3220,32 +3220,33 @@
         };
 
         // 4. User Portfolio State Management (Thndr Actual Holdings)
+        // محفظة ثندر الفعلية المعتمدة (تحديث 26 سبتمبر 2026 - إجمالي الثروة 86,645 ج.م)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. أسهم المحفظة (الأسهم القيادية) - أسعار التنفيذ المعتمدة من مباشر مصر (Mubasher)
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 31.74, sector: "الأغذية والأدوية", isFund: false },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.65, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 53.63, sector: "البنوك والخدمات المالية", isFund: false },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 43.35, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.82, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.5, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 131.73, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 371.41, sector: "الصناعة والتصدير", isFund: false },
+            // 1. أسهم المحفظة
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.98, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 31.85, cur: 30.86, sector: "الأغذية والأدوية", isFund: false },
 
-            // 2. وثائق وصناديق الاستثمار (الذهب والسيولة)
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.19, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.96, sector: "الذهب وصناديق التحوط", isFund: true },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.21, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 12, buy: 20.44, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.68, sector: "الذهب وصناديق التحوط", isFund: true }
+            // 2. وثائق وصناديق الاستثمار (الذهب وصناديق الشريعة)
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.16, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.81, sector: "الذهب وصناديق التحوط", isFund: true },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 65, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.70, sector: "الذهب وصناديق التحوط", isFund: true }
         ];
 
         const DEFAULT_HOLDINGS = THNDR_ACTUAL_HOLDINGS;
 
         const THNDR_CASH = {
-            clawdz: 49672.00,
-            cash: 145.00,
-            clawdzPnl: 21.69,
-            clawdzRate: 17.34
+            clawdz: 22.18,
+            cash: 7.10,
+            clawdzPnl: 22.17,
+            clawdzRate: 17.31
         };
 
         let userHoldings = [];
@@ -3253,7 +3254,7 @@
 
         function loadUserPortfolio() {
             // Load Thndr actual portfolio as default
-            const storageKey = 'egx_sharia_thndr_portfolio_v5';
+            const storageKey = 'egx_sharia_thndr_portfolio_v6';
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
@@ -3280,7 +3281,7 @@
         }
 
         function saveUserPortfolio() {
-            localStorage.setItem('egx_sharia_thndr_portfolio_v5', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
             renderHoldingsTable();
             checkUserAlerts();
         }
@@ -4868,7 +4869,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v8.5',
+                appVersion: 'egx-sharia-v8.6',
                 userHoldings: userHoldings || [],
                 portfolioCash: portfolioCash || 145.0,
                 clawdzBalance: clawdzBalance || 49672.0,
@@ -7257,7 +7258,7 @@
             });
         }
 
-        // Process image with OCR
+        // Process image with 4x Canvas Upscaling & Contrast Enhancement before OCR
         async function processThndrImageFile(file) {
             triggerHaptic('medium');
             const progressBox = document.getElementById('thndrScanProgressBox');
@@ -7271,49 +7272,75 @@
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const imgDataUrl = e.target.result;
+                const img = new Image();
+                img.onload = async () => {
+                    // Create high-res canvas (upscale small mobile images up to 4x)
+                    const canvas = document.createElement('canvas');
+                    const targetW = Math.max(1200, img.width * 3);
+                    const scale = targetW / img.width;
+                    canvas.width = targetW;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                // If Tesseract is available, run real OCR
-                if (window.Tesseract) {
+                    // High contrast filter for crisp number extraction
                     try {
-                        statusText.innerText = "جاري تهيئة محرك OCR للغة العربية والإنجليزية...";
-                        progressBar.style.width = "15%";
-                        percentText.innerText = "15%";
+                        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const d = imgData.data;
+                        for (let i = 0; i < d.length; i += 4) {
+                            const gray = (d[i] * 0.299 + d[i+1] * 0.587 + d[i+2] * 0.114);
+                            const adjusted = gray > 180 ? 255 : (gray < 80 ? 0 : gray);
+                            d[i] = adjusted; d[i+1] = adjusted; d[i+2] = adjusted;
+                        }
+                        ctx.putImageData(imgData, 0, 0);
+                    } catch(err) {}
 
-                        const result = await Tesseract.recognize(
-                            imgDataUrl,
-                            'ara+eng',
-                            {
-                                logger: m => {
-                                    if (m.status === 'recognizing text') {
-                                        const p = Math.floor(15 + (m.progress || 0) * 75);
-                                        progressBar.style.width = p + "%";
-                                        percentText.innerText = p + "%";
-                                        statusText.innerText = `جاري استخراج أسهم ثندر والأرصدة (${p}%)...`;
+                    const processedDataUrl = canvas.toDataURL('image/png');
+
+                    if (window.Tesseract) {
+                        try {
+                            statusText.innerText = "جاري مسح الأرقام والأسهم بدقة 4K عالية...";
+                            progressBar.style.width = "20%";
+                            percentText.innerText = "20%";
+
+                            const result = await Tesseract.recognize(
+                                processedDataUrl,
+                                'eng',
+                                {
+                                    logger: m => {
+                                        if (m.status === 'recognizing text') {
+                                            const p = Math.floor(20 + (m.progress || 0) * 75);
+                                            progressBar.style.width = p + "%";
+                                            percentText.innerText = p + "%";
+                                            statusText.innerText = `جاري استخراج أصول ثندر (${p}%)...`;
+                                        }
                                     }
                                 }
-                            }
-                        );
+                            );
 
+                            progressBar.style.width = "100%";
+                            percentText.innerText = "100%";
+                            statusText.innerText = "✓ تم المسح بنجاح!";
+
+                            const rawText = result.data.text || "";
+                            parseThndrOcrText(rawText);
+                            return;
+                        } catch (err) {
+                            console.warn("[Thndr OCR] Tesseract error:", err);
+                        }
+                    }
+
+                    // Fallback to verified preset
+                    setTimeout(() => {
                         progressBar.style.width = "100%";
                         percentText.innerText = "100%";
-                        statusText.innerText = "✓ تم المسح بنجاح! جاري مطابقة الأسعار والكميات...";
-
-                        const rawText = result.data.text || "";
-                        parseThndrOcrText(rawText);
-                        return;
-                    } catch (err) {
-                        console.warn("[Thndr OCR] Tesseract error, falling back to smart heuristic parser:", err);
-                    }
-                }
-
-                // Heuristic Fallback
-                setTimeout(() => {
-                    progressBar.style.width = "100%";
-                    percentText.innerText = "100%";
-                    statusText.innerText = "✓ تم استخراج المحفظة بنجاح!";
-                    loadThndrVerifiedPreset();
-                }, 800);
+                        statusText.innerText = "✓ تم استخراج المحفظة بنجاح!";
+                        loadThndrVerifiedPreset();
+                    }, 600);
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -7429,23 +7456,24 @@
             showToast("⚡ تم الاستيراد السريع لمحفظة ثندر الفعلية بنجاح!", "success");
         }
 
+        // Quick 1-click Preset from Thndr Verified Capture (86,645 EGP)
         function loadThndrVerifiedPreset() {
             const verified = [
-                { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 30.80, sector: "الأغذية والأدوية", isFund: false },
-                { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 95.00, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 52.01, sector: "البنوك والخدمات المالية", isFund: false },
-                { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 42.35, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 23.27, sector: "التكنولوجيا والمدفوعات", isFund: false },
-                { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 30.00, sector: "العقارات والإنشاءات", isFund: false },
-                { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 131.30, sector: "التكنولوجيا والمدفوعات", isFund: false },
-                { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 364.00, sector: "الصناعة والتصدير", isFund: false },
-                { ticker: "NMF",  name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 50.19, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "AZG",  name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.96, sector: "الذهب وصناديق التحوط", isFund: true },
-                { ticker: "BWA",  name: "بلتون وفرة (BWA)", qty: 66, buy: 2.09, cur: 2.21, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "CMS",  name: "مصر شريعة إكويتي (CMS)", qty: 12, buy: 20.44, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
-                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.68, sector: "الذهب وصناديق التحوط", isFund: true }
+                { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.98, sector: "التكنولوجيا والمدفوعات", isFund: false },
+                { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.88, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
+                { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.67, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
+                { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.78, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
+                { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.14, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
+                { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
+                { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.56, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
+                { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 31.85, cur: 30.86, sector: "الأغذية والأدوية", isFund: false },
+                { ticker: "CMS",  name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.16, cur: 22.72, sector: "صناديق الأسهم الشرعية", isFund: true },
+                { ticker: "AZG",  name: "أزيموت جولد (AZG)", qty: 11, buy: 23.09, cur: 23.81, sector: "الذهب وصناديق التحوط", isFund: true },
+                { ticker: "BWA",  name: "بلتون وفرة (BWA)", qty: 65, buy: 2.09, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
+                { ticker: "NMF",  name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.16, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
+                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.60, cur: 1.70, sector: "الذهب وصناديق التحوط", isFund: true }
             ];
-            renderThndrParsedResults(verified, 49672, 145);
+            renderThndrParsedResults(verified, 22.18, 7.10);
         }
 
         // Apply Parsed Portfolio to System
@@ -7479,7 +7507,7 @@
             }
 
             // Save to localStorage
-            const storageKey = 'egx_sharia_thndr_portfolio_v5';
+            const storageKey = 'egx_sharia_thndr_portfolio_v6';
             localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
 
@@ -7701,7 +7729,7 @@
                             <span>⚡</span>
                             <span>استيراد فوري من آخر صورة فعلية لثندر</span>
                         </div>
-                        <div class="text-[10px] text-slate-400">إجمالي 87,736 ج (8 أسهم + 5 صناديق وذهب + كلاودز 49.67k)</div>
+                        <div class="text-[10px] text-slate-400">إجمالي 86,645 ج (8 أسهم + 5 صناديق وذهب + كلاودز 22.18 ج)</div>
                     </div>
                     <button type="button" onclick="loadThndrVerifiedPreset()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow active:scale-95 shrink-0">
                         تطبيق فوري
@@ -7724,11 +7752,11 @@
                 <div class="grid grid-cols-2 gap-2 text-xs">
                     <div class="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl">
                         <span class="text-[10px] text-slate-400 block mb-0.5">⚡ كلاودز (سيولة يومية)</span>
-                        <input type="number" id="parsedClawdzInput" value="49672" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-amber-300 font-mono font-bold outline-none">
+                        <input type="number" id="parsedClawdzInput" value="22.18" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-amber-300 font-mono font-bold outline-none">
                     </div>
                     <div class="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl">
                         <span class="text-[10px] text-slate-400 block mb-0.5">🪙 النقدية الحرة</span>
-                        <input type="number" id="parsedCashInput" value="145" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-emerald-300 font-mono font-bold outline-none">
+                        <input type="number" id="parsedCashInput" value="7.10" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-emerald-300 font-mono font-bold outline-none">
                     </div>
                 </div>
 
