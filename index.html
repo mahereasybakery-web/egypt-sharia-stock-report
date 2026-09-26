@@ -79,6 +79,13 @@
         }
     </script>
     <style>
+        /* ── Enforce RTL globally ── */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { direction: rtl; text-align: right; }
+        input, textarea, select, button { direction: rtl; text-align: right; }
+        /* Numbers stay LTR inside RTL context naturally */
+        .force-ltr { direction: ltr !important; text-align: left !important; }
+
         body {
             font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
@@ -473,16 +480,17 @@
     </div>
 
     <!-- Live Toast Notification Container -->
-    <div id="toastContainer" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm space-y-2 pointer-events-none"></div>
+    <div id="toastContainer" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-sm space-y-2 pointer-events-none"></div>
 
     <!-- Top Navigation Header -->
     <header class="sticky top-0 z-40 bg-[#080c14]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div class="flex items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <!-- زر الرجوع الأيمن في الترويسة (يظهر تلقائياً عند الدخول في أي تبويب فرعي للرجوع للمحفظة) -->
-                <button id="headerBackBtn" onclick="navigateBack()" class="hidden items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shrink-0" title="الرجوع إلى المحفظة">
-                    <span class="text-sm">➔</span>
-                    <span>رجوع للمحفظة</span>
+                <button id="headerBackBtn" onclick="navigateBack()" class="hidden items-center gap-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2 py-1 rounded-lg text-xs font-bold transition active:scale-95 shrink-0" title="الرجوع إلى المحفظة" dir="rtl">
+                    <span>←</span>
+                    <span class="hidden sm:inline">رجوع</span>
+                    <span>المحفظة</span>
                 </button>
                 <div id="headerMainLogo" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-amber-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-lg shrink-0">
                     ☪️
@@ -678,7 +686,7 @@
             <!-- Search & Filter Controls -->
             <div class="glass-card rounded-2xl p-3 space-y-2.5">
                 <div class="relative">
-                    <input id="searchInput" type="text" oninput="filterStocks()" placeholder="🔍 ابحث عن أي سهم أو رمز (مثال: طلعت مصطفى، فوري، TMGH)..." 
+                    <input id="searchInput" type="text" dir="rtl" oninput="filterStocks()" placeholder="ابحث عن أي سهم أو رمز... (مثال: طلعت مصطفى، فوري، TMGH)" 
                            class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none transition">
                 </div>
                 <!-- Filter Pills -->
@@ -3301,7 +3309,7 @@
                         </div>
                     </div>
 
-                    <div class="text-left shrink-0">
+                    <div class="text-right shrink-0">
                         <div class="font-mono font-bold text-sm text-slate-900 dark:text-white">
                             ${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} <span class="text-[10px] font-normal text-slate-400">ج.م</span>
                         </div>
@@ -3323,7 +3331,7 @@
                         <span class="text-[10px] text-slate-400 block">متوسط الشراء</span>
                         <b class="font-mono text-slate-700 dark:text-slate-300 mt-0.5 block">${h.buy.toFixed(2)} ج</b>
                     </div>
-                    <div class="text-left">
+                    <div class="text-right">
                         <span class="text-[10px] text-slate-400 block">السعر اللحظي</span>
                         <b class="font-mono text-slate-900 dark:text-white mt-0.5 block font-bold">${h.cur.toFixed(2)} ج</b>
                     </div>
@@ -5149,7 +5157,7 @@
             const box = document.getElementById('aiChatOutput');
             box.classList.remove('hidden');
 
-            const userBubble = `<div class="p-2 bg-slate-800 rounded-lg text-white font-bold text-left">👤 ${q}</div>`;
+            const userBubble = `<div class="p-2 bg-slate-800 rounded-lg text-white font-bold text-right">👤 ${q}</div>`;
             box.innerHTML += userBubble;
             input.value = '';
 
@@ -5515,12 +5523,22 @@
 
                 // Fetch market_data.json with cache-bust
                 try {
-                    const cb   = Date.now();
-                    const resp = await fetch('./market_data.json?cb=' + cb, {
-                        cache: 'no-store',
-                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
-                    });
-                    if (!resp.ok) return;
+                    const cb = Date.now();
+                    let resp = null;
+                    // First try raw.githubusercontent.com for instant 0-second live updates from git push
+                    try {
+                        resp = await fetch('https://raw.githubusercontent.com/mahereasybakery-web/egypt-sharia-stock-report/main/market_data.json?cb=' + cb, {
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                        });
+                    } catch (e) {}
+                    if (!resp || !resp.ok) {
+                        resp = await fetch('./market_data.json?cb=' + cb, {
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                        });
+                    }
+                    if (!resp || !resp.ok) return;
 
                     // ETag / content-hash to skip re-processing identical files
                     const etag = resp.headers.get('ETag') || resp.headers.get('Last-Modified') || '';
@@ -5792,28 +5810,30 @@
                 const card = document.createElement('div');
                 card.className = "glass-card rounded-xl p-3 flex items-center justify-between hover:border-slate-600 transition cursor-pointer active:scale-99";
                 card.onclick = () => openStockChart(s.ticker);
+                // Format badges in strict Right-to-Left order: Recommendation -> P/E -> RSI
+                const recColor = s.rec.includes('شراء') ? 'text-emerald-400' : s.rec.includes('بيع') ? 'text-rose-400' : 'text-amber-400';
+                const arabicRec = `<span class="text-[11px] font-bold ${recColor}">${s.rec}</span>`;
+                const arabicPe  = s.pe ? `<span class="text-[10px] text-slate-400">مكرر: <b class="font-mono text-slate-300">${s.pe}x</b></span>` : '';
+                const arabicRsi = s.rsi ? `<span class="text-[10px] font-mono ${s.rsi <= 35 ? 'text-emerald-400 font-bold' : s.rsi >= 70 ? 'text-rose-400 font-bold' : 'text-slate-400'}">RSI: ${s.rsi.toFixed(1)}</span>` : '';
+
                 card.innerHTML = `
-                    <div class="space-y-0.5">
-                        <div class="flex items-center gap-2">
+                    <div class="space-y-1 text-right flex-1 min-w-0 pr-1" dir="rtl">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-bold text-sm text-white">${s.name}</span>
-                            <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${s.ticker}</span>
+                            <span class="text-[10px] font-mono bg-slate-800/90 text-slate-300 border border-slate-700/80 px-1.5 py-0.5 rounded">${s.ticker}</span>
                             ${s.type === 'fund' ? '<span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1 rounded">صندوق</span>' : ''}
                         </div>
-                        <div class="flex items-center gap-2.5 text-xs text-slate-400">
-                            ${rsiBadge}
-                            ${peBadge}
-                            <span class="text-[10px] text-slate-400">• ${s.rec}</span>
+                        <div class="flex items-center gap-2 text-xs text-slate-400 flex-wrap" dir="rtl">
+                            ${arabicRec}
+                            ${arabicPe ? '<span class="text-slate-600 text-[10px]">•</span>' + arabicPe : ''}
+                            ${arabicRsi ? '<span class="text-slate-600 text-[10px]">•</span>' + arabicRsi : ''}
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <button onclick="event.stopPropagation(); openStockNews('${s.ticker}')" class="bg-slate-800/90 hover:bg-slate-700 text-sky-300 border border-slate-700/80 text-[10px] px-2 py-1.5 rounded-lg transition active:scale-95 flex items-center gap-1" title="عرض أخبار وإفصاحات هذا السهم">
-                            <span>📰</span>
-                            <span class="hidden xs:inline">أخبار</span>
-                        </button>
-                        <div class="text-left space-y-0.5">
-                            <div class="text-sm font-bold text-white">${s.close.toFixed(2)} <span class="text-[10px] font-normal text-slate-400">ج.م</span></div>
-                            <span class="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
+                    <div class="text-left shrink-0 pl-1 space-y-0.5">
+                        <div class="text-sm font-bold text-white font-mono">${s.close.toFixed(2)} <span class="text-[10px] font-normal text-slate-400 font-sans">ج.م</span></div>
+                        <div class="flex justify-end">
+                            <span class="inline-block text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
                                 ${sign}${s.chg.toFixed(2)}%
                             </span>
                         </div>
@@ -5850,7 +5870,7 @@
                             <span class="text-sm font-bold text-white">${data.name} (${ticker})</span>
                             <div class="text-[11px] text-slate-400 mt-0.5">السعر السوقي الحالي: <b class="text-white font-mono">${data.current.toFixed(2)} ج.م</b></div>
                         </div>
-                        <div class="text-left">
+                        <div class="text-right">
                             <span class="text-[10px] text-slate-400 block">هامش الأمان (Safety)</span>
                             <span class="text-sm font-bold text-emerald-400">+${data.margin}%</span>
                         </div>
@@ -6851,7 +6871,7 @@
                         <td class="py-1.5 px-2 font-bold text-white">${c.name} (${c.ticker})</td>
                         <td class="py-1.5 px-2 text-center font-mono text-emerald-400 font-bold">${shares.toLocaleString()} ${c.ticker === 'CLAW' ? 'ج' : 'سهم/وثيقة'}</td>
                         <td class="py-1.5 px-2 text-center font-mono text-slate-300">${c.price.toFixed(2)} ج</td>
-                        <td class="py-1.5 px-2 text-left font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
+                        <td class="py-1.5 px-2 text-right font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
                         <td class="py-1.5 px-2 text-right text-[10px] text-slate-400">${c.reason}</td>
                     </tr>
                 `;
@@ -6869,7 +6889,7 @@
                                 <th class="py-1.5 px-2">الأصل / الرمز</th>
                                 <th class="py-1.5 px-2 text-center">الكمية المقترحة</th>
                                 <th class="py-1.5 px-2 text-center">السعر الحالي</th>
-                                <th class="py-1.5 px-2 text-left">التكلفة الإجمالية</th>
+                                <th class="py-1.5 px-2 text-right">التكلفة الإجمالية</th>
                                 <th class="py-1.5 px-2 text-right">المبرر الاستثماري</th>
                             </tr>
                         </thead>
