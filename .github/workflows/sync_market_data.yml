@@ -1,181 +1,171 @@
-name: ⚡ Real-Time Market Sync (Per-Minute via cron-job.org)
+name: ⚡ Per-Minute Live Price Sync (Self-Looping)
 
 on:
+  schedule:
+    # Runs every 5 minutes during EGX trading hours (Sun-Thu 07:00-12:00 UTC = 10:00-15:00 Cairo)
+    - cron: '0,5,10,15,20,25,30,35,40,45,50,55 7-12 * * 0,1,2,3,4'
+  workflow_dispatch:
   repository_dispatch:
     types: [market-sync-trigger]
-  schedule:
-    # Fallback: every 5 minutes during trading hours (Sun-Thu 07:00-12:00 UTC = 10:00-15:00 Cairo)
-    - cron: '*/5 7-12 * * 0,1,2,3,4'
-  workflow_dispatch:
 
 concurrency:
   group: market-sync
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
-  sync-prices:
+  sync-prices-per-minute:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 6
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch Real-Time Prices from Mubasher
+      - name: Loop — Fetch & Push Every 60 Seconds (x5 iterations)
         run: |
-          python << 'EOF'
-          import requests, json, re, os
+          python << 'PYEOF'
+          import requests, json, re, subprocess, time, os
           from datetime import datetime, timezone, timedelta
           from concurrent.futures import ThreadPoolExecutor
 
           cairo_tz = timezone(timedelta(hours=3))
-          now = datetime.now(cairo_tz)
-          print(f"[{now.strftime('%H:%M:%S')}] Starting Mubasher real-time sync...")
-
-          SESSION = requests.Session()
-          SESSION.headers.update({
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
-              'Accept-Language': 'en-US,en;q=0.9',
-              'Referer': 'https://english.mubasher.info/',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          })
 
           STOCKS = [
               'TMGH','SWDY','ORAS','ISPH','ETEL','AMOC','ABUK','MFPC','SKPC',
               'JUFO','EFID','ADIB','SAUD','OCDI','PHDC','COMI','FWRY','EFIH',
               'EGAL','ORHD','MCQE','ACGC','ARCC','ATQA','RMDA','GBCO',
-              'LCSW','DOMTY','CLHO','HELI','MNHD','CIEB','ESRS','MACRO'
+              'LCSW','HELI','CIEB','ESRS','CLHO','MACRO','MNHD','DOMTY'
           ]
+
+          SESSION = requests.Session()
+          SESSION.headers.update({
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept-Language': 'en-US,en;q=0.9',
+              'Referer': 'https://english.mubasher.info/',
+          })
 
           def parse_num(s, default=0.0):
               try:
-                  return float(re.sub(r'[^\d.\-]', '', s or ''))
+                  return float(re.sub(r'[^\d.\-]', '', str(s) or ''))
               except:
                   return default
 
           def fetch_stock(ticker):
               url = f'https://english.mubasher.info/markets/EGX/stocks/{ticker}/'
               try:
-                  r = SESSION.get(url, timeout=8)
+                  r = SESSION.get(url, timeout=9)
                   h = r.text
-
-                  # Extract price & change
                   pm  = re.search(r'market-summary__last-price[^"]*">\s*([0-9,.]+)\s*<', h)
                   cm  = re.search(r'market-summary__change-percentage[^"]*">\s*([-+]?[0-9,.]+%?)\s*<', h)
-                  chv = re.search(r'market-summary__change-value[^"]*">\s*([-+]?[0-9,.]+)\s*<', h)
-
-                  # OHLV — try multiple patterns
                   def block(label):
-                      m = re.search(
-                          label + r'[\s\S]{0,200}?market-summary__block-number[^>]*>\s*([0-9,.]+)\s*<',
-                          h, re.IGNORECASE)
+                      m = re.search(label + r'[\s\S]{0,300}?market-summary__block-number[^>]*>\s*([0-9,.]+)\s*<', h, re.IGNORECASE)
                       return parse_num(m.group(1)) if m else 0.0
-
                   close = parse_num(pm.group(1)) if pm else 0.0
-                  if close <= 0:
-                      return None
-
-                  chg_str = re.sub(r'[^\d.\-+]', '', cm.group(1)) if cm else '0'
-                  chg = float(chg_str) if chg_str else 0.0
-
-                  open_  = block('Open')   or close
-                  high   = block('High')   or close
-                  low    = block('Low')    or close
-                  vol_m  = re.search(r'Volume[\s\S]{0,200}?market-summary__block-number[^>]*>\s*([\d,]+)\s*<', h)
-                  volume = int(re.sub(r'[^\d]', '', vol_m.group(1))) if vol_m else 0
-
-                  return {
-                      'ticker': ticker,
-                      'close': round(close, 2),
-                      'chg':   round(chg, 2),
-                      'open':  round(open_ or close, 2),
-                      'high':  round(high  or close, 2),
-                      'low':   round(low   or close, 2),
-                      'volume': volume,
-                      'source': 'mubasher.info',
-                      'ts': now.strftime('%H:%M:%S'),
-                  }
+                  if close <= 0: return None
+                  chg_s = re.sub(r'[^\d.\-+]', '', cm.group(1)) if cm else '0'
+                  chg   = float(chg_s) if chg_s else 0.0
+                  open_ = block('Open') or close
+                  high  = block('High') or close
+                  low   = block('Low')  or close
+                  vm    = re.search(r'Volume[\s\S]{0,300}?market-summary__block-number[^>]*>\s*([\d,]+)\s*<', h)
+                  vol   = int(re.sub(r'[^\d]', '', vm.group(1))) if vm else 0
+                  return {'ticker': ticker, 'close': round(close,2), 'chg': round(chg,2),
+                          'open': round(open_,2), 'high': round(high,2), 'low': round(low,2),
+                          'volume': vol, 'source': 'mubasher.info'}
               except Exception as e:
                   print(f'  WARN {ticker}: {e}')
                   return None
 
-          # Parallel fetch with 12 workers
-          results = {}
-          with ThreadPoolExecutor(max_workers=12) as ex:
-              for res in ex.map(fetch_stock, STOCKS):
-                  if res:
-                      results[res['ticker']] = res
+          def fetch_indices():
+              idx = {}
+              for name, slug in [('EGX30','EGX30'),('EGX70','EGX70%20EWI')]:
+                  try:
+                      r = SESSION.get(f'https://english.mubasher.info/markets/EGX/indices/{slug}', timeout=8)
+                      pm = re.search(r'market-summary__last-price[^"]*">\s*([0-9,.]+)\s*<', r.text)
+                      cm = re.search(r'market-summary__change-percentage[^"]*">\s*([-+]?[0-9,.]+%?)\s*<', r.text)
+                      if pm:
+                          p = parse_num(pm.group(1))
+                          c = float(re.sub(r'[^\d.\-+]','',cm.group(1))) if cm else 0.0
+                          idx[name] = {'close': p, 'chgPct': round(c,2)}
+                  except: pass
+              return idx
 
-          print(f"Mubasher fetched: {len(results)}/{len(STOCKS)} stocks")
-
-          # ── Fetch EGX Index ──────────────────────────────────
-          indices = {}
-          for name, slug in [('EGX30','EGX30'), ('EGX33','EGX33'), ('EGX70','EGX70%20EWI')]:
+          def git_commit_push(ts_str, count):
               try:
-                  url = f'https://english.mubasher.info/markets/EGX/indices/{slug}'
-                  r = SESSION.get(url, timeout=6)
-                  pm = re.search(r'market-summary__last-price[^"]*">\s*([0-9,.]+)\s*<', r.text)
-                  cm = re.search(r'market-summary__change-percentage[^"]*">\s*([-+]?[0-9,.]+%?)\s*<', r.text)
-                  if pm:
-                      p = parse_num(pm.group(1))
-                      c = float(re.sub(r'[^\d.\-+]', '', cm.group(1))) if cm else 0.0
-                      indices[name] = {'close': p, 'chgPct': round(c, 2)}
-                      print(f'  Index {name}: {p} ({c:+.2f}%)')
+                  subprocess.run(['git','config','user.name','EGX-Bot'], check=True)
+                  subprocess.run(['git','config','user.email','bot@egx-sharia.org'], check=True)
+                  subprocess.run(['git','add','market_data.json'], check=True)
+                  diff = subprocess.run(['git','diff','--staged','--quiet'])
+                  if diff.returncode != 0:
+                      subprocess.run(['git','commit','-m',f'⚡ {ts_str} — {count} stocks [skip ci]'], check=True)
+                      subprocess.run(['git','push','origin','main'], check=True)
+                      print(f'  [GIT] Pushed at {ts_str}')
+                  else:
+                      print(f'  [GIT] No changes at {ts_str}')
               except Exception as e:
-                  print(f'  WARN index {name}: {e}')
+                  print(f'  [GIT ERROR] {e}')
 
-          # ── Load existing market_data.json ───────────────────
-          try:
-              with open('market_data.json', 'r', encoding='utf-8') as f:
-                  mdata = json.load(f)
-          except:
-              mdata = {'stocks': {}, 'funds': {}, 'indices': {}, 'fx_gold': {}}
+          # ── MAIN LOOP: 5 iterations × 60s = ~5 minutes ──────
+          for iteration in range(5):
+              now = datetime.now(cairo_tz)
+              ts  = now.strftime('%H:%M:%S')
+              print(f'\n{"="*50}')
+              print(f'[Iteration {iteration+1}/5] {ts}')
 
-          # ── Update stocks ────────────────────────────────────
-          if 'stocks' not in mdata:
-              mdata['stocks'] = {}
-          for ticker, d in results.items():
-              if ticker not in mdata['stocks']:
-                  mdata['stocks'][ticker] = {}
-              mdata['stocks'][ticker].update(d)
+              # Fetch all stocks in parallel
+              results = {}
+              with ThreadPoolExecutor(max_workers=14) as ex:
+                  for res in ex.map(fetch_stock, STOCKS):
+                      if res:
+                          results[res['ticker']] = res
 
-          # ── Update indices ───────────────────────────────────
-          if 'indices' not in mdata:
-              mdata['indices'] = {}
-          mdata['indices'].update(indices)
-          if 'EGX33' in indices:
-              mdata['indices']['EGX33'] = indices['EGX33']
+              indices = fetch_indices()
+              print(f'  Fetched: {len(results)} stocks | EGX30={indices.get("EGX30",{}).get("close","?")}')
 
-          # ── Timestamp ────────────────────────────────────────
-          mdata['updated_at']         = now.isoformat()
-          mdata['updated_at_display'] = now.strftime('%Y-%m-%d %H:%M:%S')
-          mdata['data_source']        = 'Mubasher.info Live'
-          mdata['sync_count']         = len(results)
+              # Load & merge market_data.json
+              try:
+                  with open('market_data.json', 'r', encoding='utf-8') as f:
+                      mdata = json.load(f)
+              except:
+                  mdata = {'stocks': {}, 'funds': {}, 'indices': {}, 'fx_gold': {}}
 
-          with open('market_data.json', 'w', encoding='utf-8') as f:
-              json.dump(mdata, f, ensure_ascii=False, indent=2)
+              if 'stocks' not in mdata: mdata['stocks'] = {}
+              for ticker, d in results.items():
+                  d['ts'] = ts
+                  if ticker not in mdata['stocks']:
+                      mdata['stocks'][ticker] = {}
+                  mdata['stocks'][ticker].update(d)
 
-          print(f"✅ market_data.json updated — {len(results)} stocks at {now.strftime('%H:%M:%S')}")
-          EOF
+              if 'indices' not in mdata: mdata['indices'] = {}
+              mdata['indices'].update(indices)
+              mdata['updated_at']         = now.isoformat()
+              mdata['updated_at_display'] = now.strftime('%Y-%m-%d %H:%M:%S')
+              mdata['data_source']        = 'Mubasher.info Live'
+              mdata['sync_count']         = len(results)
 
-      - name: Commit and Push
-        run: |
-          git config --global user.name "EGX-Bot"
-          git config --global user.email "bot@egx-sharia.org"
-          git add market_data.json
-          git diff --quiet && git diff --staged --quiet || \
-            git commit -m "⚡ Live Prices $(date +'%H:%M:%S') [skip ci]" && \
-            git push origin main
+              with open('market_data.json', 'w', encoding='utf-8') as f:
+                  json.dump(mdata, f, ensure_ascii=False, indent=2)
+
+              git_commit_push(ts, len(results))
+
+              # Wait 60s before next iteration (skip on last)
+              if iteration < 4:
+                  print(f'  Sleeping 58s...')
+                  time.sleep(58)
+
+          print('\n✅ All 5 iterations complete!')
+          PYEOF
