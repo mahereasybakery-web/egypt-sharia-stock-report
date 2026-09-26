@@ -960,18 +960,18 @@
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
                         <div class="text-sm">🪙</div>
                         <div class="text-[10px] text-slate-400">المحفظة (نقدية)</div>
-                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px]">145.00 ج</div>
+                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px]">7.10 ج</div>
                     </div>
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
                         <div class="text-sm">⚡</div>
                         <div class="text-[10px] text-slate-400">كلاودز (سيولة يومية)</div>
-                        <div id="p_thndr_clawdz" class="font-bold text-sky-400 font-mono text-[11px]">49,672 ج</div>
+                        <div id="p_thndr_clawdz" class="font-bold text-sky-400 font-mono text-[11px]">22.18 ج</div>
                         <div class="text-[9px] text-emerald-400 font-mono">▲ +0.04%</div>
                     </div>
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
                         <div class="text-sm">📊</div>
                         <div class="text-[10px] text-slate-400">الأسهم والصناديق</div>
-                        <div id="p_thndr_invested" class="font-bold text-emerald-400 font-mono text-[11px]">37.92k ج</div>
+                        <div id="p_thndr_invested" class="font-bold text-emerald-400 font-mono text-[11px]">86.62k ج</div>
                         <div class="text-[9px] text-emerald-400 font-mono">▲ +6.08%</div>
                     </div>
                 </div>
@@ -3253,7 +3253,7 @@
         let donutChartInstance = null;
 
         function loadUserPortfolio() {
-            // Load Thndr actual portfolio as default
+            // Load Thndr actual portfolio as default (v6 key for 86,645 EGP sync)
             const storageKey = 'egx_sharia_thndr_portfolio_v6';
             const saved = localStorage.getItem(storageKey);
             if (saved) {
@@ -3266,6 +3266,20 @@
                 userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
                 localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             }
+
+            // Load Cash and Clawdz from storage or default to 26 Sep Thndr capture
+            try {
+                const savedCash = localStorage.getItem('egx_sharia_thndr_cash_v6');
+                if (savedCash) {
+                    const parsed = JSON.parse(savedCash);
+                    if (parsed.clawdz !== undefined) THNDR_CASH.clawdz = parseFloat(parsed.clawdz);
+                    if (parsed.cash !== undefined) THNDR_CASH.cash = parseFloat(parsed.cash);
+                } else {
+                    THNDR_CASH.clawdz = 22.18;
+                    THNDR_CASH.cash = 7.10;
+                    localStorage.setItem('egx_sharia_thndr_cash_v6', JSON.stringify({ clawdz: 22.18, cash: 7.10 }));
+                }
+            } catch(e) {}
 
             // Sync live prices for stocks & funds from STOCKS_DATA
             userHoldings.forEach(h => {
@@ -3531,6 +3545,16 @@
 
             const grandWealthElem = document.getElementById('p_thndr_grand_wealth');
             if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
+
+            // Dynamically update the 3 sub-balance cards
+            const cashElem = document.getElementById('p_thndr_cash');
+            if (cashElem) cashElem.innerText = (THNDR_CASH.cash || 0).toFixed(2) + ' ج';
+
+            const clawdzElem = document.getElementById('p_thndr_clawdz');
+            if (clawdzElem) clawdzElem.innerText = (THNDR_CASH.clawdz || 0).toFixed(2) + ' ج';
+
+            const investedElem = document.getElementById('p_thndr_invested');
+            if (investedElem) investedElem.innerText = ((totalStocksVal + totalFundsVal) / 1000).toFixed(2) + 'k ج';
 
             const grandPnlElem = document.getElementById('p_thndr_grand_pnl');
             if (grandPnlElem) {
