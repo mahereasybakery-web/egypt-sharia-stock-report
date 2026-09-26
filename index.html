@@ -977,6 +977,32 @@
                 </div>
             </div>
 
+                        <!-- Thndr Quick Sync & Scanner Banner (زر الاستيراد السريع البارز) -->
+            <div class="p-3 bg-gradient-to-r from-amber-950/70 via-slate-900/90 to-emerald-950/70 border border-amber-500/50 rounded-2xl flex items-center justify-between gap-2.5 shadow-lg shadow-amber-950/30">
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0 border border-amber-500/40 shadow-sm">
+                        ⚡
+                    </div>
+                    <div class="min-w-0 text-right">
+                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>استيراد وتحديث محفظة ثندر</span>
+                            <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.2 rounded font-mono font-bold">تطبيق فوري</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate">تطبيق مباشر لآخر لقطة شاشة معتمدة أو مسح صورة جديدة</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button id="quickThndrPresetBtn" onclick="loadThndrVerifiedPresetAndApply()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs px-3 py-2 rounded-xl transition shadow-md shadow-emerald-900/40 active:scale-95 flex items-center gap-1 border border-emerald-400/40" title="تطبيق بيانات محفظة ثندر الفعلية فوراً بنقرة واحدة">
+                        <span>⚡</span>
+                        <span>استيراد سريع</span>
+                    </button>
+                    <button onclick="openThndrScannerModal()" class="bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1 shadow-sm" title="رفع لقطة شاشة جديدة من ثندر">
+                        <span>📷</span>
+                        <span>مسح صورة</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Portfolio Action Bar -->
             <div class="flex items-center justify-between gap-2">
                 <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 shadow-lg active:scale-95 border border-emerald-400/30">
@@ -7394,6 +7420,15 @@
         }
 
         // Quick 1-click Preset from Thndr Verified Capture
+        
+        // 1-Click Instant Import & Apply from Thndr Verified Preset
+        function loadThndrVerifiedPresetAndApply() {
+            triggerHaptic('success');
+            loadThndrVerifiedPreset();
+            applyThndrParsedPortfolio();
+            showToast("⚡ تم الاستيراد السريع لمحفظة ثندر الفعلية بنجاح!", "success");
+        }
+
         function loadThndrVerifiedPreset() {
             const verified = [
                 { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 23, buy: 31.85, cur: 30.80, sector: "الأغذية والأدوية", isFund: false },
