@@ -2961,7 +2961,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=10.4')
+                navigator.serviceWorker.register('sw.js?v=10.5')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3740,6 +3740,13 @@
             return card;
         }
 
+                function isFundAsset(h) {
+            if (!h) return false;
+            return h.isFund === true || 
+                   ['NMF', 'AZG', 'BWA', 'CMS', 'THNDR_GOLD'].includes(h.ticker) ||
+                   (h.sector && (h.sector.includes('صندوق') || h.sector.includes('ذهب')));
+        }
+
         function renderHoldingsTable() {
             const stocksTbody = document.getElementById('stocksHoldingsTableBody');
             const fundsTbody = document.getElementById('fundsHoldingsTableBody');
@@ -3766,10 +3773,10 @@
 
             userHoldings.forEach((h, idx) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (h.thndrCur) {
-                    h.cur = h.thndrCur;
-                } else if (stock && !isFundAsset(h)) {
+                if (stock && !isFundAsset(h) && stock.close > 0) {
                     h.cur = stock.close;
+                } else if (h.thndrCur) {
+                    h.cur = h.thndrCur;
                 }
 
                 const mVal = h.cur * h.qty;
@@ -5952,6 +5959,12 @@
             }
         }
 
+                function refreshData() {
+            triggerHaptic('medium');
+            showToast('جاري تحديث الأسعار اللحظية من البورصة المصرية...', 'info');
+            syncLiveMarketData(false);
+        }
+
         async function syncLiveMarketData(isAutoPoll = false) {
             const icon = document.getElementById('refreshIcon');
             if (icon && !isAutoPoll) icon.classList.add('rotate-180');
@@ -6060,7 +6073,7 @@
                 const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (found && found.close > 0) {
                     h.marketPrice = found.close;
-                    if (!h.thndrCur) {
+                    if (!isFundAsset(h)) {
                         h.cur = found.close;
                     }
                 }
