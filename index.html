@@ -173,7 +173,23 @@
 
         /* Sortable table row hover */
         #stocksHoldingsTableBody tr:hover,
-        #fundsHoldingsTableBody tr:hover { background: rgba(255,255,255,0.03); }
+        #fundsHoldingsTableBody tr:hover,
+        #stocksHoldingsSmartBody tr:hover,
+        #fundsHoldingsSmartBody tr:hover { background: rgba(255,255,255,0.035); }
+
+        /* Sticky First Column for Detailed 7-column Table */
+        .sticky-first-col table th:first-child,
+        .sticky-first-col table td:first-child {
+            position: sticky;
+            right: 0;
+            z-index: 10;
+            background: #0b111e;
+            box-shadow: -2px 0 6px rgba(0,0,0,0.35);
+        }
+        .sticky-first-col table thead th:first-child {
+            background: #080d17;
+            z-index: 20;
+        }
 
         /* Live pulse dot */
         @keyframes livePulse {
@@ -1280,26 +1296,38 @@
 
 
 
-                        <!-- Mobile vs Table View Mode Switcher -->
-            <div class="flex items-center justify-between pb-1 px-1">
-                <div class="flex items-center gap-2 text-xs text-slate-300">
+                        <!-- View Mode & Price Source Switcher -->
+            <div class="flex items-center justify-between pb-1 px-1 flex-wrap gap-2">
+                <div class="flex items-center gap-2 text-xs">
                     <span class="font-bold text-slate-300">الأصول</span>
                     <span id="portfolioActiveCountBadge" class="bg-slate-800 text-emerald-400 border border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
-                </div>
-                <div class="inline-flex bg-slate-900 dark:bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px]">
-                    <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="كروت الجوال الذكية المريحة">
-                        <span>📱</span>
-                        <span>كروت الجوال</span>
+                    
+                    <!-- Price Source Toggle Button (Thndr vs Live EGX) -->
+                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-950/80 text-amber-300 border-amber-700/60" title="انقر للتبديل بين أسعار محفظة ثندر وأسعار البورصة اللحظية">
+                        <span id="priceSourceIcon">📱</span>
+                        <span id="priceSourceLabel">أسعار ثندر</span>
                     </button>
-                    <button id="viewModeTableBtn" onclick="setPortfolioViewMode('table')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="عرض جدول البيانات الكامل">
+                </div>
+                
+                <!-- 3 View Modes Switcher: Smart Table vs Expanded vs Cards -->
+                <div class="inline-flex bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px] shadow-sm">
+                    <button id="viewModeSmartBtn" onclick="setPortfolioViewMode('smart')" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="جدول ذكي مدمج بدون تمرير أفقي">
+                        <span>⚡</span>
+                        <span>جدول ذكي</span>
+                    </button>
+                    <button id="viewModeTableBtn" onclick="setPortfolioViewMode('table')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="جدول مفصل كامل (7 أعمدة)">
                         <span>📊</span>
-                        <span>جدول مفصل</span>
+                        <span>مفصل (7 أعمدة)</span>
+                    </button>
+                    <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="كروت الجوال المنفصلة">
+                        <span>📱</span>
+                        <span>كروت</span>
                     </button>
                 </div>
             </div>
 
             <!-- 1. SECTION: STOCKS (الأسهم في الأعلى) -->
-            <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40">
+            <div class="glass-card rounded-2xl p-3.5 sm:p-4 space-y-3 border-emerald-900/40">
                 <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
                     <div class="flex items-center gap-2">
                         <span class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs border border-emerald-500/30">📈</span>
@@ -1311,21 +1339,87 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span id="stocksSubtotalBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-medium">37,110 ج.م (+6.1%)</span>
-                        
+                        <span id="stocksSubtotalBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-medium">36,882 ج.م (+5.4%)</span>
                     </div>
                 </div>
 
-                <!-- Stocks Mobile Cards View -->
-                <div id="stocksHoldingsCardsContainer" class="space-y-2.5">
+                <!-- Portfolio Allocation Ribbon -->
+                <div class="space-y-1.5 pt-0.5">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                        <span class="flex items-center gap-1">
+                            <span>📊</span>
+                            <span>توزيع أوزان الأسهم في المحفظة</span>
+                        </span>
+                        <span id="stocksTopWeightLabel" class="text-emerald-400 font-bold">TMGH 28.6% • ETEL 27.1%</span>
+                    </div>
+                    <div id="stocksAllocationRibbon" class="w-full flex rounded-full h-2 overflow-hidden bg-slate-850 shadow-inner">
+                        <!-- Dynamic multi-color segments -->
+                    </div>
+                </div>
+
+                <!-- Quick Filters & Sort Chips -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-[11px]">
+                    <button onclick="setHoldingsFilter('stocks', 'all', this)" class="stk-filter-btn px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>الكل</span>
+                        <span id="stocksFilterAllCount" class="font-mono text-[10px] opacity-80">(8)</span>
+                    </button>
+                    <button onclick="setHoldingsFilter('stocks', 'gainers', this)" class="stk-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>🟢 رابحة</span>
+                        <span id="stocksFilterGainersCount" class="font-mono text-[10px] text-emerald-400"></span>
+                    </button>
+                    <button onclick="setHoldingsFilter('stocks', 'losers', this)" class="stk-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>🔴 خاسرة</span>
+                        <span id="stocksFilterLosersCount" class="font-mono text-[10px] text-rose-400"></span>
+                    </button>
+                    <button onclick="sortHoldingsTable('stocks', 'val')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0" title="ترتيب حسب الأعلى قيمة">
+                        <span>💰 الأعلى قيمة</span>
+                    </button>
+                    <button onclick="sortHoldingsTable('stocks', 'pnlpct')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0" title="ترتيب حسب الأعلى عائداً">
+                        <span>📈 الأعلى عائداً</span>
+                    </button>
+                </div>
+
+                <!-- 1. Stocks Smart High-Density Table (Zero Horizontal Scroll - Default) -->
+                <div id="stocksHoldingsSmartContainer" class="w-full border border-slate-800/90 rounded-2xl overflow-hidden bg-slate-950/40">
+                    <table class="w-full text-right text-xs table-fixed">
+                        <colgroup>
+                            <col style="width: 33%;">
+                            <col style="width: 19%;">
+                            <col style="width: 20%;">
+                            <col style="width: 28%;">
+                        </colgroup>
+                        <thead class="border-b border-slate-800/80 text-[10px] select-none bg-slate-900/80 text-slate-400">
+                            <tr>
+                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_smart_ticker">
+                                    السهم <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_smart_qty">
+                                    الكمية <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_smart_cur">
+                                    السعر ⚡ <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_smart_val">
+                                    القيمة والربح <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocksHoldingsSmartBody" class="divide-y divide-slate-800/50 font-medium">
+                            <!-- Populated dynamically with Smart Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 2. Stocks Mobile Cards View -->
+                <div id="stocksHoldingsCardsContainer" class="space-y-2.5 hidden">
                     <!-- Populated dynamically with Mobile Cards -->
                 </div>
 
-                <!-- Stocks Full Table View (Horizontal Scrollable) -->
-                <div id="stocksHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-850 rounded-xl">
+                <!-- 3. Stocks Full Table View (Horizontal Scrollable with Sticky First Column) -->
+                <div id="stocksHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-800 rounded-xl sticky-first-col">
                     <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
-                        <span>👈 اسحب لمشاهدة جميع الأعمدة (الربح والعائد)</span>
-                        <span class="text-[9px] text-emerald-400 font-mono">7 أعمدة مخصصة</span>
+                        <span>📌 تم تثبيت عمود السهم لسهولة المقارنة أثناء التمرير</span>
+                        <span class="text-[9px] text-emerald-400 font-mono">7 أعمدة مفصلة</span>
                     </div>
                     <table class="w-full text-right text-xs min-w-[620px]">
                         <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
@@ -1347,7 +1441,7 @@
             </div>
 
             <!-- 2. SECTION: FUNDS & GOLD (الصناديق والذهب في الأسفل) -->
-            <div class="glass-card rounded-2xl p-4 space-y-3 border-amber-900/40">
+            <div class="glass-card rounded-2xl p-3.5 sm:p-4 space-y-3 border-amber-900/40">
                 <div class="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2">
                     <div class="flex items-center gap-2">
                         <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/30">🏦</span>
@@ -1358,19 +1452,86 @@
                             <p class="text-[10px] text-slate-400">صناديق الأسهم الإسلامية ووثائق الذهب عيار 24 الصافي</p>
                         </div>
                     </div>
-                    <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">813 ج.م (+7.0%)</span>
+                    <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">49,734 ج.م (-1.9%)</span>
                 </div>
 
-                <!-- Funds Mobile Cards View -->
-                <div id="fundsHoldingsCardsContainer" class="space-y-2.5">
+                <!-- Funds Allocation Ribbon -->
+                <div class="space-y-1.5 pt-0.5">
+                    <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                        <span class="flex items-center gap-1">
+                            <span>📊</span>
+                            <span>توزيع أوزان الصناديق والذهب في المحفظة</span>
+                        </span>
+                        <span id="fundsTopWeightLabel" class="text-amber-400 font-bold">CMS 98.9% • AZG 0.5%</span>
+                    </div>
+                    <div id="fundsAllocationRibbon" class="w-full flex rounded-full h-2 overflow-hidden bg-slate-850 shadow-inner">
+                        <!-- Dynamic multi-color segments -->
+                    </div>
+                </div>
+
+                <!-- Quick Filters & Sort Chips for Funds -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-[11px]">
+                    <button onclick="setHoldingsFilter('funds', 'all', this)" class="fnd-filter-btn px-2.5 py-1 rounded-lg bg-amber-600 text-white font-bold transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>الكل</span>
+                        <span id="fundsFilterAllCount" class="font-mono text-[10px] opacity-80">(5)</span>
+                    </button>
+                    <button onclick="setHoldingsFilter('funds', 'gainers', this)" class="fnd-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>🟢 رابحة</span>
+                        <span id="fundsFilterGainersCount" class="font-mono text-[10px] text-emerald-400"></span>
+                    </button>
+                    <button onclick="setHoldingsFilter('funds', 'losers', this)" class="fnd-filter-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0">
+                        <span>🔴 خاسرة</span>
+                        <span id="fundsFilterLosersCount" class="font-mono text-[10px] text-rose-400"></span>
+                    </button>
+                    <button onclick="sortHoldingsTable('funds', 'val')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0" title="ترتيب حسب الأعلى قيمة">
+                        <span>💰 الأعلى قيمة</span>
+                    </button>
+                    <button onclick="sortHoldingsTable('funds', 'pnlpct')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0" title="ترتيب حسب الأعلى عائداً">
+                        <span>📈 الأعلى عائداً</span>
+                    </button>
+                </div>
+
+                <!-- 1. Funds Smart High-Density Table (Zero Horizontal Scroll - Default) -->
+                <div id="fundsHoldingsSmartContainer" class="w-full border border-slate-800/90 rounded-2xl overflow-hidden bg-slate-950/40">
+                    <table class="w-full text-right text-xs table-fixed">
+                        <colgroup>
+                            <col style="width: 33%;">
+                            <col style="width: 19%;">
+                            <col style="width: 20%;">
+                            <col style="width: 28%;">
+                        </colgroup>
+                        <thead class="border-b border-slate-800/80 text-[10px] select-none bg-slate-900/80 text-slate-400">
+                            <tr>
+                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_smart_ticker">
+                                    الأصل <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_smart_qty">
+                                    الوثائق <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_smart_cur">
+                                    NAV الحالي ⚡ <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','val')" id="fh_smart_val">
+                                    القيمة والربح <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="fundsHoldingsSmartBody" class="divide-y divide-slate-800/50 font-medium">
+                            <!-- Populated dynamically with Smart Rows -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 2. Funds Mobile Cards View -->
+                <div id="fundsHoldingsCardsContainer" class="space-y-2.5 hidden">
                     <!-- Populated dynamically with Mobile Cards -->
                 </div>
 
-                <!-- Funds Full Table View (Horizontal Scrollable) -->
-                <div id="fundsHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-850 rounded-xl">
+                <!-- 3. Funds Full Table View (Horizontal Scrollable with Sticky First Column) -->
+                <div id="fundsHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-800 rounded-xl sticky-first-col">
                     <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
-                        <span>👈 اسحب لمشاهدة جميع الأعمدة (الربح والعائد)</span>
-                        <span class="text-[9px] text-amber-400 font-mono">7 أعمدة مخصصة</span>
+                        <span>📌 تم تثبيت عمود الصندوق لسهولة المقارنة أثناء التمرير</span>
+                        <span class="text-[9px] text-amber-400 font-mono">7 أعمدة مفصلة</span>
                     </div>
                     <table class="w-full text-right text-xs min-w-[620px]">
                         <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
@@ -3587,9 +3748,11 @@
 
         
         // =========================================================================
-        // PORTFOLIO VIEW MODE CONTROLLER (Cards vs Table)
+        // PORTFOLIO VIEW MODE CONTROLLER & PRICING SOURCE ENGINE
         // =========================================================================
-        let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode') || 'cards';
+        let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode') || 'smart';
+        let portfolioPriceSource = localStorage.getItem('egx_price_source') || 'thndr';
+        let _holdingsFilter = { stocks: 'all', funds: 'all' };
 
         function setPortfolioViewMode(mode) {
             triggerHaptic('selection');
@@ -3599,44 +3762,151 @@
         }
 
         function updatePortfolioViewModeUI() {
-            const isCards = portfolioViewMode === 'cards';
-            const btnCards = document.getElementById('viewModeCardsBtn');
+            const mode = portfolioViewMode || 'smart';
+            const btnSmart = document.getElementById('viewModeSmartBtn');
             const btnTable = document.getElementById('viewModeTableBtn');
+            const btnCards = document.getElementById('viewModeCardsBtn');
 
-            if (btnCards && btnTable) {
-                if (isCards) {
-                    btnCards.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
-                    btnTable.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
-                } else {
-                    btnTable.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
-                    btnCards.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
+            [
+                { id: 'smart', btn: btnSmart },
+                { id: 'table', btn: btnTable },
+                { id: 'cards', btn: btnCards }
+            ].forEach(item => {
+                if (item.btn) {
+                    if (item.id === mode) {
+                        item.btn.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
+                    } else {
+                        item.btn.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
+                    }
                 }
-            }
+            });
 
-            const sCards = document.getElementById('stocksHoldingsCardsContainer');
+            const sSmart = document.getElementById('stocksHoldingsSmartContainer');
             const sTable = document.getElementById('stocksHoldingsTableContainer');
-            const fCards = document.getElementById('fundsHoldingsCardsContainer');
+            const sCards = document.getElementById('stocksHoldingsCardsContainer');
+
+            const fSmart = document.getElementById('fundsHoldingsSmartContainer');
             const fTable = document.getElementById('fundsHoldingsTableContainer');
+            const fCards = document.getElementById('fundsHoldingsCardsContainer');
 
-            if (sCards && sTable) {
-                if (isCards) {
-                    sCards.classList.remove('hidden');
-                    sTable.classList.add('hidden');
+            if (sSmart) sSmart.classList.toggle('hidden', mode !== 'smart');
+            if (sTable) sTable.classList.toggle('hidden', mode !== 'table');
+            if (sCards) sCards.classList.toggle('hidden', mode !== 'cards');
+
+            if (fSmart) fSmart.classList.toggle('hidden', mode !== 'smart');
+            if (fTable) fTable.classList.toggle('hidden', mode !== 'table');
+            if (fCards) fCards.classList.toggle('hidden', mode !== 'cards');
+        }
+
+        function togglePortfolioPriceSource() {
+            triggerHaptic('selection');
+            portfolioPriceSource = portfolioPriceSource === 'thndr' ? 'live' : 'thndr';
+            localStorage.setItem('egx_price_source', portfolioPriceSource);
+            updatePortfolioPriceSourceUI();
+            renderHoldingsTable();
+            const msg = portfolioPriceSource === 'thndr' 
+                ? 'تم تفعيل تسعير محفظة ثندر المعتمدة (تطابق 86,645 ج) 📱' 
+                : 'تم تفعيل أسعار صفقات البورصة اللحظية من TradingView ⚡';
+            showToast(msg, 'info');
+            if (typeof logUserActivity === 'function') {
+                logUserActivity('sync', 'تبديل مصدر تسعير المحفظة 🔄', msg);
+            }
+        }
+
+        function updatePortfolioPriceSourceUI() {
+            const icon = document.getElementById('priceSourceIcon');
+            const label = document.getElementById('priceSourceLabel');
+            const btn = document.getElementById('priceSourceToggleBtn');
+            if (btn && label) {
+                if (portfolioPriceSource === 'thndr') {
+                    if (icon) icon.innerText = '📱';
+                    label.innerText = 'أسعار ثندر';
+                    btn.className = "px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-950/80 text-amber-300 border-amber-700/60";
+                    btn.title = "المحفظة مقومة حالياً بأسعار محفظة ثندر (86,645 ج.م). انقر للتبديل إلى أسعار البورصة اللحظية.";
                 } else {
-                    sCards.classList.add('hidden');
-                    sTable.classList.remove('hidden');
+                    if (icon) icon.innerText = '⚡';
+                    label.innerText = 'البورصة اللحظية';
+                    btn.className = "px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-sky-950/80 text-sky-300 border-sky-700/60";
+                    btn.title = "المحفظة مقومة حالياً بأسعار صفقات البورصة اللحظية من TradingView. انقر للتبديل إلى أسعار ثندر.";
                 }
             }
+        }
 
-            if (fCards && fTable) {
-                if (isCards) {
-                    fCards.classList.remove('hidden');
-                    fTable.classList.add('hidden');
-                } else {
-                    fCards.classList.add('hidden');
-                    fTable.classList.remove('hidden');
-                }
+        function setHoldingsFilter(type, filter, btn) {
+            triggerHaptic('selection');
+            _holdingsFilter[type] = filter;
+            if (btn && btn.parentElement) {
+                const btns = btn.parentElement.querySelectorAll('button');
+                btns.forEach(b => {
+                    b.className = "px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95 flex items-center gap-1 shrink-0";
+                });
+                btn.className = `px-2.5 py-1 rounded-lg ${type === 'stocks' ? 'bg-emerald-600' : 'bg-amber-600'} text-white font-bold transition active:scale-95 flex items-center gap-1 shrink-0`;
             }
+            renderHoldingsTable();
+        }
+
+        // =========================================================================
+        // SMART HIGH-DENSITY ZERO-SCROLL TABLE ROW RENDERER
+        // =========================================================================
+        function createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, isFund) {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-800/70 active:bg-slate-800/90 transition text-xs select-none cursor-pointer group";
+            tr.title = `انقر لعرض الشارت والتحليل الفني لـ ${h.name}`;
+            tr.onclick = (e) => {
+                if (e.target.closest('button')) return;
+                openStockChart(h.ticker);
+            };
+
+            const diffPrice = (h.cur || 0) - (h.buy || 0);
+            const badgeColor = isFund ? 'bg-amber-950/70 text-amber-300 border-amber-800/60' : 'bg-slate-800/90 text-slate-300 border-slate-700/60';
+            const altPriceVal = portfolioPriceSource === 'thndr' ? (h.liveCur || h.cur) : (h.thndrCur || h.cur);
+            const altLabel = portfolioPriceSource === 'thndr' ? 'لحظي' : 'ثندر';
+
+            tr.innerHTML = `
+                <td class="py-2.5 pr-2 sm:pr-3 align-middle overflow-hidden">
+                    <div class="space-y-0.5 min-w-0">
+                        <div class="flex items-center gap-1 min-w-0">
+                            <span class="font-bold text-white text-xs group-hover:text-emerald-400 transition leading-tight truncate block" title="${h.name}">${h.name}</span>
+                            <span class="px-1 py-0.2 rounded text-[9px] font-mono font-bold border shrink-0 ${badgeColor}">${h.ticker}</span>
+                        </div>
+                        <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                            <span class="font-mono text-emerald-400 font-bold shrink-0">${weightPct.toFixed(1)}%</span>
+                            <div class="w-8 sm:w-12 bg-slate-800 rounded-full h-1 overflow-hidden inline-block align-middle shrink-0">
+                                <div class="${isFund ? 'bg-amber-500' : 'bg-emerald-500'} h-1 rounded-full" style="width: ${Math.min(100, weightPct * 2.5)}%"></div>
+                            </div>
+                            <span class="hidden sm:inline text-slate-500 text-[9px] truncate">• ${h.sector || 'سوق المال'}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="py-2.5 px-1 text-center font-mono align-middle">
+                    <div class="text-xs font-bold text-white flex items-center justify-center gap-0.5">
+                        <span>${h.qty.toLocaleString()}</span>
+                        <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 p-0.5 text-[11px] opacity-70 hover:opacity-100 transition" title="تعديل مباشر للكمية والتكلفة">✏️</button>
+                    </div>
+                    <div class="text-[10px] text-slate-400 truncate">
+                        <span class="text-slate-500 text-[9px]">تكلفة:</span><b class="text-slate-300 font-medium">${h.buy.toFixed(1)}</b>
+                    </div>
+                </td>
+                <td class="py-2.5 px-1 text-center font-mono align-middle" title="${altLabel}: ${altPriceVal.toFixed(2)} ج">
+                    <div class="text-xs font-bold text-white flex items-center justify-center gap-0.5">
+                        <span class="text-amber-400 text-[10px] animate-pulse">⚡</span>
+                        <span>${h.cur.toFixed(2)}</span>
+                    </div>
+                    <div class="text-[10px] ${diffPrice >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium leading-none mt-0.5">
+                        ${diffPrice >= 0 ? '▲ +' : '▼ '}${diffPrice.toFixed(1)}
+                    </div>
+                </td>
+                <td class="py-2.5 pl-2 sm:pl-3 text-left font-mono align-middle">
+                    <div class="text-xs font-bold text-white text-left">
+                        ${Math.round(mVal).toLocaleString()} <span class="text-[9px] text-slate-400 font-normal">ج</span>
+                    </div>
+                    <div class="mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9.5px] font-bold ${isP ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/15 border-rose-500/40 text-rose-300'}">
+                        <span>${isP ? '+' : ''}${Math.round(pnl).toLocaleString()}</span>
+                        <span class="opacity-80 text-[8.5px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
+                    </div>
+                </td>
+            `;
+            return tr;
         }
 
         function createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFund) {
@@ -3714,7 +3984,7 @@
             return card;
         }
 
-                function isFundAsset(h) {
+        function isFundAsset(h) {
             if (!h) return false;
             return h.isFund === true || 
                    ['NMF', 'AZG', 'BWA', 'CMS', 'THNDR_GOLD'].includes(h.ticker) ||
@@ -3722,15 +3992,19 @@
         }
 
         function renderHoldingsTable() {
-            const stocksTbody = document.getElementById('stocksHoldingsTableBody');
-            const fundsTbody = document.getElementById('fundsHoldingsTableBody');
-            const stocksCards = document.getElementById('stocksHoldingsCardsContainer');
-            const fundsCards = document.getElementById('fundsHoldingsCardsContainer');
+            const stocksSmartBody = document.getElementById('stocksHoldingsSmartBody');
+            const fundsSmartBody  = document.getElementById('fundsHoldingsSmartBody');
+            const stocksTbody     = document.getElementById('stocksHoldingsTableBody');
+            const fundsTbody      = document.getElementById('fundsHoldingsTableBody');
+            const stocksCards     = document.getElementById('stocksHoldingsCardsContainer');
+            const fundsCards      = document.getElementById('fundsHoldingsCardsContainer');
 
-            if (stocksTbody) stocksTbody.innerHTML = '';
-            if (fundsTbody) fundsTbody.innerHTML = '';
-            if (stocksCards) stocksCards.innerHTML = '';
-            if (fundsCards) fundsCards.innerHTML = '';
+            if (stocksSmartBody) stocksSmartBody.innerHTML = '';
+            if (fundsSmartBody)  fundsSmartBody.innerHTML = '';
+            if (stocksTbody)     stocksTbody.innerHTML = '';
+            if (fundsTbody)      fundsTbody.innerHTML = '';
+            if (stocksCards)     stocksCards.innerHTML = '';
+            if (fundsCards)      fundsCards.innerHTML = '';
 
             let totalStocksVal = 0;
             let totalStocksCost = 0;
@@ -3738,26 +4012,26 @@
             let totalFundsCost = 0;
             const sectorWeights = {};
 
-            // Helper to determine if an asset is a fund or gold
-            const isFundAsset = (h) => {
-                return h.isFund === true || 
-                       ['NMF', 'AZG', 'BWA', 'CMS', 'THNDR_GOLD'].includes(h.ticker) ||
-                       (h.sector && (h.sector.includes('صندوق') || h.sector.includes('ذهب')));
-            };
-
-            // Separate into stocks and funds lists
+            // Separate into stocks and funds lists with accurate valuation prices
             const stocksList = [];
             const fundsList = [];
 
             userHoldings.forEach((h) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (stock && stock.close > 0) {
-                    h.cur = stock.close;
-                } else if (h.thndrCur) {
-                    h.cur = h.thndrCur;
-                } else if (!h.cur) {
-                    h.cur = h.buy || 0;
+                const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
+                const thndrPrice = h.thndrCur || (actual ? actual.thndrCur : null) || (actual ? actual.cur : null) || h.buy || 0;
+                const liveClose = (stock && stock.close > 0) ? stock.close : thndrPrice;
+
+                h.liveCur = liveClose;
+                h.thndrCur = thndrPrice;
+
+                // Price source decision: Thndr price vs TradingView live price
+                if (portfolioPriceSource === 'thndr') {
+                    h.cur = thndrPrice;
+                } else {
+                    h.cur = liveClose;
                 }
+
                 if (isFundAsset(h)) fundsList.push(h);
                 else stocksList.push(h);
             });
@@ -3800,19 +4074,108 @@
             applyListSort(stocksList, 'stocks');
             applyListSort(fundsList, 'funds');
 
-            // Render Stocks List
+            // Pre-calculate totals for accurate weights
+            stocksList.forEach(h => {
+                totalStocksVal += h.cur * h.qty;
+                totalStocksCost += h.buy * h.qty;
+            });
+            fundsList.forEach(h => {
+                totalFundsVal += h.cur * h.qty;
+                totalFundsCost += h.buy * h.qty;
+            });
+
+            // Filter counts
+            let stocksGainers = 0, stocksLosers = 0;
+            stocksList.forEach(h => {
+                if ((h.cur * h.qty - h.buy * h.qty) >= 0) stocksGainers++;
+                else stocksLosers++;
+            });
+            const sGEl = document.getElementById('stocksFilterGainersCount');
+            const sLEl = document.getElementById('stocksFilterLosersCount');
+            const sAEl = document.getElementById('stocksFilterAllCount');
+            if (sGEl) sGEl.innerText = `(${stocksGainers})`;
+            if (sLEl) sLEl.innerText = `(${stocksLosers})`;
+            if (sAEl) sAEl.innerText = `(${stocksList.length})`;
+
+            let fundsGainers = 0, fundsLosers = 0;
+            fundsList.forEach(h => {
+                if ((h.cur * h.qty - h.buy * h.qty) >= 0) fundsGainers++;
+                else fundsLosers++;
+            });
+            const fGEl = document.getElementById('fundsFilterGainersCount');
+            const fLEl = document.getElementById('fundsFilterLosersCount');
+            const fAEl = document.getElementById('fundsFilterAllCount');
+            if (fGEl) fGEl.innerText = `(${fundsGainers})`;
+            if (fLEl) fLEl.innerText = `(${fundsLosers})`;
+            if (fAEl) fAEl.innerText = `(${fundsList.length})`;
+
+            // Color palette for Allocation Ribbon
+            const ribbonColors = ['#10b981', '#0ea5e9', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316', '#06b6d4', '#84cc16'];
+
+            // Render Stocks Allocation Ribbon
+            const sRibbon = document.getElementById('stocksAllocationRibbon');
+            if (sRibbon) {
+                sRibbon.innerHTML = '';
+                stocksList.forEach((h, i) => {
+                    const mVal = h.cur * h.qty;
+                    const pct = totalStocksVal > 0 ? (mVal / totalStocksVal) * 100 : 0;
+                    const seg = document.createElement('div');
+                    seg.className = "h-full transition hover:opacity-80 cursor-pointer";
+                    seg.style.width = `${pct}%`;
+                    seg.style.backgroundColor = ribbonColors[i % ribbonColors.length];
+                    seg.title = `${h.name} (${h.ticker}): ${pct.toFixed(1)}% (${Math.round(mVal).toLocaleString()} ج)`;
+                    seg.onclick = () => openStockChart(h.ticker);
+                    sRibbon.appendChild(seg);
+                });
+                const sTopLabel = document.getElementById('stocksTopWeightLabel');
+                if (sTopLabel && stocksList.length >= 2) {
+                    const top1 = stocksList[0];
+                    const top2 = stocksList[1];
+                    const p1 = totalStocksVal > 0 ? ((top1.cur * top1.qty) / totalStocksVal * 100).toFixed(1) : 0;
+                    const p2 = totalStocksVal > 0 ? ((top2.cur * top2.qty) / totalStocksVal * 100).toFixed(1) : 0;
+                    sTopLabel.innerText = `${top1.ticker} ${p1}% • ${top2.ticker} ${p2}%`;
+                }
+            }
+
+            // Render Funds Allocation Ribbon
+            const fRibbon = document.getElementById('fundsAllocationRibbon');
+            if (fRibbon) {
+                fRibbon.innerHTML = '';
+                fundsList.forEach((h, i) => {
+                    const mVal = h.cur * h.qty;
+                    const pct = totalFundsVal > 0 ? (mVal / totalFundsVal) * 100 : 0;
+                    const seg = document.createElement('div');
+                    seg.className = "h-full transition hover:opacity-80 cursor-pointer";
+                    seg.style.width = `${pct}%`;
+                    seg.style.backgroundColor = ribbonColors[i % ribbonColors.length];
+                    seg.title = `${h.name} (${h.ticker}): ${pct.toFixed(1)}% (${Math.round(mVal).toLocaleString()} ج)`;
+                    seg.onclick = () => openStockChart(h.ticker);
+                    fRibbon.appendChild(seg);
+                });
+            }
+
+            // Render Stocks Elements
             stocksList.forEach((h, idx) => {
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
                 const pnl = mVal - cost;
                 const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
                 const isP = pnl >= 0;
+                const weightPct = totalStocksVal > 0 ? (mVal / totalStocksVal) * 100 : 0;
 
                 const sec = h.sector || 'أخرى';
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
-                totalStocksVal += mVal;
-                totalStocksCost += cost;
 
+                // Check active filter
+                const f = _holdingsFilter.stocks;
+                const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
+                if (!matchesFilter) return;
+
+                // 1. Smart Composite Row (Zero horizontal scroll)
+                const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, false);
+                if (stocksSmartBody) stocksSmartBody.appendChild(smartRow);
+
+                // 2. Expanded 7-column Row (with sticky first column)
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
                 tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
@@ -3829,7 +4192,7 @@
                                 <span class="font-bold text-white group-hover/btn:text-emerald-400 transition flex items-center gap-1">
                                     <span>${h.name}</span>
                                 </span>
-                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
+                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker} • ${weightPct.toFixed(1)}%</span>
                             </div>
                         </button>
                     </td>
@@ -3852,24 +4215,35 @@
                     </td>
                 `;
 
+                // 3. Mobile Card
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, false);
+
                 if (stocksTbody) stocksTbody.appendChild(tr);
                 if (stocksCards) stocksCards.appendChild(mobileCard);
             });
 
-            // Render Funds List
+            // Render Funds Elements
             fundsList.forEach((h, idx) => {
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
                 const pnl = mVal - cost;
                 const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
                 const isP = pnl >= 0;
+                const weightPct = totalFundsVal > 0 ? (mVal / totalFundsVal) * 100 : 0;
 
                 const sec = h.sector || 'صناديق وذهب';
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
-                totalFundsVal += mVal;
-                totalFundsCost += cost;
 
+                // Check active filter
+                const f = _holdingsFilter.funds;
+                const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
+                if (!matchesFilter) return;
+
+                // 1. Smart Composite Row
+                const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, true);
+                if (fundsSmartBody) fundsSmartBody.appendChild(smartRow);
+
+                // 2. Expanded 7-column Row
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
                 tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
@@ -3886,7 +4260,7 @@
                                 <span class="font-bold text-white group-hover/btn:text-amber-400 transition flex items-center gap-1">
                                     <span>${h.name}</span>
                                 </span>
-                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
+                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker} • ${weightPct.toFixed(1)}%</span>
                             </div>
                         </button>
                     </td>
@@ -3909,10 +4283,16 @@
                     </td>
                 `;
 
+                // 3. Mobile Card
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, true);
+
                 if (fundsTbody) fundsTbody.appendChild(tr);
                 if (fundsCards) fundsCards.appendChild(mobileCard);
             });
+
+            // Update UI modes and pricing source indicator
+            updatePortfolioViewModeUI();
+            updatePortfolioPriceSourceUI();
 
             // Subtotals
             const stocksPnl = totalStocksVal - totalStocksCost;
