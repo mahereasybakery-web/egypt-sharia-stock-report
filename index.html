@@ -1364,32 +1364,36 @@
                     <!-- Populated dynamically with Executive Cards -->
                 </div>
 
-                <!-- 2. Stocks Compact List View (النمط المدمج الثانوي - 5 أعمدة مفصلة) -->
+                <!-- 2. Stocks Compact List View (النمط المدمج الثانوي - 6 أعمدة مفصلة) -->
                 <div id="stocksHoldingsSmartContainer" class="w-full border border-slate-200 dark:border-slate-800/90 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/40 hidden">
                     <table class="w-full text-right text-xs table-fixed">
                         <colgroup>
-                            <col style="width: 28%;">
-                            <col style="width: 17%;">
-                            <col style="width: 17%;">
-                            <col style="width: 19%;">
-                            <col style="width: 19%;">
+                            <col style="width: 25%;">
+                            <col style="width: 14%;">
+                            <col style="width: 15%;">
+                            <col style="width: 16%;">
+                            <col style="width: 15%;">
+                            <col style="width: 15%;">
                         </colgroup>
                         <thead class="border-b border-slate-200 dark:border-slate-800/80 text-[10px] select-none bg-slate-50 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400">
                             <tr>
                                 <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_smart_ticker">
                                     السهم <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_smart_qty">
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_smart_qty">
                                     الكمية <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_smart_cur">
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_smart_cur">
                                     السعر ⚡ <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_smart_val">
-                                    القيمة <span class="sort-arrow opacity-40">↕</span>
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_smart_val">
+                                    القيمة (ج) <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','pnl')" id="sh_smart_pnl">
-                                    الربح والعائد <span class="sort-arrow opacity-40">↕</span>
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','pnl')" id="sh_smart_pnl">
+                                    الربح (ج) <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','pnlpct')" id="sh_smart_pnlpct">
+                                    العائد % <span class="sort-arrow opacity-40">↕</span>
                                 </th>
                             </tr>
                         </thead>
@@ -1456,32 +1460,36 @@
                     <!-- Populated dynamically with Executive Cards -->
                 </div>
 
-                <!-- 2. Funds Compact List View (النمط المدمج الثانوي - 5 أعمدة مفصلة) -->
+                <!-- 2. Funds Compact List View (النمط المدمج الثانوي - 6 أعمدة مفصلة) -->
                 <div id="fundsHoldingsSmartContainer" class="w-full border border-slate-200 dark:border-slate-800/90 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/40 hidden">
                     <table class="w-full text-right text-xs table-fixed">
                         <colgroup>
-                            <col style="width: 28%;">
-                            <col style="width: 17%;">
-                            <col style="width: 17%;">
-                            <col style="width: 19%;">
-                            <col style="width: 19%;">
+                            <col style="width: 25%;">
+                            <col style="width: 14%;">
+                            <col style="width: 15%;">
+                            <col style="width: 16%;">
+                            <col style="width: 15%;">
+                            <col style="width: 15%;">
                         </colgroup>
                         <thead class="border-b border-slate-200 dark:border-slate-800/80 text-[10px] select-none bg-slate-50 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400">
                             <tr>
                                 <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_smart_ticker">
                                     الأصل <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_smart_qty">
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_smart_qty">
                                     الوثائق <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_smart_cur">
-                                    NAV الحالي ⚡ <span class="sort-arrow opacity-40">↕</span>
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_smart_cur">
+                                    NAV ⚡ <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','val')" id="fh_smart_val">
-                                    القيمة <span class="sort-arrow opacity-40">↕</span>
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','val')" id="fh_smart_val">
+                                    القيمة (ج) <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','pnl')" id="fh_smart_pnl">
-                                    الربح والعائد <span class="sort-arrow opacity-40">↕</span>
+                                <th class="py-2.5 px-0.5 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','pnl')" id="fh_smart_pnl">
+                                    الربح (ج) <span class="sort-arrow opacity-40">↕</span>
+                                </th>
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','pnlpct')" id="fh_smart_pnlpct">
+                                    العائد % <span class="sort-arrow opacity-40">↕</span>
                                 </th>
                             </tr>
                         </thead>
@@ -3829,10 +3837,12 @@
                         <div class="font-mono font-black text-sm sm:text-base text-slate-900 dark:text-white">
                             ${Math.round(mVal).toLocaleString()} <span class="text-[10px] font-normal text-slate-500 dark:text-slate-400">ج</span>
                         </div>
-                        <div class="mt-1 flex items-center justify-end">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border text-xs font-bold font-mono ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400'}">
+                        <div class="mt-1 flex items-center justify-end gap-1.5 flex-wrap">
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-lg border text-xs font-bold font-mono ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400'}" title="قيمة الربح بالجنيه">
                                 <span>${isP ? '▲ +' : '▼ '}${Math.round(Math.abs(pnl)).toLocaleString()} ج</span>
-                                <span class="text-[10px] opacity-80">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
+                            </span>
+                            <span class="inline-flex items-center px-1.5 py-0.5 rounded-lg border text-xs font-bold font-mono ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400'}" title="نسبة العائد المئوية">
+                                <span>${isP ? '+' : ''}${pnlPct.toFixed(1)}%</span>
                             </span>
                         </div>
                     </div>
@@ -3920,40 +3930,44 @@
                         </div>
                     </div>
                 </td>
-                <td class="py-2.5 px-1 text-center font-mono align-middle">
-                    <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-center gap-0.5">
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle">
+                    <div class="flex items-center justify-center gap-0.5 text-[10.5px] font-bold text-slate-900 dark:text-white leading-tight">
                         <span>${h.qty.toLocaleString()}</span>
-                        <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-500 p-0.5 text-[11px] opacity-70 hover:opacity-100 transition" title="تعديل مباشر للكمية والتكلفة">✏️</button>
+                        <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-500 p-0.5 text-[10px] opacity-70 hover:opacity-100 transition" title="تعديل مباشر للكمية والتكلفة">✏️</button>
                     </div>
-                    <div class="text-[9px] text-slate-500 dark:text-slate-400 whitespace-nowrap mt-0.5">
-                        <b class="text-slate-700 dark:text-slate-300 font-medium">${h.buy >= 100 ? Math.round(h.buy) : h.buy.toFixed(1)}</b> <span class="text-slate-400 text-[8px]">شراء</span>
+                    <div class="text-[8px] text-slate-500 dark:text-slate-400 whitespace-nowrap mt-0.5">
+                        <span class="font-medium text-slate-700 dark:text-slate-300">${h.buy >= 100 ? Math.round(h.buy) : h.buy.toFixed(1)}</span> <span class="text-slate-400 text-[7.5px]">شراء</span>
                     </div>
                 </td>
-                <td class="py-2.5 px-1 text-center font-mono align-middle" title="${altLabel}: ${altPriceVal.toFixed(2)} ج">
-                    <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-center gap-0.5">
-                        <span class="text-amber-500 dark:text-amber-400 text-[10px] animate-pulse">⚡</span>
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle" title="${altLabel}: ${altPriceVal.toFixed(2)} ج">
+                    <div class="flex items-center justify-center gap-0.5 text-[10.5px] font-bold text-slate-900 dark:text-white leading-tight">
+                        <span class="text-amber-500 dark:text-amber-400 text-[9px] animate-pulse">⚡</span>
                         <span>${h.cur.toFixed(2)}</span>
                     </div>
-                    <div class="text-[10px] ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} font-medium leading-none mt-0.5">
-                        ${diffPrice >= 0 ? '▲ +' : '▼ '}${diffPrice.toFixed(1)}
+                    <div class="text-[8px] ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} font-medium whitespace-nowrap mt-0.5">
+                        <span dir="ltr">${diffPrice >= 0 ? '▲ +' : '▼ '}${Math.abs(diffPrice).toFixed(1)}</span>
                     </div>
                 </td>
-                <td class="py-2.5 px-1 text-center font-mono align-middle">
-                    <div class="text-xs font-bold text-slate-900 dark:text-white">
-                        ${Math.round(mVal).toLocaleString()} <span class="text-[9px] text-slate-500 dark:text-slate-400 font-normal">ج</span>
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle">
+                    <div class="text-[10.5px] font-bold text-slate-900 dark:text-white whitespace-nowrap leading-tight">
+                        <span dir="ltr">${Math.round(mVal).toLocaleString()}</span>
                     </div>
-                    <div class="text-[9px] text-slate-400 dark:text-slate-500 whitespace-nowrap mt-0.5">
-                        ${Math.round(cost).toLocaleString()} <span class="text-[8px] opacity-75">تكلفة</span>
+                    <div class="text-[7.5px] text-slate-400 dark:text-slate-500 whitespace-nowrap mt-0.5">
+                        <span dir="ltr">${Math.round(cost).toLocaleString()}</span> <span class="opacity-70">تكلفة</span>
                     </div>
                 </td>
-                <td class="py-2.5 pl-2 sm:pl-3 text-left font-mono align-middle">
-                    <div class="flex items-center justify-end gap-0.5 text-xs font-bold ${isP ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
-                        <span>${isP ? '+' : ''}${Math.round(pnl).toLocaleString()}</span>
-                        <span class="text-[8.5px] font-normal opacity-85">ج</span>
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle">
+                    <div class="text-[10.5px] font-bold whitespace-nowrap leading-tight ${isP ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
+                        <span dir="ltr">${isP ? '+' : '-'}${Math.round(Math.abs(pnl)).toLocaleString()}</span>
                     </div>
-                    <div class="mt-0.5 flex justify-end">
-                        <span class="inline-block px-1.5 py-0.2 rounded border text-[9px] font-bold ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/40 text-rose-700 dark:text-rose-300'}">
-                            ${isP ? '+' : ''}${pnlPct.toFixed(1)}%
+                    <div class="text-[7.5px] ${isP ? 'text-emerald-600/75 dark:text-emerald-400/75' : 'text-rose-600/75 dark:text-rose-400/75'} whitespace-nowrap mt-0.5">
+                        ${isP ? 'ربح ▲' : 'خسارة ▼'}
+                    </div>
+                </td>
+                <td class="py-2.5 pl-1.5 sm:pl-2 text-left font-mono align-middle">
+                    <div class="flex justify-end">
+                        <span class="inline-block px-1.5 py-0.5 rounded border text-[9px] font-bold ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/40 text-rose-700 dark:text-rose-300'}">
+                            <span dir="ltr">${isP ? '+' : ''}${pnlPct.toFixed(1)}%</span>
                         </span>
                     </div>
                 </td>
@@ -9530,7 +9544,7 @@ async function syncMubasherDirectAll() {
                 elements.forEach(th => {
                     const arrow = th.querySelector('.sort-arrow');
                     if (!arrow) return;
-                    const isActive = (c === col) || (col === 'pnlpct' && c === 'pnl') || (col === 'pnl' && c === 'pnlpct');
+                    const isActive = (c === col);
                     if (isActive) {
                         arrow.textContent = dir > 0 ? ' ↑' : ' ↓';
                         arrow.classList.remove('opacity-40');
