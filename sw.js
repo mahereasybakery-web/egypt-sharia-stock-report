@@ -1,5 +1,5 @@
 // EGX Sharia Portal - Advanced PWA Service Worker v11
-const CACHE_NAME = 'egx-sharia-v11.5';
+const CACHE_NAME = 'egx-sharia-v11.6';
 const STATIC_ASSETS = [
   './',
   './index.html',
