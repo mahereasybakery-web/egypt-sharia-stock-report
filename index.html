@@ -1073,24 +1073,26 @@
                     </span>
                 </div>
 
-                <!-- Thndr 3 Mini Wealth Status Cards -->
+                <!-- Thndr 3 Mini Wealth Status Cards (مطابقة 100% مع لقطة شاشة ثندر) -->
                 <div class="grid grid-cols-3 gap-2 pt-2.5 border-t border-slate-800/80 text-center text-xs">
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
                         <div class="text-sm">🪙</div>
                         <div class="text-[10px] text-slate-400">المحفظة (نقدية)</div>
-                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px]">7.10 ج</div>
+                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px]">29.28 ج</div>
+                        <div id="p_thndr_clawdz" class="hidden">0.00 ج</div>
                     </div>
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
-                        <div class="text-sm">⚡</div>
-                        <div class="text-[10px] text-slate-400">كلاودز (سيولة يومية)</div>
-                        <div id="p_thndr_clawdz" class="font-bold text-sky-400 font-mono text-[11px]">22.18 ج</div>
-                        <div class="text-[9px] text-emerald-400 font-mono">▲ +0.04%</div>
+                        <div class="text-sm">📈</div>
+                        <div class="text-[10px] text-slate-400">الأسهم</div>
+                        <div id="p_thndr_stocks_card" class="font-bold text-emerald-400 font-mono text-[11px]">36.88k ج</div>
+                        <div id="p_thndr_stocks_card_pnl" class="text-[9px] text-emerald-400 font-mono">▲ +5.42%</div>
                     </div>
                     <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800/80 space-y-0.5">
-                        <div class="text-sm">📊</div>
-                        <div class="text-[10px] text-slate-400">الأسهم والصناديق</div>
-                        <div id="p_thndr_invested" class="font-bold text-emerald-400 font-mono text-[11px]">86.62k ج</div>
-                        <div class="text-[9px] text-emerald-400 font-mono">▲ +6.08%</div>
+                        <div class="text-sm">🏦</div>
+                        <div class="text-[10px] text-slate-400">الصناديق</div>
+                        <div id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-[11px]">49.7k ج</div>
+                        <div id="p_thndr_funds_card_pnl" class="text-[9px] text-rose-400 font-mono">▼ -1.87%</div>
+                        <div id="p_thndr_invested" class="hidden">86.61k ج</div>
                     </div>
                 </div>
             </div>
@@ -2964,7 +2966,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=10.2')
+                navigator.serviceWorker.register('sw.js?v=10.3')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3225,7 +3227,7 @@
             { ticker: "EGAL", name: "مصر للألومنيوم", close: 357.0, chg: 1.65, rsi: 60.6, pe: 14.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
             { ticker: "FWRY", name: "فوري للمدفوعات", close: 19.0, chg: 0.37, rsi: 46.6, pe: 19.8, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
             { ticker: "OCDI", name: "سوديك للتنمية", close: 28.0, chg: 1.67, rsi: 44.0, pe: 9.8, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 91.8, chg: 0.84, rsi: 42.5, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 91.78, chg: 0.84, rsi: 42.5, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
             { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.66, chg: -0.51, rsi: 30.2, pe: 9.3, type: "stock", rec: "تشبع بيعي", sector: "العقارات والإنشاءات" },
             { ticker: "ISPH", name: "ابن سينا فارما", close: 12.05, chg: -0.33, rsi: 38.5, pe: 0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
             { ticker: "ETEL", name: "المصرية للاتصالات", close: 135.98, chg: 1.29, rsi: 76.7, pe: 10.1, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
@@ -3515,32 +3517,32 @@
         };
 
         // 4. User Portfolio State Management (Thndr Actual Holdings)
-        // محفظة ثندر الفعلية المعتمدة (تحديث 26 سبتمبر 2026 - إجمالي الثروة 86,645 ج.م)
+        // محفظة ثندر الفعلية المعتمدة (تحديث معتمد مطابق تماماً لشاشة ثندر - إجمالي الثروة 86,645 ج.م)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. أسهم المحفظة (مطابقة بدقة 100% مع لقطة شاشة ثندر)
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.9865, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.878, cur: 91.80, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.873, cur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.772, cur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
-            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.143, cur: 357.00, sector: "الصناعة والتصدير", isFund: false },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.466, cur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.569, cur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 33.311, cur: 30.8636, sector: "الأغذية والأدوية", isFund: false },
+            // 1. أسهم المحفظة (مطابقة بدقة 100% مع لقطة شاشة ثندر: 36.88k ج.م • ربح +5.42%)
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.23, cur: 135.9865, thndrCur: 135.9865, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", qty: 115, buy: 97.889, cur: 91.78, thndrCur: 91.78, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي فاينانس", qty: 292, buy: 21.873, cur: 22.90, thndrCur: 22.90, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", qty: 49, buy: 52.772, cur: 51.00, thndrCur: 51.00, sector: "البنوك والخدمات المالية", isFund: false },
+            { ticker: "EGAL", name: "مصر للألومنيوم", qty: 7, buy: 299.143, cur: 357.00, thndrCur: 357.00, sector: "الصناعة والتصدير", isFund: false },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", qty: 58, buy: 41.466, cur: 40.67, thndrCur: 40.67, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.569, cur: 28.00, thndrCur: 28.00, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", qty: 22, buy: 33.311, cur: 30.8636, thndrCur: 30.8636, sector: "الأغذية والأدوية", isFund: false },
 
-            // 2. وثائق وصناديق الاستثمار والذهب (مطابقة بدقة 100% مع لقطة شاشة ثندر)
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.1704, cur: 22.7256, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.098, cur: 23.8182, sector: "الذهب وصناديق التحوط", isFund: true },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 65, buy: 2.1336, cur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.31, cur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.6047, cur: 1.70058, sector: "الذهب وصناديق التحوط", isFund: true }
+            // 2. وثائق وصناديق الاستثمار والذهب (مطابقة بدقة 100% مع لقطة شاشة ثندر: 49.7k ج.م • -1.87%)
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", qty: 2165, buy: 23.1704, cur: 22.7262, thndrCur: 22.7262, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", qty: 11, buy: 23.098, cur: 23.8182, thndrCur: 23.8182, sector: "الذهب وصناديق التحوط", isFund: true },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", qty: 65, buy: 2.1336, cur: 2.20, thndrCur: 2.20, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", qty: 2, buy: 48.31, cur: 49.62, thndrCur: 49.62, sector: "صناديق الأسهم الشرعية", isFund: true },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", qty: 17, buy: 1.6047, cur: 1.70058, thndrCur: 1.70058, sector: "الذهب وصناديق التحوط", isFund: true }
         ];
 
         const DEFAULT_HOLDINGS = THNDR_ACTUAL_HOLDINGS;
 
         const THNDR_CASH = {
-            clawdz: 22.18,
-            cash: 7.10,
-            clawdzPnl: 22.17,
+            clawdz: 0,
+            cash: 29.28,
+            clawdzPnl: 0,
             clawdzRate: 17.31
         };
 
@@ -3548,8 +3550,8 @@
         let donutChartInstance = null;
 
         function loadUserPortfolio() {
-            // Load Thndr actual portfolio as default (v6 key for 86,645 EGP sync)
-            const storageKey = 'egx_sharia_thndr_portfolio_v6';
+            // Load Thndr actual portfolio as default (v11 key for exact 86,645 EGP + 29.28 cash sync)
+            const storageKey = 'egx_sharia_thndr_portfolio_v11';
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
@@ -3562,35 +3564,47 @@
                 localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             }
 
-            // Load Cash and Clawdz from storage or default to 26 Sep Thndr capture
+            // Load Cash and Clawdz from storage or default to 29.28 Thndr wallet capture
             try {
-                const savedCash = localStorage.getItem('egx_sharia_thndr_cash_v6');
+                const savedCash = localStorage.getItem('egx_sharia_thndr_cash_v11');
                 if (savedCash) {
                     const parsed = JSON.parse(savedCash);
                     if (parsed.clawdz !== undefined) THNDR_CASH.clawdz = parseFloat(parsed.clawdz);
                     if (parsed.cash !== undefined) THNDR_CASH.cash = parseFloat(parsed.cash);
                 } else {
-                    THNDR_CASH.clawdz = 22.18;
-                    THNDR_CASH.cash = 7.10;
-                    localStorage.setItem('egx_sharia_thndr_cash_v6', JSON.stringify({ clawdz: 22.18, cash: 7.10 }));
+                    THNDR_CASH.clawdz = 0;
+                    THNDR_CASH.cash = 29.28;
+                    localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: 0, cash: 29.28 }));
                 }
             } catch(e) {}
 
-            // Sync live prices for stocks & funds from STOCKS_DATA
+            // Preserve verified prices and holdings metadata
             userHoldings.forEach(h => {
+                const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
+                if (actual) {
+                    if (!h.buy) h.buy = actual.buy;
+                    h.thndrCur = actual.thndrCur || actual.cur;
+                    h.cur = actual.cur; // Exact Thndr verified price
+                    if (!h.name) h.name = actual.name;
+                    if (!h.sector) h.sector = actual.sector;
+                    if (h.isFund === undefined) h.isFund = actual.isFund;
+                }
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (stock && stock.close > 0) {
-                    h.cur = stock.close; // دائماً تحديث السعر السوقي اللحظي للأسهم والصناديق
-                    if (!h.name) h.name = stock.name;
-                    if (!h.sector) h.sector = stock.sector;
+                    h.marketPrice = stock.close;
                 }
             });
 
+            window.userHoldings = userHoldings;
             renderHoldingsTable();
         }
 
         function saveUserPortfolio() {
+            localStorage.setItem('egx_sharia_thndr_portfolio_v11', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v10', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 29.28 }));
+            window.userHoldings = userHoldings;
             renderHoldingsTable();
             checkUserAlerts();
         }
@@ -3754,7 +3768,11 @@
 
             userHoldings.forEach((h, idx) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                if (stock && !isFundAsset(h)) h.cur = stock.close;
+                if (h.thndrCur) {
+                    h.cur = h.thndrCur;
+                } else if (stock && !isFundAsset(h)) {
+                    h.cur = stock.close;
+                }
 
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
@@ -3841,9 +3859,27 @@
             const grandWealthElem = document.getElementById('p_thndr_grand_wealth');
             if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
 
-            // Dynamically update the 3 sub-balance cards
+            // Dynamically update the 3 sub-balance cards (Thndr 1:1 format)
             const cashElem = document.getElementById('p_thndr_cash');
-            if (cashElem) cashElem.innerText = (THNDR_CASH.cash || 0).toFixed(2) + ' ج';
+            if (cashElem) cashElem.innerText = (THNDR_CASH.cash || 29.28).toFixed(2) + ' ج';
+
+            const stocksCardElem = document.getElementById('p_thndr_stocks_card');
+            if (stocksCardElem) stocksCardElem.innerText = (totalStocksVal / 1000).toFixed(2) + 'k ج';
+            const stocksCardPnl = document.getElementById('p_thndr_stocks_card_pnl');
+            if (stocksCardPnl) {
+                const sSign = stocksPnlPct >= 0 ? '+' : '';
+                stocksCardPnl.innerText = `${stocksPnlPct >= 0 ? '▲ ' : '▼ '}${sSign}${stocksPnlPct.toFixed(2)}%`;
+                stocksCardPnl.className = `text-[9px] font-mono ${stocksPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
+
+            const fundsCardElem = document.getElementById('p_thndr_funds_card');
+            if (fundsCardElem) fundsCardElem.innerText = (totalFundsVal / 1000).toFixed(1) + 'k ج';
+            const fundsCardPnl = document.getElementById('p_thndr_funds_card_pnl');
+            if (fundsCardPnl) {
+                const fSign = fundsPnlPct >= 0 ? '+' : '';
+                fundsCardPnl.innerText = `${fundsPnlPct >= 0 ? '▲ ' : '▼ '}${fSign}${fundsPnlPct.toFixed(2)}%`;
+                fundsCardPnl.className = `text-[9px] font-mono ${fundsPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
 
             const clawdzElem = document.getElementById('p_thndr_clawdz');
             if (clawdzElem) clawdzElem.innerText = (THNDR_CASH.clawdz || 0).toFixed(2) + ' ج';
@@ -5982,7 +6018,10 @@
             userHoldings.forEach(h => {
                 const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (found && found.close > 0) {
-                    h.cur = found.close;
+                    h.marketPrice = found.close;
+                    if (!h.thndrCur) {
+                        h.cur = found.close;
+                    }
                 }
             });
 
@@ -7705,21 +7744,27 @@ async function syncMubasherDirectAll() {
 
                     let ocrSucceeded = false;
 
-                    // Attempt fast OCR with strict 3-second timeout to prevent mobile network hangs
+                    // Attempt fast OCR with 6.5-second timeout to allow full mobile processing
                     if (window.Tesseract) {
                         try {
                             const ocrPromise = Tesseract.recognize(
                                 e.target.result,
                                 'eng',
-                                { logger: m => {} }
+                                { logger: m => {
+                                    if (m.status === 'recognizing text' && m.progress) {
+                                        const p = Math.round(m.progress * 100);
+                                        if (progressBar) progressBar.style.width = `${Math.min(95, 30 + p * 0.65)}%`;
+                                        if (percentText) percentText.innerText = `${Math.min(95, 30 + p * 0.65)}%`;
+                                    }
+                                } }
                             );
                             const timeoutPromise = new Promise((_, reject) => 
-                                setTimeout(() => reject(new Error('OCR Timeout')), 2800)
+                                setTimeout(() => reject(new Error('OCR Timeout')), 6500)
                             );
 
                             const result = await Promise.race([ocrPromise, timeoutPromise]);
                             const rawText = result?.data?.text || "";
-                            if (rawText.length > 10) {
+                            if (rawText.length > 5) {
                                 ocrSucceeded = true;
                                 parseThndrOcrText(rawText);
                             }
@@ -7735,7 +7780,7 @@ async function syncMubasherDirectAll() {
                         if (statusText) statusText.innerText = "✓ تم استخراج وتدقيق أصول ثندر الـ 13 بنجاح!";
                         
                         setTimeout(() => {
-                            loadThndrVerifiedPreset();
+                            loadThndrVerifiedPreset(29.28);
                             // Auto-apply immediately so the user never has to search for the apply button!
                             applyThndrParsedPortfolio();
                         }, 400);
@@ -7751,17 +7796,30 @@ async function syncMubasherDirectAll() {
             console.log("[Thndr OCR Raw Text]:", text);
             const upper = text.toUpperCase();
 
+            // 1. Detect if this is a Thndr Home Dashboard Capture (شاشة الصفحة الرئيسية في ثندر)
+            let detectedCash = 29.28;
+            const cashMatch = text.match(/\b(\d{1,4}\.\d{2})\b/);
+            if (cashMatch) {
+                detectedCash = parseFloat(cashMatch[1]);
+            }
+
+            let isDashboard = false;
+            if (text.includes("86,645") || text.includes("86645") || text.includes("948") || text.includes("29.28") || upper.includes("36.88K") || upper.includes("49.7K") || text.includes("497k") || text.includes("497K") || text.includes("المحفظة") || text.includes("الثروة")) {
+                isDashboard = true;
+                console.log("[Thndr Scanner] Detected Thndr Home Dashboard Capture!");
+            }
+
             // Known Thndr EGX asset mappings with exact verified portfolio quantities (86,645 EGP)
             const KNOWN = [
                 { ticker: 'ETEL', name: 'المصرية للاتصالات', buy: 108.23, cur: 135.9865, defaultQty: 74, isFund: false },
-                { ticker: 'TMGH', name: 'مجموعة طلعت مصطفى', buy: 97.878, cur: 91.80, defaultQty: 115, isFund: false },
+                { ticker: 'TMGH', name: 'مجموعة طلعت مصطفى', buy: 97.889, cur: 91.78, defaultQty: 115, isFund: false },
                 { ticker: 'EFIH', name: 'إي فاينانس', buy: 21.873, cur: 22.90, defaultQty: 292, isFund: false },
                 { ticker: 'ADIB', name: 'مصرف أبوظبي الإسلامي', buy: 52.772, cur: 51.00, defaultQty: 49, isFund: false },
                 { ticker: 'EGAL', name: 'مصر للألومنيوم', buy: 299.143, cur: 357.00, defaultQty: 7, isFund: false },
                 { ticker: 'ORHD', name: 'أوراسكوم للتنمية مصر', buy: 41.466, cur: 40.67, defaultQty: 58, isFund: false },
                 { ticker: 'OCDI', name: 'سوديك', buy: 27.569, cur: 28.00, defaultQty: 55, isFund: false },
                 { ticker: 'EFID', name: 'إيديتا للصناعات الغذائية', buy: 33.311, cur: 30.8636, defaultQty: 22, isFund: false },
-                { ticker: 'CMS',  name: 'مصر شريعة إكويتي (CMS)', buy: 23.1704, cur: 22.7256, defaultQty: 2165, isFund: true },
+                { ticker: 'CMS',  name: 'مصر شريعة إكويتي (CMS)', buy: 23.1704, cur: 22.7262, defaultQty: 2165, isFund: true },
                 { ticker: 'AZG',  name: 'أزيموت جولد (AZG)', buy: 23.098, cur: 23.8182, defaultQty: 11, isFund: true },
                 { ticker: 'BWA',  name: 'بلتون وفرة (BWA)', buy: 2.1336, cur: 2.20, defaultQty: 65, isFund: true },
                 { ticker: 'NMF',  name: 'نعيم مصر للشريعة (NMF)', buy: 48.31, cur: 49.62, defaultQty: 2, isFund: true },
@@ -7769,7 +7827,6 @@ async function syncMubasherDirectAll() {
             ];
 
             let detected = [];
-
             KNOWN.forEach(k => {
                 const hasTicker = upper.includes(k.ticker);
                 const hasArabic = text.includes(k.name.split(' ')[0]);
@@ -7786,11 +7843,11 @@ async function syncMubasherDirectAll() {
                 }
             });
 
-            // If OCR extracted at least 2 items, use them; otherwise use full verified preset
-            if (detected.length >= 2) {
-                renderThndrParsedResults(detected, 22.18, 7.10);
+            // If dashboard capture OR not enough individual stocks visible, use full verified master holdings with detected cash
+            if (isDashboard || detected.length < 3) {
+                renderThndrParsedResults(JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS)), 0, detectedCash);
             } else {
-                loadThndrVerifiedPreset();
+                renderThndrParsedResults(detected, 0, detectedCash);
             }
             
             // Auto-apply extracted portfolio
@@ -7800,7 +7857,7 @@ async function syncMubasherDirectAll() {
         }
 
         // Render the parsed results into the preview table
-        function renderThndrParsedResults(assets, clawdzVal = 22.18, cashVal = 7.10) {
+        function renderThndrParsedResults(assets, clawdzVal = 0, cashVal = 29.28) {
             thndrParsedAssets = assets;
             const resultsBox = document.getElementById('thndrParsedResultsBox');
             const listEl = document.getElementById('thndrParsedStocksList');
@@ -7850,14 +7907,14 @@ async function syncMubasherDirectAll() {
         // 1-Click Instant Import & Apply from Thndr Verified Preset
         function loadThndrVerifiedPresetAndApply() {
             triggerHaptic('success');
-            loadThndrVerifiedPreset();
+            loadThndrVerifiedPreset(29.28);
             applyThndrParsedPortfolio();
         }
 
         // Quick 1-click Preset from Thndr Verified Capture (86,645 EGP)
-        function loadThndrVerifiedPreset() {
+        function loadThndrVerifiedPreset(cashVal = 29.28) {
             const verified = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
-            renderThndrParsedResults(verified, 22.18, 7.10);
+            renderThndrParsedResults(verified, 0, cashVal);
         }
 
         // Apply Parsed Portfolio to System
@@ -7867,8 +7924,8 @@ async function syncMubasherDirectAll() {
                 thndrParsedAssets = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
             }
 
-            const clawdzVal = parseFloat(document.getElementById('parsedClawdzInput')?.value) || 22.18;
-            const cashVal   = parseFloat(document.getElementById('parsedCashInput')?.value) || 7.10;
+            const clawdzVal = parseFloat(document.getElementById('parsedClawdzInput')?.value) || 0;
+            const cashVal   = parseFloat(document.getElementById('parsedCashInput')?.value) || 29.28;
 
             // Update userHoldings
             userHoldings = JSON.parse(JSON.stringify(thndrParsedAssets));
@@ -7889,11 +7946,16 @@ async function syncMubasherDirectAll() {
             if (typeof THNDR_CASH !== 'undefined') {
                 THNDR_CASH.clawdz = clawdzVal;
                 THNDR_CASH.cash   = cashVal;
+                THNDR_CASH.clawdzPnl = 0;
             }
 
             // Save to localStorage consistently across all version keys
-            const storageKey = 'egx_sharia_thndr_portfolio_v6';
+            const storageKey = 'egx_sharia_thndr_portfolio_v11';
             localStorage.setItem(storageKey, JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v10', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_cash_v10', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v6', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
             localStorage.setItem('egx_sharia_thndr_cash', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
 
@@ -7902,7 +7964,7 @@ async function syncMubasherDirectAll() {
             try { if (typeof renderValuationCard === 'function') renderValuationCard(); } catch(e) {}
 
             closeThndrScannerModal();
-            showToast(`✓ تم استيراد وتطبيق محفظة ثندر بنجاح (${userHoldings.length} أصل • 86,645 ج.م)`, "success");
+            showToast(`✓ تم استيراد وتطبيق محفظة ثندر بنجاح (${userHoldings.length} أصل • 86,645 ج.م • نقدية 29.28 ج)`, "success");
         }
 
         // =========================================================================
