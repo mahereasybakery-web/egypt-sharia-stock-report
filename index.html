@@ -548,9 +548,44 @@
             <span id="syncStatusBadge"><span id="syncStatusText">مزامنة حية 100%</span></span>
         </div>
 
+        <!-- ===== Visible Action Bar: Sync + Theme Toggle ===== -->
+        <div class="flex items-center justify-between gap-2 mb-2" dir="rtl">
+
+            <!-- Right side: Sync Button + Live indicator -->
+            <div class="flex items-center gap-2">
+                <button onclick="refreshData()" id="visibleSyncBtn" title="مزامنة الأسعار اللحظية"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                           bg-emerald-950/80 border border-emerald-700/60 text-emerald-300
+                           hover:bg-emerald-900/90 active:scale-95 transition-all text-[11.5px] font-bold select-none">
+                    <span id="visibleRefreshIcon" class="text-[15px] inline-block transition-transform duration-500">🔄</span>
+                    <span>مزامنة</span>
+                </button>
+                <span class="flex items-center gap-1 text-[10px] text-emerald-400 font-medium whitespace-nowrap">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live inline-block"></span>
+                    <span id="visibleSyncText">حية</span>
+                </span>
+            </div>
+
+            <!-- Center: App branding -->
+            <span class="text-[11px] font-bold text-slate-400 tracking-wide whitespace-nowrap">
+                ⚡ الأسهم الشرعية
+            </span>
+
+            <!-- Left side: Dark / Light Mode Toggle -->
+            <button id="visibleThemeToggleBtn" onclick="toggleThemeMode()" title="تبديل الوضع الليلي / النهاري"
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border
+                       transition-all active:scale-95 select-none text-[11.5px] font-bold
+                       dark:bg-slate-800/80 dark:border-slate-600/50 dark:text-amber-300 dark:hover:bg-slate-700/80
+                       bg-amber-50/90 border-amber-300/60 text-amber-700 hover:bg-amber-100">
+                <span id="visibleThemeIcon" class="text-[15px] leading-none">🌙</span>
+                <span id="visibleThemeLabel">ليلي</span>
+            </button>
+        </div>
+        <!-- =============================================== -->
+
         <!-- Live Ticker Bar (شريط التيكر المتحرك تلقائياً من اليمين لليسار) -->
                 <!-- Live Scrolling Ticker Bar (Left-to-Right Continuous Loop: من اليسار لليمين) -->
-        <div class="relative overflow-hidden w-full pt-2.5 text-[11px] select-none" dir="ltr">
+        <div class="relative overflow-hidden w-full text-[11px] select-none" dir="ltr">
             <div id="liveTickerBarTrack" class="ticker-marquee-track flex gap-2 items-center">
                 <!-- Sequence 1 -->
                 <div class="flex gap-2 items-center shrink-0">
@@ -2946,6 +2981,11 @@
         }
 
         function applyThemeMode(isDark, notify = false) {
+            // Update visible theme toggle button
+            const vIcon = document.getElementById('visibleThemeIcon');
+            const vLabel = document.getElementById('visibleThemeLabel');
+            if (vIcon) vIcon.textContent = isDark ? '🌙' : '☀️';
+            if (vLabel) vLabel.textContent = isDark ? 'ليلي' : 'نهاري';
             if (isDark) {
                 document.documentElement.classList.add('dark');
             } else {
@@ -6340,8 +6380,12 @@
         async function syncLiveMarketData(isAutoPoll = false) {
             const icon = document.getElementById('refreshIcon');
             if (icon && !isAutoPoll) icon.classList.add('rotate-180');
+            // Also spin visible refresh icon
+            const vIcon2 = document.getElementById('visibleRefreshIcon');
+            if (vIcon2 && !isAutoPoll) { vIcon2.style.transform = 'rotate(360deg)'; setTimeout(()=>{ vIcon2.style.transform = ''; }, 600); }
             const badge = document.getElementById('syncStatusText');
             if (badge && !isAutoPoll) badge.innerText = "جاري الاتصال المباشر بالسوق...";
+            const vSyncText = document.getElementById("visibleSyncText"); if (vSyncText) vSyncText.textContent = "جاري...";
 
             // Determine if Cairo trading session is currently open (Sun-Thu 10:00 - 14:35 UTC+3)
             const now = new Date();
