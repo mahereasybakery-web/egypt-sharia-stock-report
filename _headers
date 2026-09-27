@@ -1,0 +1,11 @@
+# Cloudflare Pages Headers configuration for EGX Sharia PWA
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /
+
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/market_data.json
+  Cache-Control: no-cache, no-store, must-revalidate
+  Access-Control-Allow-Origin: *
