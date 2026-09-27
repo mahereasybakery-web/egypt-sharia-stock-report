@@ -485,7 +485,27 @@
             animation-play-state: paused !important;
         }
 
-    </style>
+    
+        /* Custom smooth horizontal table scrollbar */
+        #stocksHoldingsTableContainer::-webkit-scrollbar,
+        #fundsHoldingsTableContainer::-webkit-scrollbar {
+            height: 6px;
+        }
+        #stocksHoldingsTableContainer::-webkit-scrollbar-track,
+        #fundsHoldingsTableContainer::-webkit-scrollbar-track {
+            background: #080c14;
+            border-radius: 4px;
+        }
+        #stocksHoldingsTableContainer::-webkit-scrollbar-thumb,
+        #fundsHoldingsTableContainer::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        #stocksHoldingsTableContainer::-webkit-scrollbar-thumb:hover,
+        #fundsHoldingsTableContainer::-webkit-scrollbar-thumb:hover {
+            background: #10b981;
+        }
+</style>
 </head>
 <body class="bg-[#080c14] text-slate-100 min-h-screen selection:bg-emerald-500 font-sans selection:text-white pb-24">
 
@@ -612,41 +632,6 @@
                         <span class="font-bold text-emerald-400 font-mono ticker-egx70-val" dir="ltr">19,834.95</span>
                     </div>
 
-                    <!-- Item 7: Azimut Gold (AZG) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
-                        <span class="text-slate-300 font-medium">🪙 أزيموت جولد (AZG):</span>
-                        <span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-amber-400 font-mono" dir="ltr">23.96 ج</span>
-                    </div>
-
-                    <!-- Item 8: Thndr Gold (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
-                        <span class="text-slate-300 font-medium">🪙 ثندر جولد:</span>
-                        <span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-amber-400 font-mono" dir="ltr">1.68 ج</span>
-                    </div>
-
-                    <!-- Item 9: CI Egypt Sharia (CMS) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
-                        <span class="text-slate-300 font-medium">🕌 مصر شريعة (CMS):</span>
-                        <span class="text-[9px] bg-sky-950 text-sky-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-sky-400 font-mono" dir="ltr">22.72 ج</span>
-                    </div>
-
-                    <!-- Item 10: Beltone Wafra (BWA) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
-                        <span class="text-slate-300 font-medium">🕌 بلتون وفرة (BWA):</span>
-                        <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-emerald-400 font-mono" dir="ltr">2.21 ج</span>
-                    </div>
-
-                    <!-- Item 11: Naeem Misr (NMF) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
-                        <span class="text-slate-300 font-medium">🕌 نعيم مصر (NMF):</span>
-                        <span class="text-[9px] bg-sky-950 text-sky-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-sky-400 font-mono" dir="ltr">50.19 ج</span>
-                    </div>
-
                     <!-- Item 12: Saudi Riyal SAR -->
                     <div dir="rtl" class="bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="text-slate-300 font-medium">🇸🇦 الريال السعودي:</span>
@@ -717,41 +702,6 @@
                         <span class="text-slate-300 font-medium">📈 مؤشر EGX70:</span>
                         <span class="text-[10px] text-rose-400 font-bold" dir="ltr">-1.92%</span>
                         <span class="font-bold text-emerald-400 font-mono ticker-egx70-val" dir="ltr">19,834.95</span>
-                    </div>
-
-                    <!-- Item 7: Azimut Gold (AZG) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('AZG')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت أزيموت جولد">
-                        <span class="text-slate-300 font-medium">🪙 أزيموت جولد (AZG):</span>
-                        <span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-amber-400 font-mono" dir="ltr">23.96 ج</span>
-                    </div>
-
-                    <!-- Item 8: Thndr Gold (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('THNDR_GOLD')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت ثندر جولد">
-                        <span class="text-slate-300 font-medium">🪙 ثندر جولد:</span>
-                        <span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-amber-400 font-mono" dir="ltr">1.68 ج</span>
-                    </div>
-
-                    <!-- Item 9: CI Egypt Sharia (CMS) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('CMS')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت صندوق مصر شريعة">
-                        <span class="text-slate-300 font-medium">🕌 مصر شريعة (CMS):</span>
-                        <span class="text-[9px] bg-sky-950 text-sky-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-sky-400 font-mono" dir="ltr">22.72 ج</span>
-                    </div>
-
-                    <!-- Item 10: Beltone Wafra (BWA) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('BWA')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت بلتون وفرة">
-                        <span class="text-slate-300 font-medium">🕌 بلتون وفرة (BWA):</span>
-                        <span class="text-[9px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-emerald-400 font-mono" dir="ltr">2.21 ج</span>
-                    </div>
-
-                    <!-- Item 11: Naeem Misr (NMF) (الشارة تسبق الرقم) -->
-                    <div dir="rtl" onclick="openStockChart('NMF')" class="bg-slate-900/90 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-lg px-2.5 py-1 flex items-center gap-1.5 whitespace-nowrap cursor-pointer transition active:scale-95 shrink-0" title="انقر لفتح شارت نعيم مصر">
-                        <span class="text-slate-300 font-medium">🕌 نعيم مصر (NMF):</span>
-                        <span class="text-[9px] bg-sky-950 text-sky-300 px-1.5 py-0.5 rounded font-mono">شارت</span>
-                        <span class="font-bold text-sky-400 font-mono" dir="ltr">50.19 ج</span>
                     </div>
 
                     <!-- Item 12: Saudi Riyal SAR -->
@@ -1250,16 +1200,21 @@
                 </div>
 
                 <!-- Stocks Full Table View (Horizontal Scrollable) -->
-                <div id="stocksHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
-                    <table class="w-full text-right text-xs min-w-[580px]">
-                        <thead class="border-b border-slate-800 text-[10px] select-none">
+                <div id="stocksHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-850 rounded-xl">
+                    <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
+                        <span>👈 اسحب لمشاهدة جميع الأعمدة (الربح والعائد)</span>
+                        <span class="text-[9px] text-emerald-400 font-mono">7 أعمدة مخصصة</span>
+                    </div>
+                    <table class="w-full text-right text-xs min-w-[620px]">
+                        <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
                             <tr class="text-slate-400">
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_ticker">السهم <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','qty')" id="sh_qty">الكمية <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','buy')" id="sh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','cur')" id="sh_cur">الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','val')" id="sh_val">القيمة <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','pnl')" id="sh_pnl">الربح ٪ <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 pr-2 text-right cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_ticker">السهم <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_qty">الكمية <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','buy')" id="sh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_cur">الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_val">القيمة (ج) <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','pnl')" id="sh_pnl">الربح (ج) <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','pnlpct')" id="sh_pnlpct">العائد (%) <span class="sort-arrow opacity-40">↕</span></th>
                             </tr>
                         </thead>
                         <tbody id="stocksHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -1290,16 +1245,21 @@
                 </div>
 
                 <!-- Funds Full Table View (Horizontal Scrollable) -->
-                <div id="fundsHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
-                    <table class="w-full text-right text-xs min-w-[580px]">
-                        <thead class="border-b border-slate-800 text-[10px] select-none">
+                <div id="fundsHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-850 rounded-xl">
+                    <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
+                        <span>👈 اسحب لمشاهدة جميع الأعمدة (الربح والعائد)</span>
+                        <span class="text-[9px] text-amber-400 font-mono">7 أعمدة مخصصة</span>
+                    </div>
+                    <table class="w-full text-right text-xs min-w-[620px]">
+                        <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
                             <tr class="text-slate-400">
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_ticker">الصندوق <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','qty')" id="fh_qty">الوثائق <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','buy')" id="fh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','cur')" id="fh_cur">NAV الحالي <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','val')" id="fh_val">القيمة <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','pnl')" id="fh_pnl">الربح ٪ <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 pr-2 text-right cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_ticker">الأصل / الصندوق <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_qty">الوثائق <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','buy')" id="fh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_cur">NAV الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','val')" id="fh_val">القيمة (ج) <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','pnl')" id="fh_pnl">الربح (ج) <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','pnlpct')" id="fh_pnlpct">العائد (%) <span class="sort-arrow opacity-40">↕</span></th>
                             </tr>
                         </thead>
                         <tbody id="fundsHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -1354,6 +1314,8 @@
                 </div>
             </div>
 
+
+        </section>
 
         <!-- ================= TAB 5: TOOLS & SHARIA HUB ================= -->
         <section id="view-tools" class="tab-content space-y-3.5 hidden">
@@ -3192,38 +3154,38 @@
 
         // 2. Comprehensive Stocks & Funds Database
         let STOCKS_DATA = [
-            { ticker: "MFPC", name: "موبكو للأسمدة", close: 50.0, chg: 2.69, rsi: 76.1, pe: 9.3, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "AMOC", name: "أموك للبترول", close: 13.73, chg: 2.6, rsi: 69.0, pe: 0, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ACGC", name: "العربية للأقطان", close: 14.38, chg: -1.32, rsi: 56.3, pe: 0, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
-            { ticker: "MCQE", name: "أسمنت قنا", close: 218.99, chg: -0.91, rsi: 45.0, pe: 0, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
-            { ticker: "ICFC", name: "الدولية للأسمدة", close: 10.0, chg: 0.0, rsi: 50.0, pe: 8.0, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 92.22, chg: 3.99, rsi: 64.3, pe: 0, type: "stock", rec: "شراء وتوزيع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "LCSW", name: "ليسيكو مصر", close: 33.4, chg: 0.51, rsi: 45.8, pe: 0, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 47.03, chg: 0.06, rsi: 76.1, pe: 9.3, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13.3, chg: -0.75, rsi: 69.0, pe: 0, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 14.1, chg: -1.26, rsi: 56.3, pe: 0, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 202.9, chg: -1.76, rsi: 45.0, pe: 0, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23.07, chg: 3.87, rsi: 50.0, pe: 8.0, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89.99, chg: -0.56, rsi: 64.3, pe: 0, type: "stock", rec: "شراء وتوزيع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 31.7, chg: 1.15, rsi: 45.8, pe: 0, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
             { ticker: "ARCC", name: "العربية للأسمنت", close: 73.0, chg: 0.56, rsi: 51.7, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.91, chg: 4.48, rsi: 59.6, pe: 8.5, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.36, chg: 1.37, rsi: 59.6, pe: 8.5, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
             { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 47.5, chg: 1.28, rsi: 67.3, pe: 0, type: "stock", rec: "شراء", sector: "البنوك والخدمات المالية" },
-            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 18.48, chg: 1.37, rsi: 60.2, pe: 0, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 17.2, chg: 0.29, rsi: 60.2, pe: 0, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
             { ticker: "ATQA", name: "حديد عتاقة", close: 12.7, chg: 0.87, rsi: 65.3, pe: 0, type: "stock", rec: "شراء", sector: "الصناعة والتصدير" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", close: 357.0, chg: 1.65, rsi: 60.6, pe: 14.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
-            { ticker: "FWRY", name: "فوري للمدفوعات", close: 19.0, chg: 0.37, rsi: 46.6, pe: 19.8, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 28.0, chg: 1.67, rsi: 44.0, pe: 9.8, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 91.78, chg: 0.84, rsi: 42.5, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.66, chg: -0.51, rsi: 30.2, pe: 9.3, type: "stock", rec: "تشبع بيعي", sector: "العقارات والإنشاءات" },
-            { ticker: "ISPH", name: "ابن سينا فارما", close: 12.05, chg: -0.33, rsi: 38.5, pe: 0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 135.98, chg: 1.29, rsi: 76.7, pe: 10.1, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 22.9, chg: 3.09, rsi: 54.0, pe: 0, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.0, chg: 3.83, rsi: 58.2, pe: 5.2, type: "stock", rec: "زخم قيادي", sector: "البنوك والخدمات المالية" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 358, chg: 0.29, rsi: 60.6, pe: 14.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.76, chg: 0.05, rsi: 46.6, pe: 19.8, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 28.2, chg: 0.71, rsi: 44.0, pe: 9.8, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 90.8, chg: -1.09, rsi: 42.5, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.2, chg: -2.22, rsi: 30.2, pe: 9.3, type: "stock", rec: "تشبع بيعي", sector: "العقارات والإنشاءات" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 11.76, chg: 0.77, rsi: 38.5, pe: 0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 136.74, chg: 0.55, rsi: 76.7, pe: 10.1, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 22.92, chg: -0.26, rsi: 54.0, pe: 0, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.11, chg: 0.22, rsi: 58.2, pe: 5.2, type: "stock", rec: "زخم قيادي", sector: "البنوك والخدمات المالية" },
             { ticker: "SAUD", name: "بنك البركة مصر", close: 23.77, chg: 2.9, rsi: 55.9, pe: 5.1, type: "stock", rec: "محايد", sector: "البنوك والخدمات المالية" },
             { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.89, chg: -0.13, rsi: 47.5, pe: 5.5, type: "stock", rec: "محايد", sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 30.86, chg: 1.3, rsi: 51.8, pe: 13.9, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 29.51, chg: 0.03, rsi: 51.8, pe: 13.9, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
             { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 6.16, chg: 1.3, rsi: 54.4, pe: 36.7, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 40.67, chg: 2.64, rsi: 60.0, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "SWDY", name: "السويدي إليكتريك", close: 126.86, chg: 2.05, rsi: 57.3, pe: 0, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
-            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 27.0, chg: -0.3, rsi: 53.0, pe: 24.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 40.05, chg: -1.52, rsi: 60.0, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 118.5, chg: 0, rsi: 57.3, pe: 0, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.95, chg: -0.12, rsi: 53.0, pe: 24.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
             { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 867.84, chg: 5.02, rsi: 66.1, pe: 8.5, type: "stock", rec: "شراء قوي", sector: "العقارات والإنشاءات" },
-            { ticker: "CIRA", name: "سيرا للتعليم", close: 40.65, chg: 4.23, rsi: 65.1, pe: 0, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.78, chg: 1.82, rsi: 65.1, pe: 0, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
             { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.46, chg: 0.0, rsi: 51.6, pe: 46.2, type: "stock", rec: "قاع استثماري", sector: "الصناعة والتصدير" },
-            { ticker: "EAST", name: "الشرقية للدخان", close: 32.62, chg: -1.63, rsi: 21.8, pe: 10.8, type: "stock", rec: "عائد توزيعات", sector: "الصناعة والتصدير" },
+            { ticker: "EAST", name: "الشرقية للدخان", close: 31.54, chg: -0.44, rsi: 21.8, pe: 10.8, type: "stock", rec: "عائد توزيعات", sector: "الصناعة والتصدير" },
             { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 30.96, chg: 1.47, rsi: 56.3, pe: 0, type: "stock", rec: "نمو مستمر", sector: "الصناعة والتصدير" },
             { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
             { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
@@ -3558,13 +3520,12 @@
                 }
             } catch(e) {}
 
-            // Preserve verified prices and holdings metadata
+            // Preserve verified prices and holdings metadata with LIVE quotes
             userHoldings.forEach(h => {
                 const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
                 if (actual) {
                     if (!h.buy) h.buy = actual.buy;
                     h.thndrCur = actual.thndrCur || actual.cur;
-                    h.cur = actual.cur; // Exact Thndr verified price
                     if (!h.name) h.name = actual.name;
                     if (!h.sector) h.sector = actual.sector;
                     if (h.isFund === undefined) h.isFund = actual.isFund;
@@ -3572,6 +3533,13 @@
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (stock && stock.close > 0) {
                     h.marketPrice = stock.close;
+                    if (!isFundAsset(h)) {
+                        h.cur = stock.close; // Set live market price immediately!
+                    } else {
+                        h.cur = actual ? actual.cur : h.cur;
+                    }
+                } else if (actual) {
+                    h.cur = actual.cur;
                 }
             });
 
@@ -3686,10 +3654,12 @@
                         <div class="font-mono font-bold text-sm text-slate-900 dark:text-white">
                             ${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} <span class="text-[10px] font-normal text-slate-400">ج.م</span>
                         </div>
-                        <div class="text-[11px] font-mono font-bold mt-0.5 flex items-center justify-end gap-1 ${isP ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">
-                            <span>${isP ? '▲ +' : '▼ '}${pnl.toFixed(0)} ج</span>
-                            <span class="text-[10px] px-1.5 py-0.2 rounded font-bold ${isP ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300' : 'bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300'}">
-                                ${isP ? '+' : ''}${pnlPct.toFixed(1)}%
+                        <div class="mt-1 flex items-center justify-end gap-1.5 flex-wrap">
+                            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg border ${isP ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border-rose-500/30 text-rose-400'}">
+                                ${isP ? '+' : ''}${pnl.toFixed(0)} ج
+                            </span>
+                            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg border ${isP ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/20 border-rose-500/40 text-rose-300'}">
+                                ${isP ? '+' : ''}${pnlPct.toFixed(2)}%
                             </span>
                         </div>
                     </div>
@@ -3783,30 +3753,33 @@
                     openStockChart(h.ticker);
                 };
                 tr.innerHTML = `
-                    <td class="py-2.5">
+                    <td class="py-2.5 pr-2">
                         <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-right flex items-center gap-1.5 hover:opacity-85 active:scale-95 transition group/btn w-full select-none" title="انقر لفتح الشارت والتحليلات لـ ${h.name}">
                             <div>
                                 <span class="font-bold text-white group-hover/btn:text-emerald-400 transition flex items-center gap-1">
                                     <span>${h.name}</span>
-                                    
                                 </span>
                                 <span class="text-[9px] text-slate-400 font-mono">${h.ticker}</span>
                             </div>
                         </button>
                     </td>
-                    <td class="py-2.5 font-mono text-white">
-                        <div class="flex items-center gap-1.5">
+                    <td class="py-2.5 text-center font-mono text-white">
+                        <div class="flex items-center justify-center gap-1">
                             <span>${h.qty.toLocaleString()}</span>
                             <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 opacity-60 hover:opacity-100 transition p-0.5 text-xs" title="تعديل مباشر للرصيد">✏️</button>
                         </div>
                     </td>
-                    <td class="py-2.5 text-slate-300 font-mono">${h.buy.toFixed(2)}</td>
-                    <td class="py-2.5 font-bold text-white font-mono">${h.cur.toFixed(2)}</td>
-                    <td class="py-2.5 font-mono font-bold text-white">${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} ج</td>
-                    <td class="py-2.5 font-bold font-mono ${isP ? 'text-emerald-400' : 'text-rose-400'}">
-                        ${isP ? '+' : ''}${pnl.toFixed(0)} <span class="text-[9px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
+                    <td class="py-2.5 text-slate-300 font-mono text-center">${h.buy.toFixed(2)}</td>
+                    <td class="py-2.5 font-bold text-white font-mono text-center">${h.cur.toFixed(2)}</td>
+                    <td class="py-2.5 font-mono font-bold text-white text-center">${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} ج</td>
+                    <td class="py-2.5 font-bold font-mono text-center ${isP ? 'text-emerald-400' : 'text-rose-400'}">
+                        ${isP ? '+' : ''}${pnl.toFixed(0)} ج
                     </td>
-
+                    <td class="py-2.5 font-bold font-mono text-center">
+                        <span class="inline-block px-1.5 py-0.5 rounded text-[11px] ${isP ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'}">
+                            ${isP ? '+' : ''}${pnlPct.toFixed(2)}%
+                        </span>
+                    </td>
                 `;
 
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFundAsset(h));
@@ -6561,8 +6534,10 @@ async function syncMubasherDirectAll() {
                 renderValuationCard();
             } else if (actualTabId === 'news') {
                 renderNewsFeed();
-            } else if (actualTabId === 'tools' && subTarget) {
-                switchToolsSubTab(subTarget);
+            } else if (actualTabId === 'tools') {
+                setTimeout(() => {
+                    switchToolsSubTab(subTarget || 'zakat');
+                }, 30);
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -8925,7 +8900,7 @@ async function syncMubasherDirectAll() {
             else { st.col = col; st.dir = -1; }
 
             const prefix = type === 'stocks' ? 'sh_' : 'fh_';
-            const cols = ['ticker','qty','buy','cur','val','pnl'];
+            const cols = ['ticker','qty','buy','cur','val','pnl','pnlpct'];
             cols.forEach(c => {
                 const th = document.getElementById(prefix + c);
                 if (!th) return;
@@ -8954,6 +8929,10 @@ async function syncMubasherDirectAll() {
                     case 'cur':    va = a.cur||0;     vb = b.cur||0;     break;
                     case 'val':    va = (a.cur||0)*a.qty; vb = (b.cur||0)*b.qty; break;
                     case 'pnl':
+                        va = ((a.cur||a.buy) - a.buy) * a.qty;
+                        vb = ((b.cur||b.buy) - b.buy) * b.qty;
+                        break;
+                    case 'pnlpct':
                         va = a.buy > 0 ? ((a.cur||a.buy)-a.buy)/a.buy*100 : 0;
                         vb = b.buy > 0 ? ((b.cur||b.buy)-b.buy)/b.buy*100 : 0;
                         break;
@@ -8982,34 +8961,29 @@ async function syncMubasherDirectAll() {
                 const sign   = isPos ? '+' : '';
 
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 transition cursor-pointer border-b border-slate-800/40';
+                tr.className = 'hover:bg-slate-800/40 transition cursor-pointer border-b border-slate-800/40 text-xs';
                 tr.onclick = () => openStockChart(h.ticker);
                 tr.innerHTML = `
-                    <td class="py-2 pr-1">
+                    <td class="py-2.5 pr-2">
                         <div class="font-bold text-white text-xs flex items-center gap-1">
                             ${h.ticker}
                             <button onclick="event.stopPropagation();editHoldingDirect('${h.ticker}')" class="text-[9px] text-slate-500 hover:text-emerald-400 transition ml-0.5">✏️</button>
                         </div>
                         <div class="text-[10px] text-slate-400 truncate max-w-[90px]">${h.name||''}</div>
                     </td>
-                    <td class="py-2 text-center font-mono text-xs text-white">${h.qty.toLocaleString()} <span class="text-[9px] text-slate-500">${shaLabel}</span></td>
-                    <td class="py-2 text-center font-mono text-xs text-slate-300">${fmt(h.buy)} ج</td>
-                    <td class="py-2 text-center font-mono text-xs text-white font-bold">${fmt(cur)} ج</td>
-                    <td class="py-2 text-center font-mono text-xs text-white">${fmt(val,0)} ج</td>
-                    <td class="py-2 text-center">
-                        <div class="font-mono font-bold text-xs ${clr}">${sign}${fmt(pnl,0)} ج</div>
-                        <div class="font-mono text-[10px] ${clr}">${sign}${fmt(pnlPct,2)}٪</div>
+                    <td class="py-2.5 text-center font-mono text-xs text-white">${h.qty.toLocaleString()}</td>
+                    <td class="py-2.5 text-center font-mono text-xs text-slate-300">${fmt(h.buy)}</td>
+                    <td class="py-2.5 text-center font-mono text-xs text-white font-bold">${fmt(cur)}</td>
+                    <td class="py-2.5 text-center font-mono text-xs text-white">${fmt(val,0)} ج</td>
+                    <td class="py-2.5 text-center font-mono font-bold text-xs ${clr}">${sign}${fmt(pnl,0)} ج</td>
+                    <td class="py-2.5 text-center font-mono font-bold text-xs">
+                        <span class="inline-block px-1.5 py-0.5 rounded text-[11px] ${isPos ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'}">
+                            ${sign}${fmt(pnlPct,2)}%
+                        </span>
                     </td>`;
                 tbody.appendChild(tr);
             });
-
-            tbody.style.opacity = '0.5';
-            requestAnimationFrame(() => { tbody.style.transition='opacity 0.25s'; tbody.style.opacity='1'; });
         }
-
-        // ── Sort Radar / Stocks List ─────────────────────────────
-        let _radarSortCol = 'chg';
-        let _radarSortDir = -1;
 
         function sortRadar(col) {
             if (_radarSortCol === col) _radarSortDir *= -1;
