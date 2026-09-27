@@ -147,6 +147,34 @@
         .price-flash-up   { animation: flashUp   1.2s ease-out forwards; border-radius:4px; }
         .price-flash-down { animation: flashDown 1.2s ease-out forwards; border-radius:4px; }
 
+        /* v11: Modern bottom nav active state */
+        .tab-btn { position: relative; }
+        .tab-btn.text-emerald-400::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: #34d399;
+            border-radius: 2px;
+        }
+        /* Card hover effects */
+        .glass-card { transition: border-color 0.2s ease; }
+
+        /* v11: Compact view mode switcher label */
+        #portfolioViewLabel { font-size: 11px; }
+
+        /* v11: Sort arrows */
+        .sort-arrow { font-size: 10px; transition: color 0.2s; }
+        th { user-select: none; }
+        th:hover .sort-arrow { opacity: 1 !important; }
+
+        /* Sortable table row hover */
+        #stocksHoldingsTableBody tr:hover,
+        #fundsHoldingsTableBody tr:hover { background: rgba(255,255,255,0.03); }
+
         /* Live pulse dot */
         @keyframes livePulse {
             0%,100% { transform:scale(1); opacity:1; }
@@ -813,6 +841,18 @@
                 </div>
             </div>
 
+            <!-- v11: Decisions Main Sub-Tabs -->
+            <div class="flex items-center gap-1 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs mb-1">
+                <button id="decisionsSubTabRecBtn" onclick="switchDecisionsSubTab('rec')" class="decisions-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-amber-600 text-white transition active:scale-95 flex items-center justify-center gap-1.5">
+                    <span>🎯</span><span>التوصيات</span>
+                </button>
+                <button id="decisionsSubTabValBtn" onclick="switchDecisionsSubTab('val')" class="decisions-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
+                    <span>📊</span><span>التحليل والتقييم</span>
+                </button>
+            </div>
+
+            <!-- Recommendations Sub-View -->
+            <div id="decisionsSubViewRec" class="space-y-3">
             <!-- Filter Controls -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex items-center justify-between flex-wrap gap-2 shadow-sm">
                 <!-- Action Filter -->
@@ -845,10 +885,27 @@
                 <!-- Dynamically generated recommendation cards -->
             </div>
 
+            </div><!-- /decisionsSubViewRec -->
+
+            <!-- v11: Valuation embedded sub-view -->
+            <div id="decisionsSubViewVal" class="space-y-3 hidden">
+                <div class="glass-card rounded-2xl p-4 text-center space-y-2 py-10"><div class="text-3xl mb-2">📊</div><div class="font-bold text-white text-sm">تحليل القيمة العادلة والكوبونات</div><p class="text-xs text-slate-400 mt-1">الأدوات المتقدمة للتقييم متوفرة هنا</p><button onclick="switchTab('valuation', document.querySelectorAll('.tab-btn')[2])" class="mt-3 bg-slate-700 hover:bg-slate-600 text-emerald-400 border border-slate-600 px-5 py-2 rounded-xl text-xs font-bold transition active:scale-95">فتح التحليل الكامل ←</button></div>
+            </div><!-- /decisionsSubViewVal -->
         </div>
 
-        <!-- ================= TAB 1: RADAR & STOCKS ================= -->
+        <!-- ================= TAB 2: MARKET (Radar + News) ================= -->
         <section id="view-radar" class="tab-content space-y-3.5 hidden">
+            <!-- v11: Market Sub-Tabs -->
+            <div class="flex items-center gap-1 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs">
+                <button id="marketSubTabStocksBtn" onclick="switchMarketSubTab('stocks')" class="market-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-emerald-600 text-white transition active:scale-95 flex items-center justify-center gap-1.5">
+                    <span>⚡</span><span>الأسهم</span>
+                </button>
+                <button id="marketSubTabNewsBtn" onclick="switchMarketSubTab('news')" class="market-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
+                    <span>📰</span><span>الأخبار</span>
+                </button>
+            </div>
+            <!-- Stocks Sub-View -->
+            <div id="marketSubViewStocks" class="space-y-3.5">
             <!-- Search & Filter Controls -->
             <div class="glass-card rounded-2xl p-3 space-y-2.5">
                 <div class="relative">
@@ -872,14 +929,45 @@
                 <!-- Populated dynamically if insiders or divergence or dividends is active -->
             </div>
 
-            <div class="text-[11px] text-slate-400 px-1 flex items-center justify-between">
-                <span>انقر على أي سهم لفتح الشارت الفني التفاعلي (Candlestick & RSI) 📈</span>
+            <div class="text-[11px] text-slate-400 px-1 flex items-center justify-between gap-2 flex-wrap">
+                <span>انقر على أي سهم لفتح الشارت التفاعلي 📈</span>
+                <div class="flex items-center gap-1 text-[10px]">
+                    <span class="text-slate-500">ترتيب:</span>
+                    <button onclick="sortRadar('chg')" id="radarSortChg" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-emerald-700 text-white font-bold border border-emerald-600">التغيير٪</button>
+                    <button onclick="sortRadar('close')" id="radarSortClose" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">السعر</button>
+                    <button onclick="sortRadar('rsi')" id="radarSortRsi" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">RSI</button>
+                    <button onclick="sortRadar('name')" id="radarSortName" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">الاسم</button>
+                    <button onclick="toggleRadarSortDir()" id="radarSortDir" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-bold">↓</button>
+                </div>
             </div>
 
             <!-- Stocks List Container -->
             <div id="stocksContainer" class="space-y-2">
                 <!-- Dynamically populated via JS -->
             </div>
+            </div><!-- /marketSubViewStocks -->
+
+            <!-- News Sub-View (embedded from view-news) -->
+            <div id="marketSubViewNews" class="space-y-3.5 hidden">
+                <!-- News Search & Category Controls -->
+                <div class="glass-card rounded-2xl p-3 space-y-2.5 border-sky-950/60">
+                    <div class="relative">
+                        <input id="newsSearchInput2" type="text" oninput="document.getElementById('newsSearchInput').value=this.value;filterNewsFeed()" placeholder="🔍 ابحث في الأخبار والإفصاحات..." 
+                               class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-sky-500 outline-none transition">
+                    </div>
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
+                        <button onclick="setNewsCategory('all', this)" class="news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل 📰</button>
+                        <button onclick="setNewsCategory('corporate', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">إفصاحات 🏢</button>
+                        <button onclick="setNewsCategory('funds', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">صناديق 📊</button>
+                        <button onclick="setNewsCategory('gold', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">ذهب 🪙</button>
+                        <button onclick="setNewsCategory('macro', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">الفائدة 💵</button>
+                        <button onclick="setNewsCategory('dividends', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">أرباح 💰</button>
+                    </div>
+                </div>
+                <div id="newsFeedContainer2" class="space-y-2.5">
+                    <!-- mirrors newsFeedContainer — populated by renderNewsFeed -->
+                </div>
+            </div><!-- /marketSubViewNews -->
         </section>
 
         <!-- ================= TAB 2: VALUATION & ANALYSIS ================= -->
@@ -950,13 +1038,13 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right text-xs">
-                            <thead class="text-slate-400 border-b border-slate-800 text-[10px]">
-                                <tr>
-                                    <th class="pb-2">السهم</th>
-                                    <th class="pb-2">قيمة الكوبون</th>
-                                    <th class="pb-2">عائد التوزيع %</th>
+                            <thead class="border-b border-slate-800 text-[10px] select-none">
+                                <tr class="text-slate-400">
+                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('name')">السهم <span class="opacity-40">↕</span></th>
+                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('coupon')">قيمة الكوبون <span class="opacity-40">↕</span></th>
+                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('yield')">العائد ٪ <span class="opacity-40">↕</span></th>
                                     <th class="pb-2">نهاية الحق</th>
-                                    <th class="pb-2">الصرف المتوقع</th>
+                                    <th class="pb-2">الصرف</th>
                                 </tr>
                             </thead>
                             <tbody id="dividendsTableBody" class="divide-y divide-slate-800/60 font-medium text-[11px]">
@@ -1001,8 +1089,8 @@
             </div>
         </section>
 
-        <!-- ================= TAB 3: ECONOMIC & SHARIA NEWS ================= -->
-        <section id="view-news" class="tab-content space-y-3.5 hidden">
+        <!-- ================= NEWS (hidden - now inside Market tab) ================= -->
+        <section id="view-news" class="tab-content space-y-3.5 hidden" style="display:none!important">
             <!-- News Search & Category Controls -->
             <div class="glass-card rounded-2xl p-3 space-y-2.5 border-sky-950/60">
                 <div class="relative">
@@ -1033,7 +1121,7 @@
                 <!-- Unified Compact Balance & Immediate PnL Row -->
                 <div class="flex items-center justify-between px-1">
                     <div class="flex items-baseline gap-2">
-                        <span class="text-xs font-medium text-slate-400">إجمالي الثروة:</span>
+                        <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span>
                         <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">86,645</span>
                         <span class="text-xs font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
@@ -1088,61 +1176,42 @@
                 </div>
             </div>
 
-                        <!-- Thndr Quick Sync & Scanner Banner (زر الاستيراد السريع البارز) -->
-            <div class="p-3 bg-gradient-to-r from-amber-950/70 via-slate-900/90 to-emerald-950/70 border border-amber-500/50 rounded-2xl flex items-center justify-between gap-2.5 shadow-lg shadow-amber-950/30">
-                <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0 border border-amber-500/40 shadow-sm">
-                        ⚡
-                    </div>
-                    <div class="min-w-0 text-right">
-                        <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                            <span>استيراد وتحديث محفظة ثندر</span>
-                            <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.2 rounded font-mono font-bold">تطبيق فوري</span>
-                        </div>
-                        <div class="text-[10px] text-slate-400 truncate">تطبيق مباشر لآخر لقطة شاشة معتمدة أو مسح صورة جديدة</div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button id="quickThndrPresetBtn" onclick="loadThndrVerifiedPresetAndApply()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs px-3 py-2 rounded-xl transition shadow-md shadow-emerald-900/40 active:scale-95 flex items-center gap-1 border border-emerald-400/40" title="تطبيق بيانات محفظة ثندر الفعلية فوراً بنقرة واحدة">
-                        <span>⚡</span>
-                        <span>استيراد سريع</span>
+                        <!-- v11: Slim Portfolio Action Bar -->
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-md active:scale-95 border border-emerald-400/30">
+                        <span>➕</span>
+                        <span>شراء / بيع</span>
                     </button>
-                    <button onclick="openThndrScannerModal()" class="bg-slate-800/90 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1 shadow-sm" title="رفع لقطة شاشة جديدة من ثندر">
+                    <button onclick="openPeriodPerformanceModal()" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5 active:scale-95">
+                        <span>📅</span>
+                        <span>أداء المحفظة</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button id="quickThndrPresetBtn" onclick="loadThndrVerifiedPresetAndApply()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1" title="مزامنة من ثندر">
+                        <span>🔄</span>
+                        <span>مزامنة</span>
+                    </button>
+                    <button onclick="openThndrScannerModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1" title="رفع صورة">
                         <span>📷</span>
-                        <span>مسح صورة</span>
+                    </button>
+                    <button onclick="exportPortfolioToCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1" title="Excel">
+                        <span>📊</span>
+                    </button>
+                    <button onclick="printPortfolioStatement()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 font-bold text-xs px-2.5 py-2 rounded-xl transition active:scale-95 flex items-center gap-1" title="PDF">
+                        <span>📄</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Portfolio Action Bar -->
-            <div class="flex items-center justify-between gap-2 flex-wrap">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-3 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg active:scale-95 border border-emerald-400/30">
-                        <span class="text-sm">🔁</span>
-                        <span>حركات الشراء والبيع</span>
-                    </button>
-                    <button onclick="openPeriodPerformanceModal()" class="bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs px-3 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-sky-950/40 active:scale-95 border border-sky-400/40" title="تحليل حركة وأرباح وخسائر الأسهم والصناديق بين تاريخين محددين">
-                        <span class="text-sm">📅</span>
-                        <span>تحليل الأداء بين تاريخين</span>
-                    </button>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <button onclick="exportPortfolioToCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-2 rounded-xl transition flex items-center gap-1 active:scale-95" title="تصدير إكسل">
-                        <span>📊</span>
-                        <span>Excel</span>
-                    </button>
-                    <button onclick="printPortfolioStatement()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-2.5 py-2 rounded-xl transition flex items-center gap-1 active:scale-95" title="طباعة / PDF">
-                        <span>📄</span>
-                        <span>PDF</span>
-                    </button>
-                </div>
-            </div>
+
 
 
                         <!-- Mobile vs Table View Mode Switcher -->
             <div class="flex items-center justify-between pb-1 px-1">
                 <div class="flex items-center gap-2 text-xs text-slate-300">
-                    <span class="font-bold">طريقة عرض أصول المحفظة:</span>
+                    <span class="font-bold text-slate-300">الأصول</span>
                     <span id="portfolioActiveCountBadge" class="bg-slate-800 text-emerald-400 border border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
                 </div>
                 <div class="inline-flex bg-slate-900 dark:bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px]">
@@ -1183,15 +1252,14 @@
                 <!-- Stocks Full Table View (Horizontal Scrollable) -->
                 <div id="stocksHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
                     <table class="w-full text-right text-xs min-w-[580px]">
-                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
-                            <tr>
-                                <th class="pb-2">السهم</th>
-                                <th class="pb-2">الكمية</th>
-                                <th class="pb-2">الشراء</th>
-                                <th class="pb-2">الحالي</th>
-                                <th class="pb-2">القيمة</th>
-                                <th class="pb-2">الربح / العائد</th>
-                                
+                        <thead class="border-b border-slate-800 text-[10px] select-none">
+                            <tr class="text-slate-400">
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_ticker">السهم <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','qty')" id="sh_qty">الكمية <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','buy')" id="sh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','cur')" id="sh_cur">الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','val')" id="sh_val">القيمة <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-emerald-400 transition text-center" onclick="sortHoldingsTable('stocks','pnl')" id="sh_pnl">الربح ٪ <span class="sort-arrow opacity-40">↕</span></th>
                             </tr>
                         </thead>
                         <tbody id="stocksHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -1224,15 +1292,14 @@
                 <!-- Funds Full Table View (Horizontal Scrollable) -->
                 <div id="fundsHoldingsTableContainer" class="overflow-x-auto no-scrollbar hidden">
                     <table class="w-full text-right text-xs min-w-[580px]">
-                        <thead class="text-slate-400 border-b border-slate-800 text-[11px]">
-                            <tr>
-                                <th class="pb-2">الصندوق / الأصل</th>
-                                <th class="pb-2">الوثائق</th>
-                                <th class="pb-2">الشراء</th>
-                                <th class="pb-2">الحالي</th>
-                                <th class="pb-2">القيمة</th>
-                                <th class="pb-2">الربح / العائد</th>
-                                
+                        <thead class="border-b border-slate-800 text-[10px] select-none">
+                            <tr class="text-slate-400">
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_ticker">الصندوق <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','qty')" id="fh_qty">الوثائق <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','buy')" id="fh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','cur')" id="fh_cur">NAV الحالي <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','val')" id="fh_val">القيمة <span class="sort-arrow opacity-40">↕</span></th>
+                                <th class="pb-2 cursor-pointer hover:text-amber-400 transition text-center" onclick="sortHoldingsTable('funds','pnl')" id="fh_pnl">الربح ٪ <span class="sort-arrow opacity-40">↕</span></th>
                             </tr>
                         </thead>
                         <tbody id="fundsHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
@@ -1242,41 +1309,8 @@
                 </div>
             </div>
 
-            <!-- 3. SECTION: CLAWDZ & CASH BREAKDOWN (كلاودز والنقدية) -->
-            <div class="glass-card rounded-2xl p-4 space-y-2.5 border-sky-900/40 bg-slate-900/60">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs border border-sky-500/30">⚡</span>
-                        <div>
-                            <h3 class="text-xs font-bold text-white">سيولة كلاودز والاستثمار اللحظي (Clawdz)</h3>
-                            <p class="text-[10px] text-slate-400 flex items-center gap-1 flex-wrap">
-                                <span>متوسط عائد سنوي تقريبي %17.34 (أدوات نقدية وأذون خزانة إسلامية مركبة يومياً)</span>
-                                <button onclick="openLiquidityDetailModal()" class="text-sky-400 underline hover:text-sky-300 font-bold">ℹ️ تفاصيل ومخاطر المنتج</button>
-                            </p>
-                        </div>
-                    </div>
-                    <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded font-mono">49,817 ج.م (56.8% من الثروة)</span>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
-                    <div class="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="text-slate-300 font-bold block text-[11px]">Amount to be invest (كلاودز)</span>
-                            <span class="text-[10px] text-emerald-400 font-mono">+21.69 ج (▲ +0.04% لحظي)</span>
-                        </div>
-                        <span class="font-mono font-bold text-white text-sm">49,672.00 ج</span>
-                    </div>
-                    <div class="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
-                        <div>
-                            <span class="text-slate-300 font-bold block text-[11px]">المحفظة (النقدية المتاحة للتداول)</span>
-                            <span class="text-[10px] text-slate-400">جاهزة للشراء الفوري بالبورصة</span>
-                        </div>
-                        <span class="font-mono font-bold text-white text-sm">145.00 ج</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sector Donut Chart & Risk Concentration Radar -->
+                        <!-- Sector Donut Chart & Risk Concentration Radar -->
             <div class="glass-card rounded-2xl p-4 space-y-3">
                 <div class="flex items-center justify-between">
                     <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
@@ -1297,113 +1331,69 @@
                 </div>
             </div>
 
-            <!-- Stress Test Shock Matrix -->
-            <div class="glass-card rounded-2xl p-4 space-y-2.5">
-                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                    💥 <span>محاكي اختبار ضغط وصدمات السوق (Stress Test)</span>
-                </h3>
-                <div class="space-y-2 text-xs">
-                    <div class="p-2 bg-rose-950/40 border border-rose-900/50 rounded-xl flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-rose-300">هبوط المؤشر العام (-7.0%)</span>
-                            <p class="text-[10px] text-slate-400">تراجع عام في السوق</p>
-                        </div>
-                        <span id="stress_shock_1" class="text-rose-400 font-bold">-7.0%</span>
-                    </div>
-                    <div class="p-2 bg-emerald-950/40 border border-emerald-900/50 rounded-xl flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-emerald-300">تحريك سعر الصرف (+10% للدولار)</span>
-                            <p class="text-[10px] text-slate-400">ارتفاع أرباح التصدير والذهب</p>
-                        </div>
-                        <span id="stress_shock_2" class="text-emerald-400 font-bold">+5.2%</span>
-                    </div>
-                    <div class="p-2 bg-amber-950/40 border border-amber-900/50 rounded-xl flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-amber-300">قفزة تاريخية في الذهب (+15%)</span>
-                            <p class="text-[10px] text-slate-400">مكاسب صناديق الذهب والتحوط</p>
-                        </div>
-                        <span id="stress_shock_3" class="text-amber-400 font-bold">+4.1%</span>
-                    </div>
+            <!-- v11: Portfolio Insight Links -->
+            <div class="glass-card rounded-2xl p-3.5 border border-slate-700/60">
+                <h3 class="text-xs font-bold text-white mb-2.5 flex items-center gap-1.5">⚙️ <span>أدوات تحليل المحفظة</span></h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button onclick="switchTab('tools',document.querySelector('[onclick*=tools]')); setTimeout(()=>switchToolsSubTab('goals'),200)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-right transition active:scale-95 flex items-center gap-2">
+                        <span class="text-base">🎯</span>
+                        <div><div class="font-bold text-slate-200">أهداف ومونتي كارلو</div><div class="text-slate-500 text-[10px]">احسب متى تصل لهدفك</div></div>
+                    </button>
+                    <button onclick="switchTab('tools',document.querySelector('[onclick*=tools]')); setTimeout(()=>switchToolsSubTab('zakat'),200)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-right transition active:scale-95 flex items-center gap-2">
+                        <span class="text-base">🕌</span>
+                        <div><div class="font-bold text-slate-200">الزكاة والضرائب</div><div class="text-slate-500 text-[10px]">حساب الزكاة وعمولات ثندر</div></div>
+                    </button>
+                    <button onclick="switchTab('tools',document.querySelector('[onclick*=tools]')); setTimeout(()=>switchToolsSubTab('advisor'),200)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-right transition active:scale-95 flex items-center gap-2">
+                        <span class="text-base">💡</span>
+                        <div><div class="font-bold text-slate-200">مستشار الفائض</div><div class="text-slate-500 text-[10px]">وجهة استثمار الفائض الشهري</div></div>
+                    </button>
+                    <button onclick="switchTab('tools',document.querySelector('[onclick*=tools]')); setTimeout(()=>switchToolsSubTab('health'),200)" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 rounded-xl text-right transition active:scale-95 flex items-center gap-2">
+                        <span class="text-base">🛡️</span>
+                        <div><div class="font-bold text-slate-200">صحة الثروة</div><div class="text-slate-500 text-[10px]">نسخ احتياطي وتحليل الصحة</div></div>
+                    </button>
                 </div>
             </div>
-        
-            <!-- Compound Wealth & Dividend Reinvestment Calculator -->
-            <div class="glass-card rounded-2xl p-4 space-y-3.5 border-amber-900/50 bg-gradient-to-br from-slate-900 to-amber-950/20">
-                <div>
-                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                        📈 <span>حاسبة العائد التراكمي وتنمية الثروة بالكوبونات (Compound Wealth)</span>
-                    </h2>
-                    <p class="text-xs text-slate-400 mt-1">محاكاة نمو محفظتك عند إعادة استثمار التوزيعات النقدية مع الادخار الشهري المنتظم.</p>
-                </div>
 
-                <div class="grid grid-cols-2 gap-2.5">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">رأس المال المبدئي (ج.م)</label>
-                        <input id="cw_initial" type="number" value="50000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">الادخار الشهري (ج.م)</label>
-                        <input id="cw_monthly" type="number" value="3000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2.5">
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">عائد الكوبون السنوي %</label>
-                        <input id="cw_yield" type="number" value="9.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-slate-400 mb-1">معدل نمو السهم السنوي %</label>
-                        <input id="cw_growth" type="number" value="12.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none font-mono">
-                    </div>
-                </div>
-
-                <button onclick="calculateCompoundWealth()" class="w-full bg-amber-600 hover:bg-amber-500 active:scale-98 text-slate-950 font-bold text-xs py-2.5 rounded-xl transition shadow">
-                    حساب خطة تنمية الثروة
-                </button>
-
-                <div id="cw_output" class="p-3 bg-slate-900/90 border border-slate-800 rounded-xl text-xs space-y-2 hidden">
-                    <!-- Compound Wealth Output -->
-                </div>
-            </div>
-</section>
 
         <!-- ================= TAB 5: TOOLS & SHARIA HUB ================= -->
         <section id="view-tools" class="tab-content space-y-3.5 hidden">
-            <!-- Tools Sub-Tabs Segmented Bar (مساعد تنمية الثروة الشامل - الفئات 13-26) -->
-            <div class="flex items-center justify-start p-1.5 bg-slate-900/95 rounded-2xl border border-slate-800 gap-1.5 text-[11px] overflow-x-auto no-scrollbar shadow-md">
-                <button id="toolSubTabZakatBtn" onclick="switchToolsSubTab('zakat')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>🕌</span>
-                    <span>الضرائب والزكاة وعمولات Thndr</span>
-                </button>
-                <button id="toolSubTabGoalsBtn" onclick="switchToolsSubTab('goals')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>🎯</span>
-                    <span>الأهداف ومونتي كارلو</span>
-                </button>
-                <button id="toolSubTabAdvisorBtn" onclick="switchToolsSubTab('advisor')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>💡</span>
-                    <span>مستشار الفائض ومحرك DCA</span>
-                </button>
-                <button id="toolSubTabJournalBtn" onclick="switchToolsSubTab('journal')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>📓</span>
-                    <span>سجل القرارات والتحيزات</span>
-                </button>
-                <button id="toolSubTabInheritanceBtn" onclick="switchToolsSubTab('inheritance')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>👨‍👩‍👧‍👦</span>
-                    <span>المواريث والتركات</span>
-                </button>
-                <button id="toolSubTabHealthBtn" onclick="switchToolsSubTab('health')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>🛡️</span>
-                    <span>صحة الثروة والنسخ وإكسيل</span>
-                </button>
-                <button id="toolSubTabAlertsBtn" onclick="switchToolsSubTab('alerts')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>🔔</span>
-                    <span>التنبيهات الذكية</span>
-                </button>
-                <button id="toolSubTabAiBtn" onclick="switchToolsSubTab('ai_chat')" class="tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap">
-                    <span>🤖</span>
-                    <span>المستشار والمقارنة الدولية</span>
-                </button>
+            <!-- v11: Tools Hub — Grid Menu (4×2) -->
+            <div class="glass-card rounded-2xl p-3 border border-slate-700/60">
+                <div class="text-[10px] text-slate-500 font-medium mb-2.5 px-1">اختر الأداة المطلوبة</div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button id="toolSubTabZakatBtn" onclick="switchToolsSubTab('zakat')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-emerald-600 text-white transition active:scale-90">
+                        <span class="text-xl">🕌</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">الزكاة والضرائب</span>
+                    </button>
+                    <button id="toolSubTabGoalsBtn" onclick="switchToolsSubTab('goals')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">🎯</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">أهداف ثروتي</span>
+                    </button>
+                    <button id="toolSubTabAdvisorBtn" onclick="switchToolsSubTab('advisor')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">💡</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">مستشار الفائض</span>
+                    </button>
+                    <button id="toolSubTabJournalBtn" onclick="switchToolsSubTab('journal')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">📓</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">سجل قراراتي</span>
+                    </button>
+                    <button id="toolSubTabInheritanceBtn" onclick="switchToolsSubTab('inheritance')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">👨‍👩‍👧‍👦</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">المواريث</span>
+                    </button>
+                    <button id="toolSubTabHealthBtn" onclick="switchToolsSubTab('health')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">🛡️</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">صحة الثروة</span>
+                    </button>
+                    <button id="toolSubTabAlertsBtn" onclick="switchToolsSubTab('alerts')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">🔔</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">التنبيهات</span>
+                    </button>
+                    <button id="toolSubTabAiBtn" onclick="switchToolsSubTab('ai_chat')" class="tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90">
+                        <span class="text-xl">🤖</span>
+                        <span class="text-[10px] font-bold text-center leading-tight">المستشار AI</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Sub-View 1: Sharia Zakat Calculator -->
@@ -2058,40 +2048,35 @@
 
     </main>
 
-    <!-- Bottom Navigation Bar (5 Professional Tabs) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-[#080c14]/95 backdrop-blur-lg border-t border-slate-800/80 px-2 py-1 max-w-lg mx-auto shadow-2xl">
-        <div class="grid grid-cols-6 gap-1 text-[10px] sm:text-[11px] font-medium text-center">
-            <!-- 1. Far Right in RTL: محفظتي -->
-            <button onclick="switchTab('portfolio', this)" class="tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">💼</span>
+    <!-- Bottom Navigation Bar — v11 Professional 4 Tabs -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto" style="background:rgba(8,12,20,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.07);padding-bottom:env(safe-area-inset-bottom,0px)">
+        <div class="grid grid-cols-4 text-center" style="padding:4px 8px 6px">
+            <!-- 1. محفظتي -->
+            <button onclick="switchTab('portfolio', this)" class="tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-emerald-400 font-bold" style="font-size:10px">
+                <span style="font-size:20px;line-height:1.2">💼</span>
                 <span>محفظتي</span>
             </button>
-            <!-- 2. الرادار -->
-            <button onclick="switchTab('radar', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">⚡</span>
-                <span>الرادار</span>
+            <!-- 2. السوق (يجمع الرادار + الأخبار) -->
+            <button onclick="switchTab('radar', this)" class="tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
+                <span style="font-size:20px;line-height:1.2">⚡</span>
+                <span>السوق</span>
             </button>
-            <!-- 3. التوصيات (جديد وبارز) -->
-            <button onclick="switchTab('recommendations', this)" class="tab-btn py-1.5 rounded-xl text-amber-400 hover:text-amber-300 font-bold transition flex flex-col items-center gap-1 active:scale-95" title="التوصيات الاستثمارية الشاملة للأسهم والصناديق">
-                <span class="text-base">🎯</span>
-                <span>التوصيات</span>
+            <!-- 3. قراراتي (يجمع التوصيات + التحليل) -->
+            <button onclick="switchTab('recommendations', this)" class="tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
+                <span style="font-size:20px;line-height:1.2">🎯</span>
+                <span>قراراتي</span>
             </button>
-            <!-- 4. التحليل -->
-            <button onclick="switchTab('valuation', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">📊</span>
-                <span>التحليل</span>
-            </button>
-            <!-- 4. الأخبار -->
-            <button onclick="switchTab('news', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">📰</span>
-                <span>الأخبار</span>
-            </button>
-            <!-- 5. الأدوات -->
-            <button onclick="switchTab('tools', this)" class="tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95">
-                <span class="text-base">🛠️</span>
-                <span>الأدوات</span>
+            <!-- 4. أدواتي -->
+            <button onclick="switchTab('tools', this)" class="tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
+                <span style="font-size:20px;line-height:1.2">🛠️</span>
+                <span>أدواتي</span>
             </button>
         </div>
+        <!-- Active indicator line -->
+        <style>
+            .tab-btn.text-emerald-400 { color:#34d399 !important; }
+            .tab-btn.text-emerald-400 span:first-child { filter: drop-shadow(0 0 6px rgba(52,211,153,0.5)); }
+        </style>
     </nav>
 
         <!-- Interactive Advanced Stock Hub Modal (Full-Screen on Mobile, Card on Desktop) -->
@@ -6490,6 +6475,48 @@ async function syncMubasherDirectAll() {
             });
         }
 
+        
+        // ─── v11: Market sub-tab switcher ──────────────────────────────
+        function switchMarketSubTab(sub) {
+            const views = { stocks: 'marketSubViewStocks', news: 'marketSubViewNews' };
+            const btns  = { stocks: 'marketSubTabStocksBtn', news: 'marketSubTabNewsBtn' };
+            Object.keys(views).forEach(k => {
+                const el = document.getElementById(views[k]);
+                const b  = document.getElementById(btns[k]);
+                if (!el || !b) return;
+                if (k === sub) {
+                    el.classList.remove('hidden');
+                    b.className = "market-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-emerald-600 text-white transition active:scale-95 flex items-center justify-center gap-1.5";
+                } else {
+                    el.classList.add('hidden');
+                    b.className = "market-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5";
+                }
+            });
+            if (sub === 'news') {
+                const src  = document.getElementById('newsFeedContainer');
+                const dest = document.getElementById('newsFeedContainer2');
+                if (src && dest) dest.innerHTML = src.innerHTML;
+            }
+        }
+
+        // ─── v11: Decisions sub-tab switcher ───────────────────────────
+        function switchDecisionsSubTab(sub) {
+            const views = { rec: 'decisionsSubViewRec', val: 'decisionsSubViewVal' };
+            const btns  = { rec: 'decisionsSubTabRecBtn', val: 'decisionsSubTabValBtn' };
+            Object.keys(views).forEach(k => {
+                const el = document.getElementById(views[k]);
+                const b  = document.getElementById(btns[k]);
+                if (!el || !b) return;
+                if (k === sub) {
+                    el.classList.remove('hidden');
+                    b.className = "decisions-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-amber-600 text-white transition active:scale-95 flex items-center justify-center gap-1.5";
+                } else {
+                    el.classList.add('hidden');
+                    b.className = "decisions-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5";
+                }
+            });
+        }
+
         function switchTab(tabId, btn, pushHistory = true) {
             triggerHaptic('medium');
             
@@ -6515,10 +6542,12 @@ async function syncMubasherDirectAll() {
             if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.className = "tab-btn py-1.5 rounded-xl text-slate-400 hover:text-slate-200 transition flex flex-col items-center gap-1 active:scale-95";
+                b.className = "tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-slate-400";
+                b.style.fontSize = "10px";
             });
             if (btn) {
-                btn.className = "tab-btn py-1.5 rounded-xl text-emerald-400 font-bold transition flex flex-col items-center gap-1 active:scale-95";
+                btn.className = "tab-btn flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-2xl transition active:scale-90 text-emerald-400 font-bold";
+                btn.style.fontSize = "10px";
             } else {
                 const foundBtn = document.querySelector(`button[onclick*="'${actualTabId}'"]`);
                 if (foundBtn) {
@@ -6589,8 +6618,8 @@ async function syncMubasherDirectAll() {
 
             Object.keys(btns).forEach(k => {
                 if (btns[k]) {
-                    if (k === sub) btns[k].className = "tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center gap-1 whitespace-nowrap";
-                    else btns[k].className = "tool-subtab-btn py-1.5 px-2.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center gap-1 whitespace-nowrap";
+                    if (k === sub) btns[k].className = "tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-emerald-600 text-white transition active:scale-90";
+                    else btns[k].className = "tool-subtab-btn flex flex-col items-center gap-1 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-90";
                 }
                 if (views[k]) {
                     if (k === sub) views[k].classList.remove('hidden');
@@ -8876,7 +8905,237 @@ async function syncMubasherDirectAll() {
             if (btn) {
                 btn.className = "rec-type-btn px-2.5 py-1 rounded-lg bg-slate-800 text-white font-medium transition active:scale-95";
             }
-            renderRecommendationsView();
+    
+        // ════════════════════════════════════════════════════════
+        //  v11 — SORT ENGINE & LIVE DATA CONNECTIONS
+        // ════════════════════════════════════════════════════════
+
+        // ── Sort State ──────────────────────────────────────────
+        const _sortState = {
+            stocks:    { col: 'pnl', dir: -1 },
+            funds:     { col: 'pnl', dir: -1 },
+            radar:     { col: 'chg', dir: -1 },
+            dividends: { col: 'yield', dir: -1 }
+        };
+
+        // ── Sort Holdings Table (stocks or funds) ───────────────
+        function sortHoldingsTable(type, col) {
+            const st = _sortState[type];
+            if (st.col === col) st.dir *= -1;
+            else { st.col = col; st.dir = -1; }
+
+            const prefix = type === 'stocks' ? 'sh_' : 'fh_';
+            const cols = ['ticker','qty','buy','cur','val','pnl'];
+            cols.forEach(c => {
+                const th = document.getElementById(prefix + c);
+                if (!th) return;
+                const arrow = th.querySelector('.sort-arrow');
+                if (!arrow) return;
+                if (c === col) {
+                    arrow.textContent = st.dir > 0 ? ' ↑' : ' ↓';
+                    arrow.classList.remove('opacity-40');
+                    arrow.style.color = type === 'stocks' ? '#34d399' : '#fbbf24';
+                } else {
+                    arrow.textContent = ' ↕';
+                    arrow.classList.add('opacity-40');
+                    arrow.style.color = '';
+                }
+            });
+
+            const isF = type === 'funds';
+            const holdings = userHoldings.filter(h => isFundAsset(h) === isF);
+
+            holdings.sort((a, b) => {
+                let va, vb;
+                switch(col) {
+                    case 'ticker': va = a.ticker||''; vb = b.ticker||''; break;
+                    case 'qty':    va = a.qty||0;     vb = b.qty||0;     break;
+                    case 'buy':    va = a.buy||0;     vb = b.buy||0;     break;
+                    case 'cur':    va = a.cur||0;     vb = b.cur||0;     break;
+                    case 'val':    va = (a.cur||0)*a.qty; vb = (b.cur||0)*b.qty; break;
+                    case 'pnl':
+                        va = a.buy > 0 ? ((a.cur||a.buy)-a.buy)/a.buy*100 : 0;
+                        vb = b.buy > 0 ? ((b.cur||b.buy)-b.buy)/b.buy*100 : 0;
+                        break;
+                    default: va = 0; vb = 0;
+                }
+                if (typeof va === 'string') return va.localeCompare(vb) * st.dir;
+                return (va - vb) * st.dir;
+            });
+
+            const tbodyId = isF ? 'fundsHoldingsTableBody' : 'stocksHoldingsTableBody';
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const fmt = (n, d=2) => n.toLocaleString('ar-EG', { minimumFractionDigits:d, maximumFractionDigits:d });
+            const shaLabel = isF ? 'وثيقة' : 'سهم';
+
+            holdings.forEach(h => {
+                const cur    = h.cur || h.buy || 0;
+                const val    = cur * h.qty;
+                const cost   = h.buy * h.qty;
+                const pnl    = val - cost;
+                const pnlPct = h.buy > 0 ? (cur - h.buy) / h.buy * 100 : 0;
+                const isPos  = pnl >= 0;
+                const clr    = isPos ? 'text-emerald-400' : 'text-rose-400';
+                const sign   = isPos ? '+' : '';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition cursor-pointer border-b border-slate-800/40';
+                tr.onclick = () => openStockChart(h.ticker);
+                tr.innerHTML = `
+                    <td class="py-2 pr-1">
+                        <div class="font-bold text-white text-xs flex items-center gap-1">
+                            ${h.ticker}
+                            <button onclick="event.stopPropagation();editHoldingDirect('${h.ticker}')" class="text-[9px] text-slate-500 hover:text-emerald-400 transition ml-0.5">✏️</button>
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate max-w-[90px]">${h.name||''}</div>
+                    </td>
+                    <td class="py-2 text-center font-mono text-xs text-white">${h.qty.toLocaleString()} <span class="text-[9px] text-slate-500">${shaLabel}</span></td>
+                    <td class="py-2 text-center font-mono text-xs text-slate-300">${fmt(h.buy)} ج</td>
+                    <td class="py-2 text-center font-mono text-xs text-white font-bold">${fmt(cur)} ج</td>
+                    <td class="py-2 text-center font-mono text-xs text-white">${fmt(val,0)} ج</td>
+                    <td class="py-2 text-center">
+                        <div class="font-mono font-bold text-xs ${clr}">${sign}${fmt(pnl,0)} ج</div>
+                        <div class="font-mono text-[10px] ${clr}">${sign}${fmt(pnlPct,2)}٪</div>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+
+            tbody.style.opacity = '0.5';
+            requestAnimationFrame(() => { tbody.style.transition='opacity 0.25s'; tbody.style.opacity='1'; });
+        }
+
+        // ── Sort Radar / Stocks List ─────────────────────────────
+        let _radarSortCol = 'chg';
+        let _radarSortDir = -1;
+
+        function sortRadar(col) {
+            if (_radarSortCol === col) _radarSortDir *= -1;
+            else { _radarSortCol = col; _radarSortDir = -1; }
+            document.querySelectorAll('.radar-sort-btn').forEach(b => {
+                b.className = 'radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[10px]';
+            });
+            const colKey = col.charAt(0).toUpperCase() + col.slice(1);
+            const ab = document.getElementById('radarSort' + colKey);
+            if (ab) ab.className = 'radar-sort-btn px-2 py-0.5 rounded-lg bg-emerald-700 text-white font-bold border border-emerald-600 text-[10px]';
+            const dd = document.getElementById('radarSortDir');
+            if (dd) dd.textContent = _radarSortDir > 0 ? ' ↑' : ' ↓';
+            if (typeof renderStockCards === 'function') renderStockCards();
+        }
+
+        function toggleRadarSortDir() {
+            _radarSortDir *= -1;
+            const dd = document.getElementById('radarSortDir');
+            if (dd) dd.textContent = _radarSortDir > 0 ? ' ↑' : ' ↓';
+            if (typeof renderStockCards === 'function') renderStockCards();
+        }
+
+        // Expose sort state so renderStockCards can pick it up
+        window.getRadarSort = () => ({ col: _radarSortCol, dir: _radarSortDir });
+
+        // ── Sort Dividends Table ─────────────────────────────────
+        let _divSortCol = 'yield';
+        let _divSortDir = -1;
+
+        function sortDividendsTable(col) {
+            if (_divSortCol === col) _divSortDir *= -1;
+            else { _divSortCol = col; _divSortDir = -1; }
+            const tbody = document.getElementById('dividendsTableBody');
+            if (!tbody) return;
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                const cellMap = { name:0, coupon:1, yield:2 };
+                const ci = cellMap[col] ?? 0;
+                const va = a.cells[ci]?.textContent?.trim() || '';
+                const vb = b.cells[ci]?.textContent?.trim() || '';
+                const na = parseFloat(va.replace(/[^0-9.-]/g,''));
+                const nb = parseFloat(vb.replace(/[^0-9.-]/g,''));
+                if (!isNaN(na) && !isNaN(nb)) return (na - nb) * _divSortDir;
+                return va.localeCompare(vb) * _divSortDir;
+            });
+            rows.forEach(r => tbody.appendChild(r));
+        }
+
+        // ════════════════════════════════════════════════════════
+        //  LIVE DATA CONNECTIONS — Sync ALL sections after update
+        // ════════════════════════════════════════════════════════
+
+        async function syncAllLiveSections() {
+            // Flash badge
+            const badge = document.getElementById('liveUpdateBadge');
+            if (badge) { badge.textContent = '🔄 جارٍ التحديث...'; }
+            try {
+                if (typeof syncLiveMarketData === 'function') await syncLiveMarketData(false);
+            } catch(e) { console.warn('sync error:', e); }
+            // Update secondary sections
+            updateLiveGoalsInput();
+            updateLiveZakatInput();
+            updateLiveStressBadges();
+            if (badge) {
+                badge.textContent = '🟢 محدث الآن';
+                badge.style.color = '#34d399';
+                setTimeout(() => {
+                    badge.textContent = '⚡ أسعار حية';
+                    badge.style.color = '';
+                }, 3500);
+            }
+        }
+
+        function updateLiveGoalsInput() {
+            try {
+                const totalVal = userHoldings.reduce((s,h) => s+(h.cur||h.buy||0)*h.qty, 0)
+                              + (THNDR_CASH?.cash || 0);
+                const el = document.getElementById('goal_current');
+                if (el && !el.dataset.userModified) el.value = Math.round(totalVal);
+            } catch(e) {}
+        }
+
+        function updateLiveZakatInput() {
+            try {
+                const stockVal = userHoldings.filter(h => !isFundAsset(h))
+                    .reduce((s,h) => s+(h.cur||h.buy||0)*h.qty, 0);
+                const el = document.getElementById('zakat_val');
+                if (el && !el.dataset.userModified) el.value = Math.round(stockVal);
+            } catch(e) {}
+        }
+
+        function updateLiveStressBadges() {
+            try {
+                const totalP = userHoldings.reduce((s,h) => s+(h.cur||h.buy||0)*h.qty,0)+(THNDR_CASH?.cash||0);
+                const equityV = userHoldings.filter(h=>!isFundAsset(h)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
+                const goldV   = userHoldings.filter(h=>['AZG','THNDR_GOLD'].includes(h.ticker)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
+                const fmt0 = n => n.toLocaleString('ar-EG',{minimumFractionDigits:0,maximumFractionDigits:0});
+
+                const s1 = document.getElementById('stress_shock_1');
+                const s2 = document.getElementById('stress_shock_2');
+                const s3 = document.getElementById('stress_shock_3');
+
+                if (s1) { const v=-(equityV*0.07); s1.textContent=fmt0(v)+' ج ('+(totalP>0?(v/totalP*100).toFixed(1):'0')+'٪)'; }
+                if (s2) { const v=equityV*0.052+goldV*0.08; s2.textContent='+'+fmt0(v)+' ج'; }
+                if (s3) { const v=goldV*0.15; s3.textContent='+'+fmt0(v)+' ج'; }
+            } catch(e) {}
+        }
+
+        // Mark inputs as user-modified when touched
+        document.addEventListener('DOMContentLoaded', () => {
+            ['zakat_val','goal_current','goal_target','goal_monthly'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', () => el.dataset.userModified = '1');
+            });
+
+            // Initial live sync after 3s
+            setTimeout(() => {
+                try { updateLiveGoalsInput(); updateLiveZakatInput(); } catch(e) {}
+            }, 3000);
+        });
+
+        // Override refreshData globally
+        window.refreshData = syncAllLiveSections;
+
+
+        renderRecommendationsView();
         }
 
 </script>
