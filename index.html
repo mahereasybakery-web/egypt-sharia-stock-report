@@ -172,24 +172,8 @@
         th:hover .sort-arrow { opacity: 1 !important; }
 
         /* Sortable table row hover */
-        #stocksHoldingsTableBody tr:hover,
-        #fundsHoldingsTableBody tr:hover,
         #stocksHoldingsSmartBody tr:hover,
         #fundsHoldingsSmartBody tr:hover { background: rgba(255,255,255,0.035); }
-
-        /* Sticky First Column for Detailed 7-column Table */
-        .sticky-first-col table th:first-child,
-        .sticky-first-col table td:first-child {
-            position: sticky;
-            right: 0;
-            z-index: 10;
-            background: #0b111e;
-            box-shadow: -2px 0 6px rgba(0,0,0,0.35);
-        }
-        .sticky-first-col table thead th:first-child {
-            background: #080d17;
-            z-index: 20;
-        }
 
         /* Live pulse dot */
         @keyframes livePulse {
@@ -1299,29 +1283,25 @@
                         <!-- View Mode & Price Source Switcher -->
             <div class="flex items-center justify-between pb-1 px-1 flex-wrap gap-2">
                 <div class="flex items-center gap-2 text-xs">
-                    <span class="font-bold text-slate-300">الأصول</span>
-                    <span id="portfolioActiveCountBadge" class="bg-slate-800 text-emerald-400 border border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-300">الأصول</span>
+                    <span id="portfolioActiveCountBadge" class="bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
                     
                     <!-- Price Source Toggle Button (Thndr vs Live EGX) -->
-                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-950/80 text-amber-300 border-amber-700/60" title="انقر للتبديل بين أسعار محفظة ثندر وأسعار البورصة اللحظية">
+                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 shadow-sm" title="انقر للتبديل بين أسعار محفظة ثندر وأسعار البورصة اللحظية">
                         <span id="priceSourceIcon">📱</span>
                         <span id="priceSourceLabel">أسعار ثندر</span>
                     </button>
                 </div>
                 
-                <!-- 3 View Modes Switcher: Smart Table vs Expanded vs Cards -->
-                <div class="inline-flex bg-slate-900 border border-slate-700/80 rounded-xl p-0.5 text-[11px] shadow-sm">
-                    <button id="viewModeSmartBtn" onclick="setPortfolioViewMode('smart')" class="px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="جدول ذكي مدمج بدون تمرير أفقي">
-                        <span>⚡</span>
-                        <span>جدول ذكي</span>
-                    </button>
-                    <button id="viewModeTableBtn" onclick="setPortfolioViewMode('table')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="جدول مفصل كامل (7 أعمدة)">
-                        <span>📊</span>
-                        <span>مفصل (7 أعمدة)</span>
-                    </button>
-                    <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95" title="كروت الجوال المنفصلة">
+                <!-- 2 Modern View Modes Switcher: Executive Cards vs Compact List -->
+                <div class="inline-flex bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl p-0.5 text-[11px] shadow-sm">
+                    <button id="viewModeCardsBtn" onclick="setPortfolioViewMode('cards')" class="px-3 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95" title="بطاقات الأصول الاستثمارية التنفيذية (أفضل وضوح للجوال)">
                         <span>📱</span>
-                        <span>كروت</span>
+                        <span>بطاقات استثمارية</span>
+                    </button>
+                    <button id="viewModeCompactBtn" onclick="setPortfolioViewMode('compact')" class="px-3 py-1 rounded-lg transition flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95" title="قائمة مالية مدمجة سريعة">
+                        <span>⚡</span>
+                        <span>قائمة مدمجة</span>
                     </button>
                 </div>
             </div>
@@ -1379,8 +1359,13 @@
                     </button>
                 </div>
 
-                <!-- 1. Stocks Smart High-Density Table (Zero Horizontal Scroll - Default) -->
-                <div id="stocksHoldingsSmartContainer" class="w-full border border-slate-800/90 rounded-2xl overflow-hidden bg-slate-950/40">
+                <!-- 1. Stocks Executive Cards View (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية) -->
+                <div id="stocksHoldingsCardsContainer" class="space-y-3">
+                    <!-- Populated dynamically with Executive Cards -->
+                </div>
+
+                <!-- 2. Stocks Compact List View (النمط المدمج الثانوي) -->
+                <div id="stocksHoldingsSmartContainer" class="w-full border border-slate-200 dark:border-slate-800/90 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/40 hidden">
                     <table class="w-full text-right text-xs table-fixed">
                         <colgroup>
                             <col style="width: 33%;">
@@ -1388,53 +1373,24 @@
                             <col style="width: 20%;">
                             <col style="width: 28%;">
                         </colgroup>
-                        <thead class="border-b border-slate-800/80 text-[10px] select-none bg-slate-900/80 text-slate-400">
+                        <thead class="border-b border-slate-200 dark:border-slate-800/80 text-[10px] select-none bg-slate-50 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400">
                             <tr>
-                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_smart_ticker">
+                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_smart_ticker">
                                     السهم <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_smart_qty">
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_smart_qty">
                                     الكمية <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_smart_cur">
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_smart_cur">
                                     السعر ⚡ <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_smart_val">
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-emerald-500 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_smart_val">
                                     القيمة والربح <span class="sort-arrow opacity-40">↕</span>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="stocksHoldingsSmartBody" class="divide-y divide-slate-800/50 font-medium">
-                            <!-- Populated dynamically with Smart Rows -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- 2. Stocks Mobile Cards View -->
-                <div id="stocksHoldingsCardsContainer" class="space-y-2.5 hidden">
-                    <!-- Populated dynamically with Mobile Cards -->
-                </div>
-
-                <!-- 3. Stocks Full Table View (Horizontal Scrollable with Sticky First Column) -->
-                <div id="stocksHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-800 rounded-xl sticky-first-col">
-                    <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
-                        <span>📌 تم تثبيت عمود السهم لسهولة المقارنة أثناء التمرير</span>
-                        <span class="text-[9px] text-emerald-400 font-mono">7 أعمدة مفصلة</span>
-                    </div>
-                    <table class="w-full text-right text-xs min-w-[620px]">
-                        <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
-                            <tr class="text-slate-400">
-                                <th class="py-2.5 pr-2 text-right cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','ticker')" id="sh_ticker">السهم <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','qty')" id="sh_qty">الكمية <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','buy')" id="sh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','cur')" id="sh_cur">الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','val')" id="sh_val">القيمة (ج) <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','pnl')" id="sh_pnl">الربح (ج) <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-emerald-400 transition" onclick="sortHoldingsTable('stocks','pnlpct')" id="sh_pnlpct">العائد (%) <span class="sort-arrow opacity-40">↕</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="stocksHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
-                            <!-- Populated dynamically with Stocks -->
+                        <tbody id="stocksHoldingsSmartBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+                            <!-- Populated dynamically with Compact Rows -->
                         </tbody>
                     </table>
                 </div>
@@ -1491,8 +1447,13 @@
                     </button>
                 </div>
 
-                <!-- 1. Funds Smart High-Density Table (Zero Horizontal Scroll - Default) -->
-                <div id="fundsHoldingsSmartContainer" class="w-full border border-slate-800/90 rounded-2xl overflow-hidden bg-slate-950/40">
+                <!-- 1. Funds Executive Cards View (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية) -->
+                <div id="fundsHoldingsCardsContainer" class="space-y-3">
+                    <!-- Populated dynamically with Executive Cards -->
+                </div>
+
+                <!-- 2. Funds Compact List View (النمط المدمج الثانوي) -->
+                <div id="fundsHoldingsSmartContainer" class="w-full border border-slate-200 dark:border-slate-800/90 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/40 hidden">
                     <table class="w-full text-right text-xs table-fixed">
                         <colgroup>
                             <col style="width: 33%;">
@@ -1500,53 +1461,24 @@
                             <col style="width: 20%;">
                             <col style="width: 28%;">
                         </colgroup>
-                        <thead class="border-b border-slate-800/80 text-[10px] select-none bg-slate-900/80 text-slate-400">
+                        <thead class="border-b border-slate-200 dark:border-slate-800/80 text-[10px] select-none bg-slate-50 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400">
                             <tr>
-                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_smart_ticker">
+                                <th class="py-2.5 pr-2 sm:pr-3 text-right cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_smart_ticker">
                                     الأصل <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_smart_qty">
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_smart_qty">
                                     الوثائق <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_smart_cur">
+                                <th class="py-2.5 px-1 text-center cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_smart_cur">
                                     NAV الحالي ⚡ <span class="sort-arrow opacity-40">↕</span>
                                 </th>
-                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','val')" id="fh_smart_val">
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left cursor-pointer hover:text-amber-500 transition" onclick="sortHoldingsTable('funds','val')" id="fh_smart_val">
                                     القيمة والربح <span class="sort-arrow opacity-40">↕</span>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="fundsHoldingsSmartBody" class="divide-y divide-slate-800/50 font-medium">
-                            <!-- Populated dynamically with Smart Rows -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- 2. Funds Mobile Cards View -->
-                <div id="fundsHoldingsCardsContainer" class="space-y-2.5 hidden">
-                    <!-- Populated dynamically with Mobile Cards -->
-                </div>
-
-                <!-- 3. Funds Full Table View (Horizontal Scrollable with Sticky First Column) -->
-                <div id="fundsHoldingsTableContainer" class="overflow-x-auto hidden border border-slate-800 rounded-xl sticky-first-col">
-                    <div class="text-[10px] text-slate-400 bg-slate-900/60 px-2.5 py-1 flex items-center justify-between border-b border-slate-800/60 select-none">
-                        <span>📌 تم تثبيت عمود الصندوق لسهولة المقارنة أثناء التمرير</span>
-                        <span class="text-[9px] text-amber-400 font-mono">7 أعمدة مفصلة</span>
-                    </div>
-                    <table class="w-full text-right text-xs min-w-[620px]">
-                        <thead class="border-b border-slate-800 text-[10px] select-none bg-slate-950/40">
-                            <tr class="text-slate-400">
-                                <th class="py-2.5 pr-2 text-right cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','ticker')" id="fh_ticker">الأصل / الصندوق <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','qty')" id="fh_qty">الوثائق <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','buy')" id="fh_buy">الشراء <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','cur')" id="fh_cur">NAV الحالي ⚡ <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','val')" id="fh_val">القيمة (ج) <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','pnl')" id="fh_pnl">الربح (ج) <span class="sort-arrow opacity-40">↕</span></th>
-                                <th class="py-2.5 text-center cursor-pointer hover:text-amber-400 transition" onclick="sortHoldingsTable('funds','pnlpct')" id="fh_pnlpct">العائد (%) <span class="sort-arrow opacity-40">↕</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="fundsHoldingsTableBody" class="divide-y divide-slate-800/60 font-medium">
-                            <!-- Populated dynamically with Funds & Gold -->
+                        <tbody id="fundsHoldingsSmartBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+                            <!-- Populated dynamically with Compact Rows -->
                         </tbody>
                     </table>
                 </div>
@@ -3750,52 +3682,51 @@
         // =========================================================================
         // PORTFOLIO VIEW MODE CONTROLLER & PRICING SOURCE ENGINE
         // =========================================================================
-        let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode') || 'smart';
+        let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode');
+        // Always default to 'cards' (FinTech Executive Cards) as the premier, clearest view
+        if (portfolioViewMode !== 'cards' && portfolioViewMode !== 'compact') {
+            portfolioViewMode = 'cards';
+            localStorage.setItem('egx_portfolio_view_mode', 'cards');
+        }
         let portfolioPriceSource = localStorage.getItem('egx_price_source') || 'thndr';
         let _holdingsFilter = { stocks: 'all', funds: 'all' };
 
         function setPortfolioViewMode(mode) {
             triggerHaptic('selection');
-            portfolioViewMode = mode;
-            localStorage.setItem('egx_portfolio_view_mode', mode);
+            portfolioViewMode = (mode === 'compact') ? 'compact' : 'cards';
+            localStorage.setItem('egx_portfolio_view_mode', portfolioViewMode);
             updatePortfolioViewModeUI();
         }
 
         function updatePortfolioViewModeUI() {
-            const mode = portfolioViewMode || 'smart';
-            const btnSmart = document.getElementById('viewModeSmartBtn');
-            const btnTable = document.getElementById('viewModeTableBtn');
+            const mode = (portfolioViewMode === 'compact') ? 'compact' : 'cards';
             const btnCards = document.getElementById('viewModeCardsBtn');
+            const btnCompact = document.getElementById('viewModeCompactBtn');
 
-            [
-                { id: 'smart', btn: btnSmart },
-                { id: 'table', btn: btnTable },
-                { id: 'cards', btn: btnCards }
-            ].forEach(item => {
-                if (item.btn) {
-                    if (item.id === mode) {
-                        item.btn.className = "px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
-                    } else {
-                        item.btn.className = "px-2.5 py-1 rounded-lg transition flex items-center gap-1 text-slate-400 hover:text-white active:scale-95";
-                    }
+            if (btnCards) {
+                if (mode === 'cards') {
+                    btnCards.className = "px-3 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
+                } else {
+                    btnCards.className = "px-3 py-1 rounded-lg transition flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95";
                 }
-            });
+            }
+            if (btnCompact) {
+                if (mode === 'compact') {
+                    btnCompact.className = "px-3 py-1 rounded-lg font-bold transition flex items-center gap-1 bg-emerald-600 text-white shadow active:scale-95";
+                } else {
+                    btnCompact.className = "px-3 py-1 rounded-lg transition flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white active:scale-95";
+                }
+            }
 
-            const sSmart = document.getElementById('stocksHoldingsSmartContainer');
-            const sTable = document.getElementById('stocksHoldingsTableContainer');
             const sCards = document.getElementById('stocksHoldingsCardsContainer');
-
-            const fSmart = document.getElementById('fundsHoldingsSmartContainer');
-            const fTable = document.getElementById('fundsHoldingsTableContainer');
+            const sCompact = document.getElementById('stocksHoldingsSmartContainer');
             const fCards = document.getElementById('fundsHoldingsCardsContainer');
+            const fCompact = document.getElementById('fundsHoldingsSmartContainer');
 
-            if (sSmart) sSmart.classList.toggle('hidden', mode !== 'smart');
-            if (sTable) sTable.classList.toggle('hidden', mode !== 'table');
             if (sCards) sCards.classList.toggle('hidden', mode !== 'cards');
-
-            if (fSmart) fSmart.classList.toggle('hidden', mode !== 'smart');
-            if (fTable) fTable.classList.toggle('hidden', mode !== 'table');
+            if (sCompact) sCompact.classList.toggle('hidden', mode !== 'compact');
             if (fCards) fCards.classList.toggle('hidden', mode !== 'cards');
+            if (fCompact) fCompact.classList.toggle('hidden', mode !== 'compact');
         }
 
         function togglePortfolioPriceSource() {
@@ -3821,12 +3752,12 @@
                 if (portfolioPriceSource === 'thndr') {
                     if (icon) icon.innerText = '📱';
                     label.innerText = 'أسعار ثندر';
-                    btn.className = "px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-950/80 text-amber-300 border-amber-700/60";
+                    btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 shadow-sm";
                     btn.title = "المحفظة مقومة حالياً بأسعار محفظة ثندر (86,645 ج.م). انقر للتبديل إلى أسعار البورصة اللحظية.";
                 } else {
                     if (icon) icon.innerText = '⚡';
                     label.innerText = 'البورصة اللحظية';
-                    btn.className = "px-2 py-0.5 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-sky-950/80 text-sky-300 border-sky-700/60";
+                    btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-sky-50 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700/60 shadow-sm";
                     btn.title = "المحفظة مقومة حالياً بأسعار صفقات البورصة اللحظية من TradingView. انقر للتبديل إلى أسعار ثندر.";
                 }
             }
@@ -3846,11 +3777,114 @@
         }
 
         // =========================================================================
-        // SMART HIGH-DENSITY ZERO-SCROLL TABLE ROW RENDERER
+        // =========================================================================
+        // EXECUTIVE FINTECH ASSET CARD RENDERER (النمط الأوضح والأرقى للجوال)
+        // =========================================================================
+        function createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFund, weightPct) {
+            const card = document.createElement('div');
+            card.className = "p-3.5 sm:p-4 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-2xl hover:border-emerald-500/50 shadow-sm hover:shadow-md active:scale-[0.99] transition cursor-pointer select-none space-y-3";
+            card.onclick = (e) => {
+                if (e.target.closest('button')) return;
+                openStockChart(h.ticker);
+            };
+
+            const typeLabel = isFund ? 'وثيقة' : 'سهم';
+            const diffPrice = (h.cur || 0) - (h.buy || 0);
+            const wPct = typeof weightPct === 'number' ? weightPct : 0;
+            const badgeColor = isFund 
+                ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' 
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
+
+            card.innerHTML = `
+                <!-- Top Row: Identity + Valuation & Returns -->
+                <div class="flex items-start justify-between gap-2.5">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold font-mono text-xs sm:text-sm shrink-0 border ${badgeColor}">
+                            ${h.ticker}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-tight truncate" title="${h.name}">
+                                ${h.name}
+                            </div>
+                            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                                <span>${h.sector || (isFund ? 'صناديق وذهب' : 'سوق المال')}</span>
+                                <span>•</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+                                    <span>متوافق شرعاً</span>
+                                    <span>🕌</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-left shrink-0">
+                        <div class="font-mono font-black text-sm sm:text-base text-slate-900 dark:text-white">
+                            ${Math.round(mVal).toLocaleString()} <span class="text-[10px] font-normal text-slate-500 dark:text-slate-400">ج</span>
+                        </div>
+                        <div class="mt-1 flex items-center justify-end">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border text-xs font-bold font-mono ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/30 text-emerald-700 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/30 text-rose-700 dark:text-rose-400'}">
+                                <span>${isP ? '▲ +' : '▼ '}${Math.round(Math.abs(pnl)).toLocaleString()} ج</span>
+                                <span class="text-[10px] opacity-80">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3 Performance Pillars: Holding Qty | Buy Cost | Current Price -->
+                <div class="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-950/60 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800/80 text-xs">
+                    <div class="text-right">
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">الكمية المملوكة</span>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            <b class="font-mono text-slate-900 dark:text-slate-100 text-xs font-bold">${h.qty.toLocaleString()} <span class="text-[9px] font-normal text-slate-500 dark:text-slate-400">${typeLabel}</span></b>
+                            <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-500 p-0.5 text-xs transition" title="تعديل الكمية والتكلفة">✏️</button>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">سعر الشراء</span>
+                        <b class="font-mono text-slate-800 dark:text-slate-200 text-xs mt-0.5 block font-bold">${h.buy.toFixed(2)} ج</b>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">السعر الحالي ⚡</span>
+                        <div class="flex items-center justify-end gap-1 mt-0.5">
+                            <b class="font-mono text-slate-900 dark:text-white text-xs font-bold">${h.cur.toFixed(2)} ج</b>
+                        </div>
+                        <span class="text-[9px] font-mono ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} block mt-0.5 font-medium">
+                            ${diffPrice >= 0 ? '▲ +' : '▼ '}${diffPrice.toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Weight Allocation Bar -->
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                        <span>الوزن النسبي: <b class="text-emerald-600 dark:text-emerald-400 font-bold">${wPct.toFixed(1)}%</b></span>
+                        <span>إجمالي التكلفة: ${Math.round(cost).toLocaleString()} ج</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                        <div class="${isFund ? 'bg-amber-500' : 'bg-emerald-500'} h-1.5 rounded-full transition-all duration-500" style="width: ${Math.min(100, Math.max(3, wPct))}%"></div>
+                    </div>
+                </div>
+
+                <!-- Card Footer Actions -->
+                <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+                    <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-bold text-[11px] flex items-center gap-1 active:scale-95 transition">
+                        <span>📈 الشارت والتحليل الفني</span>
+                        <span>👈</span>
+                    </button>
+                    <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 text-[11px] flex items-center gap-1 active:scale-95 transition">
+                        <span>✏️ تعديل الرصيد</span>
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        // =========================================================================
+        // COMPACT LIST ROW RENDERER (النمط المدمج فائق الكثافة بدون تمرير أفقي)
         // =========================================================================
         function createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, isFund) {
             const tr = document.createElement('tr');
-            tr.className = "hover:bg-slate-800/70 active:bg-slate-800/90 transition text-xs select-none cursor-pointer group";
+            tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/70 active:bg-slate-100 dark:active:bg-slate-800/90 transition text-xs select-none cursor-pointer group";
             tr.title = `انقر لعرض الشارت والتحليل الفني لـ ${h.name}`;
             tr.onclick = (e) => {
                 if (e.target.closest('button')) return;
@@ -3858,7 +3892,7 @@
             };
 
             const diffPrice = (h.cur || 0) - (h.buy || 0);
-            const badgeColor = isFund ? 'bg-amber-950/70 text-amber-300 border-amber-800/60' : 'bg-slate-800/90 text-slate-300 border-slate-700/60';
+            const badgeColor = isFund ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/90 dark:text-slate-300 dark:border-slate-700/60';
             const altPriceVal = portfolioPriceSource === 'thndr' ? (h.liveCur || h.cur) : (h.thndrCur || h.cur);
             const altLabel = portfolioPriceSource === 'thndr' ? 'لحظي' : 'ثندر';
 
@@ -3866,122 +3900,47 @@
                 <td class="py-2.5 pr-2 sm:pr-3 align-middle overflow-hidden">
                     <div class="space-y-0.5 min-w-0">
                         <div class="flex items-center gap-1 min-w-0">
-                            <span class="font-bold text-white text-xs group-hover:text-emerald-400 transition leading-tight truncate block" title="${h.name}">${h.name}</span>
+                            <span class="font-bold text-slate-900 dark:text-white text-xs group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition leading-tight truncate block" title="${h.name}">${h.name}</span>
                             <span class="px-1 py-0.2 rounded text-[9px] font-mono font-bold border shrink-0 ${badgeColor}">${h.ticker}</span>
                         </div>
-                        <div class="flex items-center gap-1 text-[10px] text-slate-400">
-                            <span class="font-mono text-emerald-400 font-bold shrink-0">${weightPct.toFixed(1)}%</span>
-                            <div class="w-8 sm:w-12 bg-slate-800 rounded-full h-1 overflow-hidden inline-block align-middle shrink-0">
+                        <div class="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
+                            <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold shrink-0">${weightPct.toFixed(1)}%</span>
+                            <div class="w-8 sm:w-12 bg-slate-200 dark:bg-slate-800 rounded-full h-1 overflow-hidden inline-block align-middle shrink-0">
                                 <div class="${isFund ? 'bg-amber-500' : 'bg-emerald-500'} h-1 rounded-full" style="width: ${Math.min(100, weightPct * 2.5)}%"></div>
                             </div>
-                            <span class="hidden sm:inline text-slate-500 text-[9px] truncate">• ${h.sector || 'سوق المال'}</span>
+                            <span class="hidden sm:inline text-slate-400 text-[9px] truncate">• ${h.sector || 'سوق المال'}</span>
                         </div>
                     </div>
                 </td>
                 <td class="py-2.5 px-1 text-center font-mono align-middle">
-                    <div class="text-xs font-bold text-white flex items-center justify-center gap-0.5">
+                    <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-center gap-0.5">
                         <span>${h.qty.toLocaleString()}</span>
-                        <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 p-0.5 text-[11px] opacity-70 hover:opacity-100 transition" title="تعديل مباشر للكمية والتكلفة">✏️</button>
+                        <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-600 dark:text-sky-400 hover:text-sky-500 p-0.5 text-[11px] opacity-70 hover:opacity-100 transition" title="تعديل مباشر للكمية والتكلفة">✏️</button>
                     </div>
-                    <div class="text-[10px] text-slate-400 truncate">
-                        <span class="text-slate-500 text-[9px]">تكلفة:</span><b class="text-slate-300 font-medium">${h.buy.toFixed(1)}</b>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                        <span class="text-slate-400 text-[9px]">تكلفة:</span><b class="text-slate-700 dark:text-slate-300 font-medium">${h.buy.toFixed(1)}</b>
                     </div>
                 </td>
                 <td class="py-2.5 px-1 text-center font-mono align-middle" title="${altLabel}: ${altPriceVal.toFixed(2)} ج">
-                    <div class="text-xs font-bold text-white flex items-center justify-center gap-0.5">
-                        <span class="text-amber-400 text-[10px] animate-pulse">⚡</span>
+                    <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-center gap-0.5">
+                        <span class="text-amber-500 dark:text-amber-400 text-[10px] animate-pulse">⚡</span>
                         <span>${h.cur.toFixed(2)}</span>
                     </div>
-                    <div class="text-[10px] ${diffPrice >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-medium leading-none mt-0.5">
+                    <div class="text-[10px] ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} font-medium leading-none mt-0.5">
                         ${diffPrice >= 0 ? '▲ +' : '▼ '}${diffPrice.toFixed(1)}
                     </div>
                 </td>
                 <td class="py-2.5 pl-2 sm:pl-3 text-left font-mono align-middle">
-                    <div class="text-xs font-bold text-white text-left">
-                        ${Math.round(mVal).toLocaleString()} <span class="text-[9px] text-slate-400 font-normal">ج</span>
+                    <div class="text-xs font-bold text-slate-900 dark:text-white text-left">
+                        ${Math.round(mVal).toLocaleString()} <span class="text-[9px] text-slate-500 dark:text-slate-400 font-normal">ج</span>
                     </div>
-                    <div class="mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9.5px] font-bold ${isP ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/15 border-rose-500/40 text-rose-300'}">
+                    <div class="mt-0.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[9.5px] font-bold ${isP ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-500/15 border-rose-200 dark:border-rose-500/40 text-rose-700 dark:text-rose-300'}">
                         <span>${isP ? '+' : ''}${Math.round(pnl).toLocaleString()}</span>
                         <span class="opacity-80 text-[8.5px]">(${isP ? '+' : ''}${pnlPct.toFixed(1)}%)</span>
                     </div>
                 </td>
             `;
             return tr;
-        }
-
-        function createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, isFund) {
-            const card = document.createElement('div');
-            card.className = "p-3 sm:p-3.5 bg-slate-900/90 dark:bg-slate-900/90 border border-slate-700/80 rounded-2xl hover:border-emerald-500/60 active:scale-[0.99] transition cursor-pointer shadow-sm select-none space-y-2.5";
-            card.onclick = (e) => {
-                if (e.target.closest('button')) return;
-                openStockChart(h.ticker);
-            };
-
-            const icon = isFund ? (h.ticker.includes('GOLD') || h.ticker === 'AZG' ? '🪙' : '🏦') : '📈';
-            const typeLabel = isFund ? 'وثيقة' : 'سهم';
-
-            card.innerHTML = `
-                <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-base shrink-0">
-                            ${icon}
-                        </div>
-                        <div class="min-w-0">
-                            <div class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap leading-snug">
-                                <span>${h.name}</span>
-                                <span class="text-[10px] font-mono text-emerald-600 dark:text-emerald-300 font-bold bg-emerald-500/15 border border-emerald-500/30 px-1.5 py-0.2 rounded">${h.ticker}</span>
-                            </div>
-                            <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
-                                <span>${h.sector || 'سوق المال المصري'}</span>
-                                <span>•</span>
-                                <span class="text-emerald-600 dark:text-emerald-400 font-medium">متوافق شرعاً 🕌</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="text-right shrink-0">
-                        <div class="font-mono font-bold text-sm text-slate-900 dark:text-white">
-                            ${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} <span class="text-[10px] font-normal text-slate-400">ج.م</span>
-                        </div>
-                        <div class="mt-1 flex items-center justify-end gap-1.5 flex-wrap">
-                            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg border ${isP ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/15 border-rose-500/30 text-rose-400'}">
-                                ${isP ? '+' : ''}${pnl.toFixed(0)} ج
-                            </span>
-                            <span class="text-[11px] font-mono font-bold px-2 py-0.5 rounded-lg border ${isP ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-500/20 border-rose-500/40 text-rose-300'}">
-                                ${isP ? '+' : ''}${pnlPct.toFixed(2)}%
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-1.5 bg-slate-950/50 dark:bg-slate-950/60 p-2 rounded-xl border border-slate-800/80 text-[11px]">
-                    <div>
-                        <span class="text-[10px] text-slate-400 block">الكمية المملوكة</span>
-                        <div class="flex items-center gap-1 mt-0.5">
-                            <b class="font-mono text-slate-900 dark:text-slate-200">${h.qty.toLocaleString()} <span class="text-[9px] font-normal text-slate-400">${typeLabel}</span></b>
-                            <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 p-0.5 text-xs opacity-75 hover:opacity-100 transition" title="تعديل مباشر للرصيد">✏️</button>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <span class="text-[10px] text-slate-400 block">متوسط الشراء</span>
-                        <b class="font-mono text-slate-700 dark:text-slate-300 mt-0.5 block">${h.buy.toFixed(2)} ج</b>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] text-slate-400 block">السعر اللحظي</span>
-                        <b class="font-mono text-slate-900 dark:text-white mt-0.5 block font-bold">${h.cur.toFixed(2)} ج</b>
-                    </div>
-                </div>
-
-                <!-- Clean card footer with tap prompt -->
-                <div class="flex items-center justify-between text-[10px] text-slate-400 pt-0.5 border-t border-slate-800/40">
-                    <span class="text-emerald-500/80 font-medium flex items-center gap-1">
-                        <span>انقر لعرض الشارت والتحليل الفني</span>
-                        <span>👈</span>
-                    </span>
-                    <span class="font-mono text-slate-500">تفاصيل متقدمة</span>
-                </div>
-            `;
-            return card;
         }
 
         function isFundAsset(h) {
@@ -4171,55 +4130,13 @@
                 const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
                 if (!matchesFilter) return;
 
-                // 1. Smart Composite Row (Zero horizontal scroll)
+                // 1. Executive Card (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية)
+                const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, false, weightPct);
+                if (stocksCards) stocksCards.appendChild(mobileCard);
+
+                // 2. Compact List Row (النمط المدمج الثانوي)
                 const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, false);
                 if (stocksSmartBody) stocksSmartBody.appendChild(smartRow);
-
-                // 2. Expanded 7-column Row (with sticky first column)
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
-                tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
-                tr.setAttribute('role', 'button');
-                tr.setAttribute('tabindex', '0');
-                tr.onclick = (e) => {
-                    if (e.target.closest('button')) return;
-                    openStockChart(h.ticker);
-                };
-                tr.innerHTML = `
-                    <td class="py-2.5 pr-2">
-                        <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-right flex items-center gap-1.5 hover:opacity-85 active:scale-95 transition group/btn w-full select-none" title="انقر لفتح الشارت والتحليلات لـ ${h.name}">
-                            <div>
-                                <span class="font-bold text-white group-hover/btn:text-emerald-400 transition flex items-center gap-1">
-                                    <span>${h.name}</span>
-                                </span>
-                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker} • ${weightPct.toFixed(1)}%</span>
-                            </div>
-                        </button>
-                    </td>
-                    <td class="py-2.5 text-center font-mono text-white">
-                        <div class="flex items-center justify-center gap-1">
-                            <span>${h.qty.toLocaleString()}</span>
-                            <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 opacity-60 hover:opacity-100 transition p-0.5 text-xs" title="تعديل مباشر للرصيد">✏️</button>
-                        </div>
-                    </td>
-                    <td class="py-2.5 text-slate-300 font-mono text-center">${h.buy.toFixed(2)}</td>
-                    <td class="py-2.5 font-bold text-white font-mono text-center">${h.cur.toFixed(2)}</td>
-                    <td class="py-2.5 font-mono font-bold text-white text-center">${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} ج</td>
-                    <td class="py-2.5 font-bold font-mono text-center ${isP ? 'text-emerald-400' : 'text-rose-400'}">
-                        ${isP ? '+' : ''}${pnl.toFixed(0)} ج
-                    </td>
-                    <td class="py-2.5 font-bold font-mono text-center">
-                        <span class="inline-block px-1.5 py-0.5 rounded text-[11px] ${isP ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'}">
-                            ${isP ? '+' : ''}${pnlPct.toFixed(2)}%
-                        </span>
-                    </td>
-                `;
-
-                // 3. Mobile Card
-                const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, false);
-
-                if (stocksTbody) stocksTbody.appendChild(tr);
-                if (stocksCards) stocksCards.appendChild(mobileCard);
             });
 
             // Render Funds Elements
@@ -4239,68 +4156,26 @@
                 const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
                 if (!matchesFilter) return;
 
-                // 1. Smart Composite Row
+                // 1. Executive Card (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية)
+                const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, true, weightPct);
+                if (fundsCards) fundsCards.appendChild(mobileCard);
+
+                // 2. Compact List Row (النمط المدمج الثانوي)
                 const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, true);
                 if (fundsSmartBody) fundsSmartBody.appendChild(smartRow);
-
-                // 2. Expanded 7-column Row
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/80 active:bg-slate-800/95 cursor-pointer active:scale-[0.99] transition text-xs group select-none";
-                tr.title = `انقر لفتح الشارت التفاعلي والتحليلات لـ ${h.name}`;
-                tr.setAttribute('role', 'button');
-                tr.setAttribute('tabindex', '0');
-                tr.onclick = (e) => {
-                    if (e.target.closest('button')) return;
-                    openStockChart(h.ticker);
-                };
-                tr.innerHTML = `
-                    <td class="py-2.5 pr-2">
-                        <button type="button" onclick="event.stopPropagation(); openStockChart('${h.ticker}')" class="text-right flex items-center gap-1.5 hover:opacity-85 active:scale-95 transition group/btn w-full select-none" title="انقر لفتح الشارت والتحليلات لـ ${h.name}">
-                            <div>
-                                <span class="font-bold text-white group-hover/btn:text-amber-400 transition flex items-center gap-1">
-                                    <span>${h.name}</span>
-                                </span>
-                                <span class="text-[9px] text-slate-400 font-mono">${h.ticker} • ${weightPct.toFixed(1)}%</span>
-                            </div>
-                        </button>
-                    </td>
-                    <td class="py-2.5 text-center font-mono text-white">
-                        <div class="flex items-center justify-center gap-1">
-                            <span>${h.qty.toLocaleString()}</span>
-                            <button type="button" onclick="event.stopPropagation(); editHoldingDirect('${h.ticker}')" class="text-sky-400 hover:text-sky-300 opacity-60 hover:opacity-100 transition p-0.5 text-xs" title="تعديل مباشر للرصيد">✏️</button>
-                        </div>
-                    </td>
-                    <td class="py-2.5 text-slate-300 font-mono text-center">${h.buy.toFixed(2)}</td>
-                    <td class="py-2.5 font-bold text-white font-mono text-center">${h.cur.toFixed(2)}</td>
-                    <td class="py-2.5 font-mono font-bold text-white text-center">${mVal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2})} ج</td>
-                    <td class="py-2.5 font-bold font-mono text-center ${isP ? 'text-emerald-400' : 'text-rose-400'}">
-                        ${isP ? '+' : ''}${pnl.toFixed(0)} ج
-                    </td>
-                    <td class="py-2.5 font-bold font-mono text-center">
-                        <span class="inline-block px-1.5 py-0.5 rounded text-[11px] ${isP ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'}">
-                            ${isP ? '+' : ''}${pnlPct.toFixed(2)}%
-                        </span>
-                    </td>
-                `;
-
-                // 3. Mobile Card
-                const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, true);
-
-                if (fundsTbody) fundsTbody.appendChild(tr);
-                if (fundsCards) fundsCards.appendChild(mobileCard);
             });
 
             // Update UI modes and pricing source indicator
             updatePortfolioViewModeUI();
             updatePortfolioPriceSourceUI();
 
-            // Subtotals
+            // Subtotals with Light/Dark Mode contrast
             const stocksPnl = totalStocksVal - totalStocksCost;
             const stocksPnlPct = totalStocksCost > 0 ? (stocksPnl / totalStocksCost) * 100 : 0;
             const stocksBadge = document.getElementById('stocksSubtotalBadge');
             if (stocksBadge) {
                 stocksBadge.innerText = `${totalStocksVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${stocksPnl >= 0 ? '+' : ''}${stocksPnlPct.toFixed(1)}%)`;
-                stocksBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${stocksPnl >= 0 ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-rose-950 text-rose-300 border-rose-800'}`;
+                stocksBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${stocksPnl >= 0 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'}`;
             }
 
             const fundsPnl = totalFundsVal - totalFundsCost;
@@ -4308,7 +4183,7 @@
             const fundsBadge = document.getElementById('fundsSubtotalBadge');
             if (fundsBadge) {
                 fundsBadge.innerText = `${totalFundsVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${fundsPnl >= 0 ? '+' : ''}${fundsPnlPct.toFixed(1)}%)`;
-                fundsBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${fundsPnl >= 0 ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-rose-950 text-rose-300 border-rose-800'}`;
+                fundsBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${fundsPnl >= 0 ? 'bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'}`;
             }
 
             // Total Invested & Thndr Grand Wealth
