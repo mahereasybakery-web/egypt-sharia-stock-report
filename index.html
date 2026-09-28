@@ -1229,47 +1229,57 @@
                 <div class="flex items-center justify-between px-1">
                     <div class="flex items-baseline gap-2">
                         <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span>
-                        <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">86,645</span>
+                        <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">85,304</span>
                         <span class="text-xs font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
                     <!-- Profit/Loss Badge placed inline (compact) -->
                     <div class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-                        <span id="p_thndr_grand_pnl">▲ +948</span>
+                        <span id="p_thndr_grand_pnl">▼ -393</span>
                         <span id="p_thndr_grand_return">(+1.11%)</span>
                         <span class="text-[9px] text-emerald-300 font-sans font-medium hidden sm:inline">أرباح غير محققة</span>
                     </div>
                 </div>
 
                 <!-- Thndr 3 Mini Wealth Status Cards (مطابقة 100% مع لقطة شاشة ثندر بشكل مدمج وأنيق) -->
-                <div class="grid grid-cols-3 gap-2 pt-1.5 border-t border-slate-800/80 text-center text-xs">
-                    <div class="bg-slate-950/70 py-1.5 px-2 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                <div class="grid grid-cols-4 gap-1.5 sm:gap-2 pt-1.5 border-t border-slate-800/80 text-center text-xs">
+                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
+                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
                             <span>🪙</span>
                             <span>المحفظة</span>
                         </div>
-                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-xs sm:text-sm">0 ج</div>
+                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px] sm:text-sm">0 ج</div>
                         <div id="p_thndr_clawdz" class="hidden">0.00 ج</div>
                     </div>
-                    <div class="bg-slate-950/70 py-1.5 px-2 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
+                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
                             <span>📈</span>
                             <span>الأسهم</span>
                         </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="p_thndr_stocks_card" class="font-bold text-emerald-400 font-mono text-xs sm:text-sm">36.88k ج</span>
-                            <span id="p_thndr_stocks_card_pnl" class="text-[9px] text-emerald-400 font-mono">▲ +5.41%</span>
+                        <div class="flex items-baseline gap-0.5">
+                            <span id="p_thndr_stocks_card" class="font-bold text-emerald-400 font-mono text-[11px] sm:text-sm">36.39k ج</span>
                         </div>
+                        <span id="p_thndr_stocks_card_pnl" class="text-[8.5px] text-emerald-400 font-mono leading-none">▲ +4.00%</span>
                     </div>
-                    <div class="bg-slate-950/70 py-1.5 px-2 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[10px] text-slate-400">
+                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
+                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
                             <span>🏦</span>
                             <span>الصناديق</span>
                         </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-xs sm:text-sm">49.7k ج</span>
-                            <span id="p_thndr_funds_card_pnl" class="text-[9px] text-rose-400 font-mono">▼ -1.87%</span>
+                        <div class="flex items-baseline gap-0.5">
+                            <span id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-[11px] sm:text-sm">48.86k ج</span>
                         </div>
-                        <div id="p_thndr_invested" class="hidden">86.61k ج</div>
+                        <span id="p_thndr_funds_card_pnl" class="text-[8.5px] text-rose-400 font-mono leading-none">▼ -3.54%</span>
+                    </div>
+                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-amber-500/30 flex flex-col justify-center items-center">
+                        <div class="flex items-center gap-1 text-[9.5px] text-amber-400">
+                            <span>🥇</span>
+                            <span>الذهب</span>
+                        </div>
+                        <div class="flex items-baseline gap-0.5">
+                            <span id="p_thndr_gold_card" class="font-bold text-amber-300 font-mono text-[11px] sm:text-sm">56.50 ج</span>
+                        </div>
+                        <span id="p_thndr_gold_card_pnl" class="text-[8.5px] text-emerald-400 font-mono leading-none">▲ +0.04%</span>
+                        <div id="p_thndr_invested" class="hidden">85.30k ج</div>
                     </div>
                 </div>
 
@@ -1354,7 +1364,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span id="stocksSubtotalBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-medium">36,882 ج.م (+5.4%)</span>
+                        <span id="stocksSubtotalBadge" class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-medium">36,388 ج.م (+4.0%)</span>
                     </div>
                 </div>
 
@@ -1449,12 +1459,12 @@
                         <span class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-xs border border-amber-500/30">🏦</span>
                         <div>
                             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                                <span>صناديق الاستثمار والذهب الشرعية</span>
+                                <span>صناديق الاستثمار الإسلامية</span>
                             </h3>
-                            <p class="text-[10px] text-slate-400">صناديق الأسهم الإسلامية ووثائق الذهب عيار 24 الصافي</p>
+                            <p class="text-[10px] text-slate-400">صناديق الأسهم المتوافقة مع معايير الشريعة الإسلامية</p>
                         </div>
                     </div>
-                    <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">49,734 ج.م (-1.9%)</span>
+                    <span id="fundsSubtotalBadge" class="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded font-mono font-medium">48,860 ج.م (-3.5%)</span>
                 </div>
 
                 <!-- Funds Allocation Ribbon -->
@@ -1462,7 +1472,7 @@
                     <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
                         <span class="flex items-center gap-1">
                             <span>📊</span>
-                            <span>توزيع أوزان الصناديق والذهب في المحفظة</span>
+                            <span>توزيع أوزان الصناديق في المحفظة</span>
                         </span>
                         <span id="fundsTopWeightLabel" class="text-amber-400 font-bold">CMS 98.9% • AZG 0.5%</span>
                     </div>
@@ -1539,7 +1549,62 @@
                         </tbody>
                     </table>
                 </div>
+            
+
+            <!-- 3. SECTION: GOLD (استثمار الذهب الفعلي عبر ثاندر عيار 24 - قائمة منفصلة) -->
+            <div class="glass-card rounded-2xl p-3.5 sm:p-4 space-y-3 border-amber-500/40 bg-gradient-to-b from-amber-950/20 via-slate-900/40 to-slate-950/60 shadow-lg">
+                <div class="flex items-center justify-between flex-wrap gap-2 border-b border-amber-800/40 pb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm border border-amber-500/40 shadow-xs">🥇</span>
+                        <div>
+                            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                                <span>استثمار الذهب الفعلي (ذهب ثاندر عيار 24)</span>
+                            </h3>
+                            <p class="text-[10px] text-amber-300/80">سبائك ذهب عيار 24 خالص بنظام الإيداع والتسليم الفعلي عبر ثندر</p>
+                        </div>
+                    </div>
+                    <span id="goldSubtotalBadge" class="text-[10.5px] bg-amber-500/15 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-lg font-mono font-bold">56.50 ج.م (+0.04%)</span>
+                </div>
+
+                <!-- 1. Gold Executive Card View -->
+                <div id="goldHoldingsCardsContainer" class="space-y-3">
+                    <!-- Populated dynamically with Gold Executive Card -->
+                </div>
+
+                <!-- 2. Gold Compact List View (6 Columns) -->
+                <div id="goldHoldingsSmartContainer" class="w-full border border-amber-500/30 rounded-2xl overflow-hidden bg-white dark:bg-slate-950/60 hidden">
+                    <table class="w-full text-right text-xs table-fixed">
+                        <colgroup>
+                            <col style="width: 25%;">
+                            <col style="width: 14%;">
+                            <col style="width: 15%;">
+                            <col style="width: 16%;">
+                            <col style="width: 15%;">
+                            <col style="width: 15%;">
+                        </colgroup>
+                        <thead class="border-b border-amber-500/20 text-[10px] select-none bg-amber-950/30 text-amber-300/90">
+                            <tr>
+                                <th class="py-2.5 pr-2 sm:pr-3 text-right select-none">
+                                    <div class="flex items-center gap-1">
+                                        <span>الأصل 🥇</span>
+                                        <button type="button" onclick="event.stopPropagation(); toggleStockBuyPrice('THNDR_GOLD', event)" class="text-[10px] text-amber-400 hover:text-amber-300 p-0.5 rounded" title="إظهار / إخفاء سعر الشراء">👁️</button>
+                                    </div>
+                                </th>
+                                <th class="py-2.5 px-0.5 text-center">الجرامات</th>
+                                <th class="py-2.5 px-0.5 text-center">سعر الجرام ⚡</th>
+                                <th class="py-2.5 px-0.5 text-center">القيمة (ج)</th>
+                                <th class="py-2.5 px-0.5 text-center">الربح (ج)</th>
+                                <th class="py-2.5 pl-2 sm:pl-3 text-left">العائد %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="goldHoldingsSmartBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+                            <!-- Populated dynamically with Gold Compact Row -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+</div>
 
 
                         <!-- Sector Donut Chart & Risk Concentration Radar -->
@@ -3360,11 +3425,11 @@
             { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.29, chg: -0.77, rsi: 40.5, pe: 46.2, type: "stock", rec: "قاع استثماري", sector: "الصناعة والتصدير" },
             { ticker: "EAST", name: "الشرقية للدخان", close: 30.52, chg: -3.66, rsi: 19.2, pe: 10.8, type: "stock", rec: "عائد توزيعات", sector: "الصناعة والتصدير" },
             { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 30, chg: -2.02, rsi: 47.8, pe: 0, type: "stock", rec: "نمو مستمر", sector: "الصناعة والتصدير" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96095, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7000.0, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.88121, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1225, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.28, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
         ];
 
         // 3. Valuation Scenarios Database
@@ -3632,6 +3697,10 @@
         };
 
         // 4. User Portfolio State Management (Thndr Actual Holdings)
+        var userHoldings = [];
+        var THNDR_CASH = { clawdz: 0, cash: 0, clawdzPnl: 0 };
+        window.THNDR_CASH = THNDR_CASH;
+        window.userHoldings = userHoldings;
         // محفظة ثندر الفعلية المعتمدة (تحديث معتمد مطابق تماماً لشاشة ثندر - إجمالي الثروة 86,645 ج.م)
         const THNDR_ACTUAL_HOLDINGS = [
             // 1. محفظة الأسهم (مطابقة 100% لتنفيذات ثندر الفعلية)
@@ -3649,7 +3718,7 @@
             { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.96095, thndrCur: 23.96095, sector: "صناديق الذهب", isFund: true },
             { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1225, thndrCur: 2.1225, sector: "صناديق نقدية وأسهم", isFund: true },
             { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.28, thndrCur: 49.28, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7000.00, thndrCur: 7000.00, sector: "الذهب الخالص 24", isFund: true }
+            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7000.00, thndrCur: 7000.00, sector: "الذهب الخالص 24", isFund: false }
         ];
         let donutChartInstance = null;
 
@@ -3705,7 +3774,7 @@
 
         function loadUserPortfolio() {
             // Load Thndr actual portfolio as default (v11 key for exact 86,645 EGP + 0 cash sync)
-            const storageKey = 'egx_sharia_thndr_portfolio_v12_verified';
+            const storageKey = 'egx_sharia_thndr_portfolio_v13_exact';
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
@@ -3760,8 +3829,8 @@
         }
 
         function saveUserPortfolio() {
-            localStorage.setItem('egx_sharia_thndr_portfolio_v12_verified', JSON.stringify(userHoldings));
-            localStorage.setItem('egx_sharia_thndr_portfolio_v12_verified', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 0 }));
             window.userHoldings = userHoldings;
@@ -3823,11 +3892,15 @@
             const sCompact = document.getElementById('stocksHoldingsSmartContainer');
             const fCards = document.getElementById('fundsHoldingsCardsContainer');
             const fCompact = document.getElementById('fundsHoldingsSmartContainer');
+            const gCards = document.getElementById('goldHoldingsCardsContainer');
+            const gCompact = document.getElementById('goldHoldingsSmartContainer');
 
             if (sCards) sCards.classList.toggle('hidden', mode !== 'cards');
             if (sCompact) sCompact.classList.toggle('hidden', mode !== 'compact');
             if (fCards) fCards.classList.toggle('hidden', mode !== 'cards');
             if (fCompact) fCompact.classList.toggle('hidden', mode !== 'compact');
+            if (gCards) gCards.classList.toggle('hidden', mode !== 'cards');
+            if (gCompact) gCompact.classList.toggle('hidden', mode !== 'compact');
         }
 
         function togglePortfolioPriceSource() {
@@ -3891,7 +3964,7 @@
                 openStockChart(h.ticker);
             };
 
-            const isGold = (h.ticker === 'THNDR_GOLD' || (h.sector && h.sector.includes('ذهب')));
+            const isGold = isGoldAsset(h);
             const typeLabel = isFund ? 'وثيقة' : (isGold ? 'جرام' : 'سهم');
             const diffPrice = (h.cur || 0) - (h.buy || 0);
             const wPct = typeof weightPct === 'number' ? weightPct : 0;
@@ -4012,7 +4085,7 @@
             const badgeColor = isFund ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/90 dark:text-slate-300 dark:border-slate-700/60';
             const altPriceVal = portfolioPriceSource === 'thndr' ? (h.liveCur || h.cur) : (h.thndrCur || h.cur);
             const altLabel = portfolioPriceSource === 'thndr' ? 'لحظي' : 'ثندر';
-            const isGold = (h.ticker === 'THNDR_GOLD' || (h.sector && h.sector.includes('ذهب')));
+            const isGold = isGoldAsset(h);
             const buyDisplay = (h.buy >= 100) ? h.buy.toFixed(2) : ((h.buy < 10) ? ((h.buy < 1) ? h.buy.toFixed(4) : h.buy.toFixed(2)) : h.buy.toFixed(2));
 
             tr.innerHTML = `
@@ -4087,37 +4160,47 @@
             return tr;
         }
 
+        function isGoldAsset(h) {
+            if (!h) return false;
+            return h.ticker === 'THNDR_GOLD' || (h.sector && h.sector.includes('الذهب الخالص'));
+        }
+
         function isFundAsset(h) {
             if (!h) return false;
+            if (isGoldAsset(h)) return false;
             return h.isFund === true || 
-                   ['NMF', 'AZG', 'BWA', 'CMS', 'THNDR_GOLD'].includes(h.ticker) ||
-                   (h.sector && (h.sector.includes('صندوق') || h.sector.includes('ذهب')));
+                   ['NMF', 'AZG', 'BWA', 'CMS'].includes(h.ticker) ||
+                   (h.sector && h.sector.includes('صندوق'));
         }
 
         function renderHoldingsTable() {
             const stocksSmartBody = document.getElementById('stocksHoldingsSmartBody');
             const fundsSmartBody  = document.getElementById('fundsHoldingsSmartBody');
+            const goldSmartBody   = document.getElementById('goldHoldingsSmartBody');
             const stocksTbody     = document.getElementById('stocksHoldingsTableBody');
             const fundsTbody      = document.getElementById('fundsHoldingsTableBody');
             const stocksCards     = document.getElementById('stocksHoldingsCardsContainer');
             const fundsCards      = document.getElementById('fundsHoldingsCardsContainer');
+            const goldCards       = document.getElementById('goldHoldingsCardsContainer');
 
             if (stocksSmartBody) stocksSmartBody.innerHTML = '';
             if (fundsSmartBody)  fundsSmartBody.innerHTML = '';
+            if (goldSmartBody)   goldSmartBody.innerHTML = '';
             if (stocksTbody)     stocksTbody.innerHTML = '';
             if (fundsTbody)      fundsTbody.innerHTML = '';
             if (stocksCards)     stocksCards.innerHTML = '';
             if (fundsCards)      fundsCards.innerHTML = '';
+            if (goldCards)       goldCards.innerHTML = '';
 
-            let totalStocksVal = 0;
-            let totalStocksCost = 0;
-            let totalFundsVal = 0;
-            let totalFundsCost = 0;
+            let totalStocksVal = 0, totalStocksCost = 0;
+            let totalFundsVal = 0, totalFundsCost = 0;
+            let totalGoldVal = 0, totalGoldCost = 0;
             const sectorWeights = {};
 
-            // Separate into stocks and funds lists with accurate valuation prices
+            // Separate into 3 distinct lists: Stocks (8), Funds (4), Gold (1)
             const stocksList = [];
-            const fundsList = [];
+            const fundsList  = [];
+            const goldList   = [];
 
             userHoldings.forEach((h) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
@@ -4135,8 +4218,13 @@
                     h.cur = liveClose;
                 }
 
-                if (isFundAsset(h)) fundsList.push(h);
-                else stocksList.push(h);
+                if (isGoldAsset(h)) {
+                    goldList.push(h);
+                } else if (isFundAsset(h)) {
+                    fundsList.push(h);
+                } else {
+                    stocksList.push(h);
+                }
             });
 
             // Sorter helper based on active column and direction
@@ -4177,7 +4265,7 @@
             applyListSort(stocksList, 'stocks');
             applyListSort(fundsList, 'funds');
 
-            // Pre-calculate totals for accurate weights
+            // Exact Totals Computation
             stocksList.forEach(h => {
                 totalStocksVal += h.cur * h.qty;
                 totalStocksCost += h.buy * h.qty;
@@ -4186,8 +4274,12 @@
                 totalFundsVal += h.cur * h.qty;
                 totalFundsCost += h.buy * h.qty;
             });
+            goldList.forEach(h => {
+                totalGoldVal += h.cur * h.qty;
+                totalGoldCost += h.buy * h.qty;
+            });
 
-            // Filter counts
+            // Filter counts for stocks
             let stocksGainers = 0, stocksLosers = 0;
             stocksList.forEach(h => {
                 if ((h.cur * h.qty - h.buy * h.qty) >= 0) stocksGainers++;
@@ -4200,6 +4292,7 @@
             if (sLEl) sLEl.innerText = `(${stocksLosers})`;
             if (sAEl) sAEl.innerText = `(${stocksList.length})`;
 
+            // Filter counts for funds
             let fundsGainers = 0, fundsLosers = 0;
             fundsList.forEach(h => {
                 if ((h.cur * h.qty - h.buy * h.qty) >= 0) fundsGainers++;
@@ -4212,7 +4305,7 @@
             if (fLEl) fLEl.innerText = `(${fundsLosers})`;
             if (fAEl) fAEl.innerText = `(${fundsList.length})`;
 
-            // Color palette for Allocation Ribbon
+            // Allocation Ribbons
             const ribbonColors = ['#10b981', '#0ea5e9', '#6366f1', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316', '#06b6d4', '#84cc16'];
 
             // Render Stocks Allocation Ribbon
@@ -4255,9 +4348,17 @@
                     seg.onclick = () => openStockChart(h.ticker);
                     fRibbon.appendChild(seg);
                 });
+                const fTopLabel = document.getElementById('fundsTopWeightLabel');
+                if (fTopLabel && fundsList.length >= 2) {
+                    const top1 = fundsList[0];
+                    const top2 = fundsList[1];
+                    const p1 = totalFundsVal > 0 ? ((top1.cur * top1.qty) / totalFundsVal * 100).toFixed(1) : 0;
+                    const p2 = totalFundsVal > 0 ? ((top2.cur * top2.qty) / totalFundsVal * 100).toFixed(1) : 0;
+                    fTopLabel.innerText = `${top1.ticker} ${p1}% • ${top2.ticker} ${p2}%`;
+                }
             }
 
-            // Render Stocks Elements
+            // 1. Render Stocks Elements
             stocksList.forEach((h, idx) => {
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
@@ -4269,21 +4370,18 @@
                 const sec = h.sector || 'أخرى';
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
 
-                // Check active filter
                 const f = _holdingsFilter.stocks;
                 const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
                 if (!matchesFilter) return;
 
-                // 1. Executive Card (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية)
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, false, weightPct);
                 if (stocksCards) stocksCards.appendChild(mobileCard);
 
-                // 2. Compact List Row (النمط المدمج الثانوي)
                 const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, false);
                 if (stocksSmartBody) stocksSmartBody.appendChild(smartRow);
             });
 
-            // Render Funds Elements
+            // 2. Render Funds Elements
             fundsList.forEach((h, idx) => {
                 const mVal = h.cur * h.qty;
                 const cost = h.buy * h.qty;
@@ -4292,33 +4390,44 @@
                 const isP = pnl >= 0;
                 const weightPct = totalFundsVal > 0 ? (mVal / totalFundsVal) * 100 : 0;
 
-                const sec = h.sector || 'صناديق وذهب';
+                const sec = h.sector || 'صناديق استثمار';
                 sectorWeights[sec] = (sectorWeights[sec] || 0) + mVal;
 
-                // Check active filter
                 const f = _holdingsFilter.funds;
                 const matchesFilter = (f === 'all') || (f === 'gainers' && isP) || (f === 'losers' && !isP);
                 if (!matchesFilter) return;
 
-                // 1. Executive Card (النمط الافتراضي الأول - الأكثر وضوحاً واحترافية)
                 const mobileCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, true, weightPct);
                 if (fundsCards) fundsCards.appendChild(mobileCard);
 
-                // 2. Compact List Row (النمط المدمج الثانوي)
                 const smartRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, true);
                 if (fundsSmartBody) fundsSmartBody.appendChild(smartRow);
             });
 
-            // Update UI modes and pricing source indicator
-            updatePortfolioViewModeUI();
-            updatePortfolioPriceSourceUI();
+            // 3. Render Gold Elements (قائمة منفصلة لذهب ثاندر)
+            goldList.forEach((h, idx) => {
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+                const isP = pnl >= 0;
+                const weightPct = 100;
 
-            // Subtotals with Light/Dark Mode contrast
+                sectorWeights['الذهب الخالص 24'] = (sectorWeights['الذهب الخالص 24'] || 0) + mVal;
+
+                const goldCard = createHoldingMobileCard(h, idx, mVal, cost, pnl, pnlPct, isP, false, weightPct);
+                if (goldCards) goldCards.appendChild(goldCard);
+
+                const goldRow = createHoldingSmartRow(h, idx, mVal, cost, pnl, pnlPct, isP, weightPct, false);
+                if (goldSmartBody) goldSmartBody.appendChild(goldRow);
+            });
+
+            // Subtotals computation
             const stocksPnl = totalStocksVal - totalStocksCost;
             const stocksPnlPct = totalStocksCost > 0 ? (stocksPnl / totalStocksCost) * 100 : 0;
             const stocksBadge = document.getElementById('stocksSubtotalBadge');
             if (stocksBadge) {
-                stocksBadge.innerText = `${totalStocksVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${stocksPnl >= 0 ? '+' : ''}${stocksPnlPct.toFixed(1)}%)`;
+                stocksBadge.innerText = `${Math.round(totalStocksVal).toLocaleString()} ج.م (${stocksPnl >= 0 ? '+' : ''}${stocksPnlPct.toFixed(1)}%)`;
                 stocksBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${stocksPnl >= 0 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'}`;
             }
 
@@ -4326,24 +4435,32 @@
             const fundsPnlPct = totalFundsCost > 0 ? (fundsPnl / totalFundsCost) * 100 : 0;
             const fundsBadge = document.getElementById('fundsSubtotalBadge');
             if (fundsBadge) {
-                fundsBadge.innerText = `${totalFundsVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج.م (${fundsPnl >= 0 ? '+' : ''}${fundsPnlPct.toFixed(1)}%)`;
+                fundsBadge.innerText = `${Math.round(totalFundsVal).toLocaleString()} ج.م (${fundsPnl >= 0 ? '+' : ''}${fundsPnlPct.toFixed(1)}%)`;
                 fundsBadge.className = `text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${fundsPnl >= 0 ? 'bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800'}`;
             }
 
+            const goldPnl = totalGoldVal - totalGoldCost;
+            const goldPnlPct = totalGoldCost > 0 ? (goldPnl / totalGoldCost) * 100 : 0;
+            const goldBadge = document.getElementById('goldSubtotalBadge');
+            if (goldBadge) {
+                goldBadge.innerText = `${totalGoldVal.toFixed(2)} ج.م (${goldPnl >= 0 ? '+' : ''}${goldPnlPct.toFixed(2)}%)`;
+                goldBadge.className = `text-[10.5px] font-mono font-bold px-2 py-0.5 rounded-lg border ${goldPnl >= 0 ? 'bg-amber-500/15 text-amber-300 border-amber-500/40' : 'bg-rose-950 text-rose-300 border-rose-800'}`;
+            }
+
             // Total Invested & Thndr Grand Wealth
-            const totalInvestedVal = totalStocksVal + totalFundsVal;
-            const totalInvestedCost = totalStocksCost + totalFundsCost;
+            const totalInvestedVal = totalStocksVal + totalFundsVal + totalGoldVal;
+            const totalInvestedCost = totalStocksCost + totalFundsCost + totalGoldCost;
             const totalInvestedPnl = totalInvestedVal - totalInvestedCost;
 
-            const grandWealth = totalInvestedVal + THNDR_CASH.clawdz + THNDR_CASH.cash;
-            const grandPnl = totalInvestedPnl + THNDR_CASH.clawdzPnl;
-            const grandCost = totalInvestedCost + THNDR_CASH.clawdz + THNDR_CASH.cash;
-            const grandReturnPct = grandCost > 0 ? (grandPnl / grandCost) * 100 : 2.56;
+            const grandWealth = totalInvestedVal + (THNDR_CASH.clawdz || 0) + (THNDR_CASH.cash || 0);
+            const grandPnl = totalInvestedPnl + (THNDR_CASH.clawdzPnl || 0);
+            const grandCost = totalInvestedCost + (THNDR_CASH.clawdz || 0) + (THNDR_CASH.cash || 0);
+            const grandReturnPct = grandCost > 0 ? (grandPnl / grandCost) * 100 : 0;
 
             const grandWealthElem = document.getElementById('p_thndr_grand_wealth');
             if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
 
-            // Dynamically update the 3 sub-balance cards (Thndr 1:1 format)
+            // Dynamically update the 4 sub-balance cards
             const cashElem = document.getElementById('p_thndr_cash');
             if (cashElem) cashElem.innerText = (THNDR_CASH.cash || 0).toFixed(2) + ' ج';
 
@@ -4353,23 +4470,32 @@
             if (stocksCardPnl) {
                 const sSign = stocksPnlPct >= 0 ? '+' : '';
                 stocksCardPnl.innerText = `${stocksPnlPct >= 0 ? '▲ ' : '▼ '}${sSign}${stocksPnlPct.toFixed(2)}%`;
-                stocksCardPnl.className = `text-[9px] font-mono ${stocksPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                stocksCardPnl.className = `text-[8.5px] font-mono leading-none ${stocksPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
             const fundsCardElem = document.getElementById('p_thndr_funds_card');
-            if (fundsCardElem) fundsCardElem.innerText = (totalFundsVal / 1000).toFixed(1) + 'k ج';
+            if (fundsCardElem) fundsCardElem.innerText = (totalFundsVal / 1000).toFixed(2) + 'k ج';
             const fundsCardPnl = document.getElementById('p_thndr_funds_card_pnl');
             if (fundsCardPnl) {
                 const fSign = fundsPnlPct >= 0 ? '+' : '';
                 fundsCardPnl.innerText = `${fundsPnlPct >= 0 ? '▲ ' : '▼ '}${fSign}${fundsPnlPct.toFixed(2)}%`;
-                fundsCardPnl.className = `text-[9px] font-mono ${fundsPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                fundsCardPnl.className = `text-[8.5px] font-mono leading-none ${fundsPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
+
+            const goldCardElem = document.getElementById('p_thndr_gold_card');
+            if (goldCardElem) goldCardElem.innerText = totalGoldVal.toFixed(2) + ' ج';
+            const goldCardPnl = document.getElementById('p_thndr_gold_card_pnl');
+            if (goldCardPnl) {
+                const gSign = goldPnlPct >= 0 ? '+' : '';
+                goldCardPnl.innerText = `${goldPnl >= 0 ? '▲ ' : '▼ '}${gSign}${goldPnlPct.toFixed(2)}%`;
+                goldCardPnl.className = `text-[8.5px] font-mono leading-none ${goldPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
             const clawdzElem = document.getElementById('p_thndr_clawdz');
             if (clawdzElem) clawdzElem.innerText = (THNDR_CASH.clawdz || 0).toFixed(2) + ' ج';
 
             const investedElem = document.getElementById('p_thndr_invested');
-            if (investedElem) investedElem.innerText = ((totalStocksVal + totalFundsVal) / 1000).toFixed(2) + 'k ج';
+            if (investedElem) investedElem.innerText = (totalInvestedVal / 1000).toFixed(2) + 'k ج';
 
             const grandPnlElem = document.getElementById('p_thndr_grand_pnl');
             if (grandPnlElem) {
@@ -4386,9 +4512,7 @@
                 grandReturnElem.innerText = `(${sign}${grandReturnPct.toFixed(2)}%)`;
             }
 
-// investedElem already updated above
-
-            // USD Equivalent & Gold Benchmark (المعيار المالي بالدولار والذهب)
+            // Currency & Commodities Equivalence
             const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
             const goldRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k : 4340.91;
             const usdVal = grandWealth / usdRate;
@@ -4399,31 +4523,30 @@
             const goldElem = document.getElementById('p_thndr_gold_val');
             if (goldElem) goldElem.innerText = `${goldGrams.toFixed(1)} جم ذهب`;
 
-            // SAR Equivalent & Health Score (الريال السعودي ومؤشر صحة الثروة - الفئات 15 و 23)
-            const sarRate = 13.90; // EGP per SAR
+            const sarRate = 13.90;
             const sarVal = grandWealth / sarRate;
             const sarElem = document.getElementById('p_thndr_sar_val');
             if (sarElem) sarElem.innerText = `${Math.round(sarVal).toLocaleString()} SAR`;
             const healthElem = document.getElementById('p_thndr_health_score');
             if (healthElem) healthElem.innerText = 'صحة الثروة: 94/100';
 
-            // Update Stress Test Calculations
+            // Stress tests
             const s1 = totalInvestedVal * -0.07;
             const s2 = totalInvestedVal * 0.052;
             const s3 = totalInvestedVal * 0.041;
             const st1 = document.getElementById('stress_shock_1');
             if (st1) st1.innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            const st2 = document.getElementById('stress_shock_2');
+            if (st2) st2.innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+            const st3 = document.getElementById('stress_shock_3');
+            if (st3) st3.innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
 
-            // Update Active Holdings Count Badge
+            // Active count badge
             const activeCountBadge = document.getElementById('portfolioActiveCountBadge');
             if (activeCountBadge) activeCountBadge.innerText = `${userHoldings.length} أصل`;
 
             // Apply view mode visibility (cards vs table)
             updatePortfolioViewModeUI();
-            const st2 = document.getElementById('stress_shock_2');
-            if (st2) st2.innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
-            const st3 = document.getElementById('stress_shock_3');
-            if (st3) st3.innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
 
             // Redraw Donut Chart with Actual Sectors (including Clawdz/Cash)
             const allWeights = Object.assign({}, sectorWeights);
@@ -8952,10 +9075,10 @@ async function syncMubasherDirectAll() {
             }
 
             // Save to localStorage consistently across all version keys
-            const storageKey = 'egx_sharia_thndr_portfolio_v12_verified';
+            const storageKey = 'egx_sharia_thndr_portfolio_v13_exact';
             localStorage.setItem(storageKey, JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
-            localStorage.setItem('egx_sharia_thndr_portfolio_v12_verified', JSON.stringify(userHoldings));
+            localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v10', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
             localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v6', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
@@ -9786,7 +9909,7 @@ async function syncMubasherDirectAll() {
 
         function updateLiveZakatInput() {
             try {
-                const stockVal = userHoldings.filter(h => !isFundAsset(h))
+                const stockVal = userHoldings.filter(h => !isFundAsset(h) && !isGoldAsset(h))
                     .reduce((s,h) => s+(h.cur||h.buy||0)*h.qty, 0);
                 const el = document.getElementById('zakat_val');
                 if (el && !el.dataset.userModified) el.value = Math.round(stockVal);
@@ -9796,7 +9919,7 @@ async function syncMubasherDirectAll() {
         function updateLiveStressBadges() {
             try {
                 const totalP = userHoldings.reduce((s,h) => s+(h.cur||h.buy||0)*h.qty,0)+(THNDR_CASH?.cash||0);
-                const equityV = userHoldings.filter(h=>!isFundAsset(h)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
+                const equityV = userHoldings.filter(h=>!isFundAsset(h) && !isGoldAsset(h)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
                 const goldV   = userHoldings.filter(h=>['AZG','THNDR_GOLD'].includes(h.ticker)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
                 const fmt0 = n => n.toLocaleString('ar-EG',{minimumFractionDigits:0,maximumFractionDigits:0});
 
