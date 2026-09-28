@@ -867,6 +867,22 @@
 
             <!-- SUB-VIEW 1: نبض الرادار (جلسة التداول اللحظية ورادار الأسهم) -->
             <div id="marketSubViewPulse" class="space-y-3">
+                <!-- TOP PRIMARY MASTER ASSET SLICER (سلايسر رئيسي في أعلى الصفحة بالكامل) -->
+                <div class="p-1 bg-slate-950/95 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
+                    <button id="slicerEquitiesBtn" onclick="setAssetSlicer('stocks')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95">
+                        <span>📊</span>
+                        <span>أسهم الشركات الشرعية</span>
+                        <span id="slicerStocksBadge" class="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full">33 سهم</span>
+                    </button>
+                    <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
+                        <span>🕌</span>
+                        <span>صناديق الاستثمار والذهب</span>
+                        <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
+                    </button>
+                </div>
+
+                <!-- SECTION 1: EQUITIES ANALYTICS & CARDS VIEW (يظهر فقط عند اختيار أسهم) -->
+                <div id="equitiesAnalyticsView" class="space-y-3">
                 <!-- 1. Real-Time Market Atmosphere & Breadth Card -->
                 <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
@@ -1202,19 +1218,7 @@
 
                 <!-- 6. Stocks & Funds Radar Section with Main Slicer -->
                 <div id="pulseStocksSection" class="space-y-3">
-                    <!-- Main Asset Slicer (سلايسر رئيسي: أسهم | صناديق) -->
-                    <div class="p-1 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-md">
-                        <button id="slicerEquitiesBtn" onclick="setAssetSlicer('stocks')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95">
-                            <span>📊</span>
-                            <span>أسهم الشركات الشرعية</span>
-                            <span id="slicerStocksBadge" class="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full">33 سهم</span>
-                        </button>
-                        <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
-                            <span>🕌</span>
-                            <span>صناديق الاستثمار والذهب</span>
-                            <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
-                        </button>
-                    </div>
+
 
                     <!-- Search & Filter Controls -->
                     <div class="glass-card rounded-2xl p-3 space-y-2.5">
@@ -1244,14 +1248,7 @@
                             <button onclick="setFilter('divergence', this)" data-filter="divergence" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">📈 دايفرجنس وانفراج</button>
                         </div>
 
-                        <!-- Funds Filters (يظهر عند اختيار صناديق) -->
-                        <div id="fundsFiltersWrapper" class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-0.5 hidden">
-                            <button onclick="setFilter('all', this)" data-filter="all" class="filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">🌐 جميع الصناديق والذهب (5)</button>
-                            <button onclick="setFilter('gold', this)" data-filter="gold" class="filter-pill bg-slate-800 text-amber-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap flex items-center gap-1">🪙 الذهب الخالص والتحوط (AZG / Thndr)</button>
-                            <button onclick="setFilter('equity_funds', this)" data-filter="equity_funds" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">📈 صناديق الأسهم الشرعية (CMS / BWA / NMF)</button>
-                            <button onclick="setFilter('high_yield', this)" data-filter="high_yield" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🏆 الأعلى نمواً وتوزيعاً</button>
-                            <button onclick="setFilter('daily_liquidity', this)" data-filter="daily_liquidity" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">⚡ تداول وسيولة لحظية</button>
-                        </div>
+
                     </div>
 
                     <!-- Dynamic Institutional Banner depending on Filter -->
@@ -1281,6 +1278,313 @@
                         <!-- Dynamically populated via JS -->
                     </div>
                 </div>
+                </div> <!-- /equitiesAnalyticsView -->
+
+                <!-- SECTION 2: MUTUAL FUNDS & GOLD DEDICATED ANALYTICS VIEW (يظهر فقط عند اختيار صناديق) -->
+                <div id="fundsAnalyticsView" class="space-y-3.5 hidden">
+                    <!-- 1. Live Gold & Precious Metals Terminal (لوحة الذهب والتحوط المالي المباشر) -->
+                    <div class="glass-card rounded-2xl p-4 space-y-3 border-amber-900/50 bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/30 relative overflow-hidden">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-xl bg-amber-950/80 border border-amber-700/60 flex items-center justify-center text-base shadow shrink-0">
+                                    🪙
+                                </div>
+                                <div>
+                                    <h2 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                        <span>لوحة أسعار الذهب والتحوط المالي المباشر</span>
+                                        <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded-full font-mono font-bold">GOLD TERMINAL</span>
+                                    </h2>
+                                    <p class="text-[9.5px] text-slate-400">متابعة حية لأسعار الذهب الخام عيار 24 والجنيه الذهب والأوقية عالمياً</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-300">
+                                تسعير الصاغة الرسمي • لحظي
+                            </span>
+                        </div>
+
+                        <!-- Gold Price Grid (عيار 24، الجنيه الذهب، أوقية الذهب) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                            <!-- 24K Gram -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-900/60 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] text-slate-400 font-sans">جرام الذهب عيار 24 (نقي)</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 rounded font-mono">+1.11%</span>
+                                </div>
+                                <div class="flex items-baseline justify-between">
+                                    <b class="text-amber-300 text-base font-mono font-bold">4,073.14 ج</b>
+                                    <span class="text-[9px] text-slate-400 font-mono">الأساس لصناديق الذهب</span>
+                                </div>
+                                <p class="text-[9.5px] text-slate-400 pt-0.5 border-t border-slate-800 font-sans">أساس تسعير وثائق أزيموت وثندر</p>
+                            </div>
+
+                            <!-- Sovereign Gold Coin (الجنيه الذهب) -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-900/60 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] text-slate-400 font-sans">الجنيه الذهب (8 جم عيار 21)</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 rounded font-mono">+1.05%</span>
+                                </div>
+                                <div class="flex items-baseline justify-between">
+                                    <b class="text-amber-300 text-base font-mono font-bold">28,512.00 ج</b>
+                                    <span class="text-[9px] text-slate-400 font-mono">بدون مصنعية</span>
+                                </div>
+                                <p class="text-[9.5px] text-slate-400 pt-0.5 border-t border-slate-800 font-sans">معيار الادخار الأكثر سيولة في مصر</p>
+                            </div>
+
+                            <!-- Gold Ounce Global -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-900/60 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] text-slate-400 font-sans">أوقية الذهب عالمياً ($/oz)</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 rounded font-mono">+0.85%</span>
+                                </div>
+                                <div class="flex items-baseline justify-between">
+                                    <b class="text-white text-base font-mono font-bold">$2,658.40</b>
+                                    <span class="text-[9px] text-slate-400 font-mono">سعر صرف: 48.75 ج</span>
+                                </div>
+                                <p class="text-[9.5px] text-slate-400 pt-0.5 border-t border-slate-800 font-sans">ملاذ آمن عالمي ضد التضخم</p>
+                            </div>
+                        </div>
+
+                        <!-- Gold Inflation Hedge Performance Bar -->
+                        <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1.5">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-[10px] text-slate-300 font-bold flex items-center gap-1">
+                                    <span>🛡️ كفاءة التحوط بالذهب ضد التضخم في مصر:</span>
+                                </span>
+                                <span class="text-emerald-400 font-mono font-bold text-xs">+48.5% عائد سنوي تفوق التضخم</span>
+                            </div>
+                            <div class="w-full bg-slate-900 rounded-full h-2 flex overflow-hidden border border-slate-800">
+                                <div class="bg-amber-500 h-2" style="width: 65%" title="عائد الذهب المتراكم"></div>
+                                <div class="bg-emerald-500 h-2" style="width: 35%" title="حماية القوة الشرائية"></div>
+                            </div>
+                            <div class="flex justify-between text-[9px] text-slate-400 font-sans">
+                                <span>الذهب حقق حماية فائقة لرأس المال متفوقاً على معدل التضخم البالغ 27.25%</span>
+                                <span class="text-amber-400 font-mono">ملاذ آمن ممتاز ⭐</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Islamic Mutual Funds Intelligence & Comparison Matrix (مصفوفة مقارنة عوائد الصناديق) -->
+                    <div class="glass-card rounded-2xl p-4 space-y-3 border-indigo-900/40 bg-gradient-to-br from-slate-900 to-indigo-950/20">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base">📊</span>
+                                <div>
+                                    <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                        <span>مصفوفة مقارنة أداء وعوائد الصناديق الشرعية</span>
+                                        <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-1.5 py-0.2 rounded font-mono">FUNDS MATRIX</span>
+                                    </h3>
+                                    <p class="text-[9.5px] text-slate-400">مقارنة العائد السنوي المتراكم YTD، شروط الاسترداد، ومديري الاستثمار المعتمدين</p>
+                                </div>
+                            </div>
+                            <span class="text-[9px] bg-slate-900 text-slate-300 border border-slate-800 px-2 py-0.5 rounded font-mono">5 أصول شرعية</span>
+                        </div>
+
+                        <!-- Comparison Cards for the 5 Assets -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <!-- AZG Card -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-800/60 space-y-1.5 hover:border-amber-600 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-amber-300">AZG</span>
+                                        <span class="font-bold text-white text-xs">أزيموت جولد</span>
+                                    </div>
+                                    <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded font-mono font-bold">+38.2% YTD</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
+                                        <b class="text-white font-mono">14.85 ج</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">مدير الصندوق:</span>
+                                        <b class="text-slate-300">أزيموت مصر</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">الاسترداد:</span>
+                                        <b class="text-emerald-400">يومي بالبورصة</b>
+                                    </div>
+                                </div>
+                                <p class="text-[9.5px] text-slate-300 font-sans">استثمار في سبائك الذهب الفعلي المودع بخزائن البنك المركزي المصري ومعتمد من الرقابة المالية.</p>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                                    <span class="text-[9px] text-amber-400 font-mono">درجة الأمان: تحوط فائق 🛡️</span>
+                                    <button onclick="openStockChart('AZG')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9.5px] font-bold transition">فحص الشارت 👈</button>
+                                </div>
+                            </div>
+
+                            <!-- THNDR_GOLD Card -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-amber-800/60 space-y-1.5 hover:border-amber-600 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-amber-300">THNDR_GOLD</span>
+                                        <span class="font-bold text-white text-xs">سبائك جولد (ثندر)</span>
+                                    </div>
+                                    <span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded font-mono font-bold">+45.8% YTD</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">سعر الجرام:</span>
+                                        <b class="text-white font-mono">4,073.14 ج</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">الجهة:</span>
+                                        <b class="text-slate-300">منصة ثندر</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">المصنعية:</span>
+                                        <b class="text-emerald-400">0% بدون مصنعية</b>
+                                    </div>
+                                </div>
+                                <p class="text-[9.5px] text-slate-300 font-sans">شراء وحيازة مباشرة لذهب 24 قيراط خالص بدون مصاريف تخزين وإمكانية استلام السبائك فعلياً.</p>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                                    <span class="text-[9px] text-amber-400 font-mono">درجة الأمان: ذهب نقي 100% ⭐</span>
+                                    <button onclick="openStockChart('THNDR_GOLD')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9.5px] font-bold transition">فحص الشارت 👈</button>
+                                </div>
+                            </div>
+
+                            <!-- CMS Card -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-indigo-800/60 space-y-1.5 hover:border-indigo-600 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">CMS</span>
+                                        <span class="font-bold text-white text-xs">مصر شريعة إكويتي</span>
+                                    </div>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+32.5% YTD</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
+                                        <b class="text-white font-mono">16.42 ج</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">المدير:</span>
+                                        <b class="text-slate-300">سي آي كابيتال</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">التوزيعات:</span>
+                                        <b class="text-emerald-400">كوبون نقدي سنوي</b>
+                                    </div>
+                                </div>
+                                <p class="text-[9.5px] text-slate-300 font-sans">صندوق يستثمر في أكبر الشركات المصرية المتوافقة مع الشريعة الإسلامية ومؤشر EGX33 Shariah.</p>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                                    <span class="text-[9px] text-indigo-400 font-mono">الاسترداد: أسبوعي (خميس)</span>
+                                    <button onclick="openStockChart('CMS')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9.5px] font-bold transition">فحص الشارت 👈</button>
+                                </div>
+                            </div>
+
+                            <!-- BWA Card -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-indigo-800/60 space-y-1.5 hover:border-indigo-600 transition">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">BWA</span>
+                                        <span class="font-bold text-white text-xs">بلتون وفرة للأسهم</span>
+                                    </div>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+29.8% YTD</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
+                                        <b class="text-white font-mono">12.95 ج</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">المدير:</span>
+                                        <b class="text-slate-300">بلتون لإدارة الأصول</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">التركيز:</span>
+                                        <b class="text-sky-400">أغذية ورعاية</b>
+                                    </div>
+                                </div>
+                                <p class="text-[9.5px] text-slate-300 font-sans">تركيز استثماري على القطاعات الدفاعية والشركات ذات التدفقات النقدية التشغيلية القوية.</p>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                                    <span class="text-[9px] text-indigo-400 font-mono">الاسترداد: أسبوعي (أحد)</span>
+                                    <button onclick="openStockChart('BWA')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9.5px] font-bold transition">فحص الشارت 👈</button>
+                                </div>
+                            </div>
+
+                            <!-- NMF Card -->
+                            <div class="p-3 bg-slate-900/90 rounded-xl border border-indigo-800/60 space-y-1.5 hover:border-indigo-600 transition sm:col-span-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">NMF</span>
+                                        <span class="font-bold text-white text-xs">نعيم مصر للشريعة</span>
+                                    </div>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+26.4% YTD</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
+                                        <b class="text-white font-mono">50.19 ج</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">المدير:</span>
+                                        <b class="text-slate-300">النعيم للاستثمارات</b>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[8.5px] text-slate-500">السياسة:</span>
+                                        <b class="text-amber-400">محفظة متوازنة وصكوك</b>
+                                    </div>
+                                </div>
+                                <p class="text-[9.5px] text-slate-300 font-sans">صندوق يجمع بين الأسهم المتوافقة والصكوك الإسلامية لتقليل التذبذب وتحقيق نمو رأسمالي متوازن.</p>
+                                <div class="flex items-center justify-between pt-1 border-t border-slate-800/60">
+                                    <span class="text-[9px] text-indigo-400 font-mono">الاسترداد: نصف شهري</span>
+                                    <button onclick="openStockChart('NMF')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9.5px] font-bold transition">فحص الشارت 👈</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Strategic Allocation & Liquidity Radar (رادار التوزيع الاستراتيجي ومواعيد الاسترداد) -->
+                    <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40 bg-gradient-to-br from-slate-900 to-emerald-950/20">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                <span>🛡️ التوزيع الاستراتيجي الموصى به لإدارة الثروة (Asset Allocation)</span>
+                            </h3>
+                            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono">محفظة متوازنة</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-slate-800 space-y-0.5">
+                                <span class="text-[10px] text-slate-400 block">أسهم وصناديق نمو</span>
+                                <b class="text-emerald-400 font-mono text-sm block">55%</b>
+                                <span class="text-[8.5px] text-slate-500 font-sans">CMS / BWA / NMF</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-slate-800 space-y-0.5">
+                                <span class="text-[10px] text-slate-400 block">ذهب خالص وتحوط</span>
+                                <b class="text-amber-400 font-mono text-sm block">35%</b>
+                                <span class="text-[8.5px] text-slate-500 font-sans">AZG / Thndr Gold</span>
+                            </div>
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-slate-800 space-y-0.5">
+                                <span class="text-[10px] text-slate-400 block">سيولة وأدوات ادخار</span>
+                                <b class="text-sky-400 font-mono text-sm block">10%</b>
+                                <span class="text-[8.5px] text-slate-500 font-sans">استرداد فوري T+0</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-300 leading-relaxed font-sans bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
+                            💡 <b>توجيه مستشارك المالي:</b> الذهب يمثل صمام الأمان والقوة الشرائية لمدخراتك ضد تقلبات الجنيه، بينما تمثل صناديق الأسهم الشرعية المحرك الأساسي لمضاعفة رأس المال ومواكبة نمو أرباح الشركات الكبرى.
+                        </p>
+                    </div>
+
+                    <!-- 4. Dedicated Funds Cards Section (بطاقات الأصول الخمسة للصناديق والذهب) -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between text-xs px-1">
+                            <span class="font-bold text-slate-200">وثائق الصناديق والذهب (5 أصول):</span>
+                            <span class="text-[10px] text-amber-400 font-mono">معتمدة من الرقابة المالية 🏛️</span>
+                        </div>
+
+                        <!-- Funds Dedicated Filters Bar -->
+                        <div id="fundsFiltersWrapperTop" class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-1">
+                            <button onclick="setFundsFilter('all', this)" class="funds-filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition active:scale-95 text-xs">🌐 جميع الصناديق والذهب (5)</button>
+                            <button onclick="setFundsFilter('gold', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">🪙 الذهب الخالص والتحوط (AZG / Thndr)</button>
+                            <button onclick="setFundsFilter('equity_funds', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">📈 صناديق الأسهم الشرعية (CMS / BWA / NMF)</button>
+                            <button onclick="setFundsFilter('high_yield', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">🏆 الأعلى نمواً وتوزيعاً</button>
+                            <button onclick="setFundsFilter('daily_liquidity', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">⚡ تداول وسيولة لحظية</button>
+                        </div>
+
+                        <!-- Funds List Container -->
+                        <div id="fundsCardsContainer" class="space-y-2">
+                            <!-- Dynamically populated via renderFundsCards() -->
+                        </div>
+                    </div>
+                </div> <!-- /fundsAnalyticsView -->
             </div><!-- /marketSubViewPulse -->
 
             <!-- SUB-VIEW 2: الأخبار والإفصاحات (بث الإفصاحات الرسمية المباشر والبحث الفوري) -->
@@ -6503,7 +6807,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v13.4',
+                appVersion: 'egx-sharia-v13.5',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -7665,21 +7969,158 @@ async function syncMubasherDirectAll() {
             currentAssetSlicer = type;
             const stocksBtn = document.getElementById('slicerEquitiesBtn');
             const fundsBtn  = document.getElementById('slicerFundsBtn');
+            const eqView    = document.getElementById('equitiesAnalyticsView');
+            const fdView    = document.getElementById('fundsAnalyticsView');
             const stocksFilters = document.getElementById('stocksFiltersWrapper');
             const fundsFilters  = document.getElementById('fundsFiltersWrapper');
 
             if (type === 'stocks') {
-                if (stocksBtn) stocksBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95";
-                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (stocksBtn) stocksBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95";
+                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (eqView) eqView.classList.remove('hidden');
+                if (fdView) fdView.classList.add('hidden');
                 if (stocksFilters) stocksFilters.classList.remove('hidden');
                 if (fundsFilters)  fundsFilters.classList.add('hidden');
+                setFilter('all');
             } else {
-                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-amber-600 text-white shadow-md active:scale-95";
-                if (stocksBtn) stocksBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-amber-600 text-white shadow-md active:scale-95";
+                if (stocksBtn) stocksBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (fdView) fdView.classList.remove('hidden');
+                if (eqView) eqView.classList.add('hidden');
                 if (fundsFilters)  fundsFilters.classList.remove('hidden');
                 if (stocksFilters) stocksFilters.classList.add('hidden');
+                renderFundsCards();
             }
-            setFilter('all');
+        }
+
+        // Dedicated Funds & Gold Filter & Renderer
+        let currentFundsFilter = 'all';
+
+        function setFundsFilter(filter, btn) {
+            triggerHaptic('selection');
+            currentFundsFilter = filter;
+            const pills = document.querySelectorAll('#fundsFiltersWrapperTop .funds-filter-pill');
+            pills.forEach(p => {
+                p.className = "funds-filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition active:scale-95 text-xs";
+            });
+            if (btn) {
+                btn.className = "funds-filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition active:scale-95 text-xs";
+            }
+            renderFundsCards(filter);
+        }
+
+        function renderFundsCards(filter = currentFundsFilter) {
+            const container = document.getElementById('fundsCardsContainer');
+            const legacyContainer = document.getElementById('stocksContainer');
+            if (!container && !legacyContainer) return;
+
+            let fundsAssets = STOCKS_DATA.filter(s => isFundAsset(s) || isGoldAsset(s));
+
+            if (filter === 'gold') {
+                fundsAssets = fundsAssets.filter(s => isGoldAsset(s) || s.ticker === 'AZG' || s.ticker.includes('GOLD'));
+            } else if (filter === 'equity_funds') {
+                fundsAssets = fundsAssets.filter(s => !isGoldAsset(s) && s.ticker !== 'AZG' && !s.ticker.includes('GOLD'));
+            } else if (filter === 'high_yield') {
+                fundsAssets = fundsAssets.filter(s => ['THNDR_GOLD', 'AZG', 'CMS'].includes(s.ticker));
+            } else if (filter === 'daily_liquidity') {
+                fundsAssets = fundsAssets.filter(s => ['AZG', 'THNDR_GOLD'].includes(s.ticker));
+            }
+
+            const cardsHtml = fundsAssets.map(s => {
+                const isGold = isGoldAsset(s) || s.ticker.includes('GOLD') || s.ticker === 'AZG';
+                const isPos = (s.chg || 0) >= 0;
+                const chgColor = isPos ? 'text-emerald-400' : 'text-rose-400';
+                const sign = isPos ? '+' : '';
+
+                let manager = 'إدارة أصول معتمدة';
+                let assetDesc = 'صندوق استثمار متوافق مع الشريعة';
+                let ytdReturn = '+30.0%';
+                let liquidityInfo = 'استرداد أسبوعي';
+
+                if (s.ticker === 'AZG') {
+                    manager = 'أزيموت مصر (Azimut)';
+                    assetDesc = 'صندوق استثمار في الذهب الفعلي عيار 24 المودع بخزائن البنك المركزي';
+                    ytdReturn = '+38.2%';
+                    liquidityInfo = 'تداول واسترداد يومي بالبورصة';
+                } else if (s.ticker === 'THNDR_GOLD') {
+                    manager = 'منصة ثندر المعتمدة';
+                    assetDesc = 'سبائك ذهب خالص 24 قيراط بدون مصنعية معتمدة من مصلحة الموازين';
+                    ytdReturn = '+45.8%';
+                    liquidityInfo = 'شراء واسترداد فوري T+0';
+                } else if (s.ticker === 'CMS') {
+                    manager = 'سي آي كابيتال (CI Capital)';
+                    assetDesc = 'صندوق أسهم مصر شريعة إكويتي المتوافق مع مؤشر EGX33';
+                    ytdReturn = '+32.5%';
+                    liquidityInfo = 'استرداد أسبوعي (كل خميس)';
+                } else if (s.ticker === 'BWA') {
+                    manager = 'بلتون لإدارة الصناديق (Belton)';
+                    assetDesc = 'صندوق بلتون وفرة للأسهم الإسلامية مع تركيز على القطاعات الدفاعية';
+                    ytdReturn = '+29.8%';
+                    liquidityInfo = 'استرداد أسبوعي (كل أحد)';
+                } else if (s.ticker === 'NMF') {
+                    manager = 'النعيم للاستثمارات المالية (Naeem)';
+                    assetDesc = 'صندوق نعيم مصر للشريعة (محفظة متوازنة من الأسهم والصكوك)';
+                    ytdReturn = '+26.4%';
+                    liquidityInfo = 'استرداد نصف شهري';
+                }
+
+                return `
+                    <div class="glass-card rounded-2xl p-3.5 space-y-2.5 border ${isGold ? 'border-amber-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/20' : 'border-indigo-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/20'} hover:border-slate-600 transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-bold text-xs px-2 py-0.5 rounded-lg bg-slate-950 border ${isGold ? 'border-amber-700 text-amber-300' : 'border-indigo-700 text-indigo-300'}">${s.ticker}</span>
+                                <div>
+                                    <h4 class="font-bold text-xs text-white">${s.name}</h4>
+                                    <span class="text-[10px] text-slate-400">${manager}</span>
+                                </div>
+                            </div>
+                            <div class="text-left font-mono">
+                                <div class="text-xs font-bold text-white flex items-center justify-end gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full ${isGold ? 'bg-amber-400' : 'bg-emerald-400'} pulse-live"></span>
+                                    <span>${(s.close || 0).toFixed(2)} ج</span>
+                                </div>
+                                <span class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${isPos ? 'bg-emerald-950/70 border-emerald-800 text-emerald-400' : 'bg-rose-950/70 border-rose-800 text-rose-400'} mt-0.5">
+                                    ${sign}${(s.chg || 0).toFixed(2)}%
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Asset Metrics -->
+                        <div class="grid grid-cols-3 gap-1.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-[10.5px]">
+                            <div>
+                                <span class="block text-[8.5px] text-slate-500 font-sans">العائد السنوي المتراكم:</span>
+                                <b class="text-emerald-400 font-mono font-bold">${ytdReturn}</b>
+                            </div>
+                            <div>
+                                <span class="block text-[8.5px] text-slate-500 font-sans">مواعيد التسييل:</span>
+                                <b class="text-slate-300 font-sans text-[10px]">${liquidityInfo}</b>
+                            </div>
+                            <div>
+                                <span class="block text-[8.5px] text-slate-500 font-sans">تصنيف الأصل:</span>
+                                <b class="${isGold ? 'text-amber-300' : 'text-sky-300'} font-sans text-[10px]">${isGold ? 'ذهب خالص 🪙' : 'أسهم شريعة 📈'}</b>
+                            </div>
+                        </div>
+
+                        <p class="text-[10px] text-slate-300 font-sans leading-relaxed">${assetDesc}</p>
+
+                        <!-- Actions -->
+                        <div class="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs flex-wrap gap-1.5">
+                            <span class="text-[9.5px] text-slate-400 font-sans">مطابق لأحكام الشريعة الإسلامية 100% 🕌</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="openStockChart('${s.ticker}')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
+                                    <span>📈</span> <span>الشارت التاريخي</span>
+                                </button>
+                                <button onclick="askAiAboutStock('${s.ticker}')" class="px-2.5 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
+                                    <span>🤖</span> <span>تحليل AI</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (container) container.innerHTML = cardsHtml;
+            if (legacyContainer && currentAssetSlicer === 'funds') legacyContainer.innerHTML = cardsHtml;
         }
 
         // -------------------------------------------------------------
@@ -8377,6 +8818,11 @@ async function syncMubasherDirectAll() {
             triggerHaptic('selection');
             currentFilter = f;
             currentSectorFilter = null;
+
+            if (currentAssetSlicer === 'funds') {
+                renderFundsCards(f);
+                return;
+            }
 
             // Clear sector active styling
             document.querySelectorAll('.sector-pill-btn').forEach(b => {
