@@ -1332,9 +1332,9 @@
                     <span id="portfolioActiveCountBadge" class="bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
                     
                     <!-- Price Source Toggle Button (Thndr vs Live EGX) -->
-                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 shadow-sm" title="انقر للتبديل بين أسعار محفظة ثندر وأسعار البورصة اللحظية">
-                        <span id="priceSourceIcon">📱</span>
-                        <span id="priceSourceLabel">أسعار ثندر</span>
+                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-sm" title="انقر للتبديل بين أسعار البورصة الحية اللحظية وأسعار محفظة ثندر">
+                        <span id="priceSourceIcon">⚡</span>
+                        <span id="priceSourceLabel">البورصة اللحظية</span>
                     </button>
                 </div>
                 
@@ -3146,7 +3146,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=11.3')
+                navigator.serviceWorker.register('sw.js?v=12.3')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3858,7 +3858,7 @@
             portfolioViewMode = 'cards';
             localStorage.setItem('egx_portfolio_view_mode', 'cards');
         }
-        let portfolioPriceSource = localStorage.getItem('egx_price_source') || 'thndr';
+        let portfolioPriceSource = localStorage.getItem('egx_price_source_v12_3') || 'live';
         let _holdingsFilter = { stocks: 'all', funds: 'all' };
 
         function setPortfolioViewMode(mode) {
@@ -3906,7 +3906,7 @@
         function togglePortfolioPriceSource() {
             triggerHaptic('selection');
             portfolioPriceSource = portfolioPriceSource === 'thndr' ? 'live' : 'thndr';
-            localStorage.setItem('egx_price_source', portfolioPriceSource);
+            localStorage.setItem('egx_price_source_v12_3', portfolioPriceSource);
             updatePortfolioPriceSourceUI();
             renderHoldingsTable();
             const msg = portfolioPriceSource === 'thndr' 
