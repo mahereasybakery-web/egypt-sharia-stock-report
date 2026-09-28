@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v13.1
-const CACHE_NAME = 'egx-sharia-v13.1';
+// EGX Sharia Portal - Advanced PWA Service Worker v13.3 (Defensive Hardened)
+const CACHE_NAME = 'egx-sharia-v13.3';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -15,7 +15,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[ServiceWorker] Pre-caching core PWA shell v7.2');
+      console.log('[ServiceWorker] Pre-caching core PWA shell v13.3');
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -37,7 +37,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch Event: Network-First for HTML/Data to ensure immediate updates, Cache-First for static media
+// Fetch Event: Network-First for HTML/Data, Cache-First for static media
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -50,13 +50,27 @@ self.addEventListener('fetch', (event) => {
       fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const resClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+          caches.open(CACHE_NAME).then((cache) => {
+            if (url.pathname.endsWith('market_data.json')) {
+              cache.put('./market_data.json', resClone);
+            } else {
+              cache.put(event.request, resClone);
+            }
+          });
         }
         return networkResponse;
       }).catch(async () => {
-        // Fallback to cache only if device is offline
-        const cached = await caches.match(event.request);
-        return cached || caches.match('./index.html');
+        if (url.pathname.endsWith('market_data.json')) {
+          const cachedData = await caches.match('./market_data.json');
+          if (cachedData) return cachedData;
+          return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+        const cached = await caches.match(event.request, { ignoreSearch: true });
+        if (cached) return cached;
+        if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+          return caches.match('./index.html');
+        }
+        return new Response('Network error', { status: 408, headers: { 'Content-Type': 'text/plain' } });
       })
     );
     return;
@@ -76,7 +90,10 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     }).catch(() => {
-      return caches.match('./index.html');
+      if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+        return caches.match('./index.html');
+      }
+      return new Response('Offline resource not found', { status: 404, headers: { 'Content-Type': 'text/plain' } });
     })
   );
 });
