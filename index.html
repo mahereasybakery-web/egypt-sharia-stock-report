@@ -30,11 +30,19 @@
         window.addEventListener('unhandledrejection', function(e) {
             console.warn('[Global Guard] Handled unhandled promise rejection:', e.reason);
         });
-        // Defensive number formatting helper
-        window.safeFixed = function(val, dec = 2) {
-            const n = parseFloat(val);
-            return (isNaN(n) || !isFinite(n)) ? '0.00' : n.toFixed(dec);
-        };
+        // Robust Global Defensive Number Formatting Helpers
+        function safeFixed(val, dec = 2, fallback = '0.00') {
+            if (val === null || val === undefined || val === '') return fallback;
+            const n = Number(val);
+            return (!isNaN(n) && isFinite(n)) ? n.toFixed(dec) : fallback;
+        }
+        function safeNum(val, fallback = 0) {
+            if (val === null || val === undefined || val === '') return fallback;
+            const n = Number(val);
+            return (!isNaN(n) && isFinite(n)) ? n : fallback;
+        }
+        window.safeFixed = safeFixed;
+        window.safeNum = safeNum;
     </script>
 
     <meta name="mobile-web-app-capable" content="yes">
@@ -1033,28 +1041,112 @@
                     </div>
                 </div>
 
-                <!-- 5. Stocks Radar Section (رادار الأسهم المطور مع فلاتر موسعة) -->
+                <!-- 5. Floor Broker Live Intelligence Radar (مستشارك الخاص في قاعة تداول البورصة) -->
+                <div class="glass-card rounded-2xl p-3.5 space-y-3 border-indigo-900/40 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 shadow-lg">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-center text-base shadow shrink-0">
+                                🏛️
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span>مستشارك ومندوبك اللحظي في قاعة التداول</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full font-mono font-bold">EGX LIVE AGENT</span>
+                                </h3>
+                                <p class="text-[10px] text-slate-400">رصد فوري لتدفق السيولة، صفقات الحجم الكبير، وتنبيهات الفرص والتهديدات أولاً بأول</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="toggleRadarAudioAlerts()" id="radarAudioToggleBtn" class="px-2.5 py-1 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-[10.5px] text-slate-300 flex items-center gap-1.5 transition active:scale-95">
+                                <span id="radarAudioIcon">🔔</span>
+                                <span id="radarAudioText">تنبيهات الفرص: مفعّلة</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Opportunities & Threats Two-Column Matrix -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <!-- Box 1: Golden Opportunities (فرص ذهبية للاقتناص) -->
+                        <div class="p-3 bg-emerald-950/30 rounded-xl border border-emerald-900/60 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                                    <span>🎯</span>
+                                    <span>رادار الفرص الذهبية اللحظية</span>
+                                </span>
+                                <span id="liveOppCountBadge" class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">2 فرصة نشطة</span>
+                            </div>
+                            <div id="liveOpportunitiesFeed" class="space-y-1.5">
+                                <!-- Populated dynamically by updateFloorBrokerRadar() -->
+                            </div>
+                        </div>
+
+                        <!-- Box 2: Threats & Risk Warnings (تحذيرات ومناطق جني أرباح) -->
+                        <div class="p-3 bg-rose-950/30 rounded-xl border border-rose-900/60 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-400 flex items-center gap-1">
+                                    <span>⚠️</span>
+                                    <span>رادار المخاطر والتهديدات</span>
+                                </span>
+                                <span id="liveThreatCountBadge" class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 py-0.2 rounded font-mono font-bold">1 تحذير نشط</span>
+                            </div>
+                            <div id="liveThreatsFeed" class="space-y-1.5">
+                                <!-- Populated dynamically by updateFloorBrokerRadar() -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Stocks & Funds Radar Section with Main Slicer -->
                 <div id="pulseStocksSection" class="space-y-3">
+                    <!-- Main Asset Slicer (سلايسر رئيسي: أسهم | صناديق) -->
+                    <div class="p-1 bg-slate-950/90 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-md">
+                        <button id="slicerEquitiesBtn" onclick="setAssetSlicer('stocks')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95">
+                            <span>📊</span>
+                            <span>أسهم الشركات الشرعية</span>
+                            <span id="slicerStocksBadge" class="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full">33 سهم</span>
+                        </button>
+                        <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
+                            <span>🕌</span>
+                            <span>صناديق الاستثمار والذهب</span>
+                            <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
+                        </button>
+                    </div>
+
                     <!-- Search & Filter Controls -->
                     <div class="glass-card rounded-2xl p-3 space-y-2.5">
                         <div class="relative">
-                            <input id="searchInput" type="text" dir="rtl" oninput="filterStocks()" placeholder="ابحث عن أي سهم أو رمز... (مثال: طلعت مصطفى، فوري، TMGH)" 
-                                   class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none transition">
+                            <input id="searchInput" type="text" dir="rtl" oninput="filterStocks()" placeholder="ابحث عن شركة، رمز (مثال: TMGH)، أو قطاع..."
+                                   class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white focus:border-emerald-500 outline-none pr-9">
+                            <span class="absolute right-3 top-2.5 text-xs text-slate-400">🔍</span>
                         </div>
-                        <!-- Extended Filter Pills -->
-                        <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-0.5">
-                            <button onclick="setFilter('all', this)" data-filter="all" class="filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition">🌟 الكل (38)</button>
-                            <button onclick="setFilter('gainers', this)" data-filter="gainers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🚀 الأعلى صعوداً</button>
-                            <button onclick="setFilter('losers', this)" data-filter="losers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🔻 الأكثر تراجعاً</button>
-                            <button onclick="setFilter('oversold', this)" data-filter="oversold" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">⚡ تشبع بيعي ارتداد</button>
-                            <button onclick="setFilter('overbought', this)" data-filter="overbought" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🔥 تشبع شرائي جني أرباح</button>
-                            <button onclick="setFilter('liquidity', this)" data-filter="liquidity" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">💎 أعلى سيولة وزخم</button>
-                            <button onclick="setFilter('margin', this)" data-filter="margin" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🛡️ أعلى هامش أمان (>20%)</button>
-                            <button onclick="setFilter('low_pe', this)" data-filter="low_pe" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">📊 مكرر ربحية جذاب (P/E &lt; 12)</button>
-                            <button onclick="setFilter('dividends', this)" data-filter="dividends" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">💰 عوائد الكوبونات</button>
-                            <button onclick="setFilter('divergence', this)" data-filter="divergence" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">📈 دايفرجنس إيجابي</button>
-                            <button onclick="setFilter('insiders', this)" data-filter="insiders" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🕵️ صفقات الداخليين</button>
-                            <button onclick="setFilter('funds', this)" data-filter="funds" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🪙 صناديق الذهب والأسهم</button>
+
+                        <!-- Stock Filters (يظهر عند اختيار أسهم) -->
+                        <div id="stocksFiltersWrapper" class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-0.5">
+                            <button onclick="setFilter('all', this)" data-filter="all" class="filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">🌐 الكل (33)</button>
+                            <button onclick="setFilter('opportunities', this)" data-filter="opportunities" class="filter-pill bg-slate-800 text-emerald-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap flex items-center gap-1">🎯 رادار الفرص الساخنة</button>
+                            <button onclick="setFilter('threats', this)" data-filter="threats" class="filter-pill bg-slate-800 text-rose-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap flex items-center gap-1">⚠️ رادار المخاطر</button>
+                            <button onclick="setFilter('gainers', this)" data-filter="gainers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🟢 الصاعدة</button>
+                            <button onclick="setFilter('losers', this)" data-filter="losers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🔴 الهابطة</button>
+                            <button onclick="setFilter('breakout', this)" data-filter="breakout" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🚀 اختراق وزخم صاعد</button>
+                            <button onclick="setFilter('dollar_earners', this)" data-filter="dollar_earners" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">💵 تدفق وتصدير دولاري</button>
+                            <button onclick="setFilter('bluechip', this)" data-filter="bluechip" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🏛️ الأسهم القيادية الكبرى</button>
+                            <button onclick="setFilter('oversold', this)" data-filter="oversold" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">⚡ قيعان تشبع بيعي</button>
+                            <button onclick="setFilter('overbought', this)" data-filter="overbought" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🔥 تشبع شرائي</button>
+                            <button onclick="setFilter('margin', this)" data-filter="margin" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">💎 هامش أمان عالي (≥ 20%)</button>
+                            <button onclick="setFilter('low_pe', this)" data-filter="low_pe" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🏷️ مكرر ربحية جذاب (P/E ≤ 10)</button>
+                            <button onclick="setFilter('dividends', this)" data-filter="dividends" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">💰 عوائد توزيعات سخية</button>
+                            <button onclick="setFilter('near_support', this)" data-filter="near_support" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🛡️ قرب مناطق الدعم</button>
+                            <button onclick="setFilter('insiders', this)" data-filter="insiders" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🕵️ صفقات الداخليين</button>
+                            <button onclick="setFilter('divergence', this)" data-filter="divergence" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">📈 دايفرجنس وانفراج</button>
+                        </div>
+
+                        <!-- Funds Filters (يظهر عند اختيار صناديق) -->
+                        <div id="fundsFiltersWrapper" class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-0.5 hidden">
+                            <button onclick="setFilter('all', this)" data-filter="all" class="filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">🌐 جميع الصناديق والذهب (5)</button>
+                            <button onclick="setFilter('gold', this)" data-filter="gold" class="filter-pill bg-slate-800 text-amber-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap flex items-center gap-1">🪙 الذهب الخالص والتحوط (AZG / Thndr)</button>
+                            <button onclick="setFilter('equity_funds', this)" data-filter="equity_funds" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">📈 صناديق الأسهم الشرعية (CMS / BWA / NMF)</button>
+                            <button onclick="setFilter('high_yield', this)" data-filter="high_yield" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">🏆 الأعلى نمواً وتوزيعاً</button>
+                            <button onclick="setFilter('daily_liquidity', this)" data-filter="daily_liquidity" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 flex items-center gap-1">⚡ تداول وسيولة لحظية</button>
                         </div>
                     </div>
 
@@ -3854,13 +3946,18 @@
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
-                    userHoldings = JSON.parse(saved);
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        userHoldings = parsed;
+                    } else {
+                        userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
+                    }
                 } catch(e) {
                     userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
                 }
             } else {
                 userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
-                localStorage.setItem(storageKey, JSON.stringify(userHoldings));
+                try { localStorage.setItem(storageKey, JSON.stringify(userHoldings)); } catch(e) {}
             }
 
             // Load Cash and Clawdz from storage or default to 0 Thndr wallet capture
@@ -4501,6 +4598,16 @@
 
             const grandWealthElem = document.getElementById('p_thndr_grand_wealth');
             if (grandWealthElem) grandWealthElem.innerText = Math.round(grandWealth).toLocaleString();
+
+            // Auto-sync calculated tools with actual grand wealth
+            const inhInput = document.getElementById('inh_wealth_val');
+            if (inhInput && (!inhInput.value || inhInput.value === '87736')) {
+                inhInput.value = Math.round(grandWealth);
+            }
+            const goalInput = document.getElementById('goal_current');
+            if (goalInput && (!goalInput.value || goalInput.value === '87736')) {
+                goalInput.value = Math.round(grandWealth);
+            }
 
             // Dynamically update the 4 sub-balance cards
             const cashElem = document.getElementById('p_thndr_cash');
@@ -5401,18 +5508,36 @@
         let cachedChartCandles = [];
 
         function getStockComprehensiveData(ticker) {
-            const s = STOCKS_DATA.find(x => x.ticker === ticker) || STOCKS_DATA[0];
-            const val = VALUATION_DATA[ticker] || {};
+            let s = STOCKS_DATA.find(x => x.ticker === ticker);
+            if (!s) {
+                s = THNDR_ACTUAL_HOLDINGS.find(x => x.ticker === ticker);
+            }
+            if (!s && typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) {
+                s = userHoldings.find(x => x.ticker === ticker);
+            }
+            if (!s) {
+                s = {
+                    ticker: ticker || 'UNKNOWN',
+                    name: ticker ? `سهم ${ticker}` : 'أصل غير معرف',
+                    close: 50.00,
+                    chg: 0.0,
+                    rsi: 50.0,
+                    sector: 'سوق الأسهم'
+                };
+            }
 
-            const support = val.support || (s.close * 0.93);
-            const resistance = val.resistance || (s.close * 1.07);
-            const base = val.base || (s.close * 1.20);
-            const bull = val.bull || (s.close * 1.35);
-            const bear = val.bear || (s.close * 0.88);
-            const margin = val.margin || parseFloat((((base - s.close) / s.close) * 100).toFixed(1));
-            const pe = val.pe || s.pe || 8.5;
-            const pb = val.pb || 1.65;
-            const divYield = s.div_yield || (ticker === 'ABUK' ? 11.8 : ticker === 'MFPC' ? 9.2 : ticker === 'ORWE' ? 9.0 : ticker === 'AMOC' ? 8.4 : ticker === 'SKPC' ? 8.2 : 5.0);
+            const val = (VALUATION_DATA && VALUATION_DATA[ticker]) ? VALUATION_DATA[ticker] : {};
+            const curPrice = safeNum(s.close, safeNum(val.current, 50.0));
+
+            const support = safeNum(val.support, Math.round(curPrice * 0.93 * 100) / 100);
+            const resistance = safeNum(val.resistance, Math.round(curPrice * 1.07 * 100) / 100);
+            const base = safeNum(val.base, Math.round(curPrice * 1.20 * 100) / 100);
+            const bull = safeNum(val.bull, Math.round(curPrice * 1.35 * 100) / 100);
+            const bear = safeNum(val.bear, Math.round(curPrice * 0.88 * 100) / 100);
+            const margin = safeNum(val.margin, curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : 0);
+            const pe = safeNum(val.pe, safeNum(s.pe, 8.5));
+            const pb = safeNum(val.pb, 1.65);
+            const divYield = safeNum(s.div_yield, (ticker === 'ABUK' ? 11.8 : ticker === 'MFPC' ? 9.2 : ticker === 'ORWE' ? 9.0 : ticker === 'AMOC' ? 8.4 : ticker === 'SKPC' ? 8.2 : 5.0));
 
             let analysis = val.analysis;
             if (!analysis) {
@@ -5456,10 +5581,14 @@
             const data = getStockComprehensiveData(ticker);
 
             // Populate Header
-            const cleanName = data.name.replace(/\s*\([A-Za-z0-9_]+\)/g, '').trim();
-            document.getElementById('modalChartTitle').innerText = `${cleanName} (${data.ticker})`;
-            document.getElementById('modalStockSector').innerText = data.sector;
-            document.getElementById('modalChartPrice').innerText = `${data.close.toFixed(2)} ج.م`;
+            const rawName = (data && data.name) ? String(data.name) : (ticker || 'سهم');
+            const cleanName = rawName.replace(/\s*\([A-Za-z0-9_]+\)/g, '').trim();
+            const titleEl = document.getElementById('modalChartTitle');
+            if (titleEl) titleEl.innerText = `${cleanName} (${data.ticker || ticker})`;
+            const secEl = document.getElementById('modalStockSector');
+            if (secEl) secEl.innerText = data.sector || 'سوق المال';
+            const priceEl = document.getElementById('modalChartPrice');
+            if (priceEl) priceEl.innerText = `${safeFixed(data.close, 2)} ج.م`;
 
             const isFundAsset = ['AZG', 'THNDR_GOLD', 'CMS', 'BWA', 'NMF'].includes(ticker) || (data.sector && (data.sector.includes('صندوق') || data.sector.includes('ذهب')));
             
@@ -5709,13 +5838,18 @@
             }
         }
 
-        function setChartTimeframe(tf, btn) {
+        function setChartTimeframe(tf, btn = null) {
             triggerHaptic('selection');
             activeChartTimeframe = tf;
             document.querySelectorAll('.chart-tf-btn').forEach(b => {
-                b.className = "chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white";
+                const isMatch = (btn && b === btn) || b.getAttribute('data-tf') === tf || b.textContent.trim() === tf;
+                b.className = isMatch 
+                    ? "chart-tf-btn px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white"
+                    : "chart-tf-btn px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white";
             });
-            btn.className = "chart-tf-btn px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white";
+            if (btn && btn.className) {
+                btn.className = "chart-tf-btn px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white";
+            }
             drawAdvancedChart();
         }
 
@@ -6008,7 +6142,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v13.1',
+                appVersion: 'egx-sharia-v13.3',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -7044,6 +7178,9 @@ async function syncMubasherDirectAll() {
             // Render Dynamic Sectors Strip
             renderLiveSectorsStrip(sectors);
 
+            // Update Floor Broker Real-Time Radar
+            updateFloorBrokerRadar();
+
             // Re-render stocks to update live badges
             renderStocks();
         }
@@ -7133,8 +7270,133 @@ async function syncMubasherDirectAll() {
             if (secSection) secSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // Asset Slicer State & Controller
+        let currentAssetSlicer = 'stocks'; // 'stocks' or 'funds'
+        let radarAudioEnabled = true;
+
+        function toggleRadarAudioAlerts() {
+            triggerHaptic('medium');
+            radarAudioEnabled = !radarAudioEnabled;
+            const iconEl = document.getElementById('radarAudioIcon');
+            const textEl = document.getElementById('radarAudioText');
+            if (iconEl) iconEl.textContent = radarAudioEnabled ? '🔔' : '🔕';
+            if (textEl) textEl.textContent = radarAudioEnabled ? 'تنبيهات الفرص: مفعّلة' : 'التنبيهات: صامتة';
+            showToast(radarAudioEnabled ? 'تم تفعيل التنبيهات الصوتية للفرص والتهديدات 🔔' : 'تم كتم التنبيهات الصوتية 🔕', 'info');
+        }
+
+        function setAssetSlicer(type) {
+            triggerHaptic('selection');
+            currentAssetSlicer = type;
+            const stocksBtn = document.getElementById('slicerEquitiesBtn');
+            const fundsBtn  = document.getElementById('slicerFundsBtn');
+            const stocksFilters = document.getElementById('stocksFiltersWrapper');
+            const fundsFilters  = document.getElementById('fundsFiltersWrapper');
+
+            if (type === 'stocks') {
+                if (stocksBtn) stocksBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95";
+                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (stocksFilters) stocksFilters.classList.remove('hidden');
+                if (fundsFilters)  fundsFilters.classList.add('hidden');
+            } else {
+                if (fundsBtn)  fundsBtn.className  = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-amber-600 text-white shadow-md active:scale-95";
+                if (stocksBtn) stocksBtn.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (fundsFilters)  fundsFilters.classList.remove('hidden');
+                if (stocksFilters) stocksFilters.classList.add('hidden');
+            }
+            setFilter('all');
+        }
+
+        // Real-Time Floor Broker Intelligence Radar
+        function updateFloorBrokerRadar() {
+            const oppContainer = document.getElementById('liveOpportunitiesFeed');
+            const threatContainer = document.getElementById('liveThreatsFeed');
+            if (!oppContainer || !threatContainer) return;
+
+            const opps = [];
+            const threats = [];
+
+            STOCKS_DATA.forEach(s => {
+                if (isFundAsset(s) || isGoldAsset(s)) return;
+                const vd = (VALUATION_DATA && VALUATION_DATA[s.ticker]) ? VALUATION_DATA[s.ticker] : null;
+                const cur = safeNum(s.close, 0);
+                const margin = (vd && cur > 0) ? ((vd.base - cur) / cur) * 100 : 0;
+                const rsi = safeNum(s.rsi, 50);
+
+                // Opportunity conditions
+                if (margin >= 20 || (rsi <= 40 && s.chg >= -1.0) || (s.chg >= 2.0 && rsi <= 60)) {
+                    opps.push({
+                        ticker: s.ticker,
+                        name: s.name,
+                        close: cur,
+                        chg: s.chg || 0,
+                        rsi: rsi,
+                        margin: margin,
+                        reason: margin >= 20 ? `خصم أمان +${margin.toFixed(0)}% عن القيمة العادلة` : `قاع تشبع ارتدادي (RSI: ${rsi.toFixed(0)})`
+                    });
+                }
+
+                // Threat conditions
+                if (rsi >= 68 || (vd && cur >= vd.resistance * 0.99) || (s.chg <= -3.0)) {
+                    threats.push({
+                        ticker: s.ticker,
+                        name: s.name,
+                        close: cur,
+                        chg: s.chg || 0,
+                        rsi: rsi,
+                        reason: rsi >= 68 ? `تشبع شرائي مفرط (RSI: ${rsi.toFixed(0)})` : (s.chg <= -3.0 ? `ضغوط تصريفية (-${Math.abs(s.chg).toFixed(1)}%)` : `اختبار مقاومة فنية حرجة`)
+                    });
+                }
+            });
+
+            // Sort top 2
+            opps.sort((a, b) => b.margin - a.margin);
+            threats.sort((a, b) => b.rsi - a.rsi);
+
+            const topOpps = opps.slice(0, 2);
+            const topThreats = threats.slice(0, 2);
+
+            const oppBadge = document.getElementById('liveOppCountBadge');
+            if (oppBadge) oppBadge.textContent = `${opps.length} فرصة رصد`;
+            const threatBadge = document.getElementById('liveThreatCountBadge');
+            if (threatBadge) threatBadge.textContent = `${threats.length} تحذير نشط`;
+
+            oppContainer.innerHTML = topOpps.map(o => `
+                <div onclick="openStockChart('${o.ticker}')" class="p-2 bg-slate-900/90 hover:bg-slate-900 border border-emerald-800/50 rounded-lg flex items-center justify-between cursor-pointer transition active:scale-98">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <b class="text-white font-mono text-[11px]">${o.ticker}</b>
+                            <span class="text-slate-300 text-[10.5px]">${o.name}</span>
+                            <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1 rounded font-mono">+${(o.margin||0).toFixed(0)}% خصم</span>
+                        </div>
+                        <p class="text-[9.5px] text-emerald-400 font-sans">${o.reason}</p>
+                    </div>
+                    <div class="text-left font-mono shrink-0 pr-1">
+                        <span class="text-white font-bold text-[11px] block">${safeFixed(o.close, 2)} ج</span>
+                        <span class="text-[9px] text-emerald-400 underline decoration-dotted">فحص الشارت 👈</span>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-slate-500 text-center py-2 text-[10px]">جاري مسح أوامر وقيعان السوق...</div>';
+
+            threatContainer.innerHTML = topThreats.map(t => `
+                <div onclick="openStockChart('${t.ticker}')" class="p-2 bg-slate-900/90 hover:bg-slate-900 border border-rose-800/50 rounded-lg flex items-center justify-between cursor-pointer transition active:scale-98">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <b class="text-white font-mono text-[11px]">${t.ticker}</b>
+                            <span class="text-slate-300 text-[10.5px]">${t.name}</span>
+                            <span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-1 rounded font-mono">حذر</span>
+                        </div>
+                        <p class="text-[9.5px] text-rose-400 font-sans">${t.reason}</p>
+                    </div>
+                    <div class="text-left font-mono shrink-0 pr-1">
+                        <span class="text-white font-bold text-[11px] block">${safeFixed(t.close, 2)} ج</span>
+                        <span class="text-[9px] text-rose-400 underline decoration-dotted">خطة الحماية 🛡️</span>
+                    </div>
+                </div>
+            `).join('') || '<div class="text-slate-500 text-center py-2 text-[10px]">لا توجد مؤشرات خطر حرجة حالياً</div>';
+        }
+
         // Set Filter with Full Interactive Integration
-        function setFilter(f, btn) {
+        function setFilter(f, btn = null) {
             triggerHaptic('selection');
             currentFilter = f;
             currentSectorFilter = null;
@@ -7245,7 +7507,63 @@ async function syncMubasherDirectAll() {
 
             // Specialized Institutional Alert Blocks
             if (institutionalBox) {
-                if (currentFilter === 'insiders') {
+                if (currentFilter === 'opportunities') {
+                    institutionalBox.innerHTML = `
+                        <div class="glass-card rounded-2xl p-4 space-y-2 border-emerald-800/80 bg-gradient-to-br from-slate-900 to-emerald-950/40">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                                    🎯 <span>رادار الفرص الذهبية اللحظية (تجميع وقيعان سعرية جذابة)</span>
+                                </h3>
+                                <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono font-bold">فرص شراء</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                يتم رصد الأسهم ذات هوامش الأمان الاستثمارية العالية (خصم ≥ 20% عن القيمة العادلة) أو المتمركزة عند قيعان تشبع بيعي حاد مع بدء ارتداد شرائي مؤسسي.
+                            </p>
+                        </div>
+                    `;
+                } else if (currentFilter === 'threats') {
+                    institutionalBox.innerHTML = `
+                        <div class="glass-card rounded-2xl p-4 space-y-2 border-rose-800/80 bg-gradient-to-br from-slate-900 to-rose-950/40">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                                    ⚠️ <span>رادار التهديدات والمخاطر (تنبيهات جني أرباح واختبار مقاومات)</span>
+                                </h3>
+                                <span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-mono font-bold">إشارات حذر</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                أسهم تتداول عند مناطق تشبع شرائي مفرط (RSI ≥ 68) أو تواجه مقاومات سعرية قوية تستوجب الحذر وتأمين الأرباح برفع الوقف المتحرك وعدم الشراء العاطفي.
+                            </p>
+                        </div>
+                    `;
+                } else if (currentFilter === 'breakout') {
+                    institutionalBox.innerHTML = `
+                        <div class="glass-card rounded-2xl p-4 space-y-2 border-sky-800/80 bg-gradient-to-br from-slate-900 to-sky-950/40">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                                    🚀 <span>رادار الاختراق الفني والزخم الصاعد (Breakout Momentum)</span>
+                                </h3>
+                                <span class="text-[9px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded font-mono font-bold">زخم إيجابي</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                أسهم نجحت في اختراق متوسطاتها المتحركة (SMA 20 و 50) وتتحرك بزخم صاعد مدعوم بتدفقات سيولة شرائية.
+                            </p>
+                        </div>
+                    `;
+                } else if (currentFilter === 'dollar_earners') {
+                    institutionalBox.innerHTML = `
+                        <div class="glass-card rounded-2xl p-4 space-y-2 border-purple-800/80 bg-gradient-to-br from-slate-900 to-purple-950/40">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+                                    💵 <span>شركات التدفق الدولاري والتصدير (تحوط من انخفاض العملة)</span>
+                                </h3>
+                                <span class="text-[9px] bg-purple-950 text-purple-300 border border-purple-800 px-2 py-0.5 rounded font-mono font-bold">تدفق دولاري</span>
+                            </div>
+                            <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                شركات مصرية رائدة تحقق معظم إيراداتها بالعملات الأجنبية الصعبة وتعتبر أفضل أداة تحوط ضد تضخم الأسعار وتقلبات الجنيه.
+                            </p>
+                        </div>
+                    `;
+                } else if (currentFilter === 'insiders') {
                     institutionalBox.innerHTML = `
                         <div class="glass-card rounded-2xl p-4 space-y-3 border-amber-900/60 bg-gradient-to-br from-slate-900 to-amber-950/30">
                             <div class="flex items-center justify-between">
@@ -7311,8 +7629,14 @@ async function syncMubasherDirectAll() {
                 }
             }
 
-            // Filtering
+            // Filtering with Main Asset Slicer & Extended Professional Filters
             let filtered = STOCKS_DATA.filter(s => {
+                const isFund = isFundAsset(s) || isGoldAsset(s);
+
+                // 1. Slicer Segregation: Stocks vs Funds
+                if (currentAssetSlicer === 'stocks' && isFund) return false;
+                if (currentAssetSlicer === 'funds' && !isFund) return false;
+
                 const matchSearch = s.name.toLowerCase().includes(search) || s.ticker.toLowerCase().includes(search);
                 if (!matchSearch) return false;
 
@@ -7322,20 +7646,58 @@ async function syncMubasherDirectAll() {
                 if (currentFilter === 'gainers') return (s.chg || 0) > 0.0001;
                 if (currentFilter === 'losers') return (s.chg || 0) < -0.0001;
                 if (currentFilter === 'unchanged') return Math.abs(s.chg || 0) <= 0.0001;
+                
+                // Professional Technical & Fundamental Filters
                 if (currentFilter === 'oversold') return s.rsi && s.rsi <= 42.0;
                 if (currentFilter === 'overbought') return s.rsi && s.rsi >= 65.0;
-                if (currentFilter === 'liquidity') return ['TMGH', 'FWRY', 'MFPC', 'SWDY', 'ETEL', 'SKPC', 'ABUK', 'AMOC'].includes(s.ticker);
+                if (currentFilter === 'breakout') {
+                    const aboveSma = (s.sma20 && s.close > s.sma20) || (s.chg >= 1.0);
+                    return aboveSma && s.rsi >= 48 && s.rsi <= 68;
+                }
+                if (currentFilter === 'dollar_earners') {
+                    return ['MFPC', 'ABUK', 'ORWE', 'EGAL', 'AMOC', 'SKPC'].includes(s.ticker);
+                }
+                if (currentFilter === 'bluechip') {
+                    return ['TMGH', 'FWRY', 'MFPC', 'SWDY', 'ETEL', 'ABUK', 'ADIB', 'EGAL'].includes(s.ticker);
+                }
+                if (currentFilter === 'near_support') {
+                    const vd = VALUATION_DATA[s.ticker];
+                    const curPrice = safeNum(s.close, (vd ? vd.current : 0));
+                    const supp = vd ? vd.support : (curPrice * 0.93);
+                    const diff = curPrice > 0 ? Math.abs(curPrice - supp) / curPrice : 1;
+                    return diff <= 0.05;
+                }
                 if (currentFilter === 'margin') {
                     const vd = VALUATION_DATA[s.ticker];
-                    const curPrice = s.close || (vd ? vd.current : 0);
+                    const curPrice = safeNum(s.close, (vd ? vd.current : 0));
                     const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
-                    return margin > 20;
+                    return margin >= 20;
                 }
-                if (currentFilter === 'low_pe') return s.pe && s.pe > 0 && s.pe <= 12.0;
+                if (currentFilter === 'low_pe') return s.pe && s.pe > 0 && s.pe <= 10.0;
                 if (currentFilter === 'dividends') return ['ABUK', 'MFPC', 'ORWE', 'AMOC', 'SKPC', 'ISPH'].includes(s.ticker);
                 if (currentFilter === 'divergence') return ['TMGH', 'PHDC', 'FWRY', 'OCDI', 'ISPH'].includes(s.ticker);
                 if (currentFilter === 'insiders') return ['TMGH', 'SKPC', 'FWRY', 'MFPC', 'OCDI'].includes(s.ticker);
-                if (currentFilter === 'funds') return s.type === 'fund' || s.ticker === 'THNDR_GOLD' || ['AZG', 'CMS', 'BWA', 'NMF'].includes(s.ticker);
+
+                // Floor Broker Opportunities & Threats Filters
+                if (currentFilter === 'opportunities') {
+                    const vd = VALUATION_DATA[s.ticker];
+                    const curPrice = safeNum(s.close, (vd ? vd.current : 0));
+                    const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
+                    return (margin >= 20) || (s.rsi && s.rsi <= 40) || (s.chg >= 1.5 && s.rsi <= 55);
+                }
+                if (currentFilter === 'threats') {
+                    const vd = VALUATION_DATA[s.ticker];
+                    const curPrice = safeNum(s.close, (vd ? vd.current : 0));
+                    const res = vd ? vd.resistance : (curPrice * 1.07);
+                    const nearRes = curPrice > 0 ? (res - curPrice) / curPrice < 0.02 : false;
+                    return (s.rsi && s.rsi >= 67) || nearRes || (s.chg <= -2.5);
+                }
+
+                // Specialized Funds Filters
+                if (currentFilter === 'gold') return isGoldAsset(s);
+                if (currentFilter === 'equity_funds') return ['CMS', 'BWA', 'NMF'].includes(s.ticker);
+                if (currentFilter === 'high_yield') return ['AZG', 'CMS', 'BWA'].includes(s.ticker);
+                if (currentFilter === 'daily_liquidity') return ['AZG', 'CMS', 'THNDR_GOLD'].includes(s.ticker);
 
                 return true;
             });
@@ -7474,24 +7836,54 @@ async function syncMubasherDirectAll() {
         function openStockValuation(ticker) {
             triggerHaptic('selection');
             switchMarketSubTab('fair');
+            populateValuationStockSelect();
             const selectEl = document.getElementById('valuationStockSelect');
             if (selectEl) {
+                if (ticker && !Array.from(selectEl.options).some(o => o.value === ticker)) {
+                    const stock = STOCKS_DATA.find(s => s.ticker === ticker);
+                    const opt = document.createElement('option');
+                    opt.value = ticker;
+                    opt.textContent = stock ? `${stock.name} (${ticker})` : ticker;
+                    selectEl.appendChild(opt);
+                }
                 selectEl.value = ticker;
                 renderValuationCard();
             }
         }
 
-        // 4. Valuation Card Matrix
+        // Dynamically populate Valuation dropdown with all 38 market assets
+        function populateValuationStockSelect() {
+            const selectEl = document.getElementById('valuationStockSelect');
+            if (!selectEl) return;
+            const curVal = selectEl.value;
+            // Only populate if needed
+            if (selectEl.options.length <= 16 && typeof STOCKS_DATA !== 'undefined' && STOCKS_DATA.length > 0) {
+                selectEl.innerHTML = '';
+                STOCKS_DATA.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.ticker;
+                    opt.textContent = `${s.name} (${s.ticker})`;
+                    selectEl.appendChild(opt);
+                });
+                if (curVal && STOCKS_DATA.some(s => s.ticker === curVal)) {
+                    selectEl.value = curVal;
+                } else {
+                    selectEl.value = 'TMGH';
+                }
+            }
+        }
+
+        // 4. Valuation Card Matrix (100% Comprehensive for all EGX Assets)
         function renderValuationCard() {
             triggerHaptic('selection');
+            populateValuationStockSelect();
             const selectEl = document.getElementById('valuationStockSelect');
             const ticker = selectEl ? selectEl.value : 'TMGH';
-            const data = VALUATION_DATA[ticker] || VALUATION_DATA['TMGH'];
+            const data = getStockComprehensiveData(ticker);
             const container = document.getElementById('valuationCardContainer');
             if (!container) return;
 
-            const liveStock = STOCKS_DATA.find(s => s.ticker === ticker);
-            const currentPrice = (liveStock && liveStock.close > 0) ? liveStock.close : data.current;
+            const currentPrice = safeNum(data.close, 50.0);
             const margin = currentPrice > 0 ? ((data.base - currentPrice) / currentPrice) * 100 : 0;
             const bullGain = currentPrice > 0 ? ((data.bull - currentPrice) / currentPrice) * 100 : 0;
             const bearRisk = currentPrice > 0 ? ((data.bear - currentPrice) / currentPrice) * 100 : 0;
@@ -8035,7 +8427,7 @@ async function syncMubasherDirectAll() {
 
                 if (hit && a.active) {
                     showToast(`🚨 تنبيه متحقق: ${a.stock} - ${a.desc}`, 'warning');
-                    if (Notification.permission === 'granted') {
+                    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                         new Notification(`🚨 تنبيه سهم ${a.stock}`, {
                             body: `${a.desc} • السعر الحالي: ${s.close.toFixed(2)} ج`,
                             icon: 'icon-192.png'
@@ -8727,13 +9119,18 @@ async function syncMubasherDirectAll() {
         window.filterNewsByInput = filterNewsFeed;
         window.filterNewsCategory = setNewsCategory;
 
-        function setNewsCategory(cat, btn) {
+        function setNewsCategory(cat, btn = null) {
             triggerHaptic('selection');
             currentNewsCategory = cat;
             document.querySelectorAll('.news-pill').forEach(b => {
-                b.className = "news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700";
+                const isMatch = (btn && b === btn) || b.getAttribute('data-cat') === cat;
+                b.className = isMatch 
+                    ? "news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm"
+                    : "news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700";
             });
-            btn.className = "news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm";
+            if (btn && btn.className) {
+                btn.className = "news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm";
+            }
             renderNewsFeed();
         }
 
@@ -9035,9 +9432,18 @@ async function syncMubasherDirectAll() {
                 notes: notes
             };
 
-            const existing = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+            let existing = [];
+            try {
+                const raw = localStorage.getItem('egx_decision_journal');
+                if (raw) existing = JSON.parse(raw);
+                if (!Array.isArray(existing)) existing = [];
+            } catch (e) {
+                existing = [];
+            }
             existing.unshift(entry);
-            localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
+            try {
+                localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
+            } catch (e) {}
 
             document.getElementById('dj_notes').value = '';
             showToast('تم توثيق القرار في السجل بنجاح ✓', 'success');
@@ -9047,7 +9453,14 @@ async function syncMubasherDirectAll() {
         function renderDecisionJournal() {
             const list = document.getElementById('dj_list');
             if (!list) return;
-            const entries = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]');
+            let entries = [];
+            try {
+                const raw = localStorage.getItem('egx_decision_journal');
+                if (raw) entries = JSON.parse(raw);
+                if (!Array.isArray(entries)) entries = [];
+            } catch (e) {
+                entries = [];
+            }
 
             if (entries.length === 0) {
                 list.innerHTML = '<div class="text-slate-500 text-center py-2">لا توجد قرارات مسجلة بعد. وثق أول صفقة بالأعلى!</div>';
