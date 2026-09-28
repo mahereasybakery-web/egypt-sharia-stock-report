@@ -1077,124 +1077,7 @@
             </div><!-- /marketSubViewFair -->
         </section>
 
-        <!-- ================= TAB 2: VALUATION & ANALYSIS ================= -->
-        <section id="view-valuation" class="tab-content space-y-3.5 hidden">
-            <!-- Valuation Sub-Tabs Segmented Bar -->
-            <div class="flex items-center justify-center p-1 bg-slate-900/90 rounded-2xl border border-slate-800 gap-1 text-xs">
-                <button id="valSubTabFairBtn" onclick="switchValuationSubTab('fair')" class="val-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>⚖️</span>
-                    <span>السعر العادل</span>
-                </button>
-                <button id="valSubTabDividendsBtn" onclick="switchValuationSubTab('dividends')" class="val-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>💰</span>
-                    <span>الكوبونات</span>
-                </button>
-                <button id="valSubTabAiBtn" onclick="switchValuationSubTab('ai')" class="val-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>🤖</span>
-                    <span>نبض السوق (AI)</span>
-                </button>
-            </div>
 
-            <!-- Sub-View 1: Fair Value Matrix -->
-            <div id="valSubViewFair" class="space-y-3.5">
-                <!-- Stock Valuation Selector Card -->
-                <div class="glass-card rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                🎯 <span>مصفوفة القيمة العادلة وهوامش الأمان</span>
-                            </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">تقييم استثماري قائم على التدفقات النقدية ومضاعفات الربحية (DCF & P/E).</p>
-                        </div>
-                    </div>
-
-                    <select id="valuationStockSelect" onchange="renderValuationCard()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
-                        <option value="TMGH">مجموعة طلعت مصطفى (TMGH)</option>
-                        <option value="FWRY">فوري للمدفوعات الرقمية (FWRY)</option>
-                        <option value="MFPC">موبكو للأسمدة (MFPC)</option>
-                        <option value="SKPC">سيدي كرير للبتروكيماويات (SKPC)</option>
-                        <option value="ABUK">أبو قير للأسمدة (ABUK)</option>
-                        <option value="ORWE">النساجون الشرقيون (ORWE)</option>
-                        <option value="ISPH">ابن سينا فارما (ISPH)</option>
-                        <option value="AMOC">الإسكندرية للزيوت المعدنية (AMOC)</option>
-                        <option value="SWDY">السويدي إليكتريك (SWDY)</option>
-                        <option value="ETEL">المصرية للاتصالات (ETEL)</option>
-                        <option value="AZG">أزيموت جولد للذهب (AZG)</option>
-                        <option value="THNDR_GOLD">سبائك جولد - ثندر (THNDR_GOLD)</option>
-                        <option value="CMS">مصر شريعة إكويتي (CMS)</option>
-                        <option value="BWA">بلتون وفرة للشريعة (BWA)</option>
-                        <option value="NMF">نعيم مصر للشريعة (NMF)</option>
-                    </select>
-
-                    <div id="valuationCardContainer">
-                        <!-- Dynamic Valuation Card -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-View 2: Dividends & Cash Yield -->
-            <div id="valSubViewDividends" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                💰 <span>سجل التوزيعات النقدية وعوائد الكوبونات</span>
-                            </h2>
-                            <p class="text-xs text-slate-400 mt-0.5">الأسهم ذات التدفقات النقدية الدورية ومواعيد استحقاق الكوبونات.</p>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right text-xs">
-                            <thead class="border-b border-slate-800 text-[10px] select-none">
-                                <tr class="text-slate-400">
-                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('name')">السهم <span class="opacity-40">↕</span></th>
-                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('coupon')">قيمة الكوبون <span class="opacity-40">↕</span></th>
-                                    <th class="pb-2 cursor-pointer hover:text-amber-400" onclick="sortDividendsTable('yield')">العائد ٪ <span class="opacity-40">↕</span></th>
-                                    <th class="pb-2">نهاية الحق</th>
-                                    <th class="pb-2">الصرف</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dividendsTableBody" class="divide-y divide-slate-800/60 font-medium text-[11px]">
-                                <!-- Populated dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-View 3: AI Pulse Market Summary Card -->
-            <div id="valSubViewAi" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/60 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-base">🤖</span>
-                            <h2 class="text-xs font-bold text-white">نبض السوق والمستشار الذكي (Gemini AI Pulse)</h2>
-                        </div>
-                        <span class="text-[10px] bg-emerald-900/90 text-emerald-300 border border-emerald-700/80 px-2 py-0.5 rounded-full flex items-center gap-1 font-medium">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
-                            تحليل مباشر للجلسة
-                        </span>
-                    </div>
-                    <p id="ai_pulse_text" class="text-xs text-slate-300 leading-relaxed">
-                        «يشهد مؤشر الشريعة $EGX33$ حركة تجميع إيجابية بقيادة قطاع البتروكيماويات والتصدير، مع دخول سيولة استثمارية ملحوظة في أسهم الأسمدة. التوصية: التركيز على أسهم التدفقات النقدية ذات مكررات الربحية الأقل من $7.5x$ مع اقتناص الارتدادات الفنية في الأسهم ذات مؤشر $RSI < 40$ وهامش أمان استثماري يفوق $20\%$».
-                    </p>
-                    <div class="grid grid-cols-3 gap-2 pt-1 text-center text-[10px]">
-                        <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400 block">شهية المخاطرة</span>
-                            <b id="ai_score_badge" class="text-emerald-400 font-bold text-xs mt-0.5 block">متفائلة (78%)</b>
-                        </div>
-                        <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400 block">القطاع القائد</span>
-                            <b id="ai_sector_badge" class="text-amber-400 font-bold text-xs mt-0.5 block">الأسمدة والكيماويات</b>
-                        </div>
-                        <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400 block">استراتيجية اليوم</span>
-                            <b class="text-sky-400 font-bold text-xs mt-0.5 block">تجميع على الدعوم</b>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <!-- ================= NEWS (hidden - now inside Market tab) ================= -->
         <section id="view-news" class="tab-content space-y-3.5 hidden" style="display:none!important">
@@ -1242,12 +1125,12 @@
 
                 <!-- Thndr 3 Mini Wealth Status Cards (مطابقة 100% مع لقطة شاشة ثندر بشكل مدمج وأنيق) -->
                 <div class="grid grid-cols-4 gap-1.5 sm:gap-2 pt-1.5 border-t border-slate-800/80 text-center text-xs">
-                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
+                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center" title="السيولة النقدية الحرة غير المستثمرة (كاش معلق)">
                         <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
                             <span>🪙</span>
-                            <span>المحفظة</span>
+                            <span>السيولة النقدية</span>
                         </div>
-                        <div id="p_thndr_cash" class="font-bold text-white font-mono text-[11px] sm:text-sm">0 ج</div>
+                        <div id="p_thndr_cash" class="font-bold text-emerald-400 font-mono text-[11px] sm:text-sm">0 ج</div>
                         <div id="p_thndr_clawdz" class="hidden">0.00 ج</div>
                     </div>
                     <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
@@ -3146,7 +3029,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.6')
+                navigator.serviceWorker.register('sw.js?v=12.7')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4140,8 +4023,7 @@
             const stocksSmartBody = document.getElementById('stocksHoldingsSmartBody');
             const fundsSmartBody  = document.getElementById('fundsHoldingsSmartBody');
             const goldSmartBody   = document.getElementById('goldHoldingsSmartBody');
-            const stocksTbody     = document.getElementById('stocksHoldingsTableBody');
-            const fundsTbody      = document.getElementById('fundsHoldingsTableBody');
+
             const stocksCards     = document.getElementById('stocksHoldingsCardsContainer');
             const fundsCards      = document.getElementById('fundsHoldingsCardsContainer');
             const goldCards       = document.getElementById('goldHoldingsCardsContainer');
@@ -4149,8 +4031,7 @@
             if (stocksSmartBody) stocksSmartBody.innerHTML = '';
             if (fundsSmartBody)  fundsSmartBody.innerHTML = '';
             if (goldSmartBody)   goldSmartBody.innerHTML = '';
-            if (stocksTbody)     stocksTbody.innerHTML = '';
-            if (fundsTbody)      fundsTbody.innerHTML = '';
+
             if (stocksCards)     stocksCards.innerHTML = '';
             if (fundsCards)      fundsCards.innerHTML = '';
             if (goldCards)       goldCards.innerHTML = '';
@@ -4512,16 +4393,7 @@
             const healthElem = document.getElementById('p_thndr_health_score');
             if (healthElem) healthElem.innerText = 'صحة الثروة: 94/100';
 
-            // Stress tests
-            const s1 = totalInvestedVal * -0.07;
-            const s2 = totalInvestedVal * 0.052;
-            const s3 = totalInvestedVal * 0.041;
-            const st1 = document.getElementById('stress_shock_1');
-            if (st1) st1.innerText = `-7.0% (${s1.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
-            const st2 = document.getElementById('stress_shock_2');
-            if (st2) st2.innerText = `+5.2% (+${s2.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
-            const st3 = document.getElementById('stress_shock_3');
-            if (st3) st3.innerText = `+4.1% (+${s3.toLocaleString(undefined, {maximumFractionDigits:0})} ج)`;
+
 
             // Active count badge
             const activeCountBadge = document.getElementById('portfolioActiveCountBadge');
@@ -5648,33 +5520,7 @@
             drawAdvancedChart();
         }
 
-        function setChartType(type) {
-            triggerHaptic('light');
-            activeChartType = type;
-            const btnLine = document.getElementById('chartTypeLineBtn');
-            const btnCandle = document.getElementById('chartTypeCandleBtn');
-            const btnHollow = document.getElementById('chartTypeHollowBtn');
 
-            if (btnLine) {
-                btnLine.className = type === 'line' 
-                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
-                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
-            }
-            if (btnCandle) {
-                btnCandle.className = type === 'candles'
-                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
-                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
-            }
-            if (btnHollow) {
-                btnHollow.className = type === 'hollow'
-                    ? 'px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white shadow-sm'
-                    : 'px-2 py-0.5 rounded text-[10px] text-slate-400 hover:text-white';
-            }
-
-            if (activeChartEngine === 'canvas') {
-                drawAdvancedChart();
-            }
-        }
 
         function generateTimeframeCandles(stock, valData, tf) {
             let numCandles = 28;
@@ -5962,7 +5808,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v12.6',
+                appVersion: 'egx-sharia-v12.7',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -7302,30 +7148,7 @@ async function syncMubasherDirectAll() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function switchValuationSubTab(sub) {
-            triggerHaptic('selection');
-            const btns = {
-                fair: document.getElementById('valSubTabFairBtn'),
-                dividends: document.getElementById('valSubTabDividendsBtn'),
-                ai: document.getElementById('valSubTabAiBtn')
-            };
-            const views = {
-                fair: document.getElementById('valSubViewFair'),
-                dividends: document.getElementById('valSubViewDividends'),
-                ai: document.getElementById('valSubViewAi')
-            };
 
-            Object.keys(btns).forEach(k => {
-                if (btns[k]) {
-                    if (k === sub) btns[k].className = "val-subtab-btn flex-1 py-1.5 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5";
-                    else btns[k].className = "val-subtab-btn flex-1 py-1.5 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1.5";
-                }
-                if (views[k]) {
-                    if (k === sub) views[k].classList.remove('hidden');
-                    else views[k].classList.add('hidden');
-                }
-            });
-        }
 
         function switchToolsSubTab(sub) {
             triggerHaptic('selection');
@@ -7397,53 +7220,7 @@ async function syncMubasherDirectAll() {
             out.classList.remove('hidden');
         }
 
-        // 11. Compound Wealth Calculator
-        function calculateCompoundWealth() {
-            triggerHaptic('medium');
-            const initial = parseFloat(document.getElementById('cw_initial').value) || 0;
-            const monthly = parseFloat(document.getElementById('cw_monthly').value) || 0;
-            const divYield = (parseFloat(document.getElementById('cw_yield').value) || 0) / 100;
-            const capitalGrowth = (parseFloat(document.getElementById('cw_growth').value) || 0) / 100;
-            const totalRate = divYield + capitalGrowth;
 
-            function futureVal(years) {
-                let val = initial;
-                for (let y = 1; y <= years; y++) {
-                    val = (val + (monthly * 12)) * (1 + totalRate);
-                }
-                return val;
-            }
-
-            const y3 = futureVal(3);
-            const y5 = futureVal(5);
-            const y10 = futureVal(10);
-            const y15 = futureVal(15);
-
-            const out = document.getElementById('cw_output');
-            out.innerHTML = `
-                <div class="font-bold text-amber-300">🌟 توقعات نمو الثروة التراكمية مع إعادة استثمار الكوبونات:</div>
-                <div class="grid grid-cols-2 gap-2 text-center pt-1">
-                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 text-[10px] block">بعد 3 سنوات</span>
-                        <b class="text-white text-xs font-mono">${y3.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
-                    </div>
-                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 text-[10px] block">بعد 5 سنوات</span>
-                        <b class="text-emerald-400 text-xs font-mono">${y5.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
-                    </div>
-                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 text-[10px] block">بعد 10 سنوات</span>
-                        <b class="text-amber-400 text-xs font-mono">${y10.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
-                    </div>
-                    <div class="p-2 bg-slate-800 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 text-[10px] block">بعد 15 سنة</span>
-                        <b class="text-purple-400 text-xs font-mono">${y15.toLocaleString(undefined, {maximumFractionDigits: 0})} ج</b>
-                    </div>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-1">توضح هذه الأرقام القوة الهائلة لأثر الفائدة المركبة ($Compounding$) عند إعادة شراء وثائق صناديق الذهب والأسهم الشريعية بانتظام.</p>
-            `;
-            out.classList.remove('hidden');
-        }
 
         // 12. Zakat Calculator
         function fillZakatFromPortfolio() {
@@ -9348,7 +9125,7 @@ async function syncMubasherDirectAll() {
 
             // Handle Cash & Clawdz Liquidity
             if (filter === 'all' || filter === 'cash') {
-                const clawdzBalance = (THNDR_CASH && THNDR_CASH.clawdz) ? THNDR_CASH.clawdz : 22.18;
+                const clawdzBalance = (THNDR_CASH && typeof THNDR_CASH.clawdz === 'number') ? THNDR_CASH.clawdz : 0.0;
                 const clawdzAnnualYield = (THNDR_CASH && THNDR_CASH.clawdzRate) ? (THNDR_CASH.clawdzRate / 100) : 0.1731;
                 // Daily compound return for elapsed period
                 const periodReturnAmount = clawdzBalance * (clawdzAnnualYield / 365) * elapsedDays;
@@ -9969,8 +9746,7 @@ async function syncMubasherDirectAll() {
             // Update secondary sections
             updateLiveGoalsInput();
             updateLiveZakatInput();
-            updateLiveStressBadges();
-            if (badge) {
+                        if (badge) {
                 badge.textContent = '🟢 محدث الآن';
                 badge.style.color = '#34d399';
                 setTimeout(() => {
@@ -9998,22 +9774,7 @@ async function syncMubasherDirectAll() {
             } catch(e) {}
         }
 
-        function updateLiveStressBadges() {
-            try {
-                const totalP = userHoldings.reduce((s,h) => s+(h.cur||h.buy||0)*h.qty,0)+(THNDR_CASH?.cash||0);
-                const equityV = userHoldings.filter(h=>!isFundAsset(h) && !isGoldAsset(h)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
-                const goldV   = userHoldings.filter(h=>['AZG','THNDR_GOLD'].includes(h.ticker)).reduce((s,h)=>s+(h.cur||h.buy||0)*h.qty,0);
-                const fmt0 = n => n.toLocaleString('ar-EG',{minimumFractionDigits:0,maximumFractionDigits:0});
 
-                const s1 = document.getElementById('stress_shock_1');
-                const s2 = document.getElementById('stress_shock_2');
-                const s3 = document.getElementById('stress_shock_3');
-
-                if (s1) { const v=-(equityV*0.07); s1.textContent=fmt0(v)+' ج ('+(totalP>0?(v/totalP*100).toFixed(1):'0')+'٪)'; }
-                if (s2) { const v=equityV*0.052+goldV*0.08; s2.textContent='+'+fmt0(v)+' ج'; }
-                if (s3) { const v=goldV*0.15; s3.textContent='+'+fmt0(v)+' ج'; }
-            } catch(e) {}
-        }
 
         // Mark inputs as user-modified when touched
         document.addEventListener('DOMContentLoaded', () => {
@@ -10877,6 +10638,168 @@ async function syncMubasherDirectAll() {
                 <button type="button" onclick="applyThndrParsedPortfolio()" class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-emerald-900/40 active:scale-95 flex items-center justify-center gap-2">
                     <span>✅</span>
                     <span>اعتماد وتحديث المحفظة في السيستم فوراً</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="periodPerformanceModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="glass-card bg-[#0b101d] border border-slate-700/80 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden my-auto" dir="rtl">
+            
+            <!-- Modal Header -->
+            <div class="px-5 py-4 border-b border-slate-800/80 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-xl shadow-inner">
+                        📅
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm sm:text-base font-bold text-white">محلل أداء وحركة الاستثمارات بين تاريخين</h3>
+                            <span class="text-[10px] bg-indigo-900/60 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded-full font-mono">SOCPA / IFRS</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400">حساب الأرباح والخسائر وحركة الأسعار لكل سهم وصندوق وجهة استثمارية بدقة</p>
+                    </div>
+                </div>
+                <button onclick="closePeriodPerformanceModal()" class="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-base transition active:scale-90">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-4">
+
+                <!-- 1. Date Range & Filter Controls -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                            <span>⏱️</span>
+                            <span>تحديد النطاق الزمني والفلترة:</span>
+                        </span>
+                        
+                        <!-- Quick Presets -->
+                        <div class="flex items-center gap-1 flex-wrap text-[10px]">
+                            <button onclick="setPeriodPerformancePreset('inception')" class="px-2 py-1 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-800/60 transition active:scale-95">منذ الشراء</button>
+                            <button onclick="setPeriodPerformancePreset('7d')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95">آخر 7 أيام</button>
+                            <button onclick="setPeriodPerformancePreset('30d')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95">آخر 30 يوم</button>
+                            <button onclick="setPeriodPerformancePreset('mtd')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95">بداية الشهر</button>
+                            <button onclick="setPeriodPerformancePreset('qtd')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95">بداية الربع</button>
+                            <button onclick="setPeriodPerformancePreset('ytd')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition active:scale-95">بداية 2026</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1 font-medium">من تاريخ (تاريخ الأساس / البداية):</label>
+                            <input type="date" id="perfStartDate" onchange="runPeriodPerformanceAnalysis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1 font-medium">إلى تاريخ (تاريخ الإقفال / النهاية):</label>
+                            <input type="date" id="perfEndDate" onchange="runPeriodPerformanceAnalysis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-indigo-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1 font-medium">فلترة الأصول المعروضة:</label>
+                            <select id="perfAssetFilter" onchange="runPeriodPerformanceAnalysis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
+                                <option value="all">جميع الاستثمارات (أسهم + صناديق + سيولة)</option>
+                                <option value="stocks">الأسهم فقط (EGX 33)</option>
+                                <option value="funds">صناديق الاستثمار والذهب فقط</option>
+                                <option value="cash">سيولة كلوودز والمرابحة فقط</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Executive Summary Cards (النتيجة الإجمالية للفترة) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-1 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-medium">قيمة البداية (تاريخ الأساس)</span>
+                        <div id="perfCardStartVal" class="text-base sm:text-lg font-bold text-white font-mono">-- ج.م</div>
+                        <span id="perfCardStartDateLbl" class="text-[9px] text-slate-500 font-mono block">--</span>
+                    </div>
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-1 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-medium">قيمة النهاية (تاريخ الإقفال)</span>
+                        <div id="perfCardEndVal" class="text-base sm:text-lg font-bold text-sky-400 font-mono">-- ج.م</div>
+                        <span id="perfCardEndDateLbl" class="text-[9px] text-slate-500 font-mono block">--</span>
+                    </div>
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-1 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-medium">نتيجة الاستثمار (ربح / خسارة)</span>
+                        <div id="perfCardNetPnl" class="text-base sm:text-lg font-bold font-mono">-- ج.م</div>
+                        <span id="perfCardDays" class="text-[9px] text-slate-500 font-mono block">0 يوم منقضي</span>
+                    </div>
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 space-y-1 shadow-sm">
+                        <span class="text-[10px] text-slate-400 font-medium">العائد المئوي للفترة</span>
+                        <div id="perfCardReturnPct" class="text-base sm:text-lg font-bold font-mono">--%</div>
+                        <span id="perfCardAnnualized" class="text-[9px] text-emerald-400/80 font-mono block">معادل سنوي: --%</span>
+                    </div>
+                </div>
+
+                <!-- 3. Performance by Investment Entity / Asset Class (تفصيل كل جهة استثمار) -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <span>🏛️</span>
+                        <span>تفصيل الأداء والأرباح حسب كل جهة استثمار:</span>
+                    </h4>
+                    <div id="perfEntitiesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- 4. Itemized Performance Table (تفصيل كل سهم وصندوق على حدة) -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h4 class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <span>📋</span>
+                            <span>الجدول التفصيلي لحركة ونتيجة كل سهم وصندوق:</span>
+                        </h4>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="exportPeriodPerformanceCsv()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[10px] px-2.5 py-1 rounded-lg transition flex items-center gap-1 active:scale-95" title="تصدير إكسل">
+                                <span>📊</span>
+                                <span>تصدير Excel</span>
+                            </button>
+                            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[10px] px-2.5 py-1 rounded-lg transition flex items-center gap-1 active:scale-95" title="طباعة تقرير الفترة">
+                                <span>🖨️</span>
+                                <span>طباعة / PDF</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                        <table class="w-full text-right text-xs">
+                            <thead class="bg-slate-900/90 text-slate-400 text-[10px] border-b border-slate-800 font-medium">
+                                <tr>
+                                    <th class="p-3">بند الاستثمار</th>
+                                    <th class="p-3">الجهة / التصنيف</th>
+                                    <th class="p-3 text-center">الكمية</th>
+                                    <th class="p-3 text-center">سعر البداية</th>
+                                    <th class="p-3 text-center">سعر النهاية</th>
+                                    <th class="p-3 text-center">تغير السعر</th>
+                                    <th class="p-3 text-center">قيمة البداية</th>
+                                    <th class="p-3 text-center">قيمة النهاية</th>
+                                    <th class="p-3 text-center">الربح / الخسارة</th>
+                                    <th class="p-3 text-center">العائد %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="perfItemizedTbody" class="divide-y divide-slate-800/60 font-mono text-[11px]">
+                                <!-- Rows injected via JavaScript -->
+                            </tbody>
+                            <tfoot id="perfItemizedTfoot" class="bg-slate-900/90 font-bold border-t border-slate-800 text-[11px]">
+                                <!-- Totals row injected via JavaScript -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-3 border-t border-slate-800/80 bg-slate-900/70 flex items-center justify-between text-xs text-slate-400 shrink-0">
+                <span class="flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>حسابات لحظية مطابقة لمعايير المراجعة المالية والتقييم المحاسبي المستمر</span>
+                </span>
+                <button onclick="closePeriodPerformanceModal()" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition active:scale-95">
+                    إغلاق
                 </button>
             </div>
 
