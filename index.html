@@ -3146,7 +3146,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.3')
+                navigator.serviceWorker.register('sw.js?v=12.4')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4624,7 +4624,7 @@
                 const val = sectorWeights[sec];
                 const pct = totalMarketVal > 0 ? (val / totalMarketVal) * 100 : 0;
                 return { name: sec, val, pct };
-            }).sort((a, b) => b.val - a.val);
+            }).filter(sec => sec.val > 0).sort((a, b) => b.val - a.val);
 
             if (sectors.length === 0) {
                 container.innerHTML = '<div class="text-slate-500 text-center py-2 text-xs">لا توجد أصول لعرض توزيع القطاعات</div>';
@@ -4653,6 +4653,26 @@
                 container.appendChild(row);
             });
 
+            // Dynamic Asset Breakdown Calculation
+            let dStocksVal = 0, dFundsVal = 0, dGoldVal = 0;
+            if (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) {
+                userHoldings.forEach(h => {
+                    const price = parseFloat(h.cur) || parseFloat(h.buy) || 0;
+                    const val = price * (parseFloat(h.qty) || 0);
+                    if (isGoldAsset(h)) {
+                        dGoldVal += val;
+                    } else if (isFundAsset(h)) {
+                        dFundsVal += val;
+                    } else {
+                        dStocksVal += val;
+                    }
+                });
+            }
+            const dGrandTotal = dStocksVal + dFundsVal + dGoldVal + (THNDR_CASH?.cash || 0) + (THNDR_CASH?.clawdz || 0);
+            const stocksPct = dGrandTotal > 0 ? ((dStocksVal / dGrandTotal) * 100).toFixed(1) : "0.0";
+            const fundsPct  = dGrandTotal > 0 ? ((dFundsVal / dGrandTotal) * 100).toFixed(1) : "0.0";
+            const goldPct   = dGrandTotal > 0 ? ((dGoldVal / dGrandTotal) * 100).toFixed(1) : "0.0";
+
             // Status message
             if (statusBadge) {
                 statusBadge.innerText = "توزيع ثروة متوازن وممتاز";
@@ -4660,7 +4680,7 @@
             }
             if (alertElem) {
                 alertElem.className = "p-2.5 rounded-xl text-[11px] leading-relaxed bg-slate-950/80 border border-slate-800 text-slate-300 block";
-                alertElem.innerHTML = `💡 <b>تحليل ثروة ثندر:</b> تشكل سيولة كلاودز والاستثمار اليومي <b>56.6%</b> من إجمالي ثروتك، بينما تشكل الأسهم المتوافقة مع الشريعة <b>42.3%</b> والصناديق والذهب <b>1.1%</b>، وهو مزيج عالي السيولة والأمان.`;
+                alertElem.innerHTML = `💡 <b>تحليل توزيع الثروة المحدث:</b> تشكل <b>صناديق المؤشرات والاستثمار الإسلامية ${fundsPct}%</b> (${Math.round(dFundsVal).toLocaleString()} ج)، بينما تشكل <b>الأسهم المتوافقة مع الشريعة ${stocksPct}%</b> (${Math.round(dStocksVal).toLocaleString()} ج)، والذهب <b>${goldPct}%</b> (${Math.round(dGoldVal).toLocaleString()} ج)؛ وهو هيكل استثماري متنوع وعالي الانضباط الشرعي يتحدث لحظياً.`;
             }
         }
 
