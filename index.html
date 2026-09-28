@@ -4659,7 +4659,7 @@
             }
             if (alertElem) {
                 alertElem.className = "p-2.5 rounded-xl text-[11px] leading-relaxed bg-slate-950/80 border border-slate-800 text-slate-300 block";
-                alertElem.innerHTML = `💡 <b>تحليل توزيع الثروة المحدث:</b> تشكل <b>صناديق المؤشرات والاستثمار الإسلامية ${fundsPct}%</b> (${Math.round(dFundsVal).toLocaleString()} ج)، بينما تشكل <b>الأسهم المتوافقة مع الشريعة ${stocksPct}%</b> (${Math.round(dStocksVal).toLocaleString()} ج)، والذهب <b>${goldPct}%</b> (${Math.round(dGoldVal).toLocaleString()} ج)؛ وهو هيكل استثماري متنوع وعالي الانضباط الشرعي يتحدث لحظياً.`;
+                alertElem.innerHTML = `💡 <b>تحليل توزيع الثروة المحدث:</b> تشكل <b>صناديق المؤشرات والاستثمار الإسلامية ${fundsPct}%</b> (${Math.round(dFundsVal).toLocaleString()} ج)، بينما تشكل <b>الأسهم المتوافقة مع الشريعة EGX33{stocksPct}%</b> (${Math.round(dStocksVal).toLocaleString()} ج)، والذهب <b>${goldPct}%</b> (${Math.round(dGoldVal).toLocaleString()} ج)؛ وهو هيكل استثماري متنوع وعالي الانضباط الشرعي يتحدث لحظياً.`;
             }
         }
 
@@ -6949,7 +6949,7 @@ async function syncMubasherDirectAll() {
                 const g1Text = g1 ? `<b>${g1.name}</b> (${g1.chg >= 0 ? '+' : ''}${g1.chg.toFixed(2)}%)` : '';
                 const g2Text = g2 ? `و<b>${g2.name}</b> (${g2.chg >= 0 ? '+' : ''}${g2.chg.toFixed(2)}%)` : '';
                 const overText = oversoldList.length > 0 ? `مع رصد قيعان ارتدادية في سهم <b>${oversoldList[0].name}</b> (RSI: ${oversoldList[0].rsi.toFixed(1)}).` : '';
-                pulseText.innerHTML = `«مؤشر الشريعة $EGX33$ يسجل متوسط أداء <b>${avgChg >= 0 ? '+' : ''}${avgChg.toFixed(2)}%</b> اليوم. يتصدر قطاع <b>${topSector.name}</b> حركة السيولة، ويقود الزخم ${g1Text} ${g2Text}. تسجل الجلسة <b>${advancers}</b> سهماً رابحاً مقابل <b>${decliners}</b> سهماً هابطاً، ${overText}»`;
+                pulseText.innerHTML = `«مؤشر الشريعة EGX33EGX33$ يسجل متوسط أداء <b>${avgChg >= 0 ? '+' : ''}${avgChg.toFixed(2)}%</b> اليوم. يتصدر قطاع <b>${topSector.name}</b> حركة السيولة، ويقود الزخم ${g1Text} ${g2Text}. تسجل الجلسة <b>${advancers}</b> سهماً رابحاً مقابل <b>${decliners}</b> سهماً هابطاً، ${overText}»`;
             }
         }
 
