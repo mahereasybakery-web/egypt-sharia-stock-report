@@ -22,6 +22,21 @@
         })();
     </script>
 
+    <script>
+        // Global Bulletproof Error & Unhandled Rejection Guards (Zero Crash Architecture)
+        window.addEventListener('error', function(e) {
+            console.warn('[Global Guard] Handled window error:', e.message, 'at', e.filename, ':', e.lineno);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.warn('[Global Guard] Handled unhandled promise rejection:', e.reason);
+        });
+        // Defensive number formatting helper
+        window.safeFixed = function(val, dec = 2) {
+            const n = parseFloat(val);
+            return (isNaN(n) || !isFinite(n)) ? '0.00' : n.toFixed(dec);
+        };
+    </script>
+
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3023,7 +3038,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.8')
+                navigator.serviceWorker.register('sw.js?v=12.9')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3117,18 +3132,24 @@
         // =========================================================================
         let currentActiveTab = 'portfolio';
 
+        const ALL_APP_MODALS = [
+            'periodPerformanceModal', 'thndrScannerModal', 'activityImageZoomModal',
+            'activityDetailModal', 'portfolioBackupModal', 'helpGlossaryModal',
+            'installModal', 'holdingModal', 'stockChartModal'
+        ];
+
         function isAnyModalOpen() {
-            const modalIds = ['stockChartModal', 'holdingModal', 'installModal'];
-            return modalIds.some(id => {
+            return ALL_APP_MODALS.some(id => {
                 const el = document.getElementById(id);
                 return el && !el.classList.contains('hidden');
             });
         }
 
         function getTopOpenModalId() {
-            if (document.getElementById('installModal') && !document.getElementById('installModal').classList.contains('hidden')) return 'installModal';
-            if (document.getElementById('holdingModal') && !document.getElementById('holdingModal').classList.contains('hidden')) return 'holdingModal';
-            if (document.getElementById('stockChartModal') && !document.getElementById('stockChartModal').classList.contains('hidden')) return 'stockChartModal';
+            for (const id of ALL_APP_MODALS) {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('hidden')) return id;
+            }
             return null;
         }
 
@@ -3158,7 +3179,19 @@
             // 1. إذا كانت أي نافذة منبثقة مفتوحة، نغلقها أولاً ونبقى في الصفحة
             const topModal = getTopOpenModalId();
             if (topModal) {
-                if (topModal === 'stockChartModal') {
+                if (topModal === 'periodPerformanceModal' && typeof closePeriodPerformanceModal === 'function') {
+                    closePeriodPerformanceModal();
+                } else if (topModal === 'thndrScannerModal' && typeof closeThndrScannerModal === 'function') {
+                    closeThndrScannerModal();
+                } else if (topModal === 'activityImageZoomModal' && typeof closeActivityImageZoom === 'function') {
+                    closeActivityImageZoom();
+                } else if (topModal === 'activityDetailModal' && typeof closeActivityDetailModal === 'function') {
+                    closeActivityDetailModal();
+                } else if (topModal === 'portfolioBackupModal' && typeof closePortfolioBackupModal === 'function') {
+                    closePortfolioBackupModal();
+                } else if (topModal === 'helpGlossaryModal' && typeof closeHelpGlossaryModal === 'function') {
+                    closeHelpGlossaryModal();
+                } else if (topModal === 'stockChartModal') {
                     closeChartModal(false);
                 } else if (topModal === 'holdingModal') {
                     closeHoldingModal(false);
@@ -3649,6 +3682,27 @@
         };
 
 
+        // Live Currency & Commodity Pricing Helpers (Defensive Guards)
+        function getLiveUsdRate() {
+            if (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) {
+                const item = window.GLOBAL_STATE.fx_gold.usd_egp;
+                const val = typeof item === 'object' ? item.close : item;
+                const n = parseFloat(val);
+                if (!isNaN(n) && n > 0) return n;
+            }
+            return 48.75;
+        }
+
+        function getLiveGoldGramRate() {
+            if (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) {
+                const item = window.GLOBAL_STATE.fx_gold.gold_24k;
+                const val = typeof item === 'object' ? item.close : item;
+                const n = parseFloat(val);
+                if (!isNaN(n) && n > 0) return n;
+            }
+            return 7120.00;
+        }
+
         function loadUserPortfolio() {
             // Load Thndr actual portfolio as default (v11 key for exact 86,645 EGP + 0 cash sync)
             const storageKey = 'egx_sharia_thndr_portfolio_v13_exact';
@@ -3701,9 +3755,13 @@
         }
 
         function saveUserPortfolio() {
-            localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
-            localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
-            localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 0 }));
+            try {
+                localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
+                localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
+                localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 0 }));
+            } catch (e) {
+                console.warn('[Storage] Quota or private mode warning:', e);
+            }
             window.userHoldings = userHoldings;
             renderHoldingsTable();
             checkUserAlerts();
@@ -3813,7 +3871,7 @@
             const badgeColor = isFund 
                 ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' 
                 : 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
-            const buyDisplay = (h.buy >= 100) ? h.buy.toFixed(2) : ((h.buy < 10) ? ((h.buy < 1) ? h.buy.toFixed(4) : h.buy.toFixed(2)) : h.buy.toFixed(2));
+            const buyDisplay = (parseFloat(h.buy)||0) < 1 ? (parseFloat(h.buy)||0).toFixed(4) : (parseFloat(h.buy)||0).toFixed(2);
 
             card.innerHTML = `
                 <!-- Top Row: Identity + Valuation & Returns -->
@@ -3878,7 +3936,7 @@
                     <div class="text-left">
                         <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">السعر الحالي ⚡</span>
                         <div class="flex items-center justify-end gap-1 mt-0.5">
-                            <b class="font-mono text-slate-900 dark:text-white text-xs font-bold">${h.cur.toFixed(2)} ج</b>
+                            <b class="font-mono text-slate-900 dark:text-white text-xs font-bold">${(parseFloat(h.cur)||0).toFixed(2)} ج</b>
                         </div>
                         <span class="text-[9px] font-mono ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} block mt-0.5 font-medium">
                             ${diffPrice >= 0 ? '▲ +' : '▼ '}${diffPrice.toFixed(2)}
@@ -3926,7 +3984,7 @@
             const diffPrice = (h.cur || 0) - (h.buy || 0);
             const badgeColor = isFund ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/90 dark:text-slate-300 dark:border-slate-700/60';
             const isGold = isGoldAsset(h);
-            const buyDisplay = (h.buy >= 100) ? h.buy.toFixed(2) : ((h.buy < 10) ? ((h.buy < 1) ? h.buy.toFixed(4) : h.buy.toFixed(2)) : h.buy.toFixed(2));
+            const buyDisplay = (parseFloat(h.buy)||0) < 1 ? (parseFloat(h.buy)||0).toFixed(4) : (parseFloat(h.buy)||0).toFixed(2);
 
             tr.innerHTML = `
                 <td class="py-2.5 pr-2 sm:pr-3 align-middle overflow-hidden">
@@ -3964,10 +4022,10 @@
                         <span>${isFund ? 'وثيقة' : (isGold ? 'جرام' : 'سهم')}</span>
                     </div>
                 </td>
-                <td class="py-2.5 px-0.5 text-center font-mono align-middle" title="سعر البورصة اللحظي: ${h.cur.toFixed(2)} ج">
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle" title="سعر البورصة اللحظي: ${(parseFloat(h.cur)||0).toFixed(2)} ج">
                     <div class="flex items-center justify-center gap-0.5 text-[10.5px] font-bold text-slate-900 dark:text-white leading-tight">
                         <span class="text-amber-500 dark:text-amber-400 text-[9px] animate-pulse">⚡</span>
-                        <span>${h.cur >= 100 ? h.cur.toFixed(2) : (h.cur < 10 ? h.cur.toFixed(2) : h.cur.toFixed(2))}</span>
+                        <span>${(parseFloat(h.cur)||0).toFixed(2)}</span>
                     </div>
                     <div class="text-[8px] ${diffPrice >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'} font-medium whitespace-nowrap mt-0.5">
                         <span dir="ltr">${diffPrice >= 0 ? '▲ +' : '▼ '}${Math.abs(diffPrice).toFixed(1)}</span>
@@ -4369,11 +4427,11 @@
                 grandLabelElem.className = `text-[9px] font-sans font-medium hidden sm:inline ${isGrandP ? 'text-emerald-300' : 'text-rose-300'}`;
             }
 
-            // Currency & Commodities Equivalence
-            const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
-            const goldRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k : 4340.91;
-            const usdVal = grandWealth / usdRate;
-            const goldGrams = grandWealth / goldRate;
+            // Currency & Commodities Equivalence (Live Verified Rates)
+            const usdRate = getLiveUsdRate();
+            const goldRate = getLiveGoldGramRate();
+            const usdVal = usdRate > 0 ? (grandWealth / usdRate) : 0;
+            const goldGrams = goldRate > 0 ? (grandWealth / goldRate) : 0;
 
             const usdElem = document.getElementById('p_thndr_usd_val');
             if (usdElem) usdElem.innerText = `$${Math.round(usdVal).toLocaleString()} USD`;
@@ -4607,9 +4665,9 @@
             const curPrice = stock ? stock.close : (holding ? holding.cur : 0);
 
             document.getElementById('transCurrentQtyText').innerText = curQty.toLocaleString();
-            document.getElementById('transCurrentAvgText').innerText = `${curAvg.toFixed(2)} ج`;
-            document.getElementById('transMarketPriceHint').innerText = `آخر سعر: ${curPrice.toFixed(2)} ج`;
-            document.getElementById('modalHoldingBuyPrice').value = curPrice > 0 ? curPrice.toFixed(2) : (curAvg > 0 ? curAvg.toFixed(2) : "50.00");
+            document.getElementById('transCurrentAvgText').innerText = `${(parseFloat(curAvg)||0).toFixed(2)} ج`;
+            document.getElementById('transMarketPriceHint').innerText = `آخر سعر: ${(parseFloat(curPrice)||0).toFixed(2)} ج`;
+            document.getElementById('modalHoldingBuyPrice').value = curPrice > 0 ? (parseFloat(curPrice)||0).toFixed(2) : (curAvg > 0 ? (parseFloat(curAvg)||0).toFixed(2) : "50.00");
 
             updateTransImpactPreview();
         }
@@ -4706,7 +4764,7 @@
             optgroupFunds.label = "── صناديق الاستثمار والذهب الشرعية ──";
             const fundsList = [
                 { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96 },
-                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 1.68 },
+                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7000.00 },
                 { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.72 },
                 { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.21 },
                 { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.19 }
@@ -4748,7 +4806,7 @@
             const holding = userHoldings.find(h => h.ticker === ticker);
             if (holding) {
                 document.getElementById('modalHoldingQty').value = holding.qty;
-                document.getElementById('modalHoldingBuyPrice').value = holding.buy.toFixed(2);
+                document.getElementById('modalHoldingBuyPrice').value = (parseFloat(holding.buy)||0).toFixed(2);
                 updateTransImpactPreview();
             }
         }
@@ -5031,9 +5089,11 @@
                     const existing = userHoldings.find(h => h.ticker === item.ticker);
                     if (existing) {
                         const totalQty = existing.qty + item.qty;
-                        existing.buy = ((existing.qty * existing.buy) + (item.qty * item.buy)) / totalQty;
-                        existing.qty = totalQty;
-                        existing.cur = item.cur;
+                        if (totalQty > 0) {
+                            existing.buy = ((existing.qty * existing.buy) + (item.qty * item.buy)) / totalQty;
+                            existing.qty = totalQty;
+                        }
+                        if (item.cur > 0) existing.cur = item.cur;
                     } else {
                         userHoldings.push(item);
                     }
@@ -5583,8 +5643,9 @@
 
             const handleMove = (e) => {
                 const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const touch = (e.touches && e.touches.length > 0) ? e.touches[0] : null;
+                const clientX = touch ? touch.clientX : (e.clientX !== undefined ? e.clientX : rect.left);
+                const clientY = touch ? touch.clientY : (e.clientY !== undefined ? e.clientY : rect.top);
                 const x = clientX - rect.left;
                 const y = clientY - rect.top;
                 drawAdvancedChart(x, y);
@@ -5802,7 +5863,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v12.8',
+                appVersion: 'egx-sharia-v12.9',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -6280,7 +6341,7 @@
                 return `
                 ${recommendationBanner}
                 📊 <b>التحليل المالي اللحظي لسهم ${s.name} (${s.ticker}):</b><br>
-                • <b>السعر اللحظي المعتمد:</b> <b class="font-mono text-white text-sm">${curPrice.toFixed(2)} ج</b> (التغير: <span class="${chgVal >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${chgVal >= 0 ? '+' : ''}${chgVal}%</span>) | القطاع: <b>${s.sector || 'العام'}</b>.<br>
+                • <b>السعر اللحظي المعتمد:</b> <b class="font-mono text-white text-sm">${(parseFloat(curPrice)||0).toFixed(2)} ج</b> (التغير: <span class="${chgVal >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${chgVal >= 0 ? '+' : ''}${chgVal}%</span>) | القطاع: <b>${s.sector || 'العام'}</b>.<br>
                 • <b>المؤشرات الفنية اللحظية:</b> مؤشر القوة النسبية RSI عند <b>${rsiVal}</b> (${rsiVal < 35 ? '🟢 تشبع بيعي حاد وفرصة ارتداد' : rsiVal > 70 ? '🔴 تشبع شرائي يستوجب الحذر' : '🟡 مسار توازني'}).<br>
                 • <b>مستويات التداول:</b> الدعم الرئيسي: <b>${suppVal} ج</b> | المقاومة المستهدفة: <b>${resVal} ج</b> | مكرر الربحية: <b>${peVal}</b>.<br>
                 ${val ? `• <b>التقييم الأساسي:</b> السعر العادل التوازني <b>${val.base} ج</b> (بهامش أمان <b>+${val.margin || 20}%</b>).<br>` : ''}
@@ -6495,6 +6556,7 @@
             // 2. Process Cloud Market JSON (Funds NAVs + Gold + Fallback Stocks)
             const cData = cloudRes.status === 'fulfilled' ? cloudRes.value : null;
             if (cData) {
+                window.GLOBAL_STATE = cData;
                 // If TradingView direct had issues, fallback to cloud stock quotes
                 if (updatedStocksCount === 0 && cData.stocks) {
                     Object.keys(cData.stocks).forEach(sym => {
@@ -6531,14 +6593,12 @@
                 }
             }
 
-            // 3. Update User Holdings Prices with 100% Verified Quotes
+            // 3. Update User Holdings Prices with 100% Verified Quotes (All Assets: Stocks, Funds, Gold)
             userHoldings.forEach(h => {
                 const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (found && found.close > 0) {
                     h.marketPrice = found.close;
-                    if (!isFundAsset(h)) {
-                        h.cur = found.close;
-                    }
+                    h.cur = found.close; // Live EGX/NAV quote applied to all assets
                 }
             });
 
@@ -6684,17 +6744,7 @@ async function syncMubasherDirectAll() {
         })();
 
 
-        // Legacy 15s interval replaced by ultra-fast 5s adaptive polling above
-
-        // التحديث الفوري عند عودة المستخدم للتطبيق أو فتح الشاشة
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                syncLiveMarketData(true);
-            }
-        });
-        window.addEventListener('focus', () => {
-            syncLiveMarketData(true);
-        });
+        // Visibility sync handled inside smart polling engine (no duplicate race conditions)
 
         // 8. Stocks Radar & Filter Logic
         let currentFilter = 'all';
@@ -7036,7 +7086,7 @@ async function syncMubasherDirectAll() {
                     ans = `<p><b>⚖️ تقييم توازن وتوزيع المحفظة:</b></p>
                     <p class="mt-1">محفظتك الحالية: <b>${sPct}% أسهم استثمارية ونمو</b>، و<b>${fPct}% صناديق شريعة وذهب</b>. هذا التوزيع يوفر عائداً متزناً وتحوطاً فعالاً ضد التضخم وتقلبات السوق.</p>`;
                 } else if (question.includes('الذهب') || question.includes('التحوط')) {
-                    const goldGram = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k.toLocaleString() : '4,340';
+                    const goldGram = Math.round(getLiveGoldGramRate()).toLocaleString();
                     ans = `<p><b>🪙 رؤية التحوط بالذهب (AZG & ذهب ثاندر):</b></p>
                     <p class="mt-1">الذهب عيار 24 يتداول حول <b>${goldGram} ج.م للجرام</b> محلياً وعالمياً. نسبة الذهب الحالية في محفظتك كافية للتحوط، ويُفضل الشراء بنظام التراكم الدوري (DCA) عند كل هبوط طفيف.</p>`;
                 } else {
@@ -7414,7 +7464,7 @@ async function syncMubasherDirectAll() {
                     <td class="border p-2 font-bold">${h.name} (${h.ticker})</td>
                     <td class="border p-2">${h.qty}</td>
                     <td class="border p-2">${h.buy.toFixed(2)} ج</td>
-                    <td class="border p-2">${h.cur.toFixed(2)} ج</td>
+                    <td class="border p-2">${(parseFloat(h.cur)||0).toFixed(2)} ج</td>
                     <td class="border p-2">${mVal.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
                     <td class="border p-2 ${pnl>=0?'text-green-700':'text-red-700'}">${pnl>=0?'+':''}${pnl.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
                 `;
@@ -8528,10 +8578,10 @@ async function syncMubasherDirectAll() {
                     h.name,
                     h.sector || 'سوق المال',
                     h.qty,
-                    parseFloat(h.buy.toFixed(2)),
-                    parseFloat(h.cur.toFixed(2)),
-                    parseFloat(mVal.toFixed(2)),
-                    parseFloat(pnl.toFixed(2)),
+                    parseFloat((parseFloat(h.buy)||0).toFixed(2)),
+                    parseFloat((parseFloat(h.cur)||0).toFixed(2)),
+                    parseFloat((parseFloat(mVal)||0).toFixed(2)),
+                    parseFloat((parseFloat(pnl)||0).toFixed(2)),
                     `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
                 ]);
             });
@@ -8562,10 +8612,10 @@ async function syncMubasherDirectAll() {
                     h.name,
                     h.sector || (isGoldAsset(h) ? 'الذهب الخالص 24' : 'صناديق استثمار'),
                     isGoldAsset(h) ? parseFloat(h.qty.toFixed(4)) : h.qty,
-                    parseFloat(h.buy.toFixed(2)),
-                    parseFloat(h.cur.toFixed(2)),
-                    parseFloat(mVal.toFixed(2)),
-                    parseFloat(pnl.toFixed(2)),
+                    parseFloat((parseFloat(h.buy)||0).toFixed(2)),
+                    parseFloat((parseFloat(h.cur)||0).toFixed(2)),
+                    parseFloat((parseFloat(mVal)||0).toFixed(2)),
+                    parseFloat((parseFloat(pnl)||0).toFixed(2)),
                     `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
                 ]);
             });
@@ -8600,10 +8650,10 @@ async function syncMubasherDirectAll() {
             const grandCost = totalInvestedCost + clawdzVal + cashVal;
             const grandReturnPct = grandCost > 0 ? (grandPnl / grandCost) * 100 : 0;
 
-            const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
-            const goldRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k : 4340.91;
-            const usdVal = grandWealth / usdRate;
-            const goldGrams = grandWealth / goldRate;
+            const usdRate = getLiveUsdRate();
+            const goldRate = getLiveGoldGramRate();
+            const usdVal = usdRate > 0 ? (grandWealth / usdRate) : 0;
+            const goldGrams = goldRate > 0 ? (grandWealth / goldRate) : 0;
             const sarRate = 13.90;
             const sarVal = grandWealth / sarRate;
 
@@ -8630,12 +8680,15 @@ async function syncMubasherDirectAll() {
         // 7. Backup & Restore (الفئة 16)
         function backupPortfolioData() {
             triggerHaptic('medium');
+            let jData = [], aData = [];
+            try { jData = JSON.parse(localStorage.getItem('egx_decision_journal') || '[]'); } catch(e) {}
+            try { aData = JSON.parse(localStorage.getItem('egx_price_alerts') || '[]'); } catch(e) {}
             const data = {
-                version: '7.0',
+                version: '12.9',
                 exportedAt: new Date().toISOString(),
-                holdings: window.USER_HOLDINGS || {},
-                journal: JSON.parse(localStorage.getItem('egx_decision_journal') || '[]'),
-                alerts: JSON.parse(localStorage.getItem('egx_price_alerts') || '[]')
+                holdings: (Array.isArray(userHoldings) && userHoldings.length > 0) ? userHoldings : THNDR_ACTUAL_HOLDINGS,
+                journal: jData,
+                alerts: aData
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -8657,9 +8710,9 @@ async function syncMubasherDirectAll() {
                     const parsed = JSON.parse(e.target.result);
                     if (parsed.journal) localStorage.setItem('egx_decision_journal', JSON.stringify(parsed.journal));
                     if (parsed.alerts) localStorage.setItem('egx_price_alerts', JSON.stringify(parsed.alerts));
-                    if (parsed.holdings) {
-                        window.USER_HOLDINGS = parsed.holdings;
-                        localStorage.setItem('user_holdings_override', JSON.stringify(parsed.holdings));
+                    if (parsed.holdings && Array.isArray(parsed.holdings) && parsed.holdings.length > 0) {
+                        userHoldings = parsed.holdings;
+                        saveUserPortfolio();
                     }
                     showToast('تمت استعادة النسخة الاحتياطية بنجاح ✓', 'success');
                     renderHoldingsTable();
@@ -8863,7 +8916,7 @@ async function syncMubasherDirectAll() {
                         <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-bold shrink-0">${i+1}</span>
                         <div class="min-w-0">
                             <div class="font-bold text-white text-xs truncate">${a.name}</div>
-                            <div class="text-[10px] text-slate-400 font-mono">${a.ticker} • ${curPrice.toFixed(2)} ج.م</div>
+                            <div class="text-[10px] text-slate-400 font-mono">${a.ticker} • ${(parseFloat(curPrice)||0).toFixed(2)} ج.م</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
@@ -9031,8 +9084,10 @@ async function syncMubasherDirectAll() {
             const endDateStr = endInput.value;
             const filter = filterInput ? filterInput.value : 'all';
 
-            const d1 = new Date(startDateStr);
-            const d2 = new Date(endDateStr);
+            let d1 = new Date(startDateStr);
+            let d2 = new Date(endDateStr);
+            if (isNaN(d1.getTime())) d1 = new Date(Date.now() - 30 * 86400000);
+            if (isNaN(d2.getTime())) d2 = new Date();
             const diffTime = Math.max(0, d2.getTime() - d1.getTime());
             const elapsedDays = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
 
@@ -9060,9 +9115,10 @@ async function syncMubasherDirectAll() {
                 const isFund = isFundAsset(h);
                 const isGold = isGoldAsset(h);
 
-                // Apply category filter
-                if (filter === 'stocks' && isFund) return;
-                if (filter === 'funds' && !isFund) return;
+                // Apply category filter (Stocks vs Funds vs Gold)
+                if (filter === 'stocks' && (isFund || isGold)) return;
+                if (filter === 'funds' && (!isFund && !isGold)) return;
+                if (filter === 'gold' && !isGold) return;
                 if (filter === 'cash') return;
 
                 const qty = h.qty || 0;
@@ -9104,18 +9160,18 @@ async function syncMubasherDirectAll() {
                     returnPct: returnPct
                 };
 
-                if (!isFund) {
-                    entities.stocks.startVal += startVal;
-                    entities.stocks.endVal += endVal;
-                    entities.stocks.items.push(itemData);
-                } else if (isGold) {
+                if (isGold) {
                     entities.goldFunds.startVal += startVal;
                     entities.goldFunds.endVal += endVal;
                     entities.goldFunds.items.push(itemData);
-                } else {
+                } else if (isFund) {
                     entities.equityFunds.startVal += startVal;
                     entities.equityFunds.endVal += endVal;
                     entities.equityFunds.items.push(itemData);
+                } else {
+                    entities.stocks.startVal += startVal;
+                    entities.stocks.endVal += endVal;
+                    entities.stocks.items.push(itemData);
                 }
             });
 
@@ -9533,7 +9589,7 @@ async function syncMubasherDirectAll() {
                         </div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs px-2.5 py-0.5 rounded-lg border ${badgeTheme} font-bold">${item.statusBadge}</span>
-                            <span class="text-xs font-mono font-bold text-white bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-800 shadow-inner">${item.targetActionPrice.toFixed(2)} ج ⚡</span>
+                            <span class="text-xs font-mono font-bold text-white bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-800 shadow-inner">${(parseFloat(item.targetActionPrice)||0).toFixed(2)} ج ⚡</span>
                         </div>
                     </div>
 
@@ -9545,15 +9601,15 @@ async function syncMubasherDirectAll() {
                         </div>
                         <div class="p-1 border-r border-slate-800/60">
                             <span class="text-[9px] text-slate-400 font-sans block">المستهدف</span>
-                            <span class="font-bold text-emerald-400 text-[11px]">${item.targetPrice.toFixed(2)} ج</span>
+                            <span class="font-bold text-emerald-400 text-[11px]">${(parseFloat(item.targetPrice)||0).toFixed(2)} ج</span>
                         </div>
                         <div class="p-1 border-r border-slate-800/60">
                             <span class="text-[9px] text-slate-400 font-sans block">وقف الخسارة</span>
-                            <span class="font-bold text-rose-400 text-[11px]">${item.stopLoss.toFixed(2)} ج</span>
+                            <span class="font-bold text-rose-400 text-[11px]">${(parseFloat(item.stopLoss)||0).toFixed(2)} ج</span>
                         </div>
                         <div class="p-1 sm:border-r border-slate-800/60">
                             <span class="text-[9px] text-slate-400 font-sans block">هامش الأمان</span>
-                            <span class="font-bold text-[11px] ${item.marginOfSafety >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${item.marginOfSafety >= 0 ? '+' : ''}${item.marginOfSafety.toFixed(1)}%</span>
+                            <span class="font-bold text-[11px] ${item.marginOfSafety >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${item.marginOfSafety >= 0 ? '+' : ''}${(parseFloat(item.marginOfSafety)||0).toFixed(1)}%</span>
                         </div>
                         <div class="p-1 border-r border-slate-800/60">
                             <span class="text-[9px] text-slate-400 font-sans block">مكرر P/E</span>
@@ -9561,7 +9617,7 @@ async function syncMubasherDirectAll() {
                         </div>
                         <div class="p-1 border-r border-slate-800/60">
                             <span class="text-[9px] text-slate-400 font-sans block">مؤشر RSI</span>
-                            <span class="font-bold text-[11px] ${item.rsi > 70 ? 'text-rose-400' : item.rsi < 40 ? 'text-emerald-400' : 'text-amber-400'}">${item.rsi.toFixed(1)}</span>
+                            <span class="font-bold text-[11px] ${item.rsi > 70 ? 'text-rose-400' : item.rsi < 40 ? 'text-emerald-400' : 'text-amber-400'}">${(parseFloat(item.rsi)||50).toFixed(1)}</span>
                         </div>
                     </div>
 
@@ -10698,7 +10754,8 @@ async function syncMubasherDirectAll() {
                             <select id="perfAssetFilter" onchange="runPeriodPerformanceAnalysis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
                                 <option value="all">جميع الاستثمارات (الأسهم + الصناديق + الذهب)</option>
                                 <option value="stocks">الأسهم فقط (EGX 33)</option>
-                                <option value="funds">صناديق الاستثمار والذهب فقط</option>
+                                <option value="funds">صناديق الاستثمار والذهب</option>
+                                <option value="gold">الذهب الخالص فقط</option>
                             </select>
                         </div>
                     </div>
