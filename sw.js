@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v13.4 (Defensive Hardened)
-const CACHE_NAME = 'egx-sharia-v13.4';
+// EGX Sharia Portal - Advanced PWA Service Worker v13.5 (Defensive Hardened)
+const CACHE_NAME = 'egx-sharia-v13.5';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -15,7 +15,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[ServiceWorker] Pre-caching core PWA shell v13.4');
+      console.log('[ServiceWorker] Pre-caching core PWA shell v13.5');
       return cache.addAll(STATIC_ASSETS);
     })
   );
