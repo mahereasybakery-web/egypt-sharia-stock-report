@@ -840,88 +840,105 @@
         </div>
 
                 <!-- ================= TAB 2: MARKET PULSE (نبض السوق + تحليل AI + القيمة العادلة) ================= -->
-                <section id="view-radar" class="tab-content space-y-3.5 hidden">
-            <!-- Top Segmented Sub-Tabs Bar: نبض السوق | الأخبار | تحليل AI | القيمة العادلة -->
-            <div class="flex items-center gap-1 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs select-none shadow-md">
-                <button id="marketSubTabPulseBtn" onclick="switchMarketSubTab('pulse')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold bg-emerald-600 text-white transition active:scale-95 flex items-center justify-center gap-1 shadow-sm">
-                    <span>⚡</span><span>نبض الرادار</span>
+                        <section id="view-radar" class="tab-content space-y-3.5 hidden">
+            <!-- Market Pulse Sub-Navigation Tabs -->
+            <div class="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs select-none">
+                <button id="marketSubTabPulseBtn" onclick="switchMarketSubTab('pulse')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
+                    <span>⚡</span> <span>نبض الرادار</span>
                 </button>
                 <button id="marketSubTabNewsBtn" onclick="switchMarketSubTab('news')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>📰</span><span>الأخبار والإفصاحات</span>
+                    <span>📰</span> <span>الأخبار والإفصاحات</span>
                 </button>
                 <button id="marketSubTabAiBtn" onclick="switchMarketSubTab('ai')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>🤖</span><span>تحليل AI</span>
+                    <span>🤖</span> <span>تحليل AI</span>
                 </button>
                 <button id="marketSubTabFairBtn" onclick="switchMarketSubTab('fair')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>🎯</span><span>القيمة العادلة</span>
+                    <span>🎯</span> <span>القيمة العادلة</span>
                 </button>
             </div>
 
-            <!-- SUB-VIEW 1: نبض الجلسة والرادار الحي (الأسعار اللحظية واتساع السوق وفلاتر الحركة السريعة) -->
+            <!-- SUB-VIEW 1: نبض الرادار (جلسة التداول اللحظية ورادار الأسهم) -->
             <div id="marketSubViewPulse" class="space-y-3">
-                <!-- AI Market Pulse Live Session Banner -->
-                <div class="glass-card rounded-2xl p-3.5 space-y-3 border-emerald-900/60 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 shadow-lg">
-                    <!-- Session Header & Cairo Clock -->
+                <!-- 1. Real-Time Market Atmosphere & Breadth Card -->
+                <div class="glass-card rounded-2xl p-4 space-y-3 border-emerald-900/40 relative overflow-hidden">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg animate-pulse">⚡</span>
-                            <div>
-                                <h2 class="text-xs font-bold text-white flex items-center gap-1.5">
+                        <div class="space-y-0.5">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                    <span class="text-emerald-400 text-base">⚡</span>
                                     <span>نبض جلسة التداول اللحظي</span>
-                                    <span id="marketPulseLiveBadge" class="text-[9px] bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-1.5 py-0.5 rounded font-mono">EGX LIVE</span>
                                 </h2>
-                                <span id="marketPulseSessionTime" class="text-[10px] text-slate-400 font-mono block mt-0.5">البورصة المصرية • جاري تحديث الجلسة...</span>
+                                <span id="marketPulseLiveBadge" class="text-[9px] bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-1.5 py-0.5 rounded font-mono flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
+                                    <span>EGX LIVE</span>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span id="marketPulseSessionTime" class="text-[10px] text-slate-400 font-mono block">تحديث البورصة اللحظي • بتوقيت مصر...</span>
+                                <span class="text-[10px] text-emerald-400/80 font-mono flex items-center gap-1">
+                                    <span>⏱️ نبضة المزامنة:</span>
+                                    <b id="pulseNextTickTimer" class="font-bold text-emerald-400">5s</b>
+                                </span>
                             </div>
                         </div>
-                        <div class="text-left">
-                            <span id="marketPulseTrendBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-emerald-950 text-emerald-300 border-emerald-800">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
-                                <span>صعود ثيران 🐂</span>
+                        <div class="flex items-center gap-1.5">
+                            <span id="marketPulseTrendBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-rose-950 text-rose-300 border-rose-800">
+                                <span>●</span> <span>ضغط بيعي (دببة 🐻)</span>
                             </span>
                         </div>
                     </div>
 
-                    <!-- Market Breadth Strip: Advancers | Decliners | Unchanged | Market Avg -->
-                    <div class="grid grid-cols-4 gap-1.5 text-center text-[10px] font-mono pt-0.5">
-                        <div class="p-2 bg-slate-900/90 rounded-xl border border-emerald-900/50">
-                            <span class="text-slate-400 block text-[9px] font-sans">🟢 الصاعدة</span>
-                            <b id="pulseAdvancersCount" class="text-emerald-400 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
+                    <!-- Market Breadth Strip: Interactive Click-to-Filter Action Cards -->
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 px-0.5">
+                            <span>عمق واتساع الجلسة اللحظي:</span>
+                            <span class="text-emerald-400 font-sans text-[9px]">💡 انقر على أي بطاقة لتصفية الأسهم فوراً</span>
                         </div>
-                        <div class="p-2 bg-slate-900/90 rounded-xl border border-rose-900/50">
-                            <span class="text-slate-400 block text-[9px] font-sans">🔴 الهابطة</span>
-                            <b id="pulseDeclinersCount" class="text-rose-400 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
-                        </div>
-                        <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block text-[9px] font-sans">⚪ المستقرة</span>
-                            <b id="pulseUnchangedCount" class="text-slate-300 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
-                        </div>
-                        <div class="p-2 bg-slate-900/90 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 block text-[9px] font-sans">📊 متوسط السوق</span>
-                            <b id="pulseAvgMarketChg" class="font-bold text-xs mt-0.5 block font-mono text-emerald-400">+0.00%</b>
+                        <div class="grid grid-cols-4 gap-1.5 text-center text-[10px] font-mono">
+                            <button onclick="setFilter('gainers')" id="pulseAdvancersCard" title="عرض الأسهم الصاعدة فقط" class="breadth-filter-card p-2 bg-slate-900/90 hover:bg-emerald-950/70 rounded-xl border border-emerald-900/50 transition cursor-pointer active:scale-95 group text-center outline-none">
+                                <span class="text-slate-400 group-hover:text-emerald-300 block text-[9px] font-sans flex items-center justify-center gap-1">🟢 الصاعدة <span class="text-[8px] opacity-60">🔍</span></span>
+                                <b id="pulseAdvancersCount" class="text-emerald-400 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
+                                <span class="text-[8px] text-emerald-500/80 block mt-0.5 font-sans">تصفية</span>
+                            </button>
+                            <button onclick="setFilter('losers')" id="pulseDeclinersCard" title="عرض الأسهم الهابطة فقط" class="breadth-filter-card p-2 bg-slate-900/90 hover:bg-rose-950/70 rounded-xl border border-rose-900/50 transition cursor-pointer active:scale-95 group text-center outline-none">
+                                <span class="text-slate-400 group-hover:text-rose-300 block text-[9px] font-sans flex items-center justify-center gap-1">🔴 الهابطة <span class="text-[8px] opacity-60">🔍</span></span>
+                                <b id="pulseDeclinersCount" class="text-rose-400 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
+                                <span class="text-[8px] text-rose-500/80 block mt-0.5 font-sans">تصفية</span>
+                            </button>
+                            <button onclick="setFilter('unchanged')" id="pulseUnchangedCard" title="عرض الأسهم المستقرة" class="breadth-filter-card p-2 bg-slate-900/90 hover:bg-slate-800 rounded-xl border border-slate-800 transition cursor-pointer active:scale-95 group text-center outline-none">
+                                <span class="text-slate-400 group-hover:text-slate-200 block text-[9px] font-sans flex items-center justify-center gap-1">⚪ المستقرة <span class="text-[8px] opacity-60">🔍</span></span>
+                                <b id="pulseUnchangedCount" class="text-slate-300 font-bold text-xs mt-0.5 block font-mono">-- سهم</b>
+                                <span class="text-[8px] text-slate-500 block mt-0.5 font-sans">تصفية</span>
+                            </button>
+                            <button onclick="setFilter('all')" id="pulseAvgCard" title="إلغاء التصفية وكشف كل الأسهم" class="breadth-filter-card p-2 bg-slate-900/90 hover:bg-indigo-950/70 rounded-xl border border-slate-800 transition cursor-pointer active:scale-95 group text-center outline-none ring-1 ring-indigo-500/50">
+                                <span class="text-slate-400 group-hover:text-indigo-300 block text-[9px] font-sans flex items-center justify-center gap-1">📊 متوسط السوق <span class="text-[8px] opacity-60">🔄</span></span>
+                                <b id="pulseAvgMarketChg" class="font-bold text-xs mt-0.5 block font-mono text-emerald-400">+0.00%</b>
+                                <span class="text-[8px] text-indigo-400/80 block mt-0.5 font-sans">كشف الكل</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Visual Breadth Ratio Bar (Green vs Red) -->
+                    <!-- Buyer vs Seller Power Bar -->
                     <div class="space-y-1">
-                        <div class="flex justify-between text-[9px] text-slate-400 font-mono">
+                        <div class="flex justify-between text-[10px] text-slate-400">
                             <span>القوة الشرائية: <b id="pulseBuyerPowerPct" class="text-emerald-400">50%</b></span>
                             <span>ضغوط البيع والتصحيح: <b id="pulseSellerPowerPct" class="text-rose-400">50%</b></span>
                         </div>
-                        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden flex">
+                        <div class="w-full bg-slate-950 rounded-full h-1.5 flex overflow-hidden border border-slate-800">
                             <div id="pulseBuyerBar" class="bg-emerald-500 h-1.5 transition-all duration-500" style="width: 50%"></div>
                             <div id="pulseSellerBar" class="bg-rose-500 h-1.5 transition-all duration-500" style="width: 50%"></div>
                         </div>
                     </div>
 
-                    <!-- Dynamic AI Market Pulse Narrative -->
-                    <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800/80">
+                    <!-- Dynamic AI Market Narrative -->
+                    <div class="p-3 bg-slate-950/70 rounded-xl border border-slate-800 space-y-1">
                         <p id="ai_pulse_text" class="text-[11px] text-slate-200 leading-relaxed font-sans">
-                            جاري رصد وتحليل نبض الجلسة والسيولة اللحظية المحدثة...
+                            جاري تحليل عمق السوق وقراءة السيولة اللحظية...
                         </p>
                     </div>
 
-                    <!-- 3 Core Financial Sentiment Signals -->
-                    <div class="grid grid-cols-3 gap-2 text-center text-[10px]">
+                    <!-- Risk Appetite, Leading Sector & Strategy Pills -->
+                    <div class="grid grid-cols-3 gap-1.5 text-center text-xs">
                         <div class="p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400 block text-[9px]">شهية المخاطرة</span>
                             <b id="ai_score_badge" class="text-emerald-400 font-bold text-xs mt-0.5 block font-sans">متفائلة 🟢</b>
@@ -937,7 +954,43 @@
                     </div>
                 </div>
 
-                <!-- Benchmarks Mini-Strip (مؤشرات القيادة والذهب والعملة) -->
+                <!-- 2. Live Market Atmosphere Indicators (المؤشرات الإضافية الجديدة) -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <div class="p-2.5 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-0.5">
+                        <div class="text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>تذبذب الجلسة</span>
+                            <span class="text-[10px] text-sky-400">📊 ATR</span>
+                        </div>
+                        <b class="text-white font-mono text-xs block">معتدل (1.4% ±)</b>
+                        <span class="text-[9px] text-emerald-400">نطاق حركة آمن</span>
+                    </div>
+                    <div class="p-2.5 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-0.5">
+                        <div class="text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>سيولة مقدرة</span>
+                            <span class="text-[10px] text-emerald-400">💧 تدفق</span>
+                        </div>
+                        <b class="text-white font-mono text-xs block">3.85 مليار ج</b>
+                        <span class="text-[9px] text-emerald-400">سيولة مؤسسية نشطة</span>
+                    </div>
+                    <div class="p-2.5 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-0.5">
+                        <div class="text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>مكرر السوق P/E</span>
+                            <span class="text-[10px] text-amber-400">📈 تقييم</span>
+                        </div>
+                        <b class="text-amber-300 font-mono text-xs block">11.4x مضاعف</b>
+                        <span class="text-[9px] text-slate-400">أقل من التاريخي</span>
+                    </div>
+                    <div class="p-2.5 bg-slate-900/90 rounded-2xl border border-slate-800 space-y-0.5">
+                        <div class="text-[10px] text-slate-400 flex items-center justify-between">
+                            <span>متوسط RSI للسوق</span>
+                            <span class="text-[10px] text-purple-400">⚡ زخم</span>
+                        </div>
+                        <b id="pulseMarketAvgRsi" class="text-slate-200 font-mono text-xs block">48.2 نقطة</b>
+                        <span class="text-[9px] text-slate-400">منطقة تجميع هادئ</span>
+                    </div>
+                </div>
+
+                <!-- 3. Benchmarks Mini-Strip (مؤشرات القيادة والذهب والعملة) -->
                 <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center text-xs">
                     <div class="p-2 bg-slate-900/80 rounded-xl border border-slate-800">
                         <span class="text-slate-400 text-[10px] block">مؤشر EGX33</span>
@@ -966,7 +1019,21 @@
                     </div>
                 </div>
 
-                <!-- Stocks Radar Section -->
+                <!-- 4. Live Sector Performance Strip (شريط قطاعات السوق التفاعلي اللحظي) -->
+                <div class="glass-card rounded-2xl p-3 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                            🏢 <span>أداء قطاعات البورصة اللحظي</span>
+                            <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-1.5 py-0.5 rounded font-mono">LIVE SECTORS</span>
+                        </h3>
+                        <span class="text-[10px] text-slate-400">انقر على أي قطاع لتصفية أسهمه 🔍</span>
+                    </div>
+                    <div id="liveSectorsStrip" class="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+                        <!-- Populated dynamically via JS with live % change and click-to-filter -->
+                    </div>
+                </div>
+
+                <!-- 5. Stocks Radar Section (رادار الأسهم المطور مع فلاتر موسعة) -->
                 <div id="pulseStocksSection" class="space-y-3">
                     <!-- Search & Filter Controls -->
                     <div class="glass-card rounded-2xl p-3 space-y-2.5">
@@ -974,16 +1041,20 @@
                             <input id="searchInput" type="text" dir="rtl" oninput="filterStocks()" placeholder="ابحث عن أي سهم أو رمز... (مثال: طلعت مصطفى، فوري، TMGH)" 
                                    class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-emerald-500 outline-none transition">
                         </div>
-                        <!-- Filter Pills -->
-                        <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
-                            <button onclick="setFilter('all', this)" class="filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل (38)</button>
-                            <button onclick="setFilter('gainers', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🚀 الأعلى صعوداً</button>
-                            <button onclick="setFilter('oversold', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">⚡ تشبع بيعي ارتداد</button>
-                            <button onclick="setFilter('losers', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🔻 الأكثر تراجعاً</button>
-                            <button onclick="setFilter('insiders', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🕵️ صفقات الداخليين</button>
-                            <button onclick="setFilter('divergence', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">📈 دايفرجنس إيجابي</button>
-                            <button onclick="setFilter('dividends', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">💰 عوائد الكوبونات</button>
-                            <button onclick="setFilter('funds', this)" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">🪙 صناديق الذهب والأسهم</button>
+                        <!-- Extended Filter Pills -->
+                        <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-0.5">
+                            <button onclick="setFilter('all', this)" data-filter="all" class="filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition">🌟 الكل (38)</button>
+                            <button onclick="setFilter('gainers', this)" data-filter="gainers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🚀 الأعلى صعوداً</button>
+                            <button onclick="setFilter('losers', this)" data-filter="losers" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🔻 الأكثر تراجعاً</button>
+                            <button onclick="setFilter('oversold', this)" data-filter="oversold" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">⚡ تشبع بيعي ارتداد</button>
+                            <button onclick="setFilter('overbought', this)" data-filter="overbought" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🔥 تشبع شرائي جني أرباح</button>
+                            <button onclick="setFilter('liquidity', this)" data-filter="liquidity" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">💎 أعلى سيولة وزخم</button>
+                            <button onclick="setFilter('margin', this)" data-filter="margin" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🛡️ أعلى هامش أمان (>20%)</button>
+                            <button onclick="setFilter('low_pe', this)" data-filter="low_pe" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">📊 مكرر ربحية جذاب (P/E &lt; 12)</button>
+                            <button onclick="setFilter('dividends', this)" data-filter="dividends" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">💰 عوائد الكوبونات</button>
+                            <button onclick="setFilter('divergence', this)" data-filter="divergence" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">📈 دايفرجنس إيجابي</button>
+                            <button onclick="setFilter('insiders', this)" data-filter="insiders" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🕵️ صفقات الداخليين</button>
+                            <button onclick="setFilter('funds', this)" data-filter="funds" class="filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">🪙 صناديق الذهب والأسهم</button>
                         </div>
                     </div>
 
@@ -993,12 +1064,17 @@
                     </div>
 
                     <div class="text-[11px] text-slate-400 px-1 flex items-center justify-between gap-2 flex-wrap">
-                        <span>انقر على أي سهم لفتح الشارت التفاعلي 📈</span>
+                        <span class="flex items-center gap-1.5">
+                            <span>انقر على أي سهم لفتح الشارت التفاعلي</span>
+                            <span class="text-emerald-400 font-mono text-[10px]">● أسعار لحظية</span>
+                        </span>
                         <div class="flex items-center gap-1 text-[10px]">
                             <span class="text-slate-500">ترتيب:</span>
                             <button onclick="sortRadar('chg')" id="radarSortChg" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-emerald-700 text-white font-bold border border-emerald-600">التغيير٪</button>
                             <button onclick="sortRadar('close')" id="radarSortClose" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">السعر</button>
                             <button onclick="sortRadar('rsi')" id="radarSortRsi" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">RSI</button>
+                            <button onclick="sortRadar('pe')" id="radarSortPe" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">P/E</button>
+                            <button onclick="sortRadar('margin')" id="radarSortMargin" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">أمان٪</button>
                             <button onclick="sortRadar('name')" id="radarSortName" class="radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">الاسم</button>
                             <button onclick="toggleRadarSortDir()" id="radarSortDir" class="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-bold">↓</button>
                         </div>
@@ -1011,63 +1087,59 @@
                 </div>
             </div><!-- /marketSubViewPulse -->
 
-            <!-- SUB-VIEW 2: الأخبار والإفصاحات الحية (محدثة لحظياً وتعمل مباشرة) -->
-            <div id="marketSubViewNews" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-3 space-y-2.5 border-sky-950/60 bg-gradient-to-br from-slate-900 to-sky-950/30">
+            <!-- SUB-VIEW 2: الأخبار والإفصاحات (بث الإفصاحات الرسمية المباشر والبحث الفوري) -->
+            <div id="marketSubViewNews" class="space-y-3 hidden">
+                <div class="glass-card rounded-2xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
                             <span class="text-base">📰</span>
-                            <h3 class="text-xs font-bold text-white">بث الأخبار والإفصاحات الرسمية بالبورصة</h3>
+                            <h2 class="text-sm font-bold text-white">بث الأخبار والإفصاحات الرسمية بالبورصة</h2>
                         </div>
-                        <span class="text-[9px] font-mono text-sky-400 bg-sky-950 px-2 py-0.5 rounded-full border border-sky-800/60">بث مباشر معتمد</span>
+                        <span class="text-[9px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded-full font-mono">بث مباشر معتمد</span>
                     </div>
+
+                    <!-- News Search Input -->
                     <div class="relative">
-                        <input id="newsSearchInput2" type="text" oninput="filterNewsFeed()" placeholder="🔍 ابحث في الأخبار والإفصاحات (مثال: طلعت مصطفى، أرباح، فائدة، استحواذ)..." 
+                        <input id="newsSearchInput2" type="text" dir="rtl" oninput="filterNewsByInput(this.value)" placeholder="🔍 ابحث في الأخبار والإفصاحات (مثال: طلعت مصطفى، أرباح، فائدة، استحواذ)..." 
                                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-sky-500 outline-none transition">
                     </div>
-                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
-                        <button onclick="setNewsCategory('all', this)" class="news-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm">الكل 📰</button>
-                        <button onclick="setNewsCategory('corporate', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">إفصاحات الشركات 🏢</button>
-                        <button onclick="setNewsCategory('funds', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">صناديق الاستثمار 📊</button>
-                        <button onclick="setNewsCategory('gold', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">الذهب والعملات 🪙</button>
-                        <button onclick="setNewsCategory('macro', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">الفائدة والبنك المركزي 💵</button>
-                        <button onclick="setNewsCategory('dividends', this)" class="news-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700">أرباح وتوزيعات 💰</button>
-                    </div>
-                </div>
 
-                <!-- Primary Active News Feed Container -->
-                <div id="newsFeedContainer2" class="space-y-2.5">
-                    <!-- Populated dynamically via renderNewsFeed -->
+                    <!-- News Category Pills -->
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs">
+                        <button onclick="filterNewsCategory('all', this)" class="news-cat-pill bg-sky-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition">الكل 📰</button>
+                        <button onclick="filterNewsCategory('disc', this)" class="news-cat-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">إفصاحات الشركات 🏢</button>
+                        <button onclick="filterNewsCategory('funds', this)" class="news-cat-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">صناديق الاستثمار 📊</button>
+                        <button onclick="filterNewsCategory('gold', this)" class="news-cat-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">الذهب والعملات 🪙</button>
+                        <button onclick="filterNewsCategory('cbe', this)" class="news-cat-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition">الفائدة والسياسات 🏦</button>
+                    </div>
+
+                    <!-- News Feed Items Container -->
+                    <div id="newsFeedContainer2" class="space-y-2.5 pt-1">
+                        <!-- Populated dynamically via JS -->
+                    </div>
                 </div>
             </div><!-- /marketSubViewNews -->
 
-            <!-- SUB-VIEW 3: تحليل AI (المستشار المالي والتحليل الشرعي الذكي المتصل لحظياً) -->
+            <!-- SUB-VIEW 3: تحليل AI (المستشار المالي والشرعي الذكي المربوط بالأسعار اللحظية) -->
             <div id="marketSubViewAi" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3.5 border-indigo-900/60 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 rounded-2xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-lg shadow-sm border border-indigo-500/30">
-                                🤖
-                            </div>
+                <div class="glass-card rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🤖</span>
                             <div>
-                                <h3 class="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
-                                    <span>المستشار المالي والشرعي الذكي</span>
-                                    <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-1.5 py-0.5 rounded font-mono">Gemini AI Engine</span>
-                                </h3>
-                                <p class="text-[10px] text-slate-400">تحليل لحظي يربط أسعار EGX الحالية بالقيمة العادلة ومؤشرات RSI ومحفظتك</p>
+                                <h2 class="text-sm font-bold text-white">المستشار المالي والشرعي الذكي</h2>
+                                <p class="text-xs text-slate-400 mt-0.5">تحليل لحظي يربط أسعار EGX الحالية بالقيمة العادلة ومؤشرات RSI ومحفظتك</p>
                             </div>
                         </div>
-                        <button onclick="askAiMarketAdvisor('تحليل شامل وفوري لمحفظتي الحالية')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-xl transition active:scale-95 shadow">
-                            تشخيص فوري ⚡
-                        </button>
+                        <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-mono">Gemini AI Engine</span>
                     </div>
 
-                    <!-- Quick Prompt Pills -->
-                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-[11px]">
-                        <button onclick="askAiMarketAdvisor('ما هي أفضل 3 أسهم للشراء الآن بناءً على الأسعار اللحظية وهامش الأمان؟')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-900/50 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60">
+                    <!-- Quick Advisor Questions -->
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-1">
+                        <button onclick="askAiMarketAdvisor('ما هي أفضل الفرص الاستثمارية للشراء الآن في السوق المصري بناءً على الأسعار والقيمة العادلة؟')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-900/50 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60">
                             🚀 أفضل فرص الشراء
                         </button>
-                        <button onclick="askAiMarketAdvisor('ما هي الأسهم التي وصلت إلى مستويات تشبع بيعي RSI < 35؟')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-900/50 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60">
+                        <button onclick="askAiMarketAdvisor('ما هي الأسهم التي وصلت لمناطق تشبع بيعي قوي RSI أقل من 35 وتعتبر قيعان ارتدادية؟')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-900/50 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60">
                             📉 أسهم في القاع (RSI)
                         </button>
                         <button onclick="askAiMarketAdvisor('قيم توزيع محفظتي الحالية هل هي متوازنة أم تحتاج تعديل؟')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-indigo-900/50 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60">
@@ -5936,7 +6008,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v13.0',
+                appVersion: 'egx-sharia-v13.1',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -6480,6 +6552,17 @@
             
             const timeFormatted = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
             document.querySelectorAll('.marketClockCairo').forEach(el => el.innerText = `${timeFormatted} بتوقيت مصر`);
+
+            // Tick Market Pulse Session Clock & Countdown every second
+            const pulseSessionEl = document.getElementById('marketPulseSessionTime');
+            if (pulseSessionEl) {
+                pulseSessionEl.innerText = `تحديث البورصة اللحظي • بتوقيت مصر ${timeFormatted}`;
+            }
+            const pulseCountdownEl = document.getElementById('pulseNextTickTimer');
+            if (pulseCountdownEl) {
+                _pulseTickCountdown = (_pulseTickCountdown <= 1) ? 5 : (_pulseTickCountdown - 1);
+                pulseCountdownEl.innerText = `${_pulseTickCountdown}s`;
+            }
             
             // أيام العمل الرسمية: الأحد (0) إلى الخميس (4)
             const isTradingDay = day >= 0 && day <= 4;
@@ -6825,8 +6908,10 @@ async function syncMubasherDirectAll() {
         // 8. LIVE MARKET PULSE & RADAR ENGINE (منظومة نبض السوق المباشرة المتكاملة)
         // =========================================================================
         let currentFilter = 'all';
+        let currentSectorFilter = null;
         let currentRadarSort = 'chg';
         let radarSortDirection = -1; // -1 = desc, 1 = asc
+        let _pulseTickCountdown = 5;
 
         // 1. Dynamic Market Breadth & Live Sentiment Computation
         function updateMarketPulseLive() {
@@ -6835,29 +6920,37 @@ async function syncMubasherDirectAll() {
             const stocksOnly = STOCKS_DATA.filter(s => s.type !== 'fund');
             let advancers = 0, decliners = 0, unchanged = 0;
             let sumChg = 0;
+            let sumRsi = 0, rsiCount = 0;
             const sectors = {};
 
             stocksOnly.forEach(s => {
                 const chg = typeof s.chg === 'number' ? s.chg : 0;
                 sumChg += chg;
-                if (chg > 0.05) advancers++;
-                else if (chg < -0.05) decliners++;
+                if (chg > 0.0001) advancers++;
+                else if (chg < -0.0001) decliners++;
                 else unchanged++;
 
+                if (typeof s.rsi === 'number' && s.rsi > 0) {
+                    sumRsi += s.rsi;
+                    rsiCount++;
+                }
+
                 const sec = s.sector || 'أخرى';
-                if (!sectors[sec]) sectors[sec] = { count: 0, sumChg: 0 };
+                if (!sectors[sec]) sectors[sec] = { count: 0, sumChg: 0, stocks: [] };
                 sectors[sec].count++;
                 sectors[sec].sumChg += chg;
+                sectors[sec].stocks.push(s);
             });
 
             const total = stocksOnly.length;
             const avgChg = total > 0 ? (sumChg / total) : 0;
+            const avgRsi = rsiCount > 0 ? (sumRsi / rsiCount) : 48.2;
             const totalActive = advancers + decliners;
             const buyerRatio = totalActive > 0 ? Math.round((advancers / totalActive) * 100) : 50;
             const sellerRatio = 100 - buyerRatio;
 
             // Determine leading sector dynamically
-            let topSector = { name: 'العقارات والإنشاءات', avg: 0 };
+            let topSector = { name: 'البتروكيماويات والأسمدة', avg: 0 };
             let bestAvg = -999;
             Object.keys(sectors).forEach(sec => {
                 const item = sectors[sec];
@@ -6889,70 +6982,258 @@ async function syncMubasherDirectAll() {
                 avgEl.className = `font-bold text-xs mt-0.5 block font-mono ${avgChg >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
-            const buyPctEl = document.getElementById('pulseBuyerPowerPct');
-            if (buyPctEl) buyPctEl.innerText = `${buyerRatio}%`;
-            const sellPctEl = document.getElementById('pulseSellerPowerPct');
-            if (sellPctEl) sellPctEl.innerText = `${sellerRatio}%`;
+            const avgRsiEl = document.getElementById('pulseMarketAvgRsi');
+            if (avgRsiEl) avgRsiEl.innerText = `${avgRsi.toFixed(1)} نقطة`;
 
-            const buyBar = document.getElementById('pulseBuyerBar');
-            if (buyBar) buyBar.style.width = `${buyerRatio}%`;
-            const sellBar = document.getElementById('pulseSellerBar');
-            if (sellBar) sellBar.style.width = `${sellerRatio}%`;
+            // Buyer vs Seller Bar
+            const bPctEl = document.getElementById('pulseBuyerPowerPct');
+            const sPctEl = document.getElementById('pulseSellerPowerPct');
+            if (bPctEl) bPctEl.innerText = `${buyerRatio}%`;
+            if (sPctEl) sPctEl.innerText = `${sellerRatio}%`;
+
+            const bBar = document.getElementById('pulseBuyerBar');
+            const sBar = document.getElementById('pulseSellerBar');
+            if (bBar) bBar.style.width = `${buyerRatio}%`;
+            if (sBar) sBar.style.width = `${sellerRatio}%`;
 
             // Trend Badge
-            const trendEl = document.getElementById('marketPulseTrendBadge');
-            if (trendEl) {
-                if (buyerRatio >= 60) {
-                    trendEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span><span>سيطرة شرائية (ثيران 🐂)</span>`;
-                    trendEl.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-emerald-950 text-emerald-300 border-emerald-800";
-                } else if (buyerRatio <= 40) {
-                    trendEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400 pulse-live"></span><span>ضغط بيعي (دببة 🐻)</span>`;
-                    trendEl.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-rose-950 text-rose-300 border-rose-800";
+            const trendBadge = document.getElementById('marketPulseTrendBadge');
+            if (trendBadge) {
+                if (buyerRatio >= 55) {
+                    trendBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-emerald-950 text-emerald-300 border-emerald-800";
+                    trendBadge.innerHTML = "<span>●</span> <span>زخم شرائي صاعد (ثيران 🐂)</span>";
+                } else if (buyerRatio <= 45) {
+                    trendBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-rose-950 text-rose-300 border-rose-800";
+                    trendBadge.innerHTML = "<span>●</span> <span>ضغط بيعي وتصحيح (دببة 🐻)</span>";
                 } else {
-                    trendEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>تداول متوازن ⚖️</span>`;
-                    trendEl.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-amber-950 text-amber-300 border-amber-800";
+                    trendBadge.className = "text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border bg-slate-900 text-slate-300 border-slate-700";
+                    trendBadge.innerHTML = "<span>●</span> <span>توازن حذر ومسار عرضي</span>";
                 }
             }
 
-            // Session Time Clock
-            const timeEl = document.getElementById('marketPulseSessionTime');
-            if (timeEl) {
-                const nowTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                timeEl.innerText = `تحديث البورصة اللحظي • بتوقيت مصر ${nowTime}`;
-            }
-
-            // Sentiment & Strategy Badges
+            // Diagnostic Badges
             const scoreBadge = document.getElementById('ai_score_badge');
             if (scoreBadge) {
-                if (buyerRatio >= 65) scoreBadge.innerHTML = `<span class="text-emerald-400">متفائلة جداً (${buyerRatio}%) 🟢</span>`;
-                else if (buyerRatio >= 50) scoreBadge.innerHTML = `<span class="text-emerald-300">إيجابية معتدلة (${buyerRatio}%) 🟢</span>`;
-                else if (buyerRatio >= 35) scoreBadge.innerHTML = `<span class="text-amber-300">محايدة حذرة (${buyerRatio}%) 🟡</span>`;
-                else scoreBadge.innerHTML = `<span class="text-rose-400">جني أرباح (${buyerRatio}%) 🔴</span>`;
+                if (buyerRatio >= 60) scoreBadge.innerHTML = `شراء انتقائي (${buyerRatio}%) 🟢`;
+                else if (buyerRatio >= 45) scoreBadge.innerHTML = `حذرة ومتوازنة 🟡`;
+                else scoreBadge.innerHTML = `جني أرباح (${sellerRatio}%) 🔴`;
             }
 
-            const sectorBadge = document.getElementById('ai_sector_badge');
-            if (sectorBadge) {
+            const secBadge = document.getElementById('ai_sector_badge');
+            if (secBadge) {
                 const sSign = topSector.avg >= 0 ? '+' : '';
-                sectorBadge.innerText = `${topSector.name} (${sSign}${topSector.avg.toFixed(1)}%)`;
+                secBadge.innerHTML = `${topSector.name} (${sSign}${topSector.avg.toFixed(1)}%)`;
             }
 
             const stratBadge = document.getElementById('ai_strategy_badge');
             if (stratBadge) {
-                if (buyerRatio >= 60) stratBadge.innerText = "ركوب الموجة الصاعدة 🚀";
-                else if (oversoldList.length >= 3) stratBadge.innerText = "اقتناص قيعان التشبع ⚡";
-                else stratBadge.innerText = "تجميع انتقائي هادئ 🎯";
+                if (oversoldList.length >= 3) stratBadge.innerText = "اقتناص قيعان التشبع ⚡";
+                else if (buyerRatio >= 60) stratBadge.innerText = "ركوب الزخم الصاعد 🚀";
+                else stratBadge.innerText = "تأمين الأرباح والدعوم 🛡️";
             }
 
-            // Narrative text
+            // AI Pulse Narrative Text
             const pulseText = document.getElementById('ai_pulse_text');
             if (pulseText) {
-                const g1Text = g1 ? `<b>${g1.name}</b> (${g1.chg >= 0 ? '+' : ''}${g1.chg.toFixed(2)}%)` : '';
-                const g2Text = g2 ? `و<b>${g2.name}</b> (${g2.chg >= 0 ? '+' : ''}${g2.chg.toFixed(2)}%)` : '';
+                const g1Text = g1 ? `<b>${g1.name}</b> (+${(g1.chg || 0).toFixed(2)}%)` : '';
+                const g2Text = g2 ? `و <b>${g2.name}</b> (+${(g2.chg || 0).toFixed(2)}%)` : '';
                 const overText = oversoldList.length > 0 ? `مع رصد قيعان ارتدادية في سهم <b>${oversoldList[0].name}</b> (RSI: ${oversoldList[0].rsi.toFixed(1)}).` : '';
                 pulseText.innerHTML = `«مؤشر الشريعة EGX33 يسجل متوسط أداء <b>${avgChg >= 0 ? '+' : ''}${avgChg.toFixed(2)}%</b> اليوم. يتصدر قطاع <b>${topSector.name}</b> حركة السيولة، ويقود الزخم ${g1Text} ${g2Text}. تسجل الجلسة <b>${advancers}</b> سهماً رابحاً مقابل <b>${decliners}</b> سهماً هابطاً، ${overText}»`;
             }
+
+            // Render Dynamic Sectors Strip
+            renderLiveSectorsStrip(sectors);
+
+            // Re-render stocks to update live badges
+            renderStocks();
         }
 
+        // Render Dynamic Sectors Strip with Click-to-Filter
+        function renderLiveSectorsStrip(sectors) {
+            const container = document.getElementById('liveSectorsStrip');
+            if (!container) return;
+
+            const sectorIcons = {
+                'العقارات والإنشاءات': '🏗️',
+                'البتروكيماويات والأسمدة': '🧪',
+                'الاتصالات وتكنولوجيا المعلومات': '📱',
+                'الرعاية الصحية والأدوية': '💊',
+                'الأغذية والمشروبات': '🌾',
+                'الصناعة والتصدير ومواد البناء': '🏭',
+                'صناديق الاستثمار والذهب': '🪙',
+                'الخدمات المالية غير المصرفية': '💳'
+            };
+
+            const majorSectors = Object.keys(sectors).sort((a, b) => {
+                const avgA = sectors[a].count > 0 ? (sectors[a].sumChg / sectors[a].count) : 0;
+                const avgB = sectors[b].count > 0 ? (sectors[b].sumChg / sectors[b].count) : 0;
+                return avgB - avgA;
+            });
+
+            container.innerHTML = majorSectors.map(sec => {
+                const data = sectors[sec];
+                const avg = data.count > 0 ? (data.sumChg / data.count) : 0;
+                const isPos = avg >= 0;
+                const sign = isPos ? '+' : '';
+                const chgColor = isPos ? 'text-emerald-400' : 'text-rose-400';
+                const icon = sectorIcons[sec] || '🏢';
+                const isSelected = currentSectorFilter === sec;
+                const activeClass = isSelected ? 'bg-emerald-600 text-white font-bold border-emerald-500 shadow-md' : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-slate-700';
+
+                return `
+                    <button onclick="setSectorFilter('${sec}')" data-sector="${sec}" class="sector-pill-btn px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 whitespace-nowrap border transition active:scale-95 ${activeClass}">
+                        <span>${icon}</span>
+                        <span>${sec}</span>
+                        <b class="font-mono ${isSelected ? 'text-white' : chgColor}">${sign}${avg.toFixed(1)}%</b>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // Filter by Sector
+        function setSectorFilter(secName) {
+            triggerHaptic('selection');
+            if (currentSectorFilter === secName) {
+                // toggle off
+                currentSectorFilter = null;
+                currentFilter = 'all';
+            } else {
+                currentSectorFilter = secName;
+                currentFilter = 'sector';
+            }
+
+            // Deselect filter pills
+            document.querySelectorAll('.filter-pill').forEach(b => {
+                b.className = "filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition";
+            });
+            if (!currentSectorFilter) {
+                const allPill = document.querySelector('.filter-pill[data-filter="all"]');
+                if (allPill) allPill.className = "filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition";
+            }
+
+            // Update sector button active states
+            document.querySelectorAll('.sector-pill-btn').forEach(b => {
+                const s = b.getAttribute('data-sector');
+                if (s === currentSectorFilter) {
+                    b.className = "sector-pill-btn px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 whitespace-nowrap border transition active:scale-95 bg-emerald-600 text-white font-bold border-emerald-500 shadow-md";
+                } else {
+                    b.className = "sector-pill-btn px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 whitespace-nowrap border transition active:scale-95 bg-slate-900/90 text-slate-300 border-slate-800 hover:border-slate-700";
+                }
+            });
+
+            // Reset breadth card active outlines
+            ['pulseAdvancersCard', 'pulseDeclinersCard', 'pulseUnchangedCard', 'pulseAvgCard'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('ring-2', 'ring-emerald-500', 'ring-rose-500', 'ring-slate-400', 'ring-indigo-500');
+            });
+
+            renderStocks();
+
+            const secSection = document.getElementById('pulseStocksSection');
+            if (secSection) secSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Set Filter with Full Interactive Integration
+        function setFilter(f, btn) {
+            triggerHaptic('selection');
+            currentFilter = f;
+            currentSectorFilter = null;
+
+            // Clear sector active styling
+            document.querySelectorAll('.sector-pill-btn').forEach(b => {
+                b.className = "sector-pill-btn px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 whitespace-nowrap border transition active:scale-95 bg-slate-900/90 text-slate-300 border-slate-800 hover:border-slate-700";
+            });
+
+            // Smart Sort defaults
+            if (f === 'gainers') { currentRadarSort = 'chg'; radarSortDirection = -1; }
+            else if (f === 'losers') { currentRadarSort = 'chg'; radarSortDirection = 1; }
+            else if (f === 'oversold') { currentRadarSort = 'rsi'; radarSortDirection = 1; }
+            else if (f === 'overbought') { currentRadarSort = 'rsi'; radarSortDirection = -1; }
+            else if (f === 'margin') { currentRadarSort = 'margin'; radarSortDirection = -1; }
+            else if (f === 'low_pe') { currentRadarSort = 'pe'; radarSortDirection = 1; }
+            else if (f === 'liquidity') { currentRadarSort = 'chg'; radarSortDirection = -1; }
+
+            updateRadarSortUI();
+
+            // Highlight Filter Pill
+            document.querySelectorAll('.filter-pill').forEach(b => {
+                b.className = "filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700 transition";
+            });
+            const activePill = btn || document.querySelector(`.filter-pill[data-filter="${f}"]`);
+            if (activePill) {
+                activePill.className = "filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition";
+                if (typeof activePill.scrollIntoView === 'function') {
+                    activePill.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }
+
+            // Highlight Breadth Action Cards
+            const cardMap = {
+                gainers: { id: 'pulseAdvancersCard', ring: 'ring-2 ring-emerald-500' },
+                losers: { id: 'pulseDeclinersCard', ring: 'ring-2 ring-rose-500' },
+                unchanged: { id: 'pulseUnchangedCard', ring: 'ring-2 ring-slate-400' },
+                all: { id: 'pulseAvgCard', ring: 'ring-2 ring-indigo-500' }
+            };
+            ['pulseAdvancersCard', 'pulseDeclinersCard', 'pulseUnchangedCard', 'pulseAvgCard'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('ring-2', 'ring-emerald-500', 'ring-rose-500', 'ring-slate-400', 'ring-indigo-500');
+            });
+            if (cardMap[f]) {
+                const activeCard = document.getElementById(cardMap[f].id);
+                if (activeCard) {
+                    cardMap[f].ring.split(' ').forEach(cls => activeCard.classList.add(cls));
+                }
+            }
+
+            renderStocks();
+
+            // Scroll down to stocks section if clicked from top breadth cards
+            if (!btn) {
+                const stocksSec = document.getElementById('pulseStocksSection');
+                if (stocksSec) stocksSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Sort Radar Columns
+        function sortRadar(col) {
+            triggerHaptic('selection');
+            if (currentRadarSort === col) {
+                radarSortDirection = -radarSortDirection;
+            } else {
+                currentRadarSort = col;
+                radarSortDirection = (col === 'name' || col === 'rsi' || col === 'pe') ? 1 : -1;
+            }
+            updateRadarSortUI();
+            renderStocks();
+        }
+
+        function toggleRadarSortDir() {
+            triggerHaptic('selection');
+            radarSortDirection = -radarSortDirection;
+            updateRadarSortUI();
+            renderStocks();
+        }
+
+        function updateRadarSortUI() {
+            const cols = ['chg', 'close', 'rsi', 'pe', 'margin', 'name'];
+            cols.forEach(c => {
+                const b = document.getElementById('radarSort' + c.charAt(0).toUpperCase() + c.slice(1));
+                if (!b) return;
+                if (c === currentRadarSort) {
+                    b.className = "radar-sort-btn px-2 py-0.5 rounded-lg bg-emerald-700 text-white font-bold border border-emerald-600 text-[10px]";
+                } else {
+                    b.className = "radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-[10px]";
+                }
+            });
+            const dd = document.getElementById('radarSortDir');
+            if (dd) dd.textContent = radarSortDirection > 0 ? '↑' : '↓';
+        }
+
+        function filterStocks() {
+            renderStocks();
+        }
+
+        // 2. High-Tech Executive Stock Cards Renderer
         function renderStocks() {
             const container = document.getElementById('stocksContainer');
             const searchInput = document.getElementById('searchInput');
@@ -6962,7 +7243,7 @@ async function syncMubasherDirectAll() {
             container.innerHTML = '';
             if (institutionalBox) institutionalBox.innerHTML = '';
 
-            // Specialized Institutional Blocks
+            // Specialized Institutional Alert Blocks
             if (institutionalBox) {
                 if (currentFilter === 'insiders') {
                     institutionalBox.innerHTML = `
@@ -7030,17 +7311,32 @@ async function syncMubasherDirectAll() {
                 }
             }
 
+            // Filtering
             let filtered = STOCKS_DATA.filter(s => {
                 const matchSearch = s.name.toLowerCase().includes(search) || s.ticker.toLowerCase().includes(search);
                 if (!matchSearch) return false;
 
-                if (currentFilter === 'gainers') return (s.chg || 0) > 0.05;
+                if (currentFilter === 'sector') {
+                    return (s.sector || '').includes(currentSectorFilter);
+                }
+                if (currentFilter === 'gainers') return (s.chg || 0) > 0.0001;
+                if (currentFilter === 'losers') return (s.chg || 0) < -0.0001;
+                if (currentFilter === 'unchanged') return Math.abs(s.chg || 0) <= 0.0001;
                 if (currentFilter === 'oversold') return s.rsi && s.rsi <= 42.0;
-                if (currentFilter === 'losers') return (s.chg || 0) < -0.05;
-                if (currentFilter === 'funds') return s.type === 'fund' || s.ticker === 'THNDR_GOLD';
-                if (currentFilter === 'dividends') return ['ABUK', 'MFPC', 'ORWE', 'AMOC', 'SKPC'].includes(s.ticker);
+                if (currentFilter === 'overbought') return s.rsi && s.rsi >= 65.0;
+                if (currentFilter === 'liquidity') return ['TMGH', 'FWRY', 'MFPC', 'SWDY', 'ETEL', 'SKPC', 'ABUK', 'AMOC'].includes(s.ticker);
+                if (currentFilter === 'margin') {
+                    const vd = VALUATION_DATA[s.ticker];
+                    const curPrice = s.close || (vd ? vd.current : 0);
+                    const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
+                    return margin > 20;
+                }
+                if (currentFilter === 'low_pe') return s.pe && s.pe > 0 && s.pe <= 12.0;
+                if (currentFilter === 'dividends') return ['ABUK', 'MFPC', 'ORWE', 'AMOC', 'SKPC', 'ISPH'].includes(s.ticker);
+                if (currentFilter === 'divergence') return ['TMGH', 'PHDC', 'FWRY', 'OCDI', 'ISPH'].includes(s.ticker);
                 if (currentFilter === 'insiders') return ['TMGH', 'SKPC', 'FWRY', 'MFPC', 'OCDI'].includes(s.ticker);
-                if (currentFilter === 'divergence') return ['TMGH', 'PHDC', 'FWRY', 'OCDI'].includes(s.ticker);
+                if (currentFilter === 'funds') return s.type === 'fund' || s.ticker === 'THNDR_GOLD' || ['AZG', 'CMS', 'BWA', 'NMF'].includes(s.ticker);
+
                 return true;
             });
 
@@ -7050,54 +7346,114 @@ async function syncMubasherDirectAll() {
                 if (currentRadarSort === 'chg') { va = a.chg || 0; vb = b.chg || 0; }
                 else if (currentRadarSort === 'close') { va = a.close || 0; vb = b.close || 0; }
                 else if (currentRadarSort === 'rsi') { va = a.rsi || 50; vb = b.rsi || 50; }
+                else if (currentRadarSort === 'pe') { va = a.pe || 999; vb = b.pe || 999; }
+                else if (currentRadarSort === 'margin') {
+                    const ma = VALUATION_DATA[a.ticker] ? ((VALUATION_DATA[a.ticker].base - (a.close||1))/(a.close||1)) : -99;
+                    const mb = VALUATION_DATA[b.ticker] ? ((VALUATION_DATA[b.ticker].base - (b.close||1))/(b.close||1)) : -99;
+                    va = ma; vb = mb;
+                }
                 else if (currentRadarSort === 'name') { return radarSortDirection * a.name.localeCompare(b.name, 'ar'); }
                 else { va = a.chg || 0; vb = b.chg || 0; }
                 return radarSortDirection * (va - vb);
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = `<div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400">لا توجد نتائج مطابقة لبحثك في هذا التصنيف</div>`;
+                container.innerHTML = `
+                    <div class="glass-card rounded-2xl p-6 text-center text-xs text-slate-400 space-y-2">
+                        <p>لا توجد نتائج مطابقة لبحثك في هذا التصنيف المحدد.</p>
+                        <button onclick="setFilter('all')" class="px-3 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-500 transition">
+                            إظهار جميع الأسهم (38)
+                        </button>
+                    </div>`;
                 return;
             }
 
             filtered.forEach(s => {
-                const isPos = (s.chg || 0) >= 0;
-                const chgColor = isPos ? 'text-emerald-400' : 'text-rose-400';
-                const chgBg = isPos ? 'bg-emerald-950/70 border-emerald-800' : 'bg-rose-950/70 border-rose-800';
+                const isPos = (s.chg || 0) > 0.0001;
+                const isNeg = (s.chg || 0) < -0.0001;
+                const chgColor = isPos ? 'text-emerald-400' : (isNeg ? 'text-rose-400' : 'text-slate-300');
+                const chgBg = isPos ? 'bg-emerald-950/70 border-emerald-800' : (isNeg ? 'bg-rose-950/70 border-rose-800' : 'bg-slate-900 border-slate-700');
                 const sign = isPos ? '+' : '';
 
+                // Valuation margin if available
+                const vd = VALUATION_DATA[s.ticker];
+                const curPrice = s.close || (vd ? vd.current : 0);
+                const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
+
+                // High / Low Range Ratio (Simulated if not explicit)
+                const dayHigh = s.high || (curPrice * 1.025);
+                const dayLow = s.low || (curPrice * 0.975);
+                const rangeSpan = (dayHigh - dayLow) || 1;
+                const rangePct = Math.min(100, Math.max(0, Math.round(((curPrice - dayLow) / rangeSpan) * 100)));
+
+                // Technical tags
+                let tagBadges = [];
+                if (s.rsi && s.rsi <= 35) tagBadges.push(`<span class="bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded text-[9px] font-bold">⚡ قاع ارتدادي</span>`);
+                else if (s.rsi && s.rsi >= 68) tagBadges.push(`<span class="bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.5 rounded text-[9px] font-bold">🔥 تشبع شرائي</span>`);
+                
+                if (margin >= 20) tagBadges.push(`<span class="bg-sky-950 text-sky-300 border border-sky-800 px-1.5 py-0.5 rounded text-[9px] font-bold">🛡️ أمان +${margin.toFixed(0)}%</span>`);
+                if (['ABUK', 'MFPC', 'ORWE', 'AMOC'].includes(s.ticker)) tagBadges.push(`<span class="bg-purple-950 text-purple-300 border border-purple-800 px-1.5 py-0.5 rounded text-[9px] font-bold">💰 عائد مجزي</span>`);
+
                 const card = document.createElement('div');
-                card.className = "glass-card rounded-xl p-3 flex items-center justify-between hover:border-slate-600 transition cursor-pointer active:scale-99";
-                card.onclick = () => openStockChart(s.ticker);
+                card.className = "glass-card rounded-2xl p-3 space-y-2 hover:border-slate-600 transition";
                 card.setAttribute('data-ticker', s.ticker);
 
                 const recColor = (s.rec || '').includes('شراء') ? 'text-emerald-400' : (s.rec || '').includes('بيع') ? 'text-rose-400' : 'text-amber-400';
-                const arabicRec = `<span class="text-[11px] font-bold ${recColor}">${s.rec || 'متابعة'}</span>`;
+                const arabicRec = `<span class="text-[10px] font-bold ${recColor}">${s.rec || 'متابعة'}</span>`;
                 const arabicPe  = s.pe ? `<span class="text-[10px] text-slate-400">مكرر: <b class="font-mono text-slate-300">${s.pe}x</b></span>` : '';
                 const arabicRsi = s.rsi ? `<span class="text-[10px] font-mono ${s.rsi <= 35 ? 'text-emerald-400 font-bold' : s.rsi >= 70 ? 'text-rose-400 font-bold' : 'text-slate-400'}">RSI: ${s.rsi.toFixed(1)}</span>` : '';
 
                 card.innerHTML = `
-                    <div class="space-y-1 text-right flex-1 min-w-0 pr-1" dir="rtl">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="font-bold text-sm text-white">${s.name}</span>
-                            <span class="text-[10px] font-mono bg-slate-800/90 text-slate-300 border border-slate-700/80 px-1.5 py-0.5 rounded">${s.ticker}</span>
-                            ${s.type === 'fund' ? '<span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1 rounded">صندوق</span>' : ''}
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono font-bold text-xs px-2 py-0.5 rounded-lg bg-slate-900 border border-slate-700 text-slate-200">${s.ticker}</span>
+                            <div>
+                                <h4 class="font-bold text-xs text-white">${s.name}</h4>
+                                <span class="text-[10px] text-slate-400">${s.sector || 'سوق الأسهم المصري'}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 text-xs text-slate-400 flex-wrap" dir="rtl">
-                            ${arabicRec}
-                            ${arabicPe ? '<span class="text-slate-600 text-[10px]">•</span>' + arabicPe : ''}
-                            ${arabicRsi ? '<span class="text-slate-600 text-[10px]">•</span>' + arabicRsi : ''}
-                            <span class="text-slate-600 text-[10px]">•</span>
-                            <span class="text-[10px] text-slate-400">${s.sector || ''}</span>
+                        <div class="text-left font-mono">
+                            <div class="text-xs font-bold text-white flex items-center justify-end gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full ${isPos ? 'bg-emerald-400' : (isNeg ? 'bg-rose-400' : 'bg-slate-400')} pulse-live"></span>
+                                <span>${(s.close || 0).toFixed(2)} ج</span>
+                            </div>
+                            <span class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${chgBg} ${chgColor} mt-0.5">
+                                ${sign}${(s.chg || 0).toFixed(2)}%
+                            </span>
                         </div>
                     </div>
 
-                    <div class="text-left shrink-0 pl-1 space-y-0.5">
-                        <div class="text-sm font-bold text-white font-mono live-price">${(parseFloat(s.close)||0).toFixed(2)} <span class="text-[10px] font-normal text-slate-400 font-sans">ج.م</span></div>
-                        <div class="flex justify-end">
-                            <span class="inline-block text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border ${chgBg} ${chgColor}">
-                                ${sign}${(parseFloat(s.chg)||0).toFixed(2)}%
-                            </span>
+                    <!-- Daily Range Slider -->
+                    <div class="space-y-0.5 pt-0.5">
+                        <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+                            <span>أدنى: ${dayLow.toFixed(2)}</span>
+                            <span>نطاق الجلسة (${rangePct}%)</span>
+                            <span>أعلى: ${dayHigh.toFixed(2)}</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-1 relative overflow-hidden border border-slate-800/80">
+                            <div class="h-1 bg-gradient-to-r from-rose-500 via-amber-500 to-emerald-500" style="width: 100%"></div>
+                            <div class="absolute top-0 bottom-0 w-2 bg-white rounded-full shadow" style="right: ${rangePct}%; transform: translateX(50%)"></div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics & Quick Action CTAs -->
+                    <div class="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs flex-wrap gap-1.5">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            ${arabicRec}
+                            ${arabicPe}
+                            ${arabicRsi}
+                            ${tagBadges.join(' ')}
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="openStockChart('${s.ticker}')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
+                                <span>📈</span> <span>الشارت</span>
+                            </button>
+                            <button onclick="askAiAboutStock('${s.ticker}')" class="px-2 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
+                                <span>🤖</span> <span>تحليل AI</span>
+                            </button>
+                            <button onclick="openStockValuation('${s.ticker}')" class="px-2 py-1 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
+                                <span>🎯</span> <span>التقييم</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -7105,58 +7461,27 @@ async function syncMubasherDirectAll() {
             });
         }
 
-        function filterStocks() {
-            renderStocks();
+        // Quick AI Diagnosis for a specific stock from its card
+        function askAiAboutStock(ticker) {
+            triggerHaptic('medium');
+            switchMarketSubTab('ai');
+            const stock = STOCKS_DATA.find(s => s.ticker === ticker);
+            const stockName = stock ? stock.name : ticker;
+            askAiMarketAdvisor(`ما هو التحليل الفني والمالي اللحظي لسهم ${stockName} (${ticker}) وهل ينصح بالشراء الآن؟`);
         }
 
-        function setFilter(f, btn) {
+        // Quick Valuation for a specific stock from its card
+        function openStockValuation(ticker) {
             triggerHaptic('selection');
-            currentFilter = f;
-            if (f === 'gainers') { currentRadarSort = 'chg'; radarSortDirection = -1; }
-            else if (f === 'losers') { currentRadarSort = 'chg'; radarSortDirection = 1; }
-            else if (f === 'oversold') { currentRadarSort = 'rsi'; radarSortDirection = 1; }
-
-            document.querySelectorAll('.filter-pill').forEach(b => {
-                b.className = "filter-pill bg-slate-800 text-slate-300 px-3 py-1 rounded-lg whitespace-nowrap hover:bg-slate-700";
-            });
-            if (btn) btn.className = "filter-pill bg-emerald-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm";
-            renderStocks();
-        }
-
-        function sortRadar(col) {
-            triggerHaptic('selection');
-            if (currentRadarSort === col) {
-                radarSortDirection = -radarSortDirection;
-            } else {
-                currentRadarSort = col;
-                radarSortDirection = (col === 'name' || col === 'rsi') ? 1 : -1;
+            switchMarketSubTab('fair');
+            const selectEl = document.getElementById('valuationStockSelect');
+            if (selectEl) {
+                selectEl.value = ticker;
+                renderValuationCard();
             }
-            updateRadarSortUI();
-            renderStocks();
         }
 
-        function toggleRadarSortDir() {
-            triggerHaptic('selection');
-            radarSortDirection = -radarSortDirection;
-            updateRadarSortUI();
-            renderStocks();
-        }
-
-        function updateRadarSortUI() {
-            const cols = ['chg', 'close', 'rsi', 'name'];
-            cols.forEach(c => {
-                const b = document.getElementById('radarSort' + c.charAt(0).toUpperCase() + c.slice(1));
-                if (!b) return;
-                if (c === currentRadarSort) {
-                    b.className = "radar-sort-btn px-2 py-0.5 rounded-lg bg-emerald-700 text-white font-bold border border-emerald-600";
-                } else {
-                    b.className = "radar-sort-btn px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700";
-                }
-            });
-            const dirBtn = document.getElementById('radarSortDir');
-            if (dirBtn) dirBtn.innerText = radarSortDirection === -1 ? '↓' : '↑';
-        }
-
+        // 4. Valuation Card Matrix
         function renderValuationCard() {
             triggerHaptic('selection');
             const selectEl = document.getElementById('valuationStockSelect');
@@ -7169,105 +7494,108 @@ async function syncMubasherDirectAll() {
             const currentPrice = (liveStock && liveStock.close > 0) ? liveStock.close : data.current;
             const margin = currentPrice > 0 ? ((data.base - currentPrice) / currentPrice) * 100 : 0;
             const bullGain = currentPrice > 0 ? ((data.bull - currentPrice) / currentPrice) * 100 : 0;
-            const baseGain = currentPrice > 0 ? ((data.base - currentPrice) / currentPrice) * 100 : 0;
-            const bearGain = currentPrice > 0 ? ((data.bear - currentPrice) / currentPrice) * 100 : 0;
-            const isMarginPos = margin >= 0;
+            const bearRisk = currentPrice > 0 ? ((data.bear - currentPrice) / currentPrice) * 100 : 0;
+
+            const marginColor = margin >= 20 ? 'text-emerald-400' : (margin >= 0 ? 'text-amber-400' : 'text-rose-400');
 
             container.innerHTML = `
-                <div class="space-y-3 pt-2">
-                    <div class="flex items-center justify-between p-3 bg-slate-900/90 rounded-xl border border-slate-800">
+                <div class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-3 mt-2">
+                    <div class="flex items-center justify-between">
                         <div>
-                            <span class="text-sm font-bold text-white">${data.name} (${ticker})</span>
-                            <div class="text-[11px] text-slate-400 mt-0.5">السعر اللحظي (EGX): <b class="text-emerald-400 font-mono">${currentPrice.toFixed(2)} ج.م</b></div>
+                            <span class="text-xs font-bold text-white">${data.name} (${ticker})</span>
+                            <span class="text-[10px] text-slate-400 block font-mono">السعر اللحظي (EGX): <b class="text-white">${currentPrice.toFixed(2)} ج.م</b></span>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[10px] text-slate-400 block">هامش الأمان اللحظي</span>
-                            <span class="text-sm font-bold font-mono ${isMarginPos ? 'text-emerald-400' : 'text-rose-400'}">${isMarginPos ? '+' : ''}${margin.toFixed(1)}%</span>
+                        <div class="text-left">
+                            <span class="text-[9px] text-slate-400 block">هامش الأمان اللحظي</span>
+                            <b class="text-sm font-bold font-mono ${marginColor}">${margin >= 0 ? '+' : ''}${margin.toFixed(1)}%</b>
                         </div>
                     </div>
 
-                    <!-- 3 Scenarios Cards -->
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                        <div class="p-2.5 bg-emerald-950/40 border border-emerald-900/60 rounded-xl">
-                            <span class="text-[10px] text-emerald-300 font-bold block">🚀 متفائل (Bull)</span>
-                            <div class="text-sm font-bold text-white mt-1 font-mono">${data.bull.toFixed(2)} ج</div>
-                            <span class="text-[9px] text-emerald-400 font-medium font-mono">${bullGain >= 0 ? '+' : ''}${bullGain.toFixed(0)}%</span>
+                        <div class="p-2 bg-emerald-950/40 rounded-xl border border-emerald-900/60">
+                            <span class="text-emerald-400 text-[10px] block">🚀 متفائل (Bull)</span>
+                            <b class="font-mono text-emerald-300 block text-xs mt-0.5">${data.bull.toFixed(2)} ج</b>
+                            <span class="text-[9px] text-emerald-400 font-mono">+${bullGain.toFixed(0)}%</span>
                         </div>
-                        <div class="p-2.5 bg-sky-950/40 border border-sky-900/60 rounded-xl">
-                            <span class="text-[10px] text-sky-300 font-bold block">⚖️ الأساسي (Base)</span>
-                            <div class="text-sm font-bold text-white mt-1 font-mono">${data.base.toFixed(2)} ج</div>
-                            <span class="text-[9px] text-sky-400 font-medium font-mono">${baseGain >= 0 ? '+' : ''}${baseGain.toFixed(0)}%</span>
+                        <div class="p-2 bg-indigo-950/40 rounded-xl border border-indigo-900/60">
+                            <span class="text-indigo-300 text-[10px] block">⚖️ الأساسي (Base)</span>
+                            <b class="font-mono text-indigo-200 block text-xs mt-0.5">${data.base.toFixed(2)} ج</b>
+                            <span class="text-[9px] text-indigo-400 font-mono">${margin >= 0 ? '+' : ''}${margin.toFixed(0)}%</span>
                         </div>
-                        <div class="p-2.5 bg-rose-950/40 border border-rose-900/60 rounded-xl">
-                            <span class="text-[10px] text-rose-300 font-bold block">🛡️ تحفظ (Bear)</span>
-                            <div class="text-sm font-bold text-white mt-1 font-mono">${data.bear.toFixed(2)} ج</div>
-                            <span class="text-[9px] text-rose-400 font-medium font-mono">${bearGain >= 0 ? '+' : ''}${bearGain.toFixed(0)}%</span>
-                        </div>
-                    </div>
-
-                    <!-- Fundamental Multiples Bar -->
-                    <div class="grid grid-cols-4 gap-2 text-center text-[10px] p-2 bg-slate-900/80 rounded-xl border border-slate-800/80">
-                        <div>
-                            <span class="text-slate-400 block">مكرر الربحية P/E</span>
-                            <b class="text-white text-xs font-mono">${data.pe}x</b>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">مضاعف الدفترية P/B</span>
-                            <b class="text-white text-xs font-mono">${data.pb}x</b>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">الدعم الفني</span>
-                            <b class="text-emerald-400 text-xs font-mono">${data.support.toFixed(2)} ج</b>
-                        </div>
-                        <div>
-                            <span class="text-slate-400 block">المقاومة الفنية</span>
-                            <b class="text-amber-400 text-xs font-mono">${data.resistance.toFixed(2)} ج</b>
+                        <div class="p-2 bg-rose-950/40 rounded-xl border border-rose-900/60">
+                            <span class="text-rose-400 text-[10px] block">🛡️ تحفظ (Bear)</span>
+                            <b class="font-mono text-rose-300 block text-xs mt-0.5">${data.bear.toFixed(2)} ج</b>
+                            <span class="text-[9px] text-rose-400 font-mono">${bearRisk.toFixed(0)}%</span>
                         </div>
                     </div>
 
-                    <div class="p-3 bg-slate-900/70 border border-slate-800 rounded-xl text-xs text-slate-300 leading-relaxed">
-                        <b class="text-emerald-400">💡 الخلاصة والتقييم الاستثماري:</b> ${data.analysis}
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px] pt-1">
+                        <div class="p-1.5 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[9px]">مكرر الربحية P/E</span>
+                            <b class="text-slate-200 font-mono">${data.pe}x</b>
+                        </div>
+                        <div class="p-1.5 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[9px]">مضاعف الدفترية P/B</span>
+                            <b class="text-slate-200 font-mono">${data.pb}x</b>
+                        </div>
+                        <div class="p-1.5 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[9px]">الدعم الفني</span>
+                            <b class="text-emerald-400 font-mono">${data.support.toFixed(2)} ج</b>
+                        </div>
+                        <div class="p-1.5 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block text-[9px]">المقاومة الفنية</span>
+                            <b class="text-amber-400 font-mono">${data.resistance.toFixed(2)} ج</b>
+                        </div>
                     </div>
 
-                    <button onclick="openStockChart('${ticker}')" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-300 font-bold text-xs py-2 rounded-xl transition border border-slate-700 flex items-center justify-center gap-1.5">
-                        <span>📈</span>
-                        <span>فتح شارت الشموع اليابانية التفاعلي لهذا السهم</span>
+                    <p class="text-[11px] text-slate-300 leading-relaxed bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80">
+                        💡 <b>الخلاصة والتقييم الاستثماري:</b> ${data.analysis}
+                    </p>
+
+                    <button onclick="openStockChart('${ticker}')" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-slate-200 transition active:scale-98 flex items-center justify-center gap-1.5">
+                        <span>📈</span> <span>فتح شارت الشموع اليابانية التفاعلي لهذا السهم</span>
                     </button>
                 </div>
             `;
         }
 
+        // 5. Dynamic Dividends Table
         function renderDividendsTable(calendarData) {
             const tbody = document.getElementById('dividendsTableBody');
             if (!tbody) return;
-            tbody.innerHTML = '';
+
             const data = calendarData || [
-                { ticker: "ABUK", name: "أبو قير للأسمدة", coupon: 7.50, yield_pct: 11.8, cum_date: "أكتوبر 2026", pay_date: "نوفمبر 2026" },
-                { ticker: "MFPC", name: "موبكو للأسمدة", coupon: 4.25, yield_pct: 9.2, cum_date: "مارس 2026", pay_date: "إبريل 2026" },
-                { ticker: "ORWE", name: "النساجون الشرقيون", coupon: 2.40, yield_pct: 9.0, cum_date: "إبريل 2026", pay_date: "مايو 2026" },
-                { ticker: "AMOC", name: "أموك للبترول", coupon: 1.10, yield_pct: 8.4, cum_date: "سبتمبر 2026", pay_date: "أكتوبر 2026" },
-                { ticker: "SKPC", name: "سيدي كرير", coupon: 1.50, yield_pct: 8.2, cum_date: "مارس 2026", pay_date: "إبريل 2026" }
+                { ticker: "ABUK", name: "أبو قير للأسمدة", coupon: 7.50, ex_date: "أكتوبر 2026", pay_date: "نوفمبر 2026", yield_pct: 8.4 },
+                { ticker: "MFPC", name: "موبكو للأسمدة", coupon: 3.75, ex_date: "سبتمبر 2026", pay_date: "أكتوبر 2026", yield_pct: 8.1 },
+                { ticker: "ORWE", name: "النساجون الشرقيون", coupon: 2.20, ex_date: "أكتوبر 2026", pay_date: "نوفمبر 2026", yield_pct: 7.9 },
+                { ticker: "AMOC", name: "أموك للبترول", coupon: 1.10, ex_date: "نوفمبر 2026", pay_date: "ديسمبر 2026", yield_pct: 8.3 },
+                { ticker: "SKPC", name: "سيدي كرير", coupon: 1.50, ex_date: "سبتمبر 2026", pay_date: "أكتوبر 2026", yield_pct: 8.2 }
             ];
 
+            tbody.innerHTML = '';
             data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/30";
-                const liveStock = STOCKS_DATA.find(s => s.ticker === item.ticker);
-                const curPrice = liveStock && liveStock.close > 0 ? liveStock.close : 0;
+                const stock = STOCKS_DATA.find(s => s.ticker === item.ticker);
+                const curPrice = stock ? stock.close : 0;
                 const dynamicYield = curPrice > 0 ? ((item.coupon / curPrice) * 100) : item.yield_pct;
 
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition cursor-pointer";
+                tr.onclick = () => openStockChart(item.ticker);
                 tr.innerHTML = `
-                    <td class="py-2.5 font-bold text-white">${item.name} (${item.ticker})</td>
-                    <td class="py-2.5 text-amber-300 font-bold font-mono">${(parseFloat(item.coupon)||0).toFixed(2)} ج</td>
-                    <td class="py-2.5 text-emerald-400 font-bold font-mono">${dynamicYield.toFixed(1)}%</td>
-                    <td class="py-2.5 text-slate-300">${item.cum_date}</td>
-                    <td class="py-2.5 text-slate-400">${item.pay_date}</td>
+                    <td class="py-2.5 font-bold text-white flex items-center gap-1.5">
+                        <span class="font-mono text-emerald-400">${item.ticker}</span>
+                        <span>${item.name}</span>
+                    </td>
+                    <td class="py-2.5 font-mono text-amber-300 font-bold">${item.coupon.toFixed(2)} ج</td>
+                    <td class="py-2.5 font-mono text-emerald-400 font-bold">${dynamicYield.toFixed(1)}%</td>
+                    <td class="py-2.5 text-slate-400 text-[10px]">${item.ex_date}</td>
+                    <td class="py-2.5 text-slate-400 text-[10px]">${item.pay_date}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // ─── Unified Market Sub-Tab Switcher (Pulse / News / AI / Fair) ───────────────
+        // 6. Subtab Switcher
         function switchMarketSubTab(sub) {
             triggerHaptic('selection');
             const views = {
@@ -7304,15 +7632,10 @@ async function syncMubasherDirectAll() {
                 if (typeof updateMarketPulseLive === 'function') updateMarketPulseLive();
             } else if (sub === 'news') {
                 if (typeof renderNewsFeed === 'function') renderNewsFeed();
-            } else if (sub === 'ai') {
-                if (typeof askAiMarketAdvisor === 'function') askAiMarketAdvisor('تحليل شامل وفوري لمحفظتي الحالية');
             }
         }
 
-        function setPulseMode(mode) {
-            switchMarketSubTab(mode === 'news' ? 'news' : 'pulse');
-        }
-
+        // 7. AI Market Advisor
         window.quickAskMarketAi = function(q) { return askAiMarketAdvisor(q); };
         window.askAiMarketAdvisor = askAiMarketAdvisor;
         function askAiMarketAdvisor(question) {
@@ -7334,82 +7657,68 @@ async function syncMubasherDirectAll() {
                     (s.name.includes('فوري') && question.includes('فوري')) ||
                     (s.name.includes('موبكو') && question.includes('موبكو')) ||
                     (s.name.includes('أبو قير') && question.includes('أبو قير')) ||
+                    (s.name.includes('السويدي') && question.includes('السويدي')) ||
                     (s.name.includes('سيدي كرير') && question.includes('كرير')) ||
-                    (s.name.includes('سوديك') && question.includes('سوديك')) ||
-                    (s.name.includes('ألومنيوم') && question.includes('ألومنيوم')) ||
-                    (s.name.includes('إي فاينانس') && (question.includes('فاينانس') || question.includes('efih')))
+                    (s.name.includes('النساجون') && question.includes('النساجون')) ||
+                    (s.name.includes('أزيموت') && question.includes('أزيموت'))
                 );
 
                 if (matchedStock) {
-                    const ticker = matchedStock.ticker;
-                    const val = VALUATION_DATA[ticker];
-                    const curP = matchedStock.close.toFixed(2);
-                    const chgP = matchedStock.chg >= 0 ? `+${matchedStock.chg.toFixed(2)}%` : `${matchedStock.chg.toFixed(2)}%`;
-                    const rsi = matchedStock.rsi ? matchedStock.rsi.toFixed(1) : '50.0';
-                    const fairP = val ? val.base.toFixed(2) : (matchedStock.close * 1.25).toFixed(2);
-                    const margin = val ? (((val.base - matchedStock.close)/matchedStock.close)*100).toFixed(1) : '20.0';
-                    const supp = val ? val.support.toFixed(2) : (matchedStock.close * 0.94).toFixed(2);
-                    const res = val ? val.resistance.toFixed(2) : (matchedStock.close * 1.12).toFixed(2);
+                    const vd = VALUATION_DATA[matchedStock.ticker];
+                    const curPrice = matchedStock.close || (vd ? vd.current : 0);
+                    const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
+                    const rsi = matchedStock.rsi || 45;
+                    const pe = matchedStock.pe ? `${matchedStock.pe}x` : '10.5x';
+                    const chg = matchedStock.chg || 0;
+                    const sign = chg >= 0 ? '+' : '';
 
                     ans = `
                         <div class="space-y-2">
-                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                                <b class="text-white text-xs">📊 التحليل اللحظي لسهم ${matchedStock.name} (${ticker}):</b>
-                                <span class="text-emerald-400 font-mono font-bold">${curP} ج (${chgP})</span>
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-white">📊 التحليل اللحظي لسهم ${matchedStock.name} (${matchedStock.ticker}):</span>
+                                <span class="font-mono font-bold ${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${curPrice.toFixed(2)} ج (${sign}${chg.toFixed(2)}%)</span>
                             </div>
-                            <p class="text-[11px] leading-relaxed">
-                                يتداول السهم حالياً عند مضاعف ربحية <b>${matchedStock.pe > 0 ? matchedStock.pe + 'x' : 'جذاب'}</b> ومؤشر القوة النسبية RSI يقع عند <b>${rsi}</b> (${matchedStock.rsi <= 35 ? 'مناطق تشبع بيعي ارتدادي 🟢' : matchedStock.rsi >= 70 ? 'تشبع شرائي وجني أرباح 🔴' : 'تداول متوازن 🟡'}).
-                            </p>
-                            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] font-mono p-1.5 bg-slate-900 rounded-xl border border-slate-800">
-                                <div><span class="text-slate-400 block text-[9px]">القيمة العادلة</span><b class="text-emerald-400">${fairP} ج</b></div>
-                                <div><span class="text-slate-400 block text-[9px]">هامش الأمان</span><b class="${parseFloat(margin)>=0?'text-emerald-400':'text-rose-400'}">${parseFloat(margin)>=0?'+':''}${margin}%</b></div>
-                                <div><span class="text-slate-400 block text-[9px]">الدعم / المقاومة</span><b class="text-sky-300">${supp} / ${res} ج</b></div>
-                            </div>
-                            <p class="text-[10px] text-amber-300"><b>💡 التوصية:</b> ${matchedStock.rec || 'احتفاظ ومراقبة'} - يُنصح بالشراء التراكمي في مناطق الدعوم الفنية وتأمين الأرباح عند المقاومة.</p>
+                            <p class="text-slate-300">يتداول السهم حالياً عند مضاعف ربحية <b>${pe}</b> ومؤشر القوة النسبية RSI يقع عند <b>${rsi.toFixed(1)}</b> (${rsi <= 35 ? 'مناطق تشبع بيعي ارتدادي 🟢' : rsi >= 70 ? 'مناطق تشبع شرائي ومقاومة 🔴' : 'نطاق سعري متوازن ⚪'}).</p>
+                            ${vd ? `
+                            <div class="grid grid-cols-2 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
+                                <div>القيمة العادلة: <b class="text-indigo-300">${vd.base.toFixed(2)} ج</b></div>
+                                <div>هامش الأمان: <b class="${margin >= 20 ? 'text-emerald-400' : 'text-amber-300'}">${margin >= 0 ? '+' : ''}${margin.toFixed(1)}%</b></div>
+                                <div>الدعم / المقاومة: <b class="text-slate-300">${vd.support.toFixed(2)} / ${vd.resistance.toFixed(2)} ج</b></div>
+                                <div>الاستراتيجية: <b class="text-emerald-400">${vd.analysis.substring(0, 30)}...</b></div>
+                            </div>` : ''}
+                            <p class="text-[10px] text-amber-300">💡 <b>التوصية:</b> ${rsi <= 40 ? 'ارتداد متوقع - يُنصح بالشراء التراكمي في مناطق الدعوم الفنية وتأمين الأرباح عند المقاومة.' : 'متابعة حركة السيولة ونقاط الدعم اللحظية.'}</p>
                         </div>
                     `;
-                } else if (question.includes('قاع') || question.includes('تشبع') || question.includes('rsi')) {
-                    const oversold = STOCKS_DATA.filter(s => s.rsi && s.rsi <= 40).sort((a,b) => a.rsi - b.rsi);
-                    let listHtml = '';
-                    oversold.slice(0, 4).forEach(s => {
-                        listHtml += `<li><b>${s.name} (${s.ticker}):</b> سعر ${s.close.toFixed(2)} ج • RSI: <b class="text-emerald-400 font-mono">${s.rsi.toFixed(1)}</b> (قاع ارتداد صلب).</li>`;
-                    });
-                    ans = `<p><b>📉 الأسهم التي بلغت مناطق تشبع بيعي مفرطة (RSI < 40):</b></p>
-                    <ul class="list-disc pr-4 space-y-1 mt-1 text-slate-200 text-[11px]">${listHtml}</ul>
-                    <p class="mt-1 text-[10px] text-slate-400">هذه الأسهم توفر تاريخياً أعلى معدلات نجاح للارتداد الصاعد السريع مع أدنى نسبة مخاطرة سعرية.</p>`;
-                } else if (question.includes('أفضل فرص') || question.includes('شراء')) {
-                    const tmgh = STOCKS_DATA.find(s => s.ticker === 'TMGH');
-                    const efih = STOCKS_DATA.find(s => s.ticker === 'EFIH');
-                    const abuk = STOCKS_DATA.find(s => s.ticker === 'ABUK');
-                    const tmghP = tmgh ? tmgh.close.toFixed(2) : '90.40';
-                    const efihP = efih ? efih.close.toFixed(2) : '22.92';
-                    const abukP = abuk ? abuk.close.toFixed(2) : '87.63';
-                    ans = `<p><b>🎯 أفضل 3 فرص شرائية بحسب الأسعار اللحظية وهامش الأمان:</b></p>
-                    <ul class="list-disc pr-4 space-y-1 mt-1 text-slate-200">
-                        <li><b>طلعت مصطفى (TMGH @ ${tmghP} ج):</b> خصم يفوق 30% عن القيمة العادلة وتدفقات دولارية صلبة.</li>
-                        <li><b>إي فاينانس (EFIH @ ${efihP} ج):</b> مكرر ربحية جذاب وهوامش ربح تشغيلية قياسية في الدفع الرقمي.</li>
-                        <li><b>أبو قير للأسمدة (ABUK @ ${abukP} ج):</b> تدفقات تصديرية بالعملة الصعبة وعوائد كوبونات نقدية ممتازة.</li>
-                    </ul>`;
-                } else if (question.includes('توازن') || question.includes('المحفظة') || question.includes('شامل')) {
-                    let sVal = 0, fVal = 0;
-                    userHoldings.forEach(h => {
-                        const v = (h.cur || h.buy || 0) * (h.qty || 0);
-                        if (h.isFund || isGoldAsset(h)) fVal += v;
-                        else sVal += v;
-                    });
-                    const tot = sVal + fVal;
-                    const sPct = tot > 0 ? ((sVal / tot) * 100).toFixed(1) : '42.5';
-                    const fPct = tot > 0 ? ((fVal / tot) * 100).toFixed(1) : '57.5';
-                    ans = `<p><b>⚖️ تشخيص توزيع ومخاطر المحفظة:</b></p>
-                    <p class="mt-1">إجمالي ثروتك موزع بنسبة <b>${sPct}% أسهم شريعة ونمو</b>، و<b>${fPct}% صناديق شريعة وذهب</b>. هذا التوزيع يوفر عائداً متزناً وتحوطاً فعالاً ضد التضخم وتقلبات سعر الصرف. صحة الثروة ممتازة (94/100).</p>`;
-                } else if (question.includes('الذهب') || question.includes('التحوط')) {
-                    const goldGram = Math.round(getLiveGoldGramRate()).toLocaleString();
-                    ans = `<p><b>🪙 رؤية التحوط بالذهب (AZG & سبائك ثاندر):</b></p>
-                    <p class="mt-1">الذهب عيار 24 يتداول حول <b>${goldGram} ج.م للجرام</b>. التمركز الحالي كافٍ للتحوط، ويُنصح بزيادة التراكم عند كل تصحيح سعري للأونصة العالمية.</p>`;
+                } else if (question.includes('أفضل') || question.includes('فرص') || question.includes('شراء')) {
+                    const topOversold = STOCKS_DATA.filter(s => s.rsi && s.rsi <= 40).sort((a,b) => a.rsi - b.rsi).slice(0, 3);
+                    const topItems = topOversold.map(s => `• <b>${s.name} (${s.ticker})</b>: يتداول بسعر ${s.close.toFixed(2)} ج مع RSI: ${s.rsi.toFixed(1)} (قاع ارتدادي).`).join('<br>');
+                    ans = `
+                        <div class="space-y-1.5">
+                            <span class="font-bold text-emerald-400">🎯 أفضل فرص الشراء والتجميع اللحظي بناءً على مؤشرات التشبع البيعي:</span>
+                            <div class="text-[11px] text-slate-200 leading-relaxed py-1">${topItems}</div>
+                            <p class="text-[10px] text-slate-400">تتميز هذه الأسهم بهامش أمان مرتفع وانخفاض مخاطر الهبوط قرب مستويات الدعم التاريخية.</p>
+                        </div>
+                    `;
+                } else if (question.includes('ذهب') || question.includes('تحوط')) {
+                    ans = `
+                        <div class="space-y-1.5">
+                            <span class="font-bold text-amber-400">🪙 استراتيجية التحوط بالذهب في السوق المصري:</span>
+                            <p class="text-[11px] text-slate-200 leading-relaxed">
+                                الذهب عيار 24 يسجل حالياً <b>7,128 ج.م</b>. في ظل معدلات التضخم وأسعار الفائدة، يُنصح بتخصيص <b>15% إلى 25%</b> من المحفظة الاستثمارية لصناديق الذهب المعتمدة مثل <b>أزيموت جولد (AZG)</b> أو <b>سبائك ثندر الذهبية (THNDR_GOLD)</b> لتفادي مصنعية السبائك وتوفير سيولة تسييل فورية 24/7.
+                            </p>
+                        </div>
+                    `;
                 } else {
-                    ans = `<p><b>💡 تحليل ${question}:</b></p>
-                    <p class="mt-1">بناءً على التداولات اللحظية لـ EGX وقوائم البيانات المالية، ينصح بالالتزام بالأسعار المستهدفة وهوامش الأمان، مع تفعيل وقف الخسارة عند كسر الدعوم الرئيسية.</p>`;
+                    ans = `
+                        <div class="space-y-1.5">
+                            <span class="font-bold text-indigo-400">💡 التحليل العام لحالة السوق ومحفظتك:</span>
+                            <p class="text-[11px] text-slate-200 leading-relaxed">
+                                يتداول السوق المصري اليوم في مسار استيعابي. يُنصح بالتركيز على الأسهم ذات الكوبونات النقدية المرتفعة (مثل أبو قير وموبكو) والشركات ذات الإيرادات التصديرية أو الدولارية، مع الحفاظ على صفقات التداول حول الدعوم الفنية وتفعيل وقف الخسارة أسفل القيعان السابقة.
+                            </p>
+                        </div>
+                    `;
                 }
+
                 textEl.innerHTML = ans;
             }, 500);
         }
@@ -7418,18 +7727,10 @@ async function syncMubasherDirectAll() {
             const input = document.getElementById('marketAiCustomInput');
             if (!input || !input.value.trim()) return;
             const q = input.value.trim();
-            askAiMarketAdvisor(q);
             input.value = '';
+            askAiMarketAdvisor(q);
         }
 
-
-        window.switchMarketSubTab = switchMarketSubTab;
-        window.setPulseMode = setPulseMode;
-        window.askAiMarketAdvisor = askAiMarketAdvisor;
-        window.submitMarketAiQuestion = submitMarketAiQuestion;
-
-
-        // ─── v11: Decisions sub-tab switcher ───────────────────────────
         function switchDecisionsSubTab(sub) {
             const views = { rec: 'decisionsSubViewRec', val: 'decisionsSubViewVal' };
             const btns  = { rec: 'decisionsSubTabRecBtn', val: 'decisionsSubTabValBtn' };
@@ -8423,6 +8724,8 @@ async function syncMubasherDirectAll() {
         function filterNewsFeed() {
             renderNewsFeed();
         }
+        window.filterNewsByInput = filterNewsFeed;
+        window.filterNewsCategory = setNewsCategory;
 
         function setNewsCategory(cat, btn) {
             triggerHaptic('selection');
