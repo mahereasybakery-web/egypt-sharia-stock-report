@@ -1123,51 +1123,45 @@
                     </div>
                 </div>
 
-                <!-- Thndr 3 Mini Wealth Status Cards (مطابقة 100% مع لقطة شاشة ثندر بشكل مدمج وأنيق) -->
-                <div class="grid grid-cols-4 gap-1.5 sm:gap-2 pt-1.5 border-t border-slate-800/80 text-center text-xs">
-                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center" title="السيولة النقدية الحرة غير المستثمرة (كاش معلق)">
-                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
-                            <span>🪙</span>
-                            <span>السيولة النقدية</span>
-                        </div>
-                        <div id="p_thndr_cash" class="font-bold text-emerald-400 font-mono text-[11px] sm:text-sm">0 ج</div>
-                        <div id="p_thndr_clawdz" class="hidden">0.00 ج</div>
-                    </div>
-                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
+                <!-- Thndr 3 Mini Wealth Status Cards (الأصول الفعلية المستثمرة بالكامل: أسهم + صناديق + ذهب) -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-3 pt-1.5 border-t border-slate-800/80 text-center text-xs">
+                    <div class="bg-slate-950/70 py-2 px-2 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center shadow-sm">
+                        <div class="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
                             <span>📈</span>
-                            <span>الأسهم</span>
+                            <span>الأسهم (8 أسهم)</span>
                         </div>
-                        <div class="flex items-baseline gap-0.5">
-                            <span id="p_thndr_stocks_card" class="font-bold text-emerald-400 font-mono text-[11px] sm:text-sm">36.39k ج</span>
+                        <div class="flex items-baseline gap-0.5 my-0.5">
+                            <span id="p_thndr_stocks_card" class="font-bold text-emerald-400 font-mono text-xs sm:text-sm">36.40k ج</span>
                         </div>
-                        <span id="p_thndr_stocks_card_pnl" class="text-[8.5px] text-emerald-400 font-mono leading-none">▲ +4.00%</span>
+                        <span id="p_thndr_stocks_card_pnl" class="text-[9px] text-emerald-400 font-mono leading-none">▲ +4.04%</span>
                     </div>
-                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[9.5px] text-slate-400">
+                    <div class="bg-slate-950/70 py-2 px-2 rounded-xl border border-slate-800/80 flex flex-col justify-center items-center shadow-sm">
+                        <div class="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
                             <span>🏦</span>
-                            <span>الصناديق</span>
+                            <span>الصناديق (4 صناديق)</span>
                         </div>
-                        <div class="flex items-baseline gap-0.5">
-                            <span id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-[11px] sm:text-sm">48.86k ج</span>
+                        <div class="flex items-baseline gap-0.5 my-0.5">
+                            <span id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-xs sm:text-sm">48.86k ج</span>
                         </div>
-                        <span id="p_thndr_funds_card_pnl" class="text-[8.5px] text-rose-400 font-mono leading-none">▼ -3.54%</span>
+                        <span id="p_thndr_funds_card_pnl" class="text-[9px] text-rose-400 font-mono leading-none">▼ -3.54%</span>
                     </div>
-                    <div class="bg-slate-950/70 py-1.5 px-1.5 rounded-xl border border-amber-500/30 flex flex-col justify-center items-center">
-                        <div class="flex items-center gap-1 text-[9.5px] text-amber-400">
+                    <div class="bg-slate-950/70 py-2 px-2 rounded-xl border border-amber-500/30 flex flex-col justify-center items-center shadow-sm">
+                        <div class="flex items-center gap-1 text-[10px] text-amber-400 font-medium">
                             <span>🥇</span>
-                            <span>الذهب</span>
+                            <span>الذهب الخالص</span>
                         </div>
-                        <div class="flex items-baseline gap-0.5">
-                            <span id="p_thndr_gold_card" class="font-bold text-amber-300 font-mono text-[11px] sm:text-sm">56.50 ج</span>
+                        <div class="flex items-baseline gap-0.5 my-0.5">
+                            <span id="p_thndr_gold_card" class="font-bold text-amber-300 font-mono text-xs sm:text-sm">56.70 ج</span>
                         </div>
-                        <span id="p_thndr_gold_card_pnl" class="text-[8.5px] text-emerald-400 font-mono leading-none">▲ +0.04%</span>
+                        <span id="p_thndr_gold_card_pnl" class="text-[9px] text-emerald-400 font-mono leading-none">▲ +0.39%</span>
                         <div id="p_thndr_invested" class="hidden">85.30k ج</div>
                     </div>
                 </div>
 
                 <!-- Hidden IDs to preserve full JS compatibility -->
                 <div class="hidden">
+                    <span id="p_thndr_cash">0.00 ج</span>
+                    <span id="p_thndr_clawdz">0.00 ج</span>
                     <span id="p_thndr_usd_val"></span>
                     <span id="p_thndr_sar_val"></span>
                     <span id="p_thndr_gold_val"></span>
@@ -3029,7 +3023,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.7')
+                navigator.serviceWorker.register('sw.js?v=12.8')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4404,7 +4398,7 @@
 
             // Redraw Donut Chart with Actual Sectors (including Clawdz/Cash)
             const allWeights = Object.assign({}, sectorWeights);
-            allWeights['كلاودز (سيولة نقدية)'] = THNDR_CASH.clawdz;
+            if (THNDR_CASH && THNDR_CASH.clawdz > 0) allWeights['كلاودز (سيولة نقدية)'] = THNDR_CASH.clawdz;
             updateDonutChart(allWeights);
 
             // Render Dynamic Sector Breakdown Bars & Concentration Risk Alert
@@ -5808,7 +5802,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v12.7',
+                appVersion: 'egx-sharia-v12.8',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -8584,17 +8578,19 @@ async function syncMubasherDirectAll() {
             const wsFunds = XLSX.utils.aoa_to_sheet(fundsData);
             XLSX.utils.book_append_sheet(wb, wsFunds, 'صناديق الاستثمار والذهب');
 
-            // 3. Cash Sheet
+            // 3. Cash Sheet (Only included if user has liquid cash)
             const clawdzVal = (THNDR_CASH && THNDR_CASH.clawdz) || 0;
             const cashVal = (THNDR_CASH && THNDR_CASH.cash) || 0;
-            const cashData = [
-                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية التقديرية (ج)', 'الحالة'],
-                ['صندوق كلاودز (سيولة واستثمار يومي)', parseFloat(clawdzVal.toFixed(2)), '17.34%', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), clawdzVal > 0 ? 'مستثمر يومياً' : 'لا يوجد رصيد حالي'],
-                ['محفظة التداول (نقدية حرة)', parseFloat(cashVal.toFixed(2)), '0.00%', 0.00, 'متاح للتداول الفوري'],
-                ['إجمالي السيولة النقدية', parseFloat((clawdzVal + cashVal).toFixed(2)), '--', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), 'جاهزية استثمارية']
-            ];
-            const wsCash = XLSX.utils.aoa_to_sheet(cashData);
-            XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
+            if (clawdzVal > 0 || cashVal > 0) {
+                const cashData = [
+                    ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية التقديرية (ج)', 'الحالة'],
+                    ['صندوق كلاودز (سيولة واستثمار يومي)', parseFloat(clawdzVal.toFixed(2)), '17.34%', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), 'مستثمر يومياً'],
+                    ['محفظة التداول (نقدية حرة)', parseFloat(cashVal.toFixed(2)), '0.00%', 0.00, 'متاح للتداول الفوري'],
+                    ['إجمالي السيولة النقدية', parseFloat((clawdzVal + cashVal).toFixed(2)), '--', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), 'جاهزية استثمارية']
+                ];
+                const wsCash = XLSX.utils.aoa_to_sheet(cashData);
+                XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
+            }
 
             // 4. Wealth Valuation & Zakat Summary Sheet
             const totalInvestedVal = totStocksMVal + totFundsMVal;
@@ -9123,11 +9119,10 @@ async function syncMubasherDirectAll() {
                 }
             });
 
-            // Handle Cash & Clawdz Liquidity
-            if (filter === 'all' || filter === 'cash') {
-                const clawdzBalance = (THNDR_CASH && typeof THNDR_CASH.clawdz === 'number') ? THNDR_CASH.clawdz : 0.0;
+            // Handle Cash & Clawdz Liquidity (Only if user has actual liquidity)
+            const clawdzBalance = (THNDR_CASH && typeof THNDR_CASH.clawdz === 'number') ? THNDR_CASH.clawdz : 0.0;
+            if ((filter === 'all' || filter === 'cash') && clawdzBalance > 0) {
                 const clawdzAnnualYield = (THNDR_CASH && THNDR_CASH.clawdzRate) ? (THNDR_CASH.clawdzRate / 100) : 0.1731;
-                // Daily compound return for elapsed period
                 const periodReturnAmount = clawdzBalance * (clawdzAnnualYield / 365) * elapsedDays;
                 const clawdzStartVal = Math.max(0, clawdzBalance - periodReturnAmount);
                 const clawdzEndVal = clawdzBalance;
@@ -10598,7 +10593,7 @@ async function syncMubasherDirectAll() {
                             <span>⚡</span>
                             <span>استيراد فوري من آخر صورة فعلية لثندر</span>
                         </div>
-                        <div class="text-[10px] text-slate-400">إجمالي 86,645 ج (8 أسهم + 5 صناديق وذهب + كلاودز 22.18 ج)</div>
+                        <div class="text-[10px] text-slate-400">إجمالي المحفظة (8 أسهم + 4 صناديق استثمارية + وثيقة الذهب الخالص - بدون رصيد سيولة)</div>
                     </div>
                     <button type="button" onclick="loadThndrVerifiedPreset()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow active:scale-95 shrink-0">
                         تطبيق فوري
@@ -10621,11 +10616,11 @@ async function syncMubasherDirectAll() {
                 <div class="grid grid-cols-2 gap-2 text-xs">
                     <div class="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl">
                         <span class="text-[10px] text-slate-400 block mb-0.5">⚡ كلاودز (سيولة يومية)</span>
-                        <input type="number" id="parsedClawdzInput" value="22.18" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-amber-300 font-mono font-bold outline-none">
+                        <input type="number" id="parsedClawdzInput" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-amber-300 font-mono font-bold outline-none">
                     </div>
                     <div class="p-2.5 bg-slate-950/80 border border-slate-800 rounded-xl">
                         <span class="text-[10px] text-slate-400 block mb-0.5">🪙 النقدية الحرة</span>
-                        <input type="number" id="parsedCashInput" value="7.10" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-emerald-300 font-mono font-bold outline-none">
+                        <input type="number" id="parsedCashInput" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1 text-xs text-emerald-300 font-mono font-bold outline-none">
                     </div>
                 </div>
 
@@ -10701,10 +10696,9 @@ async function syncMubasherDirectAll() {
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1 font-medium">فلترة الأصول المعروضة:</label>
                             <select id="perfAssetFilter" onchange="runPeriodPerformanceAnalysis()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-indigo-500 focus:outline-none">
-                                <option value="all">جميع الاستثمارات (أسهم + صناديق + سيولة)</option>
+                                <option value="all">جميع الاستثمارات (الأسهم + الصناديق + الذهب)</option>
                                 <option value="stocks">الأسهم فقط (EGX 33)</option>
                                 <option value="funds">صناديق الاستثمار والذهب فقط</option>
-                                <option value="cash">سيولة كلوودز والمرابحة فقط</option>
                             </select>
                         </div>
                     </div>
@@ -10740,7 +10734,7 @@ async function syncMubasherDirectAll() {
                         <span>🏛️</span>
                         <span>تفصيل الأداء والأرباح حسب كل جهة استثمار:</span>
                     </h4>
-                    <div id="perfEntitiesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <div id="perfEntitiesGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <!-- Injected via JavaScript -->
                     </div>
                 </div>
