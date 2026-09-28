@@ -994,7 +994,7 @@
                             <span>التحليل اللحظي للمستشار الذكي:</span>
                         </div>
                         <div id="marketAiResponseText" class="space-y-2 text-slate-300 text-[11px] leading-relaxed">
-                            <p>محفظتك الحالية بقيمة <b class="text-amber-400 font-mono">86,645 ج.م</b> تتمتع بتنويع ممتاز بين الأسهم القيادية (ETEL, TMGH, EFIH) وصناديق الشريعة والذهب (CMS, AZG). أكبر العوائد المحققة حالياً في <b class="text-emerald-400">المصرية للاتصالات (+23%)</b>، بينما يقدم <b class="text-sky-400">سهم طلعت مصطفى (90.40 ج)</b> فرصة تعزيز عند مستويات الدعم.</p>
+                            <p>محفظتك الحالية تخضع للمتابعة الفورية بأسعار البورصة المصرية اللحظية (EGX Live) مع توزيع متوازن بين الأسهم وصناديق الشريعة والذهب، وتخضع لمطابقة رياضية دقيقة لكافة العوائد المحققة وغير المحققة.</p>
                             <p class="text-slate-400">انقر على أي من الأسئلة السريعة أعلاه أو اكتب سؤالك بالأسفل للحصول على تحليل مخصص بالثانية.</p>
                         </div>
                     </div>
@@ -1233,10 +1233,10 @@
                         <span class="text-xs font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
                     <!-- Profit/Loss Badge placed inline (compact) -->
-                    <div class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
-                        <span id="p_thndr_grand_pnl">▼ -393</span>
-                        <span id="p_thndr_grand_return">(+1.11%)</span>
-                        <span class="text-[9px] text-emerald-300 font-sans font-medium hidden sm:inline">أرباح غير محققة</span>
+                    <div id="p_thndr_grand_badge" class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 font-mono bg-slate-800/40 border border-slate-700/50 px-2.5 py-0.5 rounded-full transition-colors">
+                        <span id="p_thndr_grand_pnl">--</span>
+                        <span id="p_thndr_grand_return">(--%)</span>
+                        <span id="p_thndr_grand_label" class="text-[9px] text-slate-400 font-sans font-medium hidden sm:inline">أرباح/خسائر</span>
                     </div>
                 </div>
 
@@ -3146,7 +3146,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.5')
+                navigator.serviceWorker.register('sw.js?v=12.6')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4429,29 +4429,38 @@
             if (cashElem) cashElem.innerText = (THNDR_CASH.cash || 0).toFixed(2) + ' ج';
 
             const stocksCardElem = document.getElementById('p_thndr_stocks_card');
-            if (stocksCardElem) stocksCardElem.innerText = (totalStocksVal / 1000).toFixed(2) + 'k ج';
+            if (stocksCardElem) {
+                stocksCardElem.innerText = (totalStocksVal / 1000).toFixed(2) + 'k ج';
+                stocksCardElem.className = `font-bold font-mono text-[11px] sm:text-sm ${stocksPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+            }
             const stocksCardPnl = document.getElementById('p_thndr_stocks_card_pnl');
             if (stocksCardPnl) {
                 const sSign = stocksPnlPct >= 0 ? '+' : '';
-                stocksCardPnl.innerText = `${stocksPnlPct >= 0 ? '▲ ' : '▼ '}${sSign}${stocksPnlPct.toFixed(2)}%`;
-                stocksCardPnl.className = `text-[8.5px] font-mono leading-none ${stocksPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                stocksCardPnl.innerHTML = `<span dir="ltr">${stocksPnl >= 0 ? '▲ ' : '▼ '}${sSign}${stocksPnlPct.toFixed(2)}%</span>`;
+                stocksCardPnl.className = `text-[8.5px] font-mono leading-none ${stocksPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
             const fundsCardElem = document.getElementById('p_thndr_funds_card');
-            if (fundsCardElem) fundsCardElem.innerText = (totalFundsVal / 1000).toFixed(2) + 'k ج';
+            if (fundsCardElem) {
+                fundsCardElem.innerText = (totalFundsVal / 1000).toFixed(2) + 'k ج';
+                fundsCardElem.className = `font-bold font-mono text-[11px] sm:text-sm ${fundsPnl >= 0 ? 'text-amber-400' : 'text-rose-400'}`;
+            }
             const fundsCardPnl = document.getElementById('p_thndr_funds_card_pnl');
             if (fundsCardPnl) {
                 const fSign = fundsPnlPct >= 0 ? '+' : '';
-                fundsCardPnl.innerText = `${fundsPnlPct >= 0 ? '▲ ' : '▼ '}${fSign}${fundsPnlPct.toFixed(2)}%`;
-                fundsCardPnl.className = `text-[8.5px] font-mono leading-none ${fundsPnlPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                fundsCardPnl.innerHTML = `<span dir="ltr">${fundsPnl >= 0 ? '▲ ' : '▼ '}${fSign}${fundsPnlPct.toFixed(2)}%</span>`;
+                fundsCardPnl.className = `text-[8.5px] font-mono leading-none ${fundsPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
             const goldCardElem = document.getElementById('p_thndr_gold_card');
-            if (goldCardElem) goldCardElem.innerText = totalGoldVal.toFixed(2) + ' ج';
+            if (goldCardElem) {
+                goldCardElem.innerText = totalGoldVal.toFixed(2) + ' ج';
+                goldCardElem.className = `font-bold font-mono text-[11px] sm:text-sm ${goldPnl >= 0 ? 'text-amber-300' : 'text-rose-400'}`;
+            }
             const goldCardPnl = document.getElementById('p_thndr_gold_card_pnl');
             if (goldCardPnl) {
                 const gSign = goldPnlPct >= 0 ? '+' : '';
-                goldCardPnl.innerText = `${goldPnl >= 0 ? '▲ ' : '▼ '}${gSign}${goldPnlPct.toFixed(2)}%`;
+                goldCardPnl.innerHTML = `<span dir="ltr">${goldPnl >= 0 ? '▲ ' : '▼ '}${gSign}${goldPnlPct.toFixed(2)}%</span>`;
                 goldCardPnl.className = `text-[8.5px] font-mono leading-none ${goldPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
             }
 
@@ -4461,19 +4470,28 @@
             const investedElem = document.getElementById('p_thndr_invested');
             if (investedElem) investedElem.innerText = (totalInvestedVal / 1000).toFixed(2) + 'k ج';
 
+            const isGrandP = grandPnl >= 0;
+            const grandBadge = document.getElementById('p_thndr_grand_badge');
+            if (grandBadge) {
+                grandBadge.className = `inline-flex items-center gap-1 text-[11px] font-bold font-mono px-2.5 py-0.5 rounded-full transition-colors ${isGrandP ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' : 'text-rose-400 bg-rose-500/10 border border-rose-500/20'}`;
+            }
+
             const grandPnlElem = document.getElementById('p_thndr_grand_pnl');
             if (grandPnlElem) {
-                if (grandPnl >= 0) {
-                    grandPnlElem.innerText = `▲ +${Math.round(grandPnl).toLocaleString()}`;
-                } else {
-                    grandPnlElem.innerText = `▼ -${Math.abs(Math.round(grandPnl)).toLocaleString()}`;
-                }
+                const roundedPnl = Math.round(Math.abs(grandPnl)).toLocaleString();
+                grandPnlElem.innerHTML = `<span dir="ltr">${isGrandP ? '▲ +' : '▼ -'}${roundedPnl}</span>`;
             }
 
             const grandReturnElem = document.getElementById('p_thndr_grand_return');
             if (grandReturnElem) {
                 const sign = grandReturnPct >= 0 ? '+' : '';
-                grandReturnElem.innerText = `(${sign}${grandReturnPct.toFixed(2)}%)`;
+                grandReturnElem.innerHTML = `<span dir="ltr">(${sign}${grandReturnPct.toFixed(2)}%)</span>`;
+            }
+
+            const grandLabelElem = document.getElementById('p_thndr_grand_label');
+            if (grandLabelElem) {
+                grandLabelElem.innerText = isGrandP ? 'أرباح غير محققة' : 'خسائر غير محققة';
+                grandLabelElem.className = `text-[9px] font-sans font-medium hidden sm:inline ${isGrandP ? 'text-emerald-300' : 'text-rose-300'}`;
             }
 
             // Currency & Commodities Equivalence
@@ -5944,11 +5962,11 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v9.0',
+                appVersion: 'egx-sharia-v12.6',
                 userHoldings: userHoldings || [],
-                portfolioCash: portfolioCash || 145.0,
-                clawdzBalance: clawdzBalance || 49672.0,
-                goldOunces: goldOunces || 0.0
+                portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
+                clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
+                goldOunces: 0.0
             };
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -7153,18 +7171,34 @@ async function syncMubasherDirectAll() {
             setTimeout(() => {
                 let ans = "";
                 if (question.includes('أفضل فرص') || question.includes('شراء')) {
+                    const tmgh = STOCKS_DATA.find(s => s.ticker === 'TMGH');
+                    const efih = STOCKS_DATA.find(s => s.ticker === 'EFIH');
+                    const abuk = STOCKS_DATA.find(s => s.ticker === 'ABUK');
+                    const tmghP = tmgh ? tmgh.close.toFixed(2) : '89.32';
+                    const efihP = efih ? efih.close.toFixed(2) : '22.46';
+                    const abukP = abuk ? abuk.close.toFixed(2) : '87.63';
                     ans = `<p><b>🎯 أفضل 3 فرص شرائية بحسب الأسعار اللحظية وهامش الأمان:</b></p>
                     <ul class="list-disc pr-4 space-y-1 mt-1 text-slate-200">
-                        <li><b>طلعت مصطفى (TMGH @ 90.40 ج):</b> يتداول بخصم 18% عن القيمة العادلة (110 ج) ومكرر ربحية مغري.</li>
-                        <li><b>إي فاينانس (EFIH @ 22.92 ج):</b> دعم فني تاريخي عند 22.50 ج مع تدفقات نقدية قوية ونمو 28% في المدفوعات.</li>
-                        <li><b>أبو قير للأسمدة (ABUK @ 87.63 ج):</b> عوائد تصديرية بالدولار ومكرر ربحية منخفض وفرصة ارتداد مع $RSI < 38$.</li>
+                        <li><b>طلعت مصطفى (TMGH @ ${tmghP} ج):</b> مكرر ربحية مغري ونمو في مبيعات الفنادق وإيرادات رأس الحكمة.</li>
+                        <li><b>إي فاينانس (EFIH @ ${efihP} ج):</b> دعم فني تاريخي مع تدفقات نقدية قوية ونمو في المدفوعات الرقمية.</li>
+                        <li><b>أبو قير للأسمدة (ABUK @ ${abukP} ج):</b> عوائد تصديرية بالدولار ومكرر ربحية منخفض وتوزيعات نقدية قوية.</li>
                     </ul>`;
                 } else if (question.includes('توازن') || question.includes('المحفظة')) {
+                    let sVal = 0, fVal = 0;
+                    userHoldings.forEach(h => {
+                        const v = (h.cur || h.buy || 0) * (h.qty || 0);
+                        if (h.isFund || isGoldAsset(h)) fVal += v;
+                        else sVal += v;
+                    });
+                    const tot = sVal + fVal;
+                    const sPct = tot > 0 ? ((sVal / tot) * 100).toFixed(1) : '42.5';
+                    const fPct = tot > 0 ? ((fVal / tot) * 100).toFixed(1) : '57.5';
                     ans = `<p><b>⚖️ تقييم توازن وتوزيع المحفظة:</b></p>
-                    <p class="mt-1">محفظتك متوازنة جداً: <b>43% أسهم نمو ودفاعية</b>، و<b>57% صناديق شريعة وذهب</b>. هذا التوزيع يوفر عائداً مستقراً ويحمي رأس المال من تقلبات سعر الصرف. توصية: استغلال أي تصحيح لزيادة الحصة في قطاع الأسمدة.</p>`;
+                    <p class="mt-1">محفظتك الحالية: <b>${sPct}% أسهم استثمارية ونمو</b>، و<b>${fPct}% صناديق شريعة وذهب</b>. هذا التوزيع يوفر عائداً متزناً وتحوطاً فعالاً ضد التضخم وتقلبات السوق.</p>`;
                 } else if (question.includes('الذهب') || question.includes('التحوط')) {
-                    ans = `<p><b>🪙 رؤية التحوط بالذهب (AZG & Thndr Gold):</b></p>
-                    <p class="mt-1">الذهب عيار 24 يتداول حول <b>4,120 ج.م للجرام</b> عالمياً ومحلياً. نسبة الذهب الحالية في محفظتك كافية للتحوط، ويُفضل الشراء بنظام التراكم الدوري (DCA) عند كل هبوط طفيف.</p>`;
+                    const goldGram = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k.toLocaleString() : '4,340';
+                    ans = `<p><b>🪙 رؤية التحوط بالذهب (AZG & ذهب ثاندر):</b></p>
+                    <p class="mt-1">الذهب عيار 24 يتداول حول <b>${goldGram} ج.م للجرام</b> محلياً وعالمياً. نسبة الذهب الحالية في محفظتك كافية للتحوط، ويُفضل الشراء بنظام التراكم الدوري (DCA) عند كل هبوط طفيف.</p>`;
                 } else {
                     ans = `<p><b>💡 تحليل ${question}:</b></p>
                     <p class="mt-1">بناءً على التداولات اللحظية لـ EGX وقوائم البيانات المالية، ينصح بالالتزام بالأسعار المستهدفة وهوامش الأمان، مع تفعيل وقف الخسارة عند كسر الدعوم الرئيسية.</p>`;
@@ -8705,55 +8739,118 @@ async function syncMubasherDirectAll() {
 
             const wb = XLSX.utils.book_new();
 
+            // 1. Stocks Sheet (ديناميكي ومطابق لمحفظة الأسهم الفعلية)
             const stocksData = [
-                ['الرمز', 'اسم الشركة', 'القطاع', 'الكمية', 'متوسط سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
-                ['EFID', 'إيديتا للصناعات الغذائية', 'الأغذية والأدوية', 23, 31.85, 30.80, 708.40, -24.00, '-3.3%'],
-                ['TMGH', 'طلعت مصطفى', 'العقارات والإنشاءات', 115, 97.88, 95.00, 10925.00, -331.00, '-2.9%'],
-                ['ADIB', 'أبوظبي الإسلامي', 'البنوك والخدمات المالية', 49, 52.78, 52.01, 2548.49, -38.00, '-1.5%'],
-                ['ORHD', 'أوراسكوم للتنمية', 'العقارات والإنشاءات', 58, 41.46, 42.35, 2456.30, 52.00, '+2.1%'],
-                ['EFIH', 'إي فاينانس', 'التكنولوجيا والمدفوعات', 292, 21.67, 23.27, 6794.84, 467.00, '+7.4%'],
-                ['OCDI', 'سوديك', 'العقارات والإنشاءات', 55, 27.56, 30.00, 1650.00, 134.00, '+8.9%'],
-                ['ETEL', 'المصرية للاتصالات', 'التكنولوجيا والمدفوعات', 74, 50.00, 131.30, 9716.20, 1707.00, '+21.3%'],
-                ['EGAL', 'مصر للألومنيوم', 'الصناعة والتصدير', 7, 10.00, 364.00, 2548.00, 454.00, '+21.7%']
+                ['الرمز', 'اسم الشركة', 'القطاع', 'الكمية', 'متوسط سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)']
             ];
+            const stocksList = userHoldings.filter(h => !h.isFund && !isGoldAsset(h));
+            let totStocksMVal = 0, totStocksCost = 0;
+            stocksList.forEach(h => {
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+                totStocksMVal += mVal;
+                totStocksCost += cost;
+                stocksData.push([
+                    h.ticker,
+                    h.name,
+                    h.sector || 'سوق المال',
+                    h.qty,
+                    parseFloat(h.buy.toFixed(2)),
+                    parseFloat(h.cur.toFixed(2)),
+                    parseFloat(mVal.toFixed(2)),
+                    parseFloat(pnl.toFixed(2)),
+                    `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
+                ]);
+            });
+            const totStocksPnl = totStocksMVal - totStocksCost;
+            const totStocksPnlPct = totStocksCost > 0 ? (totStocksPnl / totStocksCost) * 100 : 0;
+            stocksData.push([
+                'الإجمالي', 'إجمالي محفظة الأسهم', '--', stocksList.reduce((s, h) => s + h.qty, 0),
+                '--', '--', parseFloat(totStocksMVal.toFixed(2)), parseFloat(totStocksPnl.toFixed(2)), `${totStocksPnl >= 0 ? '+' : ''}${totStocksPnlPct.toFixed(2)}%`
+            ]);
             const wsStocks = XLSX.utils.aoa_to_sheet(stocksData);
             XLSX.utils.book_append_sheet(wb, wsStocks, 'الأسهم الشرعية');
 
+            // 2. Funds & Gold Sheet (ديناميكي ومطابق للصناديق والذهب)
             const fundsData = [
-                ['الرمز', 'اسم الصندوق', 'نوع الصندوق', 'عدد الوثائق', 'سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)'],
-                ['NMF', 'نعيم مصر للشريعة', 'صناديق الأسهم الشرعية', 2, 48.16, 50.00, 100.00, 4.00, '+3.8%'],
-                ['AZG', 'أزيموت جولد', 'الذهب والتحوط', 11, 23.09, 24.27, 266.97, 13.00, '+5.1%'],
-                ['BWA', 'بلتون وفرة للشريعة', 'صناديق الأسهم الشرعية', 66, 2.09, 2.20, 145.20, 7.00, '+5.3%'],
-                ['CMS', 'مصر شريعة إكويتي', 'صناديق الأسهم الشرعية', 12, 20.44, 22.67, 272.04, 27.00, '+10.9%'],
-                ['THNDR_GOLD', 'سبائك جولد (ثندر)', 'الذهب والتحوط', 17, 1.60, 1.72, 29.19, 1.91, '+7.0%']
+                ['الرمز', 'اسم الأصل / الصندوق', 'النوع والقطاع', 'الكمية / الوثائق', 'سعر الشراء (ج)', 'السعر الحالي (ج)', 'القيمة السوقية (ج)', 'الربح/الخسارة (ج)', 'العائد (%)']
             ];
+            const fundsList = userHoldings.filter(h => h.isFund || isGoldAsset(h));
+            let totFundsMVal = 0, totFundsCost = 0;
+            fundsList.forEach(h => {
+                const mVal = h.cur * h.qty;
+                const cost = h.buy * h.qty;
+                const pnl = mVal - cost;
+                const pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
+                totFundsMVal += mVal;
+                totFundsCost += cost;
+                fundsData.push([
+                    h.ticker,
+                    h.name,
+                    h.sector || (isGoldAsset(h) ? 'الذهب الخالص 24' : 'صناديق استثمار'),
+                    isGoldAsset(h) ? parseFloat(h.qty.toFixed(4)) : h.qty,
+                    parseFloat(h.buy.toFixed(2)),
+                    parseFloat(h.cur.toFixed(2)),
+                    parseFloat(mVal.toFixed(2)),
+                    parseFloat(pnl.toFixed(2)),
+                    `${pnl >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
+                ]);
+            });
+            const totFundsPnl = totFundsMVal - totFundsCost;
+            const totFundsPnlPct = totFundsCost > 0 ? (totFundsPnl / totFundsCost) * 100 : 0;
+            fundsData.push([
+                'الإجمالي', 'إجمالي الصناديق والذهب', '--', '--',
+                '--', '--', parseFloat(totFundsMVal.toFixed(2)), parseFloat(totFundsPnl.toFixed(2)), `${totFundsPnl >= 0 ? '+' : ''}${totFundsPnlPct.toFixed(2)}%`
+            ]);
             const wsFunds = XLSX.utils.aoa_to_sheet(fundsData);
             XLSX.utils.book_append_sheet(wb, wsFunds, 'صناديق الاستثمار والذهب');
 
+            // 3. Cash Sheet
+            const clawdzVal = (THNDR_CASH && THNDR_CASH.clawdz) || 0;
+            const cashVal = (THNDR_CASH && THNDR_CASH.cash) || 0;
             const cashData = [
-                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية (ج)', 'الحالة'],
-                ['صندوق كلاودز (سيولة واستثمار يومي)', 49672.00, '17.34%', 21.69, 'مستثمر يومياً'],
-                ['محفظة التداول (نقدية حرة)', 145.00, '0.00%', 0.00, 'متاح للتداول الفوري'],
-                ['إجمالي السيولة النقدية', 49817.00, '--', 21.69, 'أمان مالي وطوارئ']
+                ['البند', 'القيمة بالجنيه (ج.م)', 'الفائدة / العائد السنوي', 'الأرباح اليومية التقديرية (ج)', 'الحالة'],
+                ['صندوق كلاودز (سيولة واستثمار يومي)', parseFloat(clawdzVal.toFixed(2)), '17.34%', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), clawdzVal > 0 ? 'مستثمر يومياً' : 'لا يوجد رصيد حالي'],
+                ['محفظة التداول (نقدية حرة)', parseFloat(cashVal.toFixed(2)), '0.00%', 0.00, 'متاح للتداول الفوري'],
+                ['إجمالي السيولة النقدية', parseFloat((clawdzVal + cashVal).toFixed(2)), '--', parseFloat((clawdzVal * 0.1734 / 365).toFixed(2)), 'جاهزية استثمارية']
             ];
             const wsCash = XLSX.utils.aoa_to_sheet(cashData);
             XLSX.utils.book_append_sheet(wb, wsCash, 'كلاودز والسيولة النقدية');
 
+            // 4. Wealth Valuation & Zakat Summary Sheet
+            const totalInvestedVal = totStocksMVal + totFundsMVal;
+            const totalInvestedCost = totStocksCost + totFundsCost;
+            const grandWealth = totalInvestedVal + clawdzVal + cashVal;
+            const grandPnl = (totalInvestedVal - totalInvestedCost) + ((THNDR_CASH && THNDR_CASH.clawdzPnl) || 0);
+            const grandCost = totalInvestedCost + clawdzVal + cashVal;
+            const grandReturnPct = grandCost > 0 ? (grandPnl / grandCost) * 100 : 0;
+
+            const usdRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.usd_egp) ? window.GLOBAL_STATE.fx_gold.usd_egp : 52.15;
+            const goldRate = (window.GLOBAL_STATE && window.GLOBAL_STATE.fx_gold && window.GLOBAL_STATE.fx_gold.gold_24k) ? window.GLOBAL_STATE.fx_gold.gold_24k : 4340.91;
+            const usdVal = grandWealth / usdRate;
+            const goldGrams = grandWealth / goldRate;
+            const sarRate = 13.90;
+            const sarVal = grandWealth / sarRate;
+
             const summaryData = [
                 ['المؤشر المالي', 'القيمة'],
-                ['إجمالي الثروة الكلي بالجنيه', '87,978 ج.م'],
-                ['المعادل بالدولار الأمريكي ($ USD)', '$1,687 USD'],
-                ['المعادل بالريال السعودي (🇸🇦 SAR)', '6,312 SAR'],
-                ['المعادل بجرام الذهب عيار 24 الصافي', '20.3 جم ذهب'],
-                ['إجمالي الأرباح المحققة وغير المحققة', '+2,496 ج.م (+2.92%)'],
+                ['إجمالي الثروة الكلي بالجنيه (EGX Live)', `${Math.round(grandWealth).toLocaleString()} ج.م`],
+                ['إجمالي تكلفة الشراء المنفذة', `${Math.round(grandCost).toLocaleString()} ج.م`],
+                ['صافي الربح / الخسارة غير المحققة', `${grandPnl >= 0 ? '+' : '-'}${Math.abs(Math.round(grandPnl)).toLocaleString()} ج.م (${grandPnl >= 0 ? '+' : ''}${grandReturnPct.toFixed(2)}%)`],
+                ['الحالة العامة للمحفظة', grandPnl >= 0 ? 'أرباح غير محققة 🟢' : 'خسائر غير محققة 🔴'],
+                ['المعادل بالدولار الأمريكي ($ USD)', `$${Math.round(usdVal).toLocaleString()} USD`],
+                ['المعادل بالريال السعودي (🇸🇦 SAR)', `${Math.round(sarVal).toLocaleString()} SAR`],
+                ['المعادل بجرام الذهب عيار 24 الصافي', `${goldGrams.toFixed(1)} جم ذهب`],
                 ['مؤشر صحة الثروة الموحد (Wealth Health Index)', '94 / 100 (ممتاز 🟢)'],
-                ['وعاء زكاة الأسهم التقديري للمضارب (2.5%)', '2,199.45 ج.م'],
-                ['تاريخ إعداد التقرير', new Date().toLocaleDateString('ar-EG')]
+                ['وعاء زكاة الأسهم التقديري (2.577% حول ميلادي)', `${(grandWealth * 0.02577).toLocaleString(undefined, {minimumFractionDigits: 2})} ج.م`],
+                ['تاريخ ووقت إعداد التقرير', `${new Date().toLocaleDateString('ar-EG')} - ${new Date().toLocaleTimeString('ar-EG')}`]
             ];
             const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
             XLSX.utils.book_append_sheet(wb, wsSummary, 'تقييم الثروة والزكاة');
 
-            XLSX.writeFile(wb, 'محفظة_ثندر_الاستثمارية_الشاملة.xlsx');
+            XLSX.writeFile(wb, 'محفظة_الأسهم_والصناديق_الشرعية_الشاملة.xlsx');
             showToast('تم تصدير مصنف الإكسيل متعدد الأوراق بنجاح ✓', 'success');
         }
 
