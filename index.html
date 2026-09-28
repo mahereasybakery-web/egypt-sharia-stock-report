@@ -6949,7 +6949,7 @@ async function syncMubasherDirectAll() {
                 const g1Text = g1 ? `<b>${g1.name}</b> (${g1.chg >= 0 ? '+' : ''}${g1.chg.toFixed(2)}%)` : '';
                 const g2Text = g2 ? `و<b>${g2.name}</b> (${g2.chg >= 0 ? '+' : ''}${g2.chg.toFixed(2)}%)` : '';
                 const overText = oversoldList.length > 0 ? `مع رصد قيعان ارتدادية في سهم <b>${oversoldList[0].name}</b> (RSI: ${oversoldList[0].rsi.toFixed(1)}).` : '';
-                pulseText.innerHTML = `«مؤشر الشريعة EGX33EGX33$ يسجل متوسط أداء <b>${avgChg >= 0 ? '+' : ''}${avgChg.toFixed(2)}%</b> اليوم. يتصدر قطاع <b>${topSector.name}</b> حركة السيولة، ويقود الزخم ${g1Text} ${g2Text}. تسجل الجلسة <b>${advancers}</b> سهماً رابحاً مقابل <b>${decliners}</b> سهماً هابطاً، ${overText}»`;
+                pulseText.innerHTML = `«مؤشر الشريعة EGX33 يسجل متوسط أداء <b>${avgChg >= 0 ? '+' : ''}${avgChg.toFixed(2)}%</b> اليوم. يتصدر قطاع <b>${topSector.name}</b> حركة السيولة، ويقود الزخم ${g1Text} ${g2Text}. تسجل الجلسة <b>${advancers}</b> سهماً رابحاً مقابل <b>${decliners}</b> سهماً هابطاً، ${overText}»`;
             }
         }
 
