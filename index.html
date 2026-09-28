@@ -1331,11 +1331,11 @@
                     <span class="font-bold text-slate-700 dark:text-slate-300">الأصول</span>
                     <span id="portfolioActiveCountBadge" class="bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-slate-200 dark:border-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">13 أصل</span>
                     
-                    <!-- Price Source Toggle Button (Thndr vs Live EGX) -->
-                    <button id="priceSourceToggleBtn" onclick="togglePortfolioPriceSource()" class="px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-sm" title="انقر للتبديل بين أسعار البورصة الحية اللحظية وأسعار محفظة ثندر">
-                        <span id="priceSourceIcon">⚡</span>
-                        <span id="priceSourceLabel">البورصة اللحظية</span>
-                    </button>
+                    <!-- Permanent Live EGX Market Badge -->
+                    <div class="px-2.5 py-1 rounded-full text-[10px] font-bold border flex items-center gap-1.5 bg-emerald-500/15 text-emerald-400 border-emerald-500/30 shadow-xs" title="الأسعار معلنة ولحظية مباشرة طبقا لتداولات البورصة المصرية">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>البورصة اللحظية (EGX Live)</span>
+                    </div>
                 </div>
                 
                 <!-- 2 Modern View Modes Switcher: Executive Cards vs Compact List -->
@@ -3146,7 +3146,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.4')
+                navigator.serviceWorker.register('sw.js?v=12.5')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -3701,24 +3701,24 @@
         var THNDR_CASH = { clawdz: 0, cash: 0, clawdzPnl: 0 };
         window.THNDR_CASH = THNDR_CASH;
         window.userHoldings = userHoldings;
-        // محفظة ثندر الفعلية المعتمدة (تحديث معتمد مطابق تماماً لشاشة ثندر - إجمالي الثروة 86,645 ج.م)
+        // محفظة أصول المستخدم المعتمدة (الكميات وأسعار الشراء الفعلية للتكلفة)
         const THNDR_ACTUAL_HOLDINGS = [
-            // 1. محفظة الأسهم (مطابقة 100% لتنفيذات ثندر الفعلية)
-            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.26, cur: 133.00, thndrCur: 133.00, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى القابضة", qty: 115, buy: 97.88, cur: 90.40, thndrCur: 90.40, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFIH", name: "إي-فاينانس للاستثمارات المالية والرقمية", qty: 291, buy: 21.95, cur: 22.92, thndrCur: 22.92, sector: "التكنولوجيا والمدفوعات", isFund: false },
-            { ticker: "ADIB", name: "مصرف أبو ظبي الإسلامي- مصر", qty: 49, buy: 52.77, cur: 51.90, thndrCur: 51.90, sector: "القطاع المصرفي", isFund: false },
-            { ticker: "EGAL", name: "مصر للالومنيوم", qty: 7, buy: 299.06, cur: 350.00, thndrCur: 350.00, sector: "الموارد الأساسية", isFund: false },
-            { ticker: "ORHD", name: "اوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 39.50, thndrCur: 39.50, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.57, cur: 27.72, thndrCur: 27.72, sector: "العقارات والإنشاءات", isFund: false },
-            { ticker: "EFID", name: "ايديتا للصناعات الغذائية", qty: 23, buy: 31.84, cur: 29.20, thndrCur: 29.20, sector: "الأغذية والمشروبات", isFund: false },
+            // 1. محفظة الأسهم (أسعار الشراء الفعلية للتكلفة المنفذة)
+            { ticker: "ETEL", name: "المصرية للاتصالات", qty: 74, buy: 108.26, cur: 131.00, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى القابضة", qty: 115, buy: 97.88, cur: 89.32, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFIH", name: "إي-فاينانس للاستثمارات المالية والرقمية", qty: 291, buy: 21.95, cur: 22.67, sector: "التكنولوجيا والمدفوعات", isFund: false },
+            { ticker: "ADIB", name: "مصرف أبو ظبي الإسلامي- مصر", qty: 49, buy: 52.77, cur: 50.60, sector: "القطاع المصرفي", isFund: false },
+            { ticker: "EGAL", name: "مصر للالومنيوم", qty: 7, buy: 299.06, cur: 352.00, sector: "الموارد الأساسية", isFund: false },
+            { ticker: "ORHD", name: "اوراسكوم للتنمية مصر", qty: 58, buy: 41.46, cur: 39.11, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.57, cur: 27.55, sector: "العقارات والإنشاءات", isFund: false },
+            { ticker: "EFID", name: "ايديتا للصناعات الغذائية", qty: 23, buy: 31.84, cur: 28.90, sector: "الأغذية والمشروبات", isFund: false },
 
-            // 2. محفظة الصناديق والذهب (مطابقة 100% لتنفيذات ثندر الفعلية)
-            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 21.88121, thndrCur: 21.88121, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.96095, thndrCur: 23.96095, sector: "صناديق الذهب", isFund: true },
-            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1225, thndrCur: 2.1225, sector: "صناديق نقدية وأسهم", isFund: true },
-            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.28, thndrCur: 49.28, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7000.00, thndrCur: 7000.00, sector: "الذهب الخالص 24", isFund: false }
+            // 2. محفظة الصناديق والذهب (أسعار الشراء الفعلية للتكلفة)
+            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 21.88121, sector: "صناديق الأسهم الشريعة", isFund: true },
+            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.96095, sector: "صناديق الذهب", isFund: true },
+            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1225, sector: "صناديق نقدية وأسهم", isFund: true },
+            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.28, sector: "صناديق الأسهم الشريعة", isFund: true },
+            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7000.00, sector: "الذهب الخالص 24", isFund: false }
         ];
         let donutChartInstance = null;
 
@@ -3801,12 +3801,11 @@
                 }
             } catch(e) {}
 
-            // Preserve verified prices and holdings metadata with LIVE quotes
+            // Preserve verified holdings metadata with 100% pure LIVE EGX market prices
             userHoldings.forEach(h => {
                 const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
                 if (actual) {
                     if (!h.buy) h.buy = actual.buy;
-                    h.thndrCur = actual.thndrCur || actual.cur;
                     if (!h.name) h.name = actual.name;
                     if (!h.sector) h.sector = actual.sector;
                     if (h.isFund === undefined) h.isFund = actual.isFund;
@@ -3814,12 +3813,8 @@
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (stock && stock.close > 0) {
                     h.marketPrice = stock.close;
-                    if (!isFundAsset(h)) {
-                        h.cur = stock.close; // Set live market price immediately!
-                    } else {
-                        h.cur = actual ? actual.cur : h.cur;
-                    }
-                } else if (actual) {
+                    h.cur = stock.close; // Live EGX market price
+                } else if (actual && actual.cur > 0) {
                     h.cur = actual.cur;
                 }
             });
@@ -3830,7 +3825,6 @@
 
         function saveUserPortfolio() {
             localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
-            localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 0 }));
             window.userHoldings = userHoldings;
@@ -3839,18 +3833,18 @@
         }
 
         function resetPortfolioToDefault() {
-            if (confirm("هل تريد استعادة محفظة ثندر الفعلية الأصلية (الأسهم والصناديق)؟")) {
+            if (confirm("هل تريد استعادة محفظة الأصول الأصلية (الكميات وأسعار الشراء الفعلية)؟")) {
                 triggerHaptic('medium');
                 userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
                 saveUserPortfolio();
-                showToast("تمت استعادة محفظة ثندر الفعلية بنجاح", "success");
-                if (typeof logUserActivity === 'function') logUserActivity('reset', 'استعادة محفظة ثندر الأصلية 🔄', 'تمت استعادة محفظة ثندر الفعلية المعتمدة (الأسهم والصناديق) بنجاح.');
+                showToast("تمت استعادة محفظة الأصول الأصلية بنجاح", "success");
+                if (typeof logUserActivity === 'function') logUserActivity('reset', 'استعادة محفظة الأصول الأصلية 🔄', 'تمت استعادة محفظة الأصول الأصلية مع أحدث أسعار البورصة اللحظية.');
             }
         }
 
         
         // =========================================================================
-        // PORTFOLIO VIEW MODE CONTROLLER & PRICING SOURCE ENGINE
+        // PORTFOLIO VIEW MODE CONTROLLER (100% LIVE EGX REAL-TIME VALUATION)
         // =========================================================================
         let portfolioViewMode = localStorage.getItem('egx_portfolio_view_mode');
         // Always default to 'cards' (FinTech Executive Cards) as the premier, clearest view
@@ -3858,7 +3852,10 @@
             portfolioViewMode = 'cards';
             localStorage.setItem('egx_portfolio_view_mode', 'cards');
         }
-        let portfolioPriceSource = localStorage.getItem('egx_price_source_v12_3') || 'live';
+        try {
+            localStorage.removeItem('egx_price_source_v12_3');
+            localStorage.removeItem('egx_price_source_v12_2');
+        } catch(e) {}
         let _holdingsFilter = { stocks: 'all', funds: 'all' };
 
         function setPortfolioViewMode(mode) {
@@ -3903,39 +3900,7 @@
             if (gCompact) gCompact.classList.toggle('hidden', mode !== 'compact');
         }
 
-        function togglePortfolioPriceSource() {
-            triggerHaptic('selection');
-            portfolioPriceSource = portfolioPriceSource === 'thndr' ? 'live' : 'thndr';
-            localStorage.setItem('egx_price_source_v12_3', portfolioPriceSource);
-            updatePortfolioPriceSourceUI();
-            renderHoldingsTable();
-            const msg = portfolioPriceSource === 'thndr' 
-                ? 'تم تفعيل تسعير محفظة ثندر المعتمدة (تطابق 86,645 ج) 📱' 
-                : 'تم تفعيل أسعار صفقات البورصة اللحظية من TradingView ⚡';
-            showToast(msg, 'info');
-            if (typeof logUserActivity === 'function') {
-                logUserActivity('sync', 'تبديل مصدر تسعير المحفظة 🔄', msg);
-            }
-        }
 
-        function updatePortfolioPriceSourceUI() {
-            const icon = document.getElementById('priceSourceIcon');
-            const label = document.getElementById('priceSourceLabel');
-            const btn = document.getElementById('priceSourceToggleBtn');
-            if (btn && label) {
-                if (portfolioPriceSource === 'thndr') {
-                    if (icon) icon.innerText = '📱';
-                    label.innerText = 'أسعار ثندر';
-                    btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700/60 shadow-sm";
-                    btn.title = "المحفظة مقومة حالياً بأسعار محفظة ثندر (86,645 ج.م). انقر للتبديل إلى أسعار البورصة اللحظية.";
-                } else {
-                    if (icon) icon.innerText = '⚡';
-                    label.innerText = 'البورصة اللحظية';
-                    btn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold border transition flex items-center gap-1 active:scale-95 bg-sky-50 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700/60 shadow-sm";
-                    btn.title = "المحفظة مقومة حالياً بأسعار صفقات البورصة اللحظية من TradingView. انقر للتبديل إلى أسعار ثندر.";
-                }
-            }
-        }
 
         function setHoldingsFilter(type, filter, btn) {
             triggerHaptic('selection');
@@ -4083,8 +4048,6 @@
 
             const diffPrice = (h.cur || 0) - (h.buy || 0);
             const badgeColor = isFund ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800/60' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/90 dark:text-slate-300 dark:border-slate-700/60';
-            const altPriceVal = portfolioPriceSource === 'thndr' ? (h.liveCur || h.cur) : (h.thndrCur || h.cur);
-            const altLabel = portfolioPriceSource === 'thndr' ? 'لحظي' : 'ثندر';
             const isGold = isGoldAsset(h);
             const buyDisplay = (h.buy >= 100) ? h.buy.toFixed(2) : ((h.buy < 10) ? ((h.buy < 1) ? h.buy.toFixed(4) : h.buy.toFixed(2)) : h.buy.toFixed(2));
 
@@ -4124,7 +4087,7 @@
                         <span>${isFund ? 'وثيقة' : (isGold ? 'جرام' : 'سهم')}</span>
                     </div>
                 </td>
-                <td class="py-2.5 px-0.5 text-center font-mono align-middle" title="${altLabel}: ${altPriceVal.toFixed(2)} ج">
+                <td class="py-2.5 px-0.5 text-center font-mono align-middle" title="سعر البورصة اللحظي: ${h.cur.toFixed(2)} ج">
                     <div class="flex items-center justify-center gap-0.5 text-[10.5px] font-bold text-slate-900 dark:text-white leading-tight">
                         <span class="text-amber-500 dark:text-amber-400 text-[9px] animate-pulse">⚡</span>
                         <span>${h.cur >= 100 ? h.cur.toFixed(2) : (h.cur < 10 ? h.cur.toFixed(2) : h.cur.toFixed(2))}</span>
@@ -4205,18 +4168,19 @@
             userHoldings.forEach((h) => {
                 const stock = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 const actual = THNDR_ACTUAL_HOLDINGS.find(s => s.ticker === h.ticker);
-                const thndrPrice = h.thndrCur || (actual ? actual.thndrCur : null) || (actual ? actual.cur : null) || h.buy || 0;
-                const liveClose = (stock && stock.close > 0) ? stock.close : thndrPrice;
-
-                h.liveCur = liveClose;
-                h.thndrCur = thndrPrice;
-
-                // Price source decision: Thndr price vs TradingView live price
-                if (portfolioPriceSource === 'thndr') {
-                    h.cur = thndrPrice;
+                
+                // أسعار لحظية معلنة طبقا للبورصة المصرية وصناديق الاستثمار
+                let liveClose = 0;
+                if (stock && stock.close > 0) {
+                    liveClose = stock.close;
+                } else if (actual && actual.cur > 0) {
+                    liveClose = actual.cur;
                 } else {
-                    h.cur = liveClose;
+                    liveClose = h.cur || h.buy || 0;
                 }
+
+                h.cur = liveClose;
+                h.liveCur = liveClose;
 
                 if (isGoldAsset(h)) {
                     goldList.push(h);
@@ -4990,11 +4954,12 @@
                 if (exist) {
                     exist.qty = qty;
                     exist.buy = price;
-                    if (exist.thndrCur) exist.cur = exist.thndrCur;
-                    showToast(`تم تصحيح وتثبيت رصيد ${name} مباشرة: ${qty.toLocaleString()} بسعر شراء ${price.toFixed(2)} ج`, 'success');
+                    const liveSt = STOCKS_DATA.find(s => s.ticker === ticker);
+                    if (liveSt && liveSt.close > 0) exist.cur = liveSt.close;
+                    showToast(`تم تعديل رصيد ${name} بنجاح: ${qty.toLocaleString()} بسعر شراء ${price.toFixed(2)} ج`, 'success');
                 } else {
                     userHoldings.push({ ticker, name, qty, buy: price, cur, sector });
-                    showToast(`تم حفظ وتثبيت ${name} في محفظتك بنجاح`, 'success');
+                    showToast(`تمت إضافة ${name} إلى محفظتك بنجاح`, 'success');
                 }
 
                 if (typeof logUserActivity === 'function') {
