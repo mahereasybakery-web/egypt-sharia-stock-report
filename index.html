@@ -4219,39 +4219,39 @@
 
         // 2. Comprehensive Stocks & Funds Database
         let STOCKS_DATA = [
-            { ticker: "MFPC", name: "موبكو للأسمدة", close: 46.01, open: 45, high: 46.25, low: 43, chg: 2.24, rsi: 52.4, pe: 9.3, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "AMOC", name: "أموك للبترول", close: 13, open: 12.9, high: 13.19, low: 12.18, chg: 0.78, rsi: 53.8, pe: 8.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ACGC", name: "العربية للأقطان", close: 13.54, open: 13.81, high: 13.98, low: 13.11, chg: -1.96, rsi: 46.8, pe: 11.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "MCQE", name: "أسمنت قنا", close: 192.9, open: 196, high: 197, low: 186, chg: -1.58, rsi: 32.2, pe: 7.4, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "ICFC", name: "الدولية للأسمدة", close: 22.65, open: 22.76, high: 22.99, low: 22, chg: -0.48, rsi: 54.8, pe: 8.0, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 88.9, open: 87.63, high: 89.5, low: 85.02, chg: 1.45, rsi: 52.9, pe: 7.8, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "LCSW", name: "ليسيكو مصر", close: 30.63, open: 31, high: 31.2, low: 29.34, chg: -1.19, rsi: 31.1, pe: 6.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
-            { ticker: "ARCC", name: "العربية للأسمنت", close: 63.55, open: 63.31, high: 65.5, low: 60.01, chg: 0.38, rsi: 30.5, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.11, open: 27.09, high: 27.39, low: 26.01, chg: 0.07, rsi: 51.5, pe: 8.5, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 43.4, open: 44.23, high: 44.5, low: 43, chg: -3.12, rsi: 41.9, pe: 4.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
-            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 16.37, open: 16.34, high: 16.68, low: 15.7, chg: 0.18, rsi: 33.2, pe: 6.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ATQA", name: "حديد عتاقة", close: 11.86, open: 12.32, high: 12.32, low: 11.05, chg: -3.73, rsi: 44.4, pe: 5.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", close: 348.01, open: 350, high: 356, low: 340, chg: -0.57, rsi: 43.6, pe: 14.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.69, open: 18.72, high: 18.8, low: 18.1, chg: 0.21, rsi: 40.4, pe: 18.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.04, open: 27.72, high: 27.72, low: 26.5, chg: -2.45, rsi: 29.4, pe: 9.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 88.99, open: 90.4, high: 90.4, low: 88.03, chg: -1.56, rsi: 24.9, pe: 12.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 12.94, open: 13.1, high: 13.2, low: 12.57, chg: -1.22, rsi: 26.2, pe: 9.3, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "ISPH", name: "ابن سينا فارما", close: 11.7, open: 11.64, high: 11.79, low: 11.22, chg: 0.52, rsi: 33.8, pe: 8.6, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 136.3, open: 133, high: 139, low: 129, chg: 2.48, rsi: 68.6, pe: 10.1, type: "stock", rec: "جني أرباح وتخفيف", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 22.6, open: 22.92, high: 23, low: 20.2, chg: -1.4, rsi: 41.8, pe: 12.4, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.28, open: 51.9, high: 51.9, low: 49.05, chg: -1.19, rsi: 44.6, pe: 5.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "البنوك والخدمات المالية" },
-            { ticker: "SAUD", name: "بنك البركة مصر", close: 21.85, open: 22.34, high: 22.8, low: 21.6, chg: -2.19, rsi: 37.4, pe: 5.1, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
-            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.04, open: 7.15, high: 7.2, low: 6.82, chg: -1.54, rsi: 31.5, pe: 5.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 28.59, open: 29.2, high: 29.3, low: 27.81, chg: -2.09, rsi: 36.3, pe: 13.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 5.39, open: 5.41, high: 5.72, low: 5.05, chg: -0.37, rsi: 31.8, pe: 36.7, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.32, open: 39.5, high: 39.8, low: 38.02, chg: -0.46, rsi: 35.3, pe: 7.2, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "SWDY", name: "السويدي إليكتريك", close: 114.9, open: 113.45, high: 118.6, low: 108.01, chg: 1.28, rsi: 38.6, pe: 8.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.48, open: 25.52, high: 25.87, low: 24.5, chg: -0.16, rsi: 34.8, pe: 24.3, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 797.45, open: 809, high: 809, low: 780.01, chg: -1.43, rsi: 43.2, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "CIRA", name: "سيرا للتعليم", close: 38.68, open: 39.07, high: 39.39, low: 37.01, chg: -1.0, rsi: 53.1, pe: 9.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "خدمات وتعليم" },
-            { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 2.46, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "EAST", name: "الشرقية للدخان", close: 30.37, open: 30.52, high: 30.94, low: 29.81, chg: -0.49, rsi: 15.5, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
-            { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29, open: 30, high: 30.01, low: 28.1, chg: -3.33, rsi: 41.0, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 46.21, open: 45, high: 46.25, low: 43, chg: -0.06, rsi: 53.1, pe: 9.3, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13.42, open: 12.9, high: 13.19, low: 12.18, chg: 2.29, rsi: 58.6, pe: 8.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 13.44, open: 13.81, high: 13.98, low: 13.11, chg: -0.81, rsi: 45.6, pe: 11.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 186.39, open: 196, high: 197, low: 186, chg: 2.64, rsi: 32.1, pe: 7.4, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 22.01, open: 22.76, high: 22.99, low: 22, chg: -0.18, rsi: 50.5, pe: 8.0, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 89, open: 87.63, high: 89.5, low: 85.02, chg: 0, rsi: 53.1, pe: 7.8, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 30.5, open: 31, high: 31.2, low: 29.34, chg: 0.83, rsi: 31.9, pe: 6.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
+            { ticker: "ARCC", name: "العربية للأسمنت", close: 64.47, open: 63.31, high: 65.5, low: 60.01, chg: 4.47, rsi: 36.4, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.05, open: 27.09, high: 27.39, low: 26.01, chg: 0.56, rsi: 51.1, pe: 8.5, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 43.28, open: 44.23, high: 44.5, low: 43, chg: 0.65, rsi: 42.0, pe: 4.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 16.35, open: 16.34, high: 16.68, low: 15.7, chg: 0.93, rsi: 34.2, pe: 6.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ATQA", name: "حديد عتاقة", close: 11.9, open: 12.32, high: 12.32, low: 11.05, chg: 0.59, rsi: 45.2, pe: 5.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 347, open: 350, high: 356, low: 340, chg: 1.46, rsi: 44.1, pe: 14.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.45, open: 18.72, high: 18.8, low: 18.1, chg: 0.82, rsi: 37.0, pe: 18.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.17, open: 27.72, high: 27.72, low: 26.5, chg: 1.95, rsi: 32.4, pe: 9.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 87.95, open: 90.4, high: 90.4, low: 88.03, chg: 0.42, rsi: 24.5, pe: 12.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 12.82, open: 13.1, high: 13.2, low: 12.57, chg: 0.23, rsi: 25.6, pe: 9.3, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 11.85, open: 11.64, high: 11.79, low: 11.22, chg: 0.94, rsi: 37.8, pe: 8.6, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 136.88, open: 133, high: 139, low: 129, chg: 0.65, rsi: 69.3, pe: 10.1, type: "stock", rec: "جني أرباح وتخفيف", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 22.3, open: 22.92, high: 23, low: 20.2, chg: 1.36, rsi: 40.7, pe: 12.4, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.19, open: 51.9, high: 51.9, low: 49.05, chg: 1.51, rsi: 45.3, pe: 5.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "البنوك والخدمات المالية" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 22.24, open: 22.34, high: 22.8, low: 21.6, chg: 1.69, rsi: 40.9, pe: 5.1, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.22, open: 7.15, high: 7.2, low: 6.82, chg: 2.85, rsi: 37.7, pe: 5.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 18.79, open: 29.2, high: 29.3, low: 27.81, chg: -33.91, rsi: 15.2, pe: 13.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 5.44, open: 5.41, high: 5.72, low: 5.05, chg: 2.64, rsi: 35.7, pe: 36.7, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.18, open: 39.5, high: 39.8, low: 38.02, chg: 1.24, rsi: 36.5, pe: 7.2, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 113.98, open: 113.45, high: 118.6, low: 108.01, chg: 1.32, rsi: 37.8, pe: 8.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.29, open: 25.52, high: 25.87, low: 24.5, chg: 1.04, rsi: 35.4, pe: 24.3, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 803.8, open: 809, high: 809, low: 780.01, chg: 1.6, rsi: 45.6, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 38.98, open: 39.07, high: 39.39, low: 37.01, chg: 0.91, rsi: 54.5, pe: 9.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "خدمات وتعليم" },
+            { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 0, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "EAST", name: "الشرقية للدخان", close: 29.99, open: 30.52, high: 30.94, low: 29.81, chg: 0.3, rsi: 15.6, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
+            { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29.69, open: 30, high: 30.01, low: 28.1, chg: 0.85, rsi: 45.6, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96095, open: 23.81, high: 24.15, low: 23.75, chg: 0.63, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط" },
             { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 6970.0, open: 7000.0, high: 7050.0, low: 6920.0, chg: -0.43, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط" },
             { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.88121, open: 22.02, high: 22.15, low: 21.75, chg: -0.62, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
@@ -7056,7 +7056,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v13.8',
+                appVersion: 'egx-sharia-v13.9',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -7689,10 +7689,9 @@
             syncLiveMarketData(false);
         }
 
-        async function syncLiveMarketData(isAutoPoll = false) {
+                async function syncLiveMarketData(isAutoPoll = false) {
             const icon = document.getElementById('refreshIcon');
             if (icon && !isAutoPoll) icon.classList.add('rotate-180');
-            // Also spin visible refresh icon
             const vIcon2 = document.getElementById('visibleRefreshIcon');
             if (vIcon2 && !isAutoPoll) { vIcon2.style.transform = 'rotate(360deg)'; setTimeout(()=>{ vIcon2.style.transform = ''; }, 600); }
             const badge = document.getElementById('syncStatusText');
@@ -7731,7 +7730,10 @@
                     const local = STOCKS_DATA.find(s => s.ticker === sym);
                     if (local) {
                         const prevClose = local.close;
-                        local.close = Math.round(d[1] * 100) / 100;
+                        const newClose = Math.round(d[1] * 100) / 100;
+                        const hasPriceChanged = prevClose !== newClose;
+
+                        local.close = newClose;
                         if (d[2] !== null) local.chg = Math.round(d[2] * 100) / 100;
                         if (d[3] !== null) local.open = d[3];
                         if (d[4] !== null) local.high = d[4];
@@ -7743,13 +7745,23 @@
                         if (d[10] !== null) local.sma200 = d[10];
                         if (d[11] !== null && d[11] > 0) local.pe = Math.round(d[11] * 10) / 10;
 
-                        // Flash animation if price changed
-                        if (prevClose !== local.close) {
-                            const isUp = local.close > prevClose;
-                            document.querySelectorAll(`[data-ticker="${sym}"] .live-price`).forEach(el => {
-                                el.classList.remove('price-flash-up', 'price-flash-down');
-                                void el.offsetWidth;
-                                el.classList.add(isUp ? 'price-flash-up' : 'price-flash-down');
+                        // Second-by-Second In-Place DOM Flash & Text Updates (Zero Latency)
+                        if (hasPriceChanged) {
+                            const isUp = newClose > prevClose;
+                            document.querySelectorAll(`[data-ticker="${sym}"] .live-stock-price`).forEach(el => {
+                                el.textContent = `${newClose.toFixed(2)} ج`;
+                                el.classList.remove('text-emerald-400', 'text-rose-400', 'bg-emerald-950/60', 'bg-rose-950/60');
+                                el.classList.add(isUp ? 'text-emerald-400' : 'text-rose-400', isUp ? 'bg-emerald-950/60' : 'bg-rose-950/60');
+                                setTimeout(() => {
+                                    el.classList.remove('bg-emerald-950/60', 'bg-rose-950/60');
+                                }, 700);
+                            });
+
+                            // Update live change badge
+                            document.querySelectorAll(`[data-ticker="${sym}"] .live-stock-chg`).forEach(el => {
+                                const sign = local.chg >= 0 ? '+' : '';
+                                el.textContent = `${sign}${local.chg.toFixed(2)}%`;
+                                el.className = `live-stock-chg inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${local.chg >= 0 ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800' : 'bg-rose-950/80 text-rose-300 border-rose-800'} mt-0.5`;
                             });
                         }
                         updatedStocksCount++;
@@ -7803,12 +7815,12 @@
                 }
             }
 
-            // 3. Update User Holdings Prices with 100% Verified Quotes (All Assets: Stocks, Funds, Gold)
+            // 3. Update User Holdings Prices with 100% Live Quotes (Stocks, Funds, Gold)
             userHoldings.forEach(h => {
                 const found = STOCKS_DATA.find(s => s.ticker === h.ticker);
                 if (found && found.close > 0) {
                     h.marketPrice = found.close;
-                    h.cur = found.close; // Live EGX/NAV quote applied to all assets
+                    h.cur = found.close;
                 }
             });
 
@@ -7816,7 +7828,7 @@
             const nowTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             if (badge) {
                 if (inSession) {
-                    badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>بث مباشر TradingView (${nowTime})`;
+                    badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>بث لحظي TradingView ثانية بثانية (${nowTime}) ⚡`;
                 } else {
                     badge.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-slate-400 ml-1"></span>إقفال رسمي معتمد (${nowTime}) ✓`;
                 }
@@ -7824,16 +7836,17 @@
 
             const sessionBadge = document.querySelector('.marketSessionText');
             if (sessionBadge) {
-                sessionBadge.innerText = inSession ? "البورصة المصرية: جلسة مباشرة" : "البورصة المصرية: إقفال رسمي";
+                sessionBadge.innerText = inSession ? `البورصة المصرية: بث مباشر ثانية بثانية (${nowTime})` : `البورصة المصرية: إقفال رسمي (${nowTime})`;
             }
 
-            // 5. Render All Components
+            // 5. Render All Components with Fresh Live Prices
             renderStocks();
             if (typeof updateMarketPulseLive === 'function') updateMarketPulseLive();
             if (typeof renderNewsFeed === 'function') renderNewsFeed();
             renderHoldingsTable();
             if (typeof updateDonutChart === 'function') updateDonutChart();
-            if (typeof renderRecommendations === 'function') renderRecommendations();
+            if (typeof generateLiveRecommendations === 'function') generateLiveRecommendations();
+            if (typeof renderRecommendationsView === 'function') renderRecommendationsView();
             if (typeof updateTargetsTab === 'function') updateTargetsTab();
             if (typeof renderDividendsTable === 'function' && cData?.dividends_calendar) renderDividendsTable(cData.dividends_calendar);
 
@@ -7844,7 +7857,7 @@
             }
 
             if (!isAutoPoll) {
-                showToast(`✓ تم تحديث الأسعار والصناديق بنجاح (دقة 100% — ${updatedStocksCount} سهماً و ${updatedFundsCount || 5} صناديق)`, "success");
+                showToast(`✓ تم تحديث الأسعار اللحظية بنجاح (دقة 100% — ${updatedStocksCount} سهماً)`, "success");
             }
             if (icon) setTimeout(() => icon.classList.remove('rotate-180'), 500);
         }
@@ -7910,16 +7923,20 @@ async function syncMubasherDirectAll() {
             }
         }
 
-        // ── Ultra-fast polling: 5s during trading, 30s outside ─────
+                // ── Ultra-fast Second-by-Second Real-Time Polling Engine (v13.9) ─────
         (function startSmartPolling() {
-            let lastHash = '';
+            let isSyncing = false;
 
             async function ultraFastSync() {
                 if (document.hidden) return;
+                if (isSyncing) return; // Prevent overlapping requests
+                isSyncing = true;
                 try {
                     await syncLiveMarketData(true);
                 } catch (e) {
                     console.warn('[AutoPoll] Sync note:', e);
+                } finally {
+                    isSyncing = false;
                 }
             }
 
@@ -7930,28 +7947,35 @@ async function syncMubasherDirectAll() {
                 const cairoMin = now.getUTCMinutes();
                 const dow      = now.getUTCDay();
                 const totalMin = cairoH * 60 + cairoMin;
-                const inSession = dow >= 0 && dow <= 4 && totalMin >= 600 && totalMin < 885;
-                const interval  = inSession ? 5000 : 30000;
+                // EGX Trading Session: Sun-Thu 10:00 AM to 2:35 PM Cairo (UTC+3)
+                const inSession = dow >= 0 && dow <= 4 && totalMin >= 600 && totalMin <= 875;
+                // 1500ms (1.5s) second-by-second updates during session; 15s outside session
+                const interval  = inSession ? 1500 : 15000;
 
                 if (pollInterval) clearInterval(pollInterval);
                 pollInterval = setInterval(ultraFastSync, interval);
 
                 const badge = document.getElementById('syncStatusText');
-                if (badge && !badge.innerText.includes('بث')) {
-                    badge.innerText = inSession ? '🟢 بث لحظي كل 5 ثوانٍ' : '⏱ تحديث كل 30 ثانية';
+                if (badge) {
+                    badge.innerHTML = inSession 
+                        ? '<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>بث مباشر لحظي ثانية بثانية ⚡' 
+                        : '<span class="inline-block w-2 h-2 rounded-full bg-slate-400 ml-1"></span>إقفال رسمي معتمد ✓';
                 }
             }
 
-            // Start immediately
+            // Start immediately without delay
             ultraFastSync();
             startPolling();
 
-            // Re-evaluate interval every 5 minutes (session transitions)
-            setInterval(startPolling, 300000);
+            // Re-evaluate session state every 2 minutes
+            setInterval(startPolling, 120000);
 
-            // Also sync when tab becomes visible
+            // Immediate sync when browser tab regains focus
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden) { ultraFastSync(); startPolling(); }
+            });
+            window.addEventListener('focus', () => {
+                ultraFastSync();
             });
         })();
 
@@ -9563,9 +9587,9 @@ async function syncMubasherDirectAll() {
                         <div class="text-left font-mono">
                             <div class="text-xs font-bold text-white flex items-center justify-end gap-1">
                                 <span class="w-1.5 h-1.5 rounded-full ${isPos ? 'bg-emerald-400' : (isNeg ? 'bg-rose-400' : 'bg-slate-400')} pulse-live"></span>
-                                <span>${(s.close || 0).toFixed(2)} ج</span>
+                                <span class="live-stock-price transition px-1 py-0.5 rounded font-bold">${(s.close || 0).toFixed(2)} ج</span>
                             </div>
-                            <span class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${chgBg} ${chgColor} mt-0.5">
+                            <span class="live-stock-chg inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${chgBg} ${chgColor} mt-0.5">
                                 ${sign}${(s.chg || 0).toFixed(2)}%
                             </span>
                         </div>
@@ -12258,7 +12282,7 @@ async function syncMubasherDirectAll() {
 
 
                 // =========================================================================
-        // INSTITUTIONAL 3-PILLAR DECISION ENGINE & CAPITAL PROTECTION (v13.8)
+        // INSTITUTIONAL 3-PILLAR DECISION ENGINE & CAPITAL PROTECTION (v13.9)
         // خوارزمية القرارات الاستثمارية الثلاثية المؤسسية وحواجز الحماية الرأسمالية الصارمة
         // =========================================================================
 
@@ -12489,7 +12513,7 @@ async function syncMubasherDirectAll() {
         }
 
         // =========================================================================
-        // DYNAMIC QUANTITATIVE & TECHNICAL RECOMMENDATION ENGINE (v13.8)
+        // DYNAMIC QUANTITATIVE & TECHNICAL RECOMMENDATION ENGINE (v13.9)
         // =========================================================================
         function generateLiveRecommendations() {
             const list = [];
