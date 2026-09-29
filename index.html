@@ -3955,7 +3955,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=12.9')
+                navigator.serviceWorker.register('sw.js?v=14.0')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -4252,11 +4252,11 @@
             { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 0, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "EAST", name: "الشرقية للدخان", close: 29.99, open: 30.52, high: 30.94, low: 29.81, chg: 0.3, rsi: 15.6, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
             { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29.69, open: 30, high: 30.01, low: 28.1, chg: 0.85, rsi: 45.6, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96095, open: 23.81, high: 24.15, low: 23.75, chg: 0.63, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.50, open: 23.81, high: 24.15, low: 23.50, chg: -1.92, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط" },
             { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 6970.0, open: 7000.0, high: 7050.0, low: 6920.0, chg: -0.43, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.88121, open: 22.02, high: 22.15, low: 21.75, chg: -0.62, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1225, open: 2.095, high: 2.15, low: 2.08, chg: 1.31, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.94, open: 49.28, high: 50.20, low: 49.10, chg: 1.34, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" }
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.5283, open: 21.88, high: 22.00, low: 21.50, chg: -1.61, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.0874, open: 2.12, high: 2.15, low: 2.08, chg: -1.65, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.04, open: 49.94, high: 50.20, low: 49.00, chg: -1.80, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" }
         ];
 
                 // 3. Valuation Scenarios Database (100% Comprehensive for all 38 EGX Assets)
@@ -4692,7 +4692,7 @@
             },
             "AZG": {
                 name: "صندوق أزيموت جولد (AZG)",
-                current: 23.96,
+                current: 23.50,
                 bull: 30.00,
                 base: 28.50,
                 bear: 22.00,
@@ -4718,7 +4718,7 @@
             },
             "CMS": {
                 name: "صندوق مصر شريعة إكويتي (CMS)",
-                current: 21.88,
+                current: 21.5283,
                 bull: 30.00,
                 base: 27.50,
                 bear: 20.50,
@@ -4731,7 +4731,7 @@
             },
             "BWA": {
                 name: "صندوق بلتون وفرة للأسهم (BWA)",
-                current: 2.12,
+                current: 2.0874,
                 bull: 2.80,
                 base: 2.60,
                 bear: 1.95,
@@ -4744,7 +4744,7 @@
             },
             "NMF": {
                 name: "صندوق نعيم مصر للشريعة (NMF)",
-                current: 49.94,
+                current: 49.04,
                 bull: 64.00,
                 base: 58.50,
                 bear: 46.00,
@@ -4775,10 +4775,10 @@
             { ticker: "EFID", name: "ايديتا للصناعات الغذائية", qty: 23, buy: 31.84, cur: 28.90, sector: "الأغذية والمشروبات", isFund: false },
 
             // 2. محفظة الصناديق والذهب (أسعار الشراء الفعلية للتكلفة)
-            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 21.88121, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.96095, sector: "صناديق الذهب", isFund: true },
-            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1225, sector: "صناديق نقدية وأسهم", isFund: true },
-            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.94, sector: "صناديق الأسهم الشريعة", isFund: true },
+            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 21.5283, sector: "صناديق الأسهم الشريعة", isFund: true },
+            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.50, sector: "صناديق الذهب", isFund: true },
+            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.0874, sector: "صناديق نقدية وأسهم", isFund: true },
+            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.04, sector: "صناديق الأسهم الشريعة", isFund: true },
             { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 6970.00, sector: "الذهب الخالص 24", isFund: false }
         ];
         let donutChartInstance = null;
@@ -7843,6 +7843,7 @@
             renderStocks();
             if (typeof updateMarketPulseLive === 'function') updateMarketPulseLive();
             if (typeof renderNewsFeed === 'function') renderNewsFeed();
+            if (typeof renderFundsCards === 'function') renderFundsCards();
             renderHoldingsTable();
             if (typeof updateDonutChart === 'function') updateDonutChart();
             if (typeof generateLiveRecommendations === 'function') generateLiveRecommendations();
@@ -8388,7 +8389,7 @@ async function syncMubasherDirectAll() {
                             <div class="text-left font-mono">
                                 <div class="text-xs font-bold text-white flex items-center justify-end gap-1">
                                     <span class="w-1.5 h-1.5 rounded-full ${isGold ? 'bg-amber-400' : 'bg-emerald-400'} pulse-live"></span>
-                                    <span>${(s.close || 0).toFixed(2)} ج</span>
+                                    <span>${(s.close && s.close % 1 !== 0 && s.close.toString().split('.')[1]?.length > 2) ? s.close.toFixed(4) : (s.close || 0).toFixed(2)} ج</span>
                                 </div>
                                 <span class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${isPos ? 'bg-emerald-950/70 border-emerald-800 text-emerald-400' : 'bg-rose-950/70 border-rose-800 text-rose-400'} mt-0.5">
                                     ${sign}${(s.chg || 0).toFixed(2)}%
@@ -11753,10 +11754,10 @@ async function syncMubasherDirectAll() {
                 { ticker: 'ORHD', name: 'اوراسكوم للتنمية مصر', buy: 41.46, cur: 39.50, defaultQty: 58, isFund: false },
                 { ticker: 'OCDI', name: 'سوديك', buy: 27.57, cur: 27.72, defaultQty: 55, isFund: false },
                 { ticker: 'EFID', name: 'ايديتا للصناعات الغذائية', buy: 31.84, cur: 29.20, defaultQty: 23, isFund: false },
-                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 21.88121, defaultQty: 2210, isFund: true },
-                { ticker: 'AZG', name: 'صندوق Azimut جولد', buy: 23.1027, cur: 23.96095, defaultQty: 11, isFund: true },
-                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.1225, defaultQty: 66, isFund: true },
-                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 49.28, defaultQty: 2, isFund: true },
+                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 21.5283, defaultQty: 2210, isFund: true },
+                { ticker: 'AZG', name: 'صندوق Azimut جولد', buy: 23.1027, cur: 23.50, defaultQty: 11, isFund: true },
+                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.0874, defaultQty: 66, isFund: true },
+                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 49.04, defaultQty: 2, isFund: true },
                 { ticker: 'THNDR_GOLD', name: 'ذهب ثاندر (عياّر 24)', buy: 6972.84, cur: 7000.00, defaultQty: 0.0081, isFund: true }
             ];
 
