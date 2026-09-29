@@ -81,51 +81,51 @@ funds_data = {
     "CMS": {
         "name": "مصر شريعة إكويتي (CMS)",
         "manager": "CI Capital Asset Management",
-        "close": 22.72,
-        "chg": 0.00,
+        "close": 21.88121,
+        "chg": -0.62,
         "type": "equity_sharia",
-        "valuation_cycle": "أسبوعي / إقفال الجلسة",
-        "last_nav_date": "2026-09-24",
-        "source": "إفصاح رسمي - سي أي كابيتال"
+        "valuation_cycle": "يومي معتمد / إقفال الجلسة",
+        "last_nav_date": "2026-09-28",
+        "source": "إفصاح رسمي - سي آي لإدارة الأصول"
     },
     "AZG": {
         "name": "أزيموت جولد (AZG)",
         "manager": "Azimut Egypt",
-        "close": 23.81,
-        "chg": 0.00,
+        "close": 23.96095,
+        "chg": 0.63,
         "type": "gold_bullion",
-        "valuation_cycle": "يومي / إقفال جرام 24",
-        "last_nav_date": "2026-09-25",
+        "valuation_cycle": "يومي / تسعير خزائن البنك المركزي",
+        "last_nav_date": "2026-09-28",
         "source": "إفصاح رسمي - أزيموت مصر"
     },
     "THNDR_GOLD": {
         "name": "سبائك جولد (Thndr)",
         "manager": "Thndr Bullion",
-        "close": 1.70,
-        "chg": 0.00,
+        "close": 6970.0,
+        "chg": -0.43,
         "type": "gold_bullion",
-        "valuation_cycle": "لحظي / الصاغة المصرية",
-        "last_nav_date": "2026-09-26",
+        "valuation_cycle": "لحظي / الصاغة والبورصة السلعية",
+        "last_nav_date": "2026-09-29",
         "source": "تسعير الذهب الفعلي عيار 24"
     },
     "BWA": {
         "name": "بلتون وفرة (BWA)",
-        "manager": "Beltone Financial",
-        "close": 2.20,
-        "chg": 0.00,
-        "type": "equity_growth",
-        "valuation_cycle": "دوري / إقفال معتمد",
-        "last_nav_date": "2026-09-24",
-        "source": "إفصاح رسمي - بلتون القابضة"
+        "manager": "Beltone Asset Management",
+        "close": 2.1225,
+        "chg": 1.31,
+        "type": "equity_sharia",
+        "valuation_cycle": "دوري معتمد / بلتون القابضة",
+        "last_nav_date": "2026-09-28",
+        "source": "إفصاح رسمي - بلتون المالية"
     },
     "NMF": {
         "name": "نعيم مصر للشريعة (NMF)",
         "manager": "Naeem Financial Investments",
-        "close": 49.62,
-        "chg": 0.00,
+        "close": 49.94,
+        "chg": 1.34,
         "type": "equity_sharia",
-        "valuation_cycle": "دوري / إقفال معتمد",
-        "last_nav_date": "2026-09-24",
+        "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
+        "last_nav_date": "2026-09-28",
         "source": "إفصاح رسمي - النعيم للاستثمارات"
     }
 }
@@ -137,7 +137,7 @@ fx_gold = {
         "source": "البنك المركزي المصري"
     },
     "gold_24k": {
-        "close": 7120.0,
+        "close": 6970.0,
         "source": "شعبة الذهب والبورصة السلعية"
     },
     "clawdz_yield": {
