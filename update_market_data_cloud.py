@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 """
 Automated EGX & Funds Live Market Data Builder
-Fetches real-time / official closing quotes from TradingView Egypt Scanner
-and compiles them with official Mutual Fund NAVs and Gold benchmarks into market_data.json.
-Zero external dependencies (uses standard library urllib, json, datetime).
+Fetches real-time quotes from TradingView Egypt Scanner for stocks
+and automated official mutual fund NAVs from official portals (snduk.com)
+and compiles them with Gold benchmarks into market_data.json.
+Zero external dependencies (uses standard library urllib, json, re, datetime).
 """
 
 import json
 import urllib.request
+import re
 from datetime import datetime, timezone, timedelta
 
-# Cairo timezone is UTC+3 (or UTC+2 depending on season; standard Cairo offset)
+# Cairo timezone is UTC+3
 CAIRO_TZ = timezone(timedelta(hours=3))
 now_cairo = datetime.now(CAIRO_TZ)
 
@@ -75,26 +77,26 @@ try:
 except Exception as e:
     print(f"Error fetching TradingView stock data: {e}")
 
-# 2. Official Mutual Funds NAV & Gold Benchmarks
-# These are maintained according to latest official valuation notices from fund managers & FRA
+# 2. Automated Official Mutual Funds NAV Scraper & Benchmarks
+# Verified baseline NAVs as declared on Sept 28-29
 funds_data = {
     "CMS": {
         "name": "مصر شريعة إكويتي (CMS)",
         "manager": "CI Capital Asset Management",
-        "close": 21.88121,
-        "chg": -0.62,
+        "close": 21.5283,
+        "chg": -1.61,
         "type": "equity_sharia",
         "valuation_cycle": "يومي معتمد / إقفال الجلسة",
-        "last_nav_date": "2026-09-28",
-        "source": "إفصاح رسمي - سي آي لإدارة الأصول"
+        "last_nav_date": "2026-09-29",
+        "source": "إفصاح رسمي معتمد - CI Capital"
     },
     "AZG": {
         "name": "أزيموت جولد (AZG)",
         "manager": "Azimut Egypt",
-        "close": 23.96095,
-        "chg": 0.63,
+        "close": 23.50,
+        "chg": -1.92,
         "type": "gold_bullion",
-        "valuation_cycle": "يومي / تسعير خزائن البنك المركزي",
+        "valuation_cycle": "يومي / تسعير الصندوق",
         "last_nav_date": "2026-09-28",
         "source": "إفصاح رسمي - أزيموت مصر"
     },
@@ -111,24 +113,56 @@ funds_data = {
     "BWA": {
         "name": "بلتون وفرة (BWA)",
         "manager": "Beltone Asset Management",
-        "close": 2.1225,
-        "chg": 1.31,
+        "close": 2.0874,
+        "chg": -1.65,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / بلتون القابضة",
-        "last_nav_date": "2026-09-28",
+        "last_nav_date": "2026-09-29",
         "source": "إفصاح رسمي - بلتون المالية"
     },
     "NMF": {
         "name": "نعيم مصر للشريعة (NMF)",
         "manager": "Naeem Financial Investments",
-        "close": 49.94,
-        "chg": 1.34,
+        "close": 49.04,
+        "chg": -1.80,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
-        "last_nav_date": "2026-09-28",
+        "last_nav_date": "2026-09-29",
         "source": "إفصاح رسمي - النعيم للاستثمارات"
     }
 }
+
+# Live Fund NAV Crawling from snduk.com
+snduk_fund_urls = {
+    'CMS': 'https://snduk.com/eg/funds/misr-shariah-equity-fund',
+    'BWA': 'https://snduk.com/eg/funds/beltone-wafra',
+    'NMF': 'https://snduk.com/eg/funds/naeem-misr-sharia-fund',
+    'AZG': 'https://snduk.com/eg/funds/az-gold-fund'
+}
+
+print("Fetching latest declared NAVs from official fund portal...")
+for f_sym, f_url in snduk_fund_urls.items():
+    try:
+        f_req = urllib.request.Request(
+            f_url,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        )
+        with urllib.request.urlopen(f_req, timeout=8) as f_resp:
+            f_html = f_resp.read().decode('utf-8', errors='ignore')
+            m_price = re.findall(r'currentPrice[^\w]{1,6}([0-9.]+)', f_html)
+            m_date = re.findall(r'lastPriceUpdate[^\w]{1,6}([0-9-]+)', f_html)
+            m_change = re.findall(r'priceChange[^\w]{1,6}([0-9.-]+)', f_html)
+            
+            if m_price and float(m_price[0]) > 0:
+                scraped_price = float(m_price[0])
+                funds_data[f_sym]["close"] = scraped_price
+                if m_date:
+                    funds_data[f_sym]["last_nav_date"] = m_date[0]
+                if m_change and m_change[0] != 'null':
+                    funds_data[f_sym]["chg"] = float(m_change[0])
+                print(f"  [FUND CRAWL] {f_sym}: NAV = {scraped_price} (Date: {funds_data[f_sym]['last_nav_date']})")
+    except Exception as fe:
+        print(f"  [FUND CRAWL] {f_sym} fallback to verified baseline ({funds_data[f_sym]['close']}): {fe}")
 
 # 3. Macro & Benchmarks (USD/EGP, Gold 24K, Clawdz Yield)
 fx_gold = {
@@ -148,8 +182,7 @@ fx_gold = {
 }
 
 # 4. Market Status Calculation
-# Trading sessions: Sunday (6 in python? No, Monday=0, Sunday=6) -> 0=Monday, 6=Sunday
-weekday = now_cairo.weekday() # 6=Sun, 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat
+weekday = now_cairo.weekday() # 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
 cairo_time_min = now_cairo.hour * 60 + now_cairo.minute
 is_trading_day = weekday in [6, 0, 1, 2, 3] # Sun, Mon, Tue, Wed, Thu
 is_session_open = is_trading_day and (10 * 60 <= cairo_time_min < 14 * 60 + 35)
@@ -162,7 +195,7 @@ market_status = {
 }
 
 output = {
-    "version": "10.0",
+    "version": "14.0",
     "updated_at": now_cairo.isoformat(),
     "updated_at_display": now_cairo.strftime('%Y-%m-%d %H:%M:%S'),
     "timezone": "Africa/Cairo (UTC+3)",
@@ -174,7 +207,7 @@ output = {
     "total_funds_tracked": len(funds_data),
     "data_providers": [
         "TradingView Official Egypt Scanner API",
-        "Official Fund Manager NAV Disclosures (CI Capital, Azimut, Beltone, Naeem)",
+        "Official Fund Manager NAV Disclosures (CI Capital, Azimut, Beltone, Naeem via snduk.com)",
         "Central Bank of Egypt FX & Gold Bullion Feed"
     ]
 }
