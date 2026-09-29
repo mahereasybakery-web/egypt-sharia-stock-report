@@ -2,8 +2,8 @@ name: Automated EGX & Funds Market Data Sync
 
 on:
   schedule:
-    # 1. Trading Hours Sync: Every 30 minutes during EGX trading session (10:00 - 15:30 Cairo = 07:00 - 12:30 UTC)
-    - cron: '*/30 7-12 * * 0,1,2,3,4'
+    # 1. Trading Hours Sync: Every 10 minutes during EGX trading session (10:00 - 15:30 Cairo = 07:00 - 12:30 UTC)
+    - cron: '*/10 7-12 * * 0,1,2,3,4'
     # 2. Evening Mutual Funds NAV Sync: Every 30 minutes during official Fund NAV disclosures window (17:00 - 21:30 Cairo = 14:00 - 18:30 UTC)
     - cron: '*/30 14-18 * * 0,1,2,3,4'
   workflow_dispatch:
