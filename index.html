@@ -848,9 +848,23 @@
         </div>
 
                 <!-- ================= TAB 2: MARKET PULSE (نبض السوق + تحليل AI + القيمة العادلة) ================= -->
-                        <section id="view-radar" class="tab-content space-y-3.5 hidden">
-            <!-- Market Pulse Sub-Navigation Tabs -->
-            <div class="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs select-none">
+        <section id="view-radar" class="tab-content space-y-3 hidden">
+            <!-- TOP PRIMARY MASTER ASSET SLICER (أعلى شيء في صفحة نبض السوق بالكامل) -->
+            <div id="masterAssetSlicerContainer" class="p-1 bg-slate-950/95 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
+                <button id="slicerEquitiesBtn" onclick="setAssetSlicer('stocks')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95">
+                    <span>📊</span>
+                    <span>أسهم الشركات الشرعية</span>
+                    <span id="slicerStocksBadge" class="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full">33 سهم</span>
+                </button>
+                <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
+                    <span>🕌</span>
+                    <span>صناديق الاستثمار والذهب</span>
+                    <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
+                </button>
+            </div>
+
+            <!-- Market Pulse Sub-Navigation Tabs (تظهر أسفل السلايسر لتحليلات الأسهم) -->
+            <div id="marketSubTabsBar" class="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs select-none">
                 <button id="marketSubTabPulseBtn" onclick="switchMarketSubTab('pulse')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
                     <span>⚡</span> <span>نبض الرادار</span>
                 </button>
@@ -867,20 +881,6 @@
 
             <!-- SUB-VIEW 1: نبض الرادار (جلسة التداول اللحظية ورادار الأسهم) -->
             <div id="marketSubViewPulse" class="space-y-3">
-                <!-- TOP PRIMARY MASTER ASSET SLICER (سلايسر رئيسي في أعلى الصفحة بالكامل) -->
-                <div class="p-1 bg-slate-950/95 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
-                    <button id="slicerEquitiesBtn" onclick="setAssetSlicer('stocks')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95">
-                        <span>📊</span>
-                        <span>أسهم الشركات الشرعية</span>
-                        <span id="slicerStocksBadge" class="text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded-full">33 سهم</span>
-                    </button>
-                    <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
-                        <span>🕌</span>
-                        <span>صناديق الاستثمار والذهب</span>
-                        <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
-                    </button>
-                </div>
-
                 <!-- SECTION 1: EQUITIES ANALYTICS & CARDS VIEW (يظهر فقط عند اختيار أسهم) -->
                 <div id="equitiesAnalyticsView" class="space-y-3">
                 <!-- 1. Real-Time Market Atmosphere & Breadth Card -->
@@ -2847,41 +2847,56 @@
                 <div class="p-2.5 bg-rose-950/40 rounded-xl border border-rose-900/60 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-950 text-rose-300 border border-rose-800">R2</span>
-                        <span class="text-rose-200 font-sans text-xs">المقاومة الثانية (جني أرباح نهائي)</span>
+                        <span id="pivotModalR2Label" class="text-rose-200 font-sans text-xs">المقاومة الثانية (جني أرباح نهائي)</span>
                     </div>
-                    <b id="pivotModalR2" class="text-rose-300 font-bold text-xs">-- ج</b>
+                    <div class="flex items-center gap-1.5">
+                        <span id="pivotModalR2Pct" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800">+0.00%</span>
+                        <b id="pivotModalR2" class="text-rose-300 font-bold text-xs">-- ج</b>
+                    </div>
                 </div>
                 <!-- R1 -->
                 <div class="p-2.5 bg-rose-950/20 rounded-xl border border-rose-800/40 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-rose-900/60 text-rose-300 border border-rose-700">R1</span>
-                        <span class="text-rose-300 font-sans text-xs">المقاومة الأولى (مستوى تخفيف جزئي)</span>
+                        <span id="pivotModalR1Label" class="text-rose-300 font-sans text-xs">المقاومة الأولى (مستوى تخفيف جزئي)</span>
                     </div>
-                    <b id="pivotModalR1" class="text-rose-400 font-bold text-xs">-- ج</b>
+                    <div class="flex items-center gap-1.5">
+                        <span id="pivotModalR1Pct" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-900">+0.00%</span>
+                        <b id="pivotModalR1" class="text-rose-400 font-bold text-xs">-- ج</b>
+                    </div>
                 </div>
                 <!-- PP -->
                 <div class="p-2.5 bg-indigo-950/60 rounded-xl border-2 border-indigo-600 flex items-center justify-between ring-2 ring-indigo-500/30">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-600 text-white shadow">PP</span>
-                        <span class="text-indigo-200 font-sans text-xs font-bold">نقطة الارتكاز المركزية (محور الجلسة)</span>
+                        <span id="pivotModalPPLabel" class="text-indigo-200 font-sans text-xs font-bold">نقطة الارتكاز المركزية (محور الجلسة)</span>
                     </div>
-                    <b id="pivotModalPP" class="text-white font-bold text-sm">-- ج</b>
+                    <div class="flex items-center gap-1.5">
+                        <span id="pivotModalPPPct" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">0.00%</span>
+                        <b id="pivotModalPP" class="text-white font-bold text-sm">-- ج</b>
+                    </div>
                 </div>
                 <!-- S1 -->
                 <div class="p-2.5 bg-emerald-950/20 rounded-xl border border-emerald-800/40 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-700">S1</span>
-                        <span class="text-emerald-300 font-sans text-xs">الدعم الأول (منطقة ارتداد شرائي للمضارب)</span>
+                        <span id="pivotModalS1Label" class="text-emerald-300 font-sans text-xs">الدعم الأول (منطقة ارتداد شرائي للمضارب)</span>
                     </div>
-                    <b id="pivotModalS1" class="text-emerald-400 font-bold text-xs">-- ج</b>
+                    <div class="flex items-center gap-1.5">
+                        <span id="pivotModalS1Pct" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-900">-0.00%</span>
+                        <b id="pivotModalS1" class="text-emerald-400 font-bold text-xs">-- ج</b>
+                    </div>
                 </div>
                 <!-- S2 -->
                 <div class="p-2.5 bg-emerald-950/40 rounded-xl border border-emerald-900/60 flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">S2</span>
-                        <span class="text-emerald-200 font-sans text-xs">الدعم الثاني (قاع الدفاع الأخير ووقف الخسارة)</span>
+                        <span id="pivotModalS2Label" class="text-emerald-200 font-sans text-xs">الدعم الثاني (قاع الدفاع الأخير ووقف الخسارة)</span>
                     </div>
-                    <b id="pivotModalS2" class="text-emerald-300 font-bold text-xs">-- ج</b>
+                    <div class="flex items-center gap-1.5">
+                        <span id="pivotModalS2Pct" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">-0.00%</span>
+                        <b id="pivotModalS2" class="text-emerald-300 font-bold text-xs">-- ج</b>
+                    </div>
                 </div>
             </div>
 
@@ -4204,44 +4219,44 @@
 
         // 2. Comprehensive Stocks & Funds Database
         let STOCKS_DATA = [
-            { ticker: "MFPC", name: "موبكو للأسمدة", close: 45, chg: -4.26, rsi: 57.5, pe: 9.3, type: "stock", rec: "شراء قوي", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "AMOC", name: "أموك للبترول", close: 12.9, chg: -3.73, rsi: 58.4, pe: 0, type: "stock", rec: "شراء وتجميع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ACGC", name: "العربية للأقطان", close: 14, chg: -1.96, rsi: 52.5, pe: 0, type: "stock", rec: "اتجاه صاعد", sector: "الصناعة والتصدير" },
-            { ticker: "MCQE", name: "أسمنت قنا", close: 202.5, chg: -1.96, rsi: 36.8, pe: 0, type: "stock", rec: "محايد إيجابي", sector: "العقارات والإنشاءات" },
-            { ticker: "ICFC", name: "الدولية للأسمدة", close: 23, chg: 3.56, rsi: 56.9, pe: 8.0, type: "stock", rec: "شراء", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 87.63, chg: -3.17, rsi: 55.4, pe: 0, type: "stock", rec: "شراء وتوزيع", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "LCSW", name: "ليسيكو مصر", close: 31.7, chg: 1.15, rsi: 37.4, pe: 0, type: "stock", rec: "استقرار", sector: "الصناعة والتصدير" },
-            { ticker: "ARCC", name: "العربية للأسمنت", close: 66, chg: -1.49, rsi: 34.0, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.09, chg: 0.37, rsi: 52.8, pe: 8.5, type: "stock", rec: "تماسك قوي", sector: "الصناعة والتصدير" },
-            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 45.14, chg: -2.53, rsi: 50.4, pe: 0, type: "stock", rec: "شراء", sector: "البنوك والخدمات المالية" },
-            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 16.34, chg: -4.72, rsi: 39.9, pe: 0, type: "stock", rec: "زخم صاعد", sector: "البتروكيماويات والأسمدة" },
-            { ticker: "ATQA", name: "حديد عتاقة", close: 12.42, chg: -1.51, rsi: 52.3, pe: 0, type: "stock", rec: "شراء", sector: "الصناعة والتصدير" },
-            { ticker: "EGAL", name: "مصر للألومنيوم", close: 350, chg: -1.95, rsi: 50.5, pe: 14.2, type: "stock", rec: "تحوط وتصدير", sector: "الصناعة والتصدير" },
-            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.72, chg: -0.16, rsi: 43.2, pe: 19.8, type: "stock", rec: "منطقة تجميع", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.72, chg: -1.0, rsi: 33.1, pe: 9.8, type: "stock", rec: "دعم فني رئيسي", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 90.4, chg: -1.53, rsi: 27.3, pe: 12.8, type: "stock", rec: "ارتداد متوقع", sector: "العقارات والإنشاءات" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 13.1, chg: -2.96, rsi: 27.5, pe: 9.3, type: "stock", rec: "تشبع بيعي", sector: "العقارات والإنشاءات" },
-            { ticker: "ISPH", name: "ابن سينا فارما", close: 11.64, chg: -0.26, rsi: 34.3, pe: 0, type: "stock", rec: "اقتراب من القاع", sector: "الأغذية والأدوية" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 133, chg: -2.2, rsi: 71.8, pe: 10.1, type: "stock", rec: "تشبع شرائي", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 22.92, chg: -0.26, rsi: 44.5, pe: 0, type: "stock", rec: "تجميع هادئ", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.9, chg: 1.76, rsi: 43.2, pe: 5.2, type: "stock", rec: "زخم قيادي", sector: "البنوك والخدمات المالية" },
-            { ticker: "SAUD", name: "بنك البركة مصر", close: 22.49, chg: -3.43, rsi: 41.1, pe: 5.1, type: "stock", rec: "محايد", sector: "البنوك والخدمات المالية" },
-            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.4, chg: -0.67, rsi: 37.9, pe: 5.5, type: "stock", rec: "محايد", sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 29.2, chg: -1.02, rsi: 42.7, pe: 13.9, type: "stock", rec: "محايد", sector: "الأغذية والأدوية" },
-            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 5.69, chg: -1.39, rsi: 38.2, pe: 36.7, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.5, chg: -2.88, rsi: 39.1, pe: 0, type: "stock", rec: "شراء", sector: "العقارات والإنشاءات" },
-            { ticker: "SWDY", name: "السويدي إليكتريك", close: 113.45, chg: -4.26, rsi: 40.7, pe: 0, type: "stock", rec: "محايد", sector: "الصناعة والتصدير" },
-            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.52, chg: -1.77, rsi: 38.5, pe: 24.3, type: "stock", rec: "شراء", sector: "الأغذية والأدوية" },
-            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 815, chg: -1.09, rsi: 47.4, pe: 8.5, type: "stock", rec: "شراء قوي", sector: "العقارات والإنشاءات" },
-            { ticker: "CIRA", name: "سيرا للتعليم", close: 39.78, chg: 1.82, rsi: 58.0, pe: 0, type: "stock", rec: "شراء", sector: "خدمات وتعليم" },
-            { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.29, chg: -0.77, rsi: 40.5, pe: 46.2, type: "stock", rec: "قاع استثماري", sector: "الصناعة والتصدير" },
-            { ticker: "EAST", name: "الشرقية للدخان", close: 30.52, chg: -3.66, rsi: 19.2, pe: 10.8, type: "stock", rec: "عائد توزيعات", sector: "الصناعة والتصدير" },
-            { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 30, chg: -2.02, rsi: 47.8, pe: 0, type: "stock", rec: "نمو مستمر", sector: "الصناعة والتصدير" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96095, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "ذهب 24 / ثندر", sector: "الذهب وصناديق التحوط" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7000.0, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق الذهب", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.88121, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1225, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تتبع EGX33", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.28, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "صندوق إسلامي", sector: "صناديق الأسهم الشرعية" }
+            { ticker: "MFPC", name: "موبكو للأسمدة", close: 46.01, open: 45, high: 46.25, low: 43, chg: 2.24, rsi: 52.4, pe: 9.3, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "AMOC", name: "أموك للبترول", close: 13, open: 12.9, high: 13.19, low: 12.18, chg: 0.78, rsi: 53.8, pe: 8.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ACGC", name: "العربية للأقطان", close: 13.54, open: 13.81, high: 13.98, low: 13.11, chg: -1.96, rsi: 46.8, pe: 11.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "MCQE", name: "أسمنت قنا", close: 192.9, open: 196, high: 197, low: 186, chg: -1.58, rsi: 32.2, pe: 7.4, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ICFC", name: "الدولية للأسمدة", close: 22.65, open: 22.76, high: 22.99, low: 22, chg: -0.48, rsi: 54.8, pe: 8.0, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ABUK", name: "أبو قير للأسمدة", close: 88.9, open: 87.63, high: 89.5, low: 85.02, chg: 1.45, rsi: 52.9, pe: 7.8, type: "stock", rec: "احتفاظ ومراقبة", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "LCSW", name: "ليسيكو مصر", close: 30.63, open: 31, high: 31.2, low: 29.34, chg: -1.19, rsi: 31.1, pe: 6.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
+            { ticker: "ARCC", name: "العربية للأسمنت", close: 63.55, open: 63.31, high: 65.5, low: 60.01, chg: 0.38, rsi: 30.5, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ORWE", name: "النساجون الشرقيون", close: 27.11, open: 27.09, high: 27.39, low: 26.01, chg: 0.07, rsi: 51.5, pe: 8.5, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "FAIT", name: "بنك فيصل (جنيه)", close: 43.4, open: 44.23, high: 44.5, low: 43, chg: -3.12, rsi: 41.9, pe: 4.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
+            { ticker: "SKPC", name: "سيدي كرير للبتروكيماويات", close: 16.37, open: 16.34, high: 16.68, low: 15.7, chg: 0.18, rsi: 33.2, pe: 6.8, type: "stock", rec: "شراء وتجميع قاع", sector: "البتروكيماويات والأسمدة" },
+            { ticker: "ATQA", name: "حديد عتاقة", close: 11.86, open: 12.32, high: 12.32, low: 11.05, chg: -3.73, rsi: 44.4, pe: 5.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "EGAL", name: "مصر للألومنيوم", close: 348.01, open: 350, high: 356, low: 340, chg: -0.57, rsi: 43.6, pe: 14.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.69, open: 18.72, high: 18.8, low: 18.1, chg: 0.21, rsi: 40.4, pe: 18.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.04, open: 27.72, high: 27.72, low: 26.5, chg: -2.45, rsi: 29.4, pe: 9.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 88.99, open: 90.4, high: 90.4, low: 88.03, chg: -1.56, rsi: 24.9, pe: 12.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 12.94, open: 13.1, high: 13.2, low: 12.57, chg: -1.22, rsi: 26.2, pe: 9.3, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ISPH", name: "ابن سينا فارما", close: 11.7, open: 11.64, high: 11.79, low: 11.22, chg: 0.52, rsi: 33.8, pe: 8.6, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 136.3, open: 133, high: 139, low: 129, chg: 2.48, rsi: 68.6, pe: 10.1, type: "stock", rec: "جني أرباح وتخفيف", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 22.6, open: 22.92, high: 23, low: 20.2, chg: -1.4, rsi: 41.8, pe: 12.4, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.28, open: 51.9, high: 51.9, low: 49.05, chg: -1.19, rsi: 44.6, pe: 5.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "البنوك والخدمات المالية" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 21.85, open: 22.34, high: 22.8, low: 21.6, chg: -2.19, rsi: 37.4, pe: 5.1, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.04, open: 7.15, high: 7.2, low: 6.82, chg: -1.54, rsi: 31.5, pe: 5.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 28.59, open: 29.2, high: 29.3, low: 27.81, chg: -2.09, rsi: 36.3, pe: 13.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 5.39, open: 5.41, high: 5.72, low: 5.05, chg: -0.37, rsi: 31.8, pe: 36.7, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.32, open: 39.5, high: 39.8, low: 38.02, chg: -0.46, rsi: 35.3, pe: 7.2, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "SWDY", name: "السويدي إليكتريك", close: 114.9, open: 113.45, high: 118.6, low: 108.01, chg: 1.28, rsi: 38.6, pe: 8.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.48, open: 25.52, high: 25.87, low: 24.5, chg: -0.16, rsi: 34.8, pe: 24.3, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 797.45, open: 809, high: 809, low: 780.01, chg: -1.43, rsi: 43.2, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "CIRA", name: "سيرا للتعليم", close: 38.68, open: 39.07, high: 39.39, low: 37.01, chg: -1.0, rsi: 53.1, pe: 9.1, type: "stock", rec: "احتفاظ ومراقبة", sector: "خدمات وتعليم" },
+            { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 2.46, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "EAST", name: "الشرقية للدخان", close: 30.37, open: 30.52, high: 30.94, low: 29.81, chg: -0.49, rsi: 15.5, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
+            { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29, open: 30, high: 30.01, low: 28.1, chg: -3.33, rsi: 41.0, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.96095, open: 23.96095, high: 24.68, low: 23.24, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7000.0, open: 7000.0, high: 7210.0, low: 6790.0, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.88121, open: 21.88121, high: 22.76, low: 21.00, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1225, open: 2.1225, high: 2.20, low: 2.04, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.28, open: 49.28, high: 51.25, low: 47.31, chg: 0.0, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" }
         ];
 
         // 3. Valuation Scenarios Database
@@ -6193,14 +6208,16 @@
 
             const val = (VALUATION_DATA && VALUATION_DATA[ticker]) ? VALUATION_DATA[ticker] : {};
             const curPrice = safeNum(s.close, safeNum(val.current, 50.0));
+            const isFund = isFundAsset(s) || isGoldAsset(s);
+            const piv = calculatePivotPoints(s.high, s.low, curPrice, isFund ? 'fund' : 'stock');
 
-            const support = safeNum(val.support, Math.round(curPrice * 0.93 * 100) / 100);
-            const resistance = safeNum(val.resistance, Math.round(curPrice * 1.07 * 100) / 100);
+            const support = piv.s1;
+            const resistance = piv.r1;
             const base = safeNum(val.base, Math.round(curPrice * 1.20 * 100) / 100);
             const bull = safeNum(val.bull, Math.round(curPrice * 1.35 * 100) / 100);
             const bear = safeNum(val.bear, Math.round(curPrice * 0.88 * 100) / 100);
             const margin = safeNum(val.margin, curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : 0);
-            const pe = safeNum(val.pe, safeNum(s.pe, 8.5));
+            const pe = safeNum(s.pe, safeNum(val.pe, 8.5));
             const pb = safeNum(val.pb, 1.65);
             const divYield = safeNum(s.div_yield, (ticker === 'ABUK' ? 11.8 : ticker === 'MFPC' ? 9.2 : ticker === 'ORWE' ? 9.0 : ticker === 'AMOC' ? 8.4 : ticker === 'SKPC' ? 8.2 : 5.0));
 
@@ -6282,8 +6299,10 @@
             chgElem.className = `text-[10px] font-bold px-1.5 py-0.2 rounded border ${isP ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800'}`;
 
             // Populate Sub-Tab 1: Chart Quick Badges
-            document.getElementById('modalChartSupport').innerText = `${data.support.toFixed(2)} ج`;
-            document.getElementById('modalChartResistance').innerText = `${data.resistance.toFixed(2)} ج`;
+            const suppDiff = data.close > 0 ? (((data.support - data.close) / data.close) * 100) : 0;
+            const resDiff = data.close > 0 ? (((data.resistance - data.close) / data.close) * 100) : 0;
+            document.getElementById('modalChartSupport').innerText = `${data.support.toFixed(2)} ج (${suppDiff >= 0 ? '+' : ''}${suppDiff.toFixed(1)}%)`;
+            document.getElementById('modalChartResistance').innerText = `${data.resistance.toFixed(2)} ج (+${resDiff.toFixed(1)}%)`;
             document.getElementById('modalChartRsi').innerText = `${data.rsi.toFixed(1)}`;
             document.getElementById('modalChartVolumeStatus').innerText = data.rsi >= 50 ? 'تجميع شرائي نشط' : 'استقرار وتماسك';
 
@@ -6807,7 +6826,7 @@
             triggerHaptic('medium');
             const backupData = {
                 exportDate: new Date().toISOString(),
-                appVersion: 'egx-sharia-v13.5',
+                appVersion: 'egx-sharia-v13.6',
                 userHoldings: userHoldings || [],
                 portfolioCash: (window.THNDR_CASH && window.THNDR_CASH.cash) || 0.0,
                 clawdzBalance: (window.THNDR_CASH && window.THNDR_CASH.clawdz) || 0.0,
@@ -7513,17 +7532,23 @@
             if (cData) {
                 window.GLOBAL_STATE = cData;
                 // If TradingView direct had issues, fallback to cloud stock quotes
-                if (updatedStocksCount === 0 && cData.stocks) {
+                if (cData.stocks) {
                     Object.keys(cData.stocks).forEach(sym => {
                         const live = cData.stocks[sym];
                         const local = STOCKS_DATA.find(s => s.ticker === sym);
                         if (local && live && live.close > 0) {
-                            local.close = live.close;
-                            if (live.chg !== undefined) local.chg = live.chg;
-                            if (live.rsi !== undefined) local.rsi = live.rsi;
-                            updatedStocksCount++;
+                            if (updatedStocksCount === 0) {
+                                local.close = live.close;
+                                if (live.chg !== undefined) local.chg = live.chg;
+                                if (live.rsi !== undefined) local.rsi = live.rsi;
+                            }
+                            if (live.high !== undefined && live.high > 0) local.high = live.high;
+                            if (live.low !== undefined && live.low > 0) local.low = live.low;
+                            if (live.open !== undefined && live.open > 0) local.open = live.open;
+                            if (live.pe !== undefined && live.pe > 0 && !local.pe) local.pe = live.pe;
                         }
                     });
+                    if (updatedStocksCount === 0) updatedStocksCount = Object.keys(cData.stocks).length;
                 }
 
                 // Mutual Funds & Gold NAVs (Official manager valuations)
@@ -7971,12 +7996,31 @@ async function syncMubasherDirectAll() {
             const fundsBtn  = document.getElementById('slicerFundsBtn');
             const eqView    = document.getElementById('equitiesAnalyticsView');
             const fdView    = document.getElementById('fundsAnalyticsView');
+            const subTabsBar = document.getElementById('marketSubTabsBar');
             const stocksFilters = document.getElementById('stocksFiltersWrapper');
             const fundsFilters  = document.getElementById('fundsFiltersWrapper');
 
             if (type === 'stocks') {
                 if (stocksBtn) stocksBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-emerald-600 text-white shadow-md active:scale-95";
                 if (fundsBtn)  fundsBtn.className  = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (subTabsBar) subTabsBar.classList.remove('hidden');
+
+                // Return to pulse subview
+                const views = ['marketSubViewPulse', 'marketSubViewNews', 'marketSubViewAi', 'marketSubViewFair'];
+                views.forEach(v => {
+                    const el = document.getElementById(v);
+                    if (el) {
+                        if (v === 'marketSubViewPulse') el.classList.remove('hidden');
+                        else el.classList.add('hidden');
+                    }
+                });
+                const pulseBtn = document.getElementById('marketSubTabPulseBtn');
+                if (pulseBtn) pulseBtn.className = "market-subtab-btn flex-1 py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1";
+                ['marketSubTabNewsBtn', 'marketSubTabAiBtn', 'marketSubTabFairBtn'].forEach(id => {
+                    const b = document.getElementById(id);
+                    if (b) b.className = "market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1";
+                });
+
                 if (eqView) eqView.classList.remove('hidden');
                 if (fdView) fdView.classList.add('hidden');
                 if (stocksFilters) stocksFilters.classList.remove('hidden');
@@ -7985,6 +8029,19 @@ async function syncMubasherDirectAll() {
             } else {
                 if (fundsBtn)  fundsBtn.className  = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-amber-600 text-white shadow-md active:scale-95";
                 if (stocksBtn) stocksBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                
+                // Hide equities-only subtabs so funds suite immediately follows the top master slicer!
+                if (subTabsBar) subTabsBar.classList.add('hidden');
+
+                const views = ['marketSubViewPulse', 'marketSubViewNews', 'marketSubViewAi', 'marketSubViewFair'];
+                views.forEach(v => {
+                    const el = document.getElementById(v);
+                    if (el) {
+                        if (v === 'marketSubViewPulse') el.classList.remove('hidden');
+                        else el.classList.add('hidden');
+                    }
+                });
+
                 if (fdView) fdView.classList.remove('hidden');
                 if (eqView) eqView.classList.add('hidden');
                 if (fundsFilters)  fundsFilters.classList.remove('hidden');
@@ -8456,19 +8513,45 @@ async function syncMubasherDirectAll() {
         // -------------------------------------------------------------
         let currentPivotTicker = 'TMGH';
 
-        function calculatePivotPoints(high, low, close) {
+        function calculatePivotPoints(high, low, close, type = 'stock') {
             const h = safeNum(high, 0);
             const l = safeNum(low, 0);
             const c = safeNum(close, 0);
-            if (h <= 0 || l <= 0 || c <= 0) {
-                return { pp: c, r1: c * 1.02, r2: c * 1.04, s1: c * 0.98, s2: c * 0.96 };
+            if (c <= 0) {
+                return { pp: 0, r1: 0, r2: 0, s1: 0, s2: 0, r1Pct: 0, r2Pct: 0, ppPct: 0, s1Pct: 0, s2Pct: 0 };
             }
-            const pp = (h + l + c) / 3;
-            const r1 = (2 * pp) - l;
-            const s1 = (2 * pp) - h;
-            const r2 = pp + (h - l);
-            const s2 = pp - (h - l);
-            return { pp, r1, r2, s1, s2 };
+
+            let pp, r1, r2, s1, s2;
+
+            if (type === 'fund') {
+                // Open-ended Mutual Funds & Gold Bullion Bands
+                pp = c;
+                r1 = Math.round(c * 1.035 * 100) / 100;
+                r2 = Math.round(c * 1.075 * 100) / 100;
+                s1 = Math.round(c * 0.965 * 100) / 100;
+                s2 = Math.round(c * 0.925 * 100) / 100;
+            } else {
+                // Classic Floor Pivot Points for Equities
+                let realH = (h > l && h > 0) ? h : (c * 1.025);
+                let realL = (l > 0 && l < realH) ? l : (c * 0.975);
+                pp = Math.round(((realH + realL + c) / 3.0) * 100) / 100;
+                r1 = Math.round(((2 * pp) - realL) * 100) / 100;
+                s1 = Math.round(((2 * pp) - realH) * 100) / 100;
+                r2 = Math.round((pp + (realH - realL)) * 100) / 100;
+                s2 = Math.round((pp - (realH - realL)) * 100) / 100;
+            }
+
+            // Exact percentage ratios relative to Current Price (C)
+            const r2Pct = ((r2 - c) / c) * 100.0;
+            const r1Pct = ((r1 - c) / c) * 100.0;
+            const ppPct = ((pp - c) / c) * 100.0;
+            const s1Pct = ((s1 - c) / c) * 100.0;
+            const s2Pct = ((s2 - c) / c) * 100.0;
+
+            return {
+                pp, r1, r2, s1, s2,
+                r2Pct, r1Pct, ppPct, s1Pct, s2Pct
+            };
         }
 
         function openPivotModal(ticker) {
@@ -8477,34 +8560,81 @@ async function syncMubasherDirectAll() {
             const s = STOCKS_DATA.find(x => x.ticker === ticker);
             if (!s) return;
 
-            const cur = s.close || 0;
-            const dayHigh = s.high || (cur * 1.025);
-            const dayLow = s.low || (cur * 0.975);
-            const piv = calculatePivotPoints(dayHigh, dayLow, cur);
+            const isFund = isFundAsset(s) || isGoldAsset(s);
+            const cur = safeNum(s.close, 0);
+            const dayHigh = safeNum(s.high, cur * 1.025);
+            const dayLow = safeNum(s.low, cur * 0.975);
+            const piv = calculatePivotPoints(dayHigh, dayLow, cur, isFund ? 'fund' : 'stock');
             const isAbove = cur >= piv.pp;
 
-            document.getElementById('pivotModalTitle').textContent = `ارتكاز ${s.name}`;
+            // Header titles
+            document.getElementById('pivotModalTitle').textContent = isFund ? `نطاقات وثيقة ${s.name}` : `ارتكاز ${s.name}`;
             document.getElementById('pivotModalTicker').textContent = ticker;
             document.getElementById('pivotModalCurrentPrice').textContent = cur.toFixed(2) + ' ج';
+
+            // Labels for fund vs stock
+            const r2Label = document.getElementById('pivotModalR2Label');
+            const r1Label = document.getElementById('pivotModalR1Label');
+            const ppLabel = document.getElementById('pivotModalPPLabel');
+            const s1Label = document.getElementById('pivotModalS1Label');
+            const s2Label = document.getElementById('pivotModalS2Label');
+
+            if (isFund) {
+                if (r2Label) r2Label.textContent = 'أعلى قمة تاريخية (52W High NAV)';
+                if (r1Label) r1Label.textContent = 'المستهدف السنوي للوثيقة (+3.5%)';
+                if (ppLabel) ppLabel.textContent = 'صافي قيمة الوثيقة (NAV المحوري)';
+                if (s1Label) s1Label.textContent = 'مستوى التعزيز والشراء التراكمي (-3.5%)';
+                if (s2Label) s2Label.textContent = 'قاع الأمان الدفاعي للوثيقة (52W Low)';
+            } else {
+                if (r2Label) r2Label.textContent = 'المقاومة الثانية (جني أرباح نهائي)';
+                if (r1Label) r1Label.textContent = 'المقاومة الأولى (مستوى تخفيف جزئي)';
+                if (ppLabel) ppLabel.textContent = 'نقطة الارتكاز المركزية (محور الجلسة)';
+                if (s1Label) s1Label.textContent = 'الدعم الأول (منطقة ارتداد شرائي للمضارب)';
+                if (s2Label) s2Label.textContent = 'الدعم الثاني (قاع الدفاع الأخير ووقف الخسارة)';
+            }
+
+            // Prices
             document.getElementById('pivotModalR2').textContent = piv.r2.toFixed(2) + ' ج';
             document.getElementById('pivotModalR1').textContent = piv.r1.toFixed(2) + ' ج';
             document.getElementById('pivotModalPP').textContent = piv.pp.toFixed(2) + ' ج';
             document.getElementById('pivotModalS1').textContent = piv.s1.toFixed(2) + ' ج';
             document.getElementById('pivotModalS2').textContent = piv.s2.toFixed(2) + ' ج';
 
+            // Percentages
+            const fmtPct = (val) => (val >= 0 ? `+${val.toFixed(2)}%` : `${val.toFixed(2)}%`);
+            const r2PctEl = document.getElementById('pivotModalR2Pct');
+            const r1PctEl = document.getElementById('pivotModalR1Pct');
+            const ppPctEl = document.getElementById('pivotModalPPPct');
+            const s1PctEl = document.getElementById('pivotModalS1Pct');
+            const s2PctEl = document.getElementById('pivotModalS2Pct');
+
+            if (r2PctEl) r2PctEl.textContent = fmtPct(piv.r2Pct);
+            if (r1PctEl) r1PctEl.textContent = fmtPct(piv.r1Pct);
+            if (ppPctEl) ppPctEl.textContent = fmtPct(piv.ppPct);
+            if (s1PctEl) s1PctEl.textContent = fmtPct(piv.s1Pct);
+            if (s2PctEl) s2PctEl.textContent = fmtPct(piv.s2Pct);
+
+            // Badges & narrative
             const badgeEl = document.getElementById('pivotModalPositionBadge');
             if (badgeEl) {
-                badgeEl.textContent = isAbove ? '↗️ أعلى الارتكاز (إيجابي صاعد)' : '↘️ تحت الارتكاز (حذر وتصحيح)';
-                badgeEl.className = isAbove ? 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800' :
-                                              'text-[10px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800';
+                if (isFund) {
+                    badgeEl.textContent = '🛡️ أصل تحوطي آمن (متوافق مع الشريعة)';
+                    badgeEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800';
+                } else {
+                    badgeEl.textContent = isAbove ? '↗️ أعلى الارتكاز (إيجابي صاعد)' : '↘️ تحت الارتكاز (حذر وتصحيح)';
+                    badgeEl.className = isAbove ? 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800' :
+                                                  'text-[10px] font-bold px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800';
+                }
             }
 
             const stratEl = document.getElementById('pivotModalStrategyText');
             if (stratEl) {
-                if (isAbove) {
-                    stratEl.textContent = `السعر يتداول أعلى نقطة الارتكاز (${piv.pp.toFixed(2)} ج) مما يمنح الثيران الأفضلية لاستهداف المقاومة الأولى R1 (${piv.r1.toFixed(2)} ج). اختراق R1 يفتح المجال نحو R2 (${piv.r2.toFixed(2)} ج). الحماية برفع الوقف لنقطة الارتكاز.`;
+                if (isFund) {
+                    stratEl.textContent = `وثيقة الصندوق/الذهب تتداول عند ${cur.toFixed(2)} ج. يُنصح بالاستثمار التراكمي المنتظم وتفعيل التعزيز عند ملامسة الدعم S1 (${piv.s1.toFixed(2)} ج، ${fmtPct(piv.s1Pct)}) لتحقيق متوسط سعري منخفض، واستهداف المقاومة R1 (${piv.r1.toFixed(2)} ج، ${fmtPct(piv.r1Pct)}) كعائد استثماري مستقر.`;
+                } else if (isAbove) {
+                    stratEl.textContent = `السعر يتداول أعلى نقطة الارتكاز (${piv.pp.toFixed(2)} ج) بمسافة ${fmtPct(piv.ppPct)}، مما يمنح الثيران الأفضلية لاستهداف المقاومة الأولى R1 (${piv.r1.toFixed(2)} ج، ${fmtPct(piv.r1Pct)}). اختراق R1 يفتح المجال نحو R2 (${piv.r2.toFixed(2)} ج، ${fmtPct(piv.r2Pct)}). يُنصح برفع الوقف لنقطة الارتكاز.`;
                 } else {
-                    stratEl.textContent = `السعر يتداول أسفل نقطة الارتكاز (${piv.pp.toFixed(2)} ج) مما يفرض الحذر والترقب. أول منطقة دعم وارتداد شرائي للمضارب هي S1 (${piv.s1.toFixed(2)} ج)، بينما يمثل كسر S2 (${piv.s2.toFixed(2)} ج) إشارة وقف خسارة قطعية.`;
+                    stratEl.textContent = `السعر يتداول أسفل نقطة الارتكاز (${piv.pp.toFixed(2)} ج) بفارق ${fmtPct(piv.ppPct)} مما يفرض الحذر. أول منطقة دعم وارتداد شرائي للمضارب هي S1 (${piv.s1.toFixed(2)} ج، ${fmtPct(piv.s1Pct)})، بينما يمثل كسر S2 (${piv.s2.toFixed(2)} ج، ${fmtPct(piv.s2Pct)}) إشارة وقف خسارة قطعية.`;
                 }
             }
 
@@ -11857,57 +11987,72 @@ async function syncMubasherDirectAll() {
         function generateLiveRecommendations() {
             const list = [];
 
-            // 1. تحليل أسهم المحفظة والأسهم القيادية
-            const targetStocks = ['TMGH', 'ETEL', 'EFIH', 'ADIB', 'EGAL', 'ORHD', 'OCDI', 'EFID', 'FWRY', 'MFPC', 'ABUK', 'SKPC', 'ORWE'];
-            
-            targetStocks.forEach(sym => {
-                const s = STOCKS_DATA.find(item => item.ticker === sym);
+            // 1. All 33 Sharia Equities dynamically evaluated with 100% Market Pulse synchronization
+            STOCKS_DATA.forEach(s => {
+                if (isFundAsset(s) || isGoldAsset(s)) return;
                 if (!s || !s.close) return;
 
+                const sym = s.ticker;
                 const curPrice = s.close;
                 const rsi = s.rsi || 50;
                 const chg = s.chg || 0;
                 const pe = s.pe || 0;
-                const fairVal = (VALUATION_DATA[sym] && VALUATION_DATA[sym].base) ? VALUATION_DATA[sym].base : (curPrice * 1.25);
+                const vd = (VALUATION_DATA && VALUATION_DATA[sym]) ? VALUATION_DATA[sym] : null;
+                const fairVal = (vd && vd.base) ? vd.base : (curPrice * 1.22);
                 const marginOfSafety = curPrice > 0 ? ((fairVal - curPrice) / curPrice) * 100 : 0;
-                
+
+                // Classic Floor Pivots & Levels
+                const dayHigh = s.high || (curPrice * 1.025);
+                const dayLow = s.low || (curPrice * 0.975);
+                const piv = calculatePivotPoints(dayHigh, dayLow, curPrice, 'stock');
+
+                // Derive Action 100% harmoniously from canonical s.rec & technical levels
                 let action = 'hold';
-                let statusBadge = 'احتفاظ ومراقبة 🟡';
-                let actionTitle = `احتفاظ ومتابعة مسار اتجاه سهم ${s.name} (${sym})`;
-                let targetPrice = Math.round((fairVal > curPrice ? fairVal : curPrice * 1.15) * 100) / 100;
-                let stopLoss = Math.round((curPrice * 0.93) * 100) / 100;
-                let entryLow = (curPrice * 0.98).toFixed(2);
-                let entryHigh = (curPrice * 1.02).toFixed(2);
+                let statusBadge = s.rec ? `${s.rec} 🟡` : 'احتفاظ ومراقبة 🟡';
+                let actionTitle = `احتفاظ بالمركز ومراقبة نطاق التجميع لسهم ${s.name} (${sym})`;
+                let targetPrice = Math.round(piv.r1 * 100) / 100;
+                let stopLoss = Math.round(piv.s1 * 100) / 100;
+                let entryLow = piv.s1.toFixed(2);
+                let entryHigh = piv.pp.toFixed(2);
                 let fundamentalReason = '';
                 let technicalReason = '';
                 let newsReason = '';
 
-                // خوارزمية اتخاذ القرار الكمي:
-                if (rsi < 42 || marginOfSafety > 25 || chg < -2.0) {
-                    action = 'buy';
-                    statusBadge = 'شراء تجميعي قوي 🟢';
-                    actionTitle = `ننصح بالشراء التجميعي في سهم ${s.name} (${sym})`;
-                    entryLow = (curPrice * 0.97).toFixed(2);
-                    entryHigh = (curPrice * 1.01).toFixed(2);
-                    fundamentalReason = `تشبع بيعي كمي (RSI: ${rsi.toFixed(1)}) مع خصم ${marginOfSafety.toFixed(1)}% عن القيمة العادلة (${fairVal.toFixed(2)} ج) ومكرر ربحية ${pe > 0 ? pe.toFixed(1) + 'x' : 'منخفض'} وتدفقات تشغيلية صلبة.`;
-                    technicalReason = `مؤشر القوة النسبية RSI يقع عند ${rsi} في مناطق تشبع بيعي مفرطة، مع اقتراب السعر من قاع دعم صلب، مما يرجح ارتداداً تصاعدياً سريعاً نحو المستهدف الفني.`;
-                    newsReason = `إفصاحات الأرباح والنمو التشغيلي تؤكد صلابة المركز المالي للشركة وتدعم استئناف الاتجاه الصاعد مع عودة السيولة المؤسسية.`;
-                } else if (rsi > 72 || marginOfSafety < -8 || chg > 5.0) {
+                const recStr = s.rec || '';
+
+                if (recStr.includes('بيع') || recStr.includes('جني') || recStr.includes('تخفيف') || rsi >= 68) {
                     action = 'sell';
-                    statusBadge = 'جني أرباح وتخفيف 🔴';
+                    statusBadge = `${recStr || 'جني أرباح وتخفيف'} 🔴`;
                     actionTitle = `إشارة جني أرباح وتخفيف المراكز في سهم ${s.name} (${sym})`;
-                    targetPrice = Math.round((curPrice * 1.03) * 100) / 100;
-                    stopLoss = Math.round((curPrice * 0.96) * 100) / 100;
-                    fundamentalReason = `تشبع شرائي مفرط (RSI: ${rsi.toFixed(1)}) وتجاوز السعر للقيمة العادلة (${fairVal.toFixed(2)} ج)، مما يرفع مخاطر التصحيح وجني الأرباح.`;
-                    technicalReason = `مؤشر RSI وصل إلى مستويات ذروة الشراء المفرطة (${rsi}) مع ظهور إشارات ضعف في العزم الصاعد بالقرب من مستويات المقاومة الرئيسية.`;
-                    newsReason = `توصية بتأمين الأرباح المحققة وإعادة تدوير السيولة النقدية نحو أسهم الشريعة التي لم تأخذ حقها في الصعود بعد.`;
+                    targetPrice = Math.round((piv.r2 > curPrice ? piv.r2 : curPrice * 1.02) * 100) / 100;
+                    stopLoss = Math.round((piv.s1 * 0.98) * 100) / 100;
+                    entryLow = piv.pp.toFixed(2);
+                    entryHigh = piv.r1.toFixed(2);
+                    fundamentalReason = `تشبع شرائي مفرط (RSI: ${rsi.toFixed(1)}) واقتراب السعر من مستويات المقاومة الفنية (${piv.r1.toFixed(2)} ج) مع تراجع هامش الأمان إلى ${marginOfSafety.toFixed(1)}%.`;
+                    technicalReason = `مؤشر RSI بلغ مستوى ذروة الشراء (${rsi.toFixed(1)}) مع اختبار مقاومة R1 عند ${piv.r1.toFixed(2)} ج (+${piv.r1Pct >= 0 ? '+' : ''}${piv.r1Pct.toFixed(1)}%)، مما يرجح هدوء الزخم وجني أرباح تكتيكي.`;
+                    newsReason = `توصية بتأمين السيولة والأرباح وتخفيف المراكز تمهيداً لإعادة التمركز عند دعوم القاع الآمنة.`;
+                } else if (recStr.includes('شراء') || recStr.includes('تجميع') || rsi <= 35) {
+                    action = 'buy';
+                    statusBadge = `${recStr || 'شراء وتجميع قاع'} 🟢`;
+                    actionTitle = `ننصح بالشراء التجميعي واقتناص القاع في سهم ${s.name} (${sym})`;
+                    targetPrice = Math.round(piv.r1 * 100) / 100;
+                    stopLoss = Math.round((piv.s2 > 0 ? piv.s2 : curPrice * 0.95) * 100) / 100;
+                    entryLow = (piv.s1 * 0.99).toFixed(2);
+                    entryHigh = (curPrice * 1.01).toFixed(2);
+                    fundamentalReason = `هامش أمان استثماري قوي (+${marginOfSafety.toFixed(1)}%) عن القيمة العادلة (${fairVal.toFixed(2)} ج) مع مكرر ربحية ${pe > 0 ? pe.toFixed(1) + 'x' : 'جذاب'} ونمو تشغيلي متوازن.`;
+                    technicalReason = `تشبع بيعي ارتدادي واضح (RSI: ${rsi.toFixed(1)}) مع استقرار السعر أعلى دعم S1 البالغ ${piv.s1.toFixed(2)} ج (${piv.s1Pct.toFixed(1)}%) مما يمهد لموجة ارتداد صاعدة نحو ${piv.r1.toFixed(2)} ج.`;
+                    newsReason = `إفصاحات إيجابية وعودة السيولة المؤسسية لاقتناص القيعان السعرية والشركات المتوافقة شرعياً 100%.`;
                 } else {
                     action = 'hold';
-                    statusBadge = 'احتفاظ ومراقبة 🟡';
+                    statusBadge = `${recStr || 'احتفاظ ومراقبة'} 🟡`;
                     actionTitle = `احتفاظ بالمركز ومراقبة نطاق التجميع لسهم ${s.name} (${sym})`;
-                    fundamentalReason = `تداول عرضي متوازن فوق متوسط 20 يوماً (RSI: ${rsi.toFixed(1)}) بالقرب من القيمة العادلة (${fairVal.toFixed(2)} ج) مع استقرار الأرباح التشغيلية.`;
-                    technicalReason = `تداول هادئ ضمن مسار عرضي متوازن (RSI: ${rsi}) فوق متوسط 20 يوماً، دون إشارات كسر أو خروج سلبي.`;
-                    newsReason = `انتظام الأنشطة التشغيلية وسلامة التوافق الشرعي بنسبة 100% وفقاً لمعايير AAOIFI.`;
+                    targetPrice = Math.round(piv.r1 * 100) / 100;
+                    stopLoss = Math.round(piv.s1 * 100) / 100;
+                    entryLow = piv.s1.toFixed(2);
+                    entryHigh = piv.pp.toFixed(2);
+                    fundamentalReason = `تداول عرضي متوازن بالقرب من القيمة العادلة (${fairVal.toFixed(2)} ج) مع هامش أمان ${marginOfSafety.toFixed(1)}% واستقرار التدفقات التشغيلية.`;
+                    technicalReason = `السعر يتذبذب بانتظام حول نقطة الارتكاز ${piv.pp.toFixed(2)} ج مع مؤشر RSI محايد (${rsi.toFixed(1)}) دون إشارات كسر أو خروج سلبي.`;
+                    newsReason = `انتظام الأنشطة التشغيلية وتوافق شرعي تام 100% وفقاً لمعايير الهيئة الشرعية ومؤشر EGX33.`;
                 }
 
                 list.push({
@@ -11931,45 +12076,112 @@ async function syncMubasherDirectAll() {
                 });
             });
 
-            // 2. تحليل الصناديق والذهب الاستثماري
-            list.push({
-                ticker: "CMS",
-                name: "صندوق مصر شريعة إكويتي (CMS)",
-                type: "fund",
-                sector: "صناديق الأسهم الشرعية",
-                action: "buy",
-                actionTitle: "ننصح بالاكتتاب والاستثمار التراكمي في وثائق مصر شريعة (CMS)",
-                statusBadge: "شراء وتجميع دوري 🟢",
-                targetActionPrice: 22.73,
-                entryRange: "22.50 - 23.00 ج.م",
-                targetPrice: 28.50,
-                stopLoss: 21.00,
-                marginOfSafety: 25.4,
-                pe: 0,
-                rsi: 48.5,
-                fundamentalReason: "محفظة أصول متنوعة في 33 شركة مصرية متوافقة 100% مع الشريعة الإسلامية، مما يقلل مخاطر السهم المنفرد ويحقق نمواً مؤسسياً متزناً.",
-                technicalReason: "منحنى صافي قيمة الأصول (NAV) يسير في اتجاه صاعد مستقر طويل الأجل متماشياً مع صعود مؤشر EGX33 الشريعة.",
-                newsReason: "إقبال مؤسسي واسع وإدارة احترافية نشطة من شركة سي آي كابيتال لتعظيم التوزيعات الرأسمالية الدورية."
-            });
+            // 2. All 5 Mutual Funds & Gold Bullion (تحليلات الصناديق والذهب الاستثماري)
+            const fundSpecs = [
+                {
+                    ticker: "AZG",
+                    name: "صندوق أزيموت جولد (AZG)",
+                    type: "fund",
+                    sector: "صناديق الذهب والتحوط",
+                    action: "buy",
+                    actionTitle: "توصية تراكم وشراء تحوطي في وثائق أزيموت جولد (AZG)",
+                    statusBadge: "تحوط وشراء تراكمي 🟢",
+                    targetActionPrice: 23.82,
+                    entryRange: "23.20 - 24.10 ج.م",
+                    targetPrice: 28.50,
+                    stopLoss: 22.00,
+                    marginOfSafety: 19.6,
+                    pe: 0,
+                    rsi: 58.0,
+                    fundamentalReason: "أداة التحوط الأساسية لحماية السيولة من تآكل القوة الشرائية، مدعومة بسبائك ذهب فيزيائي عيار 24 معتمدة ومودعة في خزائن البنك المركزي المصري.",
+                    technicalReason: "منحنى سعر الوثيقة يتحرك في مسار صاعد ثابت أعلى مستويات الدعم الفنية للذهب عيار 24 محلياً ودولياً.",
+                    newsReason: "توافق شرعي كامل بنسبة 100% واعتماد رسمي من الهيئة العامة للرقابة المالية والبنك المركزي."
+                },
+                {
+                    ticker: "THNDR_GOLD",
+                    name: "سبائك ذهب عيار 24 ثندر (Gold)",
+                    type: "fund",
+                    sector: "سبائك الذهب المعتمدة",
+                    action: "buy",
+                    actionTitle: "شراء سبائك ذهب خالص عيار 24 بدون مصنعية لحفظ الثروة والتحوط",
+                    statusBadge: "شراء سبائك تحوطي 🟢",
+                    targetActionPrice: 7128.00,
+                    entryRange: "7,000 - 7,200 ج.م",
+                    targetPrice: 8200.00,
+                    stopLoss: 6800.00,
+                    marginOfSafety: 15.0,
+                    pe: 0,
+                    rsi: 55.0,
+                    fundamentalReason: "حيازة سبائك ذهب نقي 999.9 بدون مصنعية أو هوامش تجارية باهظة، مع إمكانية التسييل الفوري T+0 والاستلام المادي المعتمد.",
+                    technicalReason: "استمرار الزخم الصاعد للمعدن النفيس في مواجهة التضخم مع الحفاظ على القيمة الشرائية للسيولة النقدية.",
+                    newsReason: "سبائك معتمدة رسمياً ومختومة من مصلحة الدمغة والموازين المصرية بأعلى معايير الأمان."
+                },
+                {
+                    ticker: "CMS",
+                    name: "صندوق مصر شريعة إكويتي (CMS)",
+                    type: "fund",
+                    sector: "صناديق الأسهم الشرعية",
+                    action: "buy",
+                    actionTitle: "اكتتاب واستثمار تراكمي في وثائق صندوق مصر شريعة (CMS)",
+                    statusBadge: "استثمار مؤسسي دوري 🟢",
+                    targetActionPrice: 22.73,
+                    entryRange: "22.40 - 23.00 ج.م",
+                    targetPrice: 28.50,
+                    stopLoss: 21.00,
+                    marginOfSafety: 25.4,
+                    pe: 0,
+                    rsi: 48.5,
+                    fundamentalReason: "محفظة مؤسسية موزعة على 33 شركة مصرية متوافقة مع الشريعة ومطابقة لمؤشر EGX33، مما يحقق تنويعاً مثالياً ويحد من مخاطر تقلب السهم الفردي.",
+                    technicalReason: "صافي قيمة الأصول (NAV) يسير في اتجاه صاعد متوسط وطويل الأجل مع تعاظم العوائد الرأسمالية والتوزيعات.",
+                    newsReason: "إدارة احترافية نشطة من شركة سي آي كابيتال (CI Capital) لتعظيم الأرباح التراكمية."
+                },
+                {
+                    ticker: "BWA",
+                    name: "صندوق بلتون وفرة للأسهم الإسلامية (BWA)",
+                    type: "fund",
+                    sector: "صناديق الأسهم الشرعية",
+                    action: "buy",
+                    actionTitle: "شراء واستثمار تراكمي للنمو في وثائق بلتون وفرة (BWA)",
+                    statusBadge: "شراء تراكمي للنمو 🟢",
+                    targetActionPrice: 15.40,
+                    entryRange: "15.10 - 15.60 ج.م",
+                    targetPrice: 19.00,
+                    stopLoss: 14.20,
+                    marginOfSafety: 23.4,
+                    pe: 0,
+                    rsi: 47.0,
+                    fundamentalReason: "محفظة تركز على القطاعات الدفاعية والسلعية الرابحة في سوق المال المصري مع التزام تام بالضوابط الشرعية.",
+                    technicalReason: "استقرار نسبي في وتيرة نمو وثائق الصندوق مع حماية رأس المال أثناء موجات التصحيح العامة.",
+                    newsReason: "انتظام توزيعات الأرباح وسهولة الاسترداد الأسبوعي كل يوم أحد عبر بنك أبوظبي الإسلامي."
+                },
+                {
+                    ticker: "NMF",
+                    name: "صندوق نعيم مصر للشريعة (NMF)",
+                    type: "fund",
+                    sector: "صناديق متوازنة وصكوك",
+                    action: "hold",
+                    actionTitle: "مراقبة واحتفاظ بوثائق صندوق نعيم المتوازن للشريعة (NMF)",
+                    statusBadge: "احتفاظ واستثمار دوري 🟡",
+                    targetActionPrice: 312.50,
+                    entryRange: "305.00 - 315.00 ج.م",
+                    targetPrice: 360.00,
+                    stopLoss: 295.00,
+                    marginOfSafety: 15.2,
+                    pe: 0,
+                    rsi: 49.0,
+                    fundamentalReason: "محفظة متوازنة تجمع بين الأسهم الإسلامية عالية التوزيعات والصكوك، مما يمنح عائداً شبه ثابت مع تقلبات منخفضة.",
+                    technicalReason: "تحرك هادئ داخل قناة سعرية أفقية تعكس استقرار مكونات المحفظة وصكوكها.",
+                    newsReason: "تقارير أداء نصف شهرية تثبت دقة الالتزام بمعايير هيئة الرقابة الشرعية للصندوق."
+                }
+            ];
 
-            list.push({
-                ticker: "AZG",
-                name: "صندوق أزيموت جولد (AZG)",
-                type: "fund",
-                sector: "الذهب وصناديق التحوط",
-                action: "hold",
-                actionTitle: "احتفاظ واستمرار التراكم في وثائق الذهب عيار 24 (AZG)",
-                statusBadge: "تحوط استراتيجي 🟡",
-                targetActionPrice: 23.82,
-                entryRange: "23.20 - 24.10 ج.م",
-                targetPrice: 28.00,
-                stopLoss: 22.00,
-                marginOfSafety: 17.5,
-                pe: 0,
-                rsi: 58.0,
-                fundamentalReason: "أفضل أداة لحفظ القوة الشرائية والتحوط ضد أي تذبذبات في سعر الصرف، مدعومة بسبائك ذهب فيزيائي عيار 24 في خزائن آمنة.",
-                technicalReason: "استمرار الزخم الصاعد لأسعار الذهب العالمية والمحلية فوق مستويات الدعم الرئيسية للأونصة.",
-                newsReason: "تغطية كاملة للوثائق بالذهب الفعلي المعتمد من مصلحة الدمغة والموازين والرقابة المالية."
+            fundSpecs.forEach(f => {
+                const liveFund = STOCKS_DATA.find(s => s.ticker === f.ticker);
+                if (liveFund && liveFund.close > 0) {
+                    f.targetActionPrice = liveFund.close;
+                    if (liveFund.rsi) f.rsi = liveFund.rsi;
+                }
+                list.push(f);
             });
 
             return list;
