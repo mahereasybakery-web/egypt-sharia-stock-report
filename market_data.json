@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-30T16:24:18.003236+03:00",
+  "updated_at": "2026-09-30T16:25:19.481736+03:00",
   "indices": {
     "EGX33": {
       "close": 3380.45,
@@ -52,7 +52,7 @@
       "low": 84.4,
       "volume": 3428401,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "SWDY": {
       "ticker": "SWDY",
@@ -63,7 +63,7 @@
       "low": 102.31,
       "volume": 1479329,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ORAS": {
       "ticker": "ORAS",
@@ -74,7 +74,7 @@
       "low": 763.0,
       "volume": 202796,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ISPH": {
       "ticker": "ISPH",
@@ -85,7 +85,7 @@
       "low": 11.3,
       "volume": 5084163,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ETEL": {
       "ticker": "ETEL",
@@ -96,7 +96,7 @@
       "low": 129.07,
       "volume": 2969043,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "AMOC": {
       "ticker": "AMOC",
@@ -107,7 +107,7 @@
       "low": 13.0,
       "volume": 5739272,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ABUK": {
       "ticker": "ABUK",
@@ -118,7 +118,7 @@
       "low": 83.55,
       "volume": 1312675,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "MFPC": {
       "ticker": "MFPC",
@@ -129,7 +129,7 @@
       "low": 43.8,
       "volume": 1067707,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "SKPC": {
       "ticker": "SKPC",
@@ -140,7 +140,7 @@
       "low": 15.4,
       "volume": 4955748,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "JUFO": {
       "ticker": "JUFO",
@@ -151,7 +151,7 @@
       "low": 24.4,
       "volume": 673145,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "EFID": {
       "ticker": "EFID",
@@ -162,7 +162,7 @@
       "low": 18.1,
       "volume": 2117255,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ADIB": {
       "ticker": "ADIB",
@@ -173,7 +173,7 @@
       "low": 48.2,
       "volume": 1439120,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "SAUD": {
       "ticker": "SAUD",
@@ -184,7 +184,7 @@
       "low": 21.64,
       "volume": 233733,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "OCDI": {
       "ticker": "OCDI",
@@ -195,7 +195,7 @@
       "low": 24.2,
       "volume": 1027823,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "PHDC": {
       "ticker": "PHDC",
@@ -206,7 +206,7 @@
       "low": 12.36,
       "volume": 11776151,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "COMI": {
       "ticker": "COMI",
@@ -217,7 +217,7 @@
       "low": 124.5,
       "volume": 4395320,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "FWRY": {
       "ticker": "FWRY",
@@ -228,7 +228,7 @@
       "low": 17.7,
       "volume": 6079688,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "EFIH": {
       "ticker": "EFIH",
@@ -239,7 +239,7 @@
       "low": 21.5,
       "volume": 3090697,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "EGAL": {
       "ticker": "EGAL",
@@ -250,7 +250,7 @@
       "low": 331.5,
       "volume": 125203,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ORHD": {
       "ticker": "ORHD",
@@ -261,7 +261,7 @@
       "low": 37.41,
       "volume": 3441459,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "MCQE": {
       "ticker": "MCQE",
@@ -272,7 +272,7 @@
       "low": 177.02,
       "volume": 82672,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ACGC": {
       "ticker": "ACGC",
@@ -283,7 +283,7 @@
       "low": 13.8,
       "volume": 2961609,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ARCC": {
       "ticker": "ARCC",
@@ -294,7 +294,7 @@
       "low": 61.5,
       "volume": 331475,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ATQA": {
       "ticker": "ATQA",
@@ -305,7 +305,7 @@
       "low": 10.91,
       "volume": 4701801,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "RMDA": {
       "ticker": "RMDA",
@@ -316,7 +316,7 @@
       "low": 5.09,
       "volume": 5937075,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "GBCO": {
       "ticker": "GBCO",
@@ -327,7 +327,7 @@
       "low": 29.0,
       "volume": 3584452,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "LCSW": {
       "ticker": "LCSW",
@@ -338,7 +338,7 @@
       "low": 28.86,
       "volume": 443900,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "HELI": {
       "ticker": "HELI",
@@ -349,7 +349,7 @@
       "low": 6.94,
       "volume": 10930839,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "CIEB": {
       "ticker": "CIEB",
@@ -360,7 +360,7 @@
       "low": 23.0,
       "volume": 675539,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "ESRS": {
       "ticker": "ESRS",
@@ -371,7 +371,7 @@
       "low": 141.0,
       "volume": 5592,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     },
     "CLHO": {
       "ticker": "CLHO",
@@ -382,10 +382,10 @@
       "low": 14.81,
       "volume": 1797724,
       "source": "mubasher.info",
-      "ts": "16:24:18"
+      "ts": "16:25:19"
     }
   },
-  "updated_at_display": "2026-09-30 16:24:18",
+  "updated_at_display": "2026-09-30 16:25:19",
   "data_source": "Mubasher.info Live",
   "sync_count": 31
 }
