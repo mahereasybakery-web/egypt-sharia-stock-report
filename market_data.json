@@ -720,51 +720,51 @@
       "name": "مصر شريعة إكويتي (CMS)",
       "manager": "CI Capital Asset Management",
       "close": 21.3976,
-      "chg": 0.541,
+      "chg": -0.61,
       "type": "equity_sharia",
       "valuation_cycle": "يومي معتمد / إقفال الجلسة",
       "last_nav_date": "2026-10-01",
-      "source": "إفصاح رسمي معتمد - CI Capital"
+      "source": "تطبيق Thndr / إفصاح سي آي لإدارة الأصول (CIAM)"
     },
     "AZG": {
       "name": "أزيموت جولد (AZG)",
       "manager": "Azimut Egypt",
-      "close": 23.547,
-      "chg": 0.0744,
+      "close": 23.6040,
+      "chg": 0.44,
       "type": "gold_bullion",
       "valuation_cycle": "يومي / تسعير الصندوق",
-      "last_nav_date": "2026-09-30",
-      "source": "إفصاح رسمي - أزيموت مصر"
+      "last_nav_date": "2026-10-01",
+      "source": "تطبيق Thndr / إفصاح أزيموت مصر للذهب"
     },
     "THNDR_GOLD": {
       "name": "سبائك جولد (Thndr)",
       "manager": "Thndr Bullion",
-      "close": 6970.0,
-      "chg": -0.43,
+      "close": 7015.0,
+      "chg": -0.83,
       "type": "gold_bullion",
       "valuation_cycle": "لحظي / الصاغة والبورصة السلعية",
-      "last_nav_date": "2026-09-29",
-      "source": "تسعير الذهب الفعلي عيار 24"
+      "last_nav_date": "2026-10-01",
+      "source": "تطبيق Thndr / تسعير الذهب الفعلي عيار 24"
     },
     "BWA": {
       "name": "بلتون وفرة (BWA)",
       "manager": "Beltone Asset Management",
       "close": 2.0733,
-      "chg": 0.5755,
+      "chg": -0.68,
       "type": "equity_sharia",
       "valuation_cycle": "دوري معتمد / بلتون القابضة",
       "last_nav_date": "2026-10-01",
-      "source": "إفصاح رسمي - بلتون المالية"
+      "source": "تطبيق Thndr / إفصاح بلتون المالية"
     },
     "NMF": {
       "name": "نعيم مصر للشريعة (NMF)",
       "manager": "Naeem Financial Investments",
-      "close": 48.92,
-      "chg": 0.1633,
+      "close": 48.9200,
+      "chg": -0.24,
       "type": "equity_sharia",
       "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
       "last_nav_date": "2026-10-01",
-      "source": "إفصاح رسمي - النعيم للاستثمارات"
+      "source": "تطبيق Thndr / إفصاح النعيم للاستثمارات"
     }
   },
   "fx_gold": {

@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v15.4 (5 Core Tabs Reorg, Responsive AI Grid, Tripartite Audit Suite)
-const CACHE_NAME = 'egx-sharia-v15.4';
+// EGX Sharia Portal - Advanced PWA Service Worker v15.5 (Multi-Source Hybrid Fund Valuation Engine & Thursday Disclosures)
+const CACHE_NAME = 'egx-sharia-v15.5';
 const STATIC_ASSETS = [
   './',
   './index.html',
