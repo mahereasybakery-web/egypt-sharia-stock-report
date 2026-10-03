@@ -1474,9 +1474,9 @@ def generate_market_infographic_card(parsed_stocks, indices=None, fx_gold=None, 
 
         egx_val = indices.get('EGX33', {}).get('close', 3380.45) if indices else 3380.45
         egx_chg = indices.get('EGX33', {}).get('chgPct', 1.15) if indices else 1.15
-        usd_val = fx_gold[0].get('close', 52.15) if (fx_gold and len(fx_gold)>0 and isinstance(fx_gold[0], dict)) else 52.15
+        usd_val = fx_gold[0].get('close', 52.26) if (fx_gold and len(fx_gold)>0 and isinstance(fx_gold[0], dict)) else 52.26
         usd_chg = fx_gold[0].get('chgPct', 0.46) if (fx_gold and len(fx_gold)>0 and isinstance(fx_gold[0], dict)) else 0.46
-        gold_val = fx_gold[1].get('close', 4340.91) if (fx_gold and len(fx_gold)>1 and isinstance(fx_gold[1], dict)) else 4340.91
+        gold_val = fx_gold[1].get('close', 7015.00) if (fx_gold and len(fx_gold)>1 and isinstance(fx_gold[1], dict)) else 7015.00
         gold_chg = fx_gold[1].get('chgPct', 1.11) if (fx_gold and len(fx_gold)>1 and isinstance(fx_gold[1], dict)) else 1.11
 
         ax_top.text(0.18, 0.65, "EGX 33 SHARIAH", color='#94a3b8', fontsize=8, ha='center')
@@ -2593,8 +2593,8 @@ def export_and_sync_market_data(stocks_data, indices_data, fx_gold_data, summary
                 "EGX30": {"close": 31450.20, "chgPct": 0.82}
             },
             "fx_gold": {
-                "usd_egp": {"close": 52.15, "chgPct": 0.46},
-                "gold_24k": {"close": 4340.91, "chgPct": 1.11}
+                "usd_egp": {"close": 52.26, "chgPct": 0.46},
+                "gold_24k": {"close": 7015.00, "chgPct": 1.11}
             },
             "ai_pulse": {
                 "sentiment": "bullish",
@@ -2611,9 +2611,9 @@ def export_and_sync_market_data(stocks_data, indices_data, fx_gold_data, summary
             usd = fx_gold_data.get("USD/EGP")
             gold = fx_gold_data.get("GOLD")
             if isinstance(usd, dict):
-                payload["fx_gold"]["usd_egp"] = {"close": usd.get("close", 52.15), "chgPct": usd.get("chgPct", 0)}
+                payload["fx_gold"]["usd_egp"] = {"close": usd.get("close", 52.26), "chgPct": usd.get("chgPct", 0)}
             if isinstance(gold, dict):
-                payload["fx_gold"]["gold_24k"] = {"close": gold.get("close", 4340.0), "chgPct": gold.get("chgPct", 0)}
+                payload["fx_gold"]["gold_24k"] = {"close": gold.get("close", 7015.00), "chgPct": gold.get("chgPct", 0)}
         
         with open("market_data.json", "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)

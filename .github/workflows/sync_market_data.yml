@@ -48,7 +48,8 @@ jobs:
               'TMGH','SWDY','ORAS','ISPH','ETEL','AMOC','ABUK','MFPC','SKPC',
               'JUFO','EFID','ADIB','SAUD','OCDI','PHDC','COMI','FWRY','EFIH',
               'EGAL','ORHD','MCQE','ACGC','ARCC','ATQA','RMDA','GBCO',
-              'LCSW','HELI','CIEB','ESRS','CLHO','MACRO','MNHD','DOMTY'
+              'LCSW','HELI','CIEB','ESRS','CLHO','MACRO','MNHD','DOMTY',
+              'CERA','CIRA','EAST','FAIT','ICFC','MASR','ORWE'
           ]
 
           SESSION = requests.Session()
@@ -144,24 +145,27 @@ jobs:
               except:
                   mdata = {'stocks': {}, 'funds': {}, 'indices': {}, 'fx_gold': {}}
 
-              if 'stocks' not in mdata: mdata['stocks'] = {}
-              for ticker, d in results.items():
-                  d['ts'] = ts
-                  if ticker not in mdata['stocks']:
-                      mdata['stocks'][ticker] = {}
-                  mdata['stocks'][ticker].update(d)
+              if len(results) > 0:
+                  if 'stocks' not in mdata: mdata['stocks'] = {}
+                  for ticker, d in results.items():
+                      d['ts'] = ts
+                      if ticker not in mdata['stocks']:
+                          mdata['stocks'][ticker] = {}
+                      mdata['stocks'][ticker].update(d)
 
-              if 'indices' not in mdata: mdata['indices'] = {}
-              mdata['indices'].update(indices)
-              mdata['updated_at']         = now.isoformat()
-              mdata['updated_at_display'] = now.strftime('%Y-%m-%d %H:%M:%S')
-              mdata['data_source']        = 'Mubasher.info Live'
-              mdata['sync_count']         = len(results)
+                  if 'indices' not in mdata: mdata['indices'] = {}
+                  mdata['indices'].update(indices)
+                  mdata['updated_at']         = now.isoformat()
+                  mdata['updated_at_display'] = now.strftime('%Y-%m-%d %H:%M:%S')
+                  mdata['data_source']        = 'Mubasher.info Live'
+                  mdata['sync_count']         = len(results)
 
-              with open('market_data.json', 'w', encoding='utf-8') as f:
-                  json.dump(mdata, f, ensure_ascii=False, indent=2)
+                  with open('market_data.json', 'w', encoding='utf-8') as f:
+                      json.dump(mdata, f, ensure_ascii=False, indent=2)
 
-              git_commit_push(ts, len(results))
+                  git_commit_push(ts, len(results))
+              else:
+                  print(f'  [WARN] Zero stock results fetched at {ts}. Preserving existing market_data.json without updating timestamp.')
 
               # Wait 60s before next iteration (skip on last)
               if iteration < 4:

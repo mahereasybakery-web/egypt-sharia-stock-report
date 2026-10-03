@@ -7302,7 +7302,7 @@
             const base = safeNum(val.base, Math.round(curPrice * 1.20 * 100) / 100);
             const bull = safeNum(val.bull, Math.round(curPrice * 1.35 * 100) / 100);
             const bear = safeNum(val.bear, Math.round(curPrice * 0.88 * 100) / 100);
-            const margin = safeNum(val.margin, curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : 0);
+            const margin = curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : safeNum(val.margin, 0);
             const pe = safeNum(s.pe, safeNum(val.pe, 8.5));
             const pb = safeNum(val.pb, 1.65);
             const divYield = safeNum(s.div_yield, (ticker === 'ABUK' ? 11.8 : ticker === 'MFPC' ? 9.2 : ticker === 'ORWE' ? 9.0 : ticker === 'AMOC' ? 8.4 : ticker === 'SKPC' ? 8.2 : 5.0));
@@ -8389,7 +8389,7 @@
                 • <b>السعر اللحظي المعتمد:</b> <b class="font-mono text-white text-sm">${(parseFloat(curPrice)||0).toFixed(2)} ج</b> (التغير: <span class="${chgVal >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold">${chgVal >= 0 ? '+' : ''}${chgVal}%</span>) | القطاع: <b>${s.sector || 'العام'}</b>.<br>
                 • <b>المؤشرات الفنية اللحظية:</b> مؤشر القوة النسبية RSI عند <b>${rsiVal}</b> (${rsiVal < 35 ? '🟢 تشبع بيعي حاد وفرصة ارتداد' : rsiVal > 70 ? '🔴 تشبع شرائي يستوجب الحذر' : '🟡 مسار توازني'}).<br>
                 • <b>مستويات التداول:</b> الدعم الرئيسي: <b>${suppVal} ج</b> | المقاومة المستهدفة: <b>${resVal} ج</b> | مكرر الربحية: <b>${peVal}</b>.<br>
-                ${val ? `• <b>التقييم الأساسي:</b> السعر العادل التوازني <b>${val.base} ج</b> (بهامش أمان <b>+${val.margin || 20}%</b>).<br>` : ''}
+                ${val ? `• <b>التقييم الأساسي:</b> السعر العادل التوازني <b>${val.base} ج</b> (بهامش أمان <b>+${(curPrice > 0 ? Math.round(((val.base - curPrice) / curPrice) * 1000) / 10 : (val.margin || 20)).toFixed(1)}%</b>).<br>` : ''}
                 ${holdingInfo}
                 <div class="text-[11px] text-slate-300 mt-1.5 pt-1.5 border-t border-slate-700">
                     💡 <b>التوجيه المالي:</b> السهم متوافق 100% مع معايير الشريعة الإسلامية ومدرج في مؤشر EGX33. يُنصح بالالتزام بوقف الخسارة أسفل ${suppVal} ج.
@@ -12256,12 +12256,9 @@ async function syncMubasherDirectAll() {
             const stampDuty = tradeVal * 0.0005;
             const totalFees = thndrComm + egxFees + stampDuty;
 
+            // ضريبة الأرباح الرأسمالية: معفاة/مؤجلة رسمياً للأفراد المقيمين في البورصة المصرية
             let cgtTax = 0;
-            if (tradeType === 'sell' && capitalGain > 0) {
-                cgtTax = capitalGain * 0.10;
-            }
-
-            const netAmount = tradeType === 'buy' ? (tradeVal + totalFees) : (tradeVal - totalFees - cgtTax);
+            const netAmount = tradeType === 'buy' ? (tradeVal + totalFees) : (tradeVal - totalFees);
 
             out.innerHTML = `
                 <div class="font-bold text-emerald-400 flex items-center gap-1">
@@ -12286,9 +12283,9 @@ async function syncMubasherDirectAll() {
                         <b class="text-amber-400 font-mono">${totalFees.toFixed(2)} ج.م (${((totalFees / tradeVal) * 100).toFixed(3)}%)</b>
                     </div>
                     ${tradeType === 'sell' ? `
-                    <div class="flex justify-between border-b border-slate-800 pb-1 text-rose-300">
-                        <span>ضريبة الأرباح الرأسمالية (10% على ${capitalGain.toFixed(2)} ج):</span>
-                        <b class="text-rose-400 font-mono">-${cgtTax.toFixed(2)} ج.م</b>
+                    <div class="flex justify-between border-b border-slate-800 pb-1 text-emerald-400">
+                        <span>ضريبة الأرباح الرأسمالية (الأفراد المقيمون):</span>
+                        <b class="text-emerald-400 font-mono">0.00 ج.م (معفاة رسمياً ✓)</b>
                     </div>
                     ` : ''}
                     <div class="flex justify-between pt-1 font-bold text-sm bg-slate-950/80 p-2 rounded-lg border border-slate-800">
@@ -15168,7 +15165,7 @@ async function syncMubasherDirectAll() {
             const sma20 = stock.sma20 || (cur * 0.98);
             const sma50 = stock.sma50 || (cur * 0.95);
             const fair = stock.fairValue || (cur * 1.25);
-            const safety = fair > 0 ? (((fair - cur) / fair) * 100) : 0;
+            const safety = cur > 0 ? (((fair - cur) / cur) * 100) : 0;
 
             // Mathematical Classic Floor Pivot calculation
             const pivot = cur;

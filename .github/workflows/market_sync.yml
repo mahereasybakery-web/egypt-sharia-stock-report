@@ -36,4 +36,4 @@ jobs:
           git config --global user.name "EGX-Sharia-AutoSync[bot]"
           git config --global user.email "auto-sync@mahereasybakery.internal"
           git add market_data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: automated market data sync [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: automated market data sync [skip ci]" && git pull --rebase origin main && git push)

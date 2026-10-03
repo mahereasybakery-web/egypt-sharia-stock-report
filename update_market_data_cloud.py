@@ -25,7 +25,7 @@ STOCKS_TICKERS = [
     "EKHO", "JUFO", "ESRS", "CIRA", "POUL", "EFID", "DOMT", "ASCM", "ADIB", "SAUD",
     "FAIT", "ALCN", "ACGC", "HELI", "ORHD", "OCDI", "PHDC", "ARAB", "CCAP", "BTFH",
     "DSCW", "LCSW", "MCQE", "COMI", "FWRY", "EFIH", "RACC", "CICH", "MASR", "AUTO",
-    "ARCC", "ATQA", "CERA", "GBCO", "RMDA", "ICFC", "ORWE"
+    "ARCC", "ATQA", "CERA", "GBCO", "RMDA", "ICFC", "ORWE", "EGAL"
 ]
 
 TV_SYMBOLS = [f"EGX:{t}" for t in set(STOCKS_TICKERS)]
@@ -76,6 +76,17 @@ try:
                 }
 except Exception as e:
     print(f"Error fetching TradingView stock data: {e}")
+
+# Safety Guard: If TradingView failed or returned empty data, preserve existing market_data.json stocks
+if len(stocks_data) == 0:
+    print("Warning: TradingView returned 0 stocks. Preserving existing market_data.json stocks...")
+    try:
+        with open("market_data.json", "r", encoding="utf-8") as prev_f:
+            prev_json = json.load(prev_f)
+            stocks_data = prev_json.get("stocks", {})
+            print(f"Successfully preserved {len(stocks_data)} existing stocks from market_data.json.")
+    except Exception as prev_err:
+        print(f"Could not load previous stocks: {prev_err}")
 
 # 2. Automated Multi-Source Mutual Funds NAV Engine (Thndr + FoudaLens + Snduk + Official Issuers)
 # Verified baseline NAVs as declared on Thursday, October 1, 2026
@@ -132,9 +143,38 @@ funds_data = {
     }
 }
 
-# Multi-Source Crawler: Source A (Snduk) + Source B (FoudaLens)
+# Multi-Source Crawler: Source A (FoudaLens) + Source B (Snduk) + Source C (Thndr verified)
 print("Fetching latest declared NAVs from Multi-Source Hybrid Engine (Thndr + FoudaLens + Snduk)...")
 
+# Source A: Live FoudaLens Extraction
+try:
+    fl_req = urllib.request.Request(
+        "https://foudalens.com/ar/funds",
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    )
+    with urllib.request.urlopen(fl_req, timeout=8) as fl_resp:
+        fl_html = fl_resp.read().decode("utf-8", errors="ignore")
+        fl_patterns = {
+            'BWA': r'Beltone Wafra[^\}]*?\"last_nav\":([0-9.]+)[^\}]*?\"last_nav_date\":\"([0-9-]+)\"',
+            'CMS': r'Misr Shariah Equity[^\}]*?\"last_nav\":([0-9.]+)[^\}]*?\"last_nav_date\":\"([0-9-]+)\"',
+            'NMF': r'Naeem Misr[^\}]*?\"last_nav\":([0-9.]+)[^\}]*?\"last_nav_date\":\"([0-9-]+)\"',
+            'AZG': r'Azimut Gold[^\}]*?\"last_nav\":([0-9.]+)[^\}]*?\"last_nav_date\":\"([0-9-]+)\"'
+        }
+        for f_sym, pat in fl_patterns.items():
+            m = re.search(pat, fl_html, re.DOTALL)
+            if m:
+                fl_price = float(m.group(1))
+                fl_date = m.group(2)
+                curr_date = funds_data[f_sym].get("last_nav_date", "2026-09-01")
+                if fl_date and fl_date >= curr_date:
+                    funds_data[f_sym]["close"] = fl_price
+                    funds_data[f_sym]["last_nav_date"] = fl_date
+                    funds_data[f_sym]["source"] = f"منصة FoudaLens + إفصاح المدير ({fl_date})"
+                    print(f"  [FOUDALENS SYNC] {f_sym}: NAV = {fl_price} (Date: {fl_date})")
+except Exception as fle:
+    print(f"  [FOUDALENS SKIP] {fle}")
+
+# Source B: Snduk Crawler (with Date Guard)
 snduk_fund_urls = {
     'CMS': 'https://snduk.com/eg/funds/misr-shariah-equity-fund',
     'BWA': 'https://snduk.com/eg/funds/beltone-wafra',
@@ -167,18 +207,18 @@ for f_sym, f_url in snduk_fund_urls.items():
                     funds_data[f_sym]["source"] = f"منصة سندك + إفصاح الصندوق ({scraped_date})"
                     print(f"  [SNDUK SYNC] {f_sym}: NAV = {scraped_price} (Date: {scraped_date})")
                 else:
-                    print(f"  [SNDUK SKIP] {f_sym}: Snduk date ({scraped_date}) older than verified Thndr date ({current_date}), keeping Thndr verified price {funds_data[f_sym]['close']}.")
+                    print(f"  [SNDUK SKIP] {f_sym}: Snduk date ({scraped_date}) older than verified date ({current_date}), keeping current price {funds_data[f_sym]['close']}.")
     except Exception as fe:
-        print(f"  [SNDUK FALLBACK] {f_sym} keeping verified Thndr baseline ({funds_data[f_sym]['close']}): {fe}")
+        print(f"  [SNDUK FALLBACK] {f_sym} keeping verified baseline ({funds_data[f_sym]['close']}): {fe}")
 
 # 3. Macro & Benchmarks (USD/EGP, Gold 24K, Clawdz Yield)
 fx_gold = {
     "usd_egp": {
-        "close": 48.75,
-        "source": "البنك المركزي المصري"
+        "close": 52.26,
+        "source": "البنك المركزي المصري / البنوك التجارية"
     },
     "gold_24k": {
-        "close": 6970.0,
+        "close": 7015.0,
         "source": "شعبة الذهب والبورصة السلعية"
     },
     "clawdz_yield": {
