@@ -195,7 +195,7 @@ market_status = {
 }
 
 output = {
-    "version": "14.0",
+    "version": "15.0",
     "updated_at": now_cairo.isoformat(),
     "updated_at_display": now_cairo.strftime('%Y-%m-%d %H:%M:%S'),
     "timezone": "Africa/Cairo (UTC+3)",

@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v14.0 (Defensive Hardened)
-const CACHE_NAME = 'egx-sharia-v14.0';
+// EGX Sharia Portal - Advanced PWA Service Worker v15.0 (6-Tab + News Hub + System Audit)
+const CACHE_NAME = 'egx-sharia-v15.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
