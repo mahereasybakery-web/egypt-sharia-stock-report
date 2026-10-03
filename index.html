@@ -797,7 +797,7 @@
 
 
     <!-- Main Views Container -->
-    <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4">
+    <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4 pb-24 md:pb-8">
 
         
         <!-- ================= TAB: COMPREHENSIVE RECOMMENDATIONS ================= -->
@@ -1825,7 +1825,7 @@
                                         <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 font-medium">وثائق وصناديق</span>
                                     </div>
                                     <h4 class="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-1">صناديق الأسهم والشريعة</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">بشاير، بلتون، النعيم وأزيموت وعوائدها الاستثمارية</p>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">سي آي إيجيكس 33، بلتون وفرة، النعيم وأزيموت جولد وعوائدها</p>
                                 </div>
                                 <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-indigo-400 font-medium">
                                     <span>تحليل فوري</span>
@@ -3565,7 +3565,7 @@
                             <label class="block text-[10px] text-slate-400 mb-1">تصفية حسب الصندوق الاستثماري:</label>
                             <select id="newsFundFilterSelect" onchange="applyNewsFilters()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white outline-none">
                                 <option value="all">جميع صناديق الاستثمار</option>
-                                <option value="CMS">CMS - صندوق بشاير (مصر شريعة إكويتي)</option>
+                                <option value="CMS">CMS - صندوق مؤشر CI EGX33 الشريعة (مصر شريعة إكويتي)</option>
                                 <option value="BWA">BWA - صندوق بلتون وفرة للأسهم الشرعية</option>
                                 <option value="NMF">NMF - صندوق نعيم مصر للشريعة</option>
                                 <option value="AZG">AZG - صندوق أزيموت جولد (صندوق الذهب)</option>
@@ -3609,8 +3609,8 @@
 
     </main>
 
-        <!-- Bottom Navigation Bar — Reorganized v15.4 Professional 5 Golden Tabs -->
-    <nav class="fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto" style="background:rgba(8,12,20,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding-bottom:env(safe-area-inset-bottom,0px)">
+        <!-- Bottom Navigation Bar — Reorganized v15.5 Mobile-Only 5 Golden Tabs (Hidden on Desktop md:hidden) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto" style="background:rgba(8,12,20,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding-bottom:env(safe-area-inset-bottom,0px)">
         <div class="grid grid-cols-5 text-center" style="padding:4px 2px 6px">
             <!-- 1. محفظتي والأداء -->
             <button onclick="switchTab('portfolio', this)" id="tabBtn_portfolio" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-90 text-emerald-400 font-bold" style="font-size:10px">
@@ -15114,7 +15114,7 @@ async function syncMubasherDirectAll() {
                     relevantNews = nList.filter(n => n.ticker === fundFilter);
                 } else {
                     targetTitle = `تقرير تحليل صناديق الاستثمار الإسلامية المتوافقة مع الشريعة`;
-                    targetScope = `مقارنة أداء صناديق الأسهم (بشاير وبلتون والنعيم) وصناديق الذهب التحوطية`;
+                    targetScope = `مقارنة أداء صناديق الأسهم (سي آي إيجيكس 33 وبلتون والنعيم) وصناديق الذهب التحوطية`;
                     relevantNews = nList.filter(n => ['CMS', 'BWA', 'NMF', 'AZG', 'THNDR_GOLD'].includes(n.ticker));
                 }
                 avgRsi = 48.0;
