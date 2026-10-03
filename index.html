@@ -13008,6 +13008,9 @@ async function syncMubasherDirectAll() {
                     name: decision.name,
                     type: decision.type,
                     sector: decision.sector,
+                    cur: decision.curPrice,
+                    curPrice: decision.curPrice,
+                    close: decision.curPrice,
                     action: decision.action,
                     actionTitle: decision.actionTitle,
                     statusBadge: decision.statusBadge,
@@ -13084,18 +13087,18 @@ async function syncMubasherDirectAll() {
             const enrichedRecs = liveRecs.map(item => {
                 const isOwned = ownedTickers.includes(item.ticker);
                 const holding = THNDR_ACTUAL_HOLDINGS.find(h => h.ticker === item.ticker);
-                const cur = item.cur || item.close || 0;
+                const cur = item.cur || item.curPrice || item.targetActionPrice || item.close || (holding ? holding.cur : 0);
                 const buy = holding ? holding.buy : 0;
                 const fair = item.fairValue || (cur * 1.25);
-                const safety = fair > 0 ? (((fair - cur) / fair) * 100) : 0;
+                const safety = item.marginOfSafety !== undefined ? Math.abs(item.marginOfSafety) : (fair > 0 && cur > 0 ? (((fair - cur) / fair) * 100) : 0);
                 const rsi = item.rsi || 50;
 
                 // Smart DCA Logic: If owned, and price is below buy price with positive safety margin
                 let action = item.action;
-                let actionLabel = item.actionLabel;
+                let actionLabel = item.actionTitle || item.statusBadge || 'مراقبة واحتفاظ 🟡';
                 let badgeClass = '';
 
-                if (isOwned && cur < buy && safety > 10) {
+                if (isOwned && cur < buy && safety > 5) {
                     action = 'dca';
                     actionLabel = 'تبريد استثماري (DCA) 🛡️';
                     badgeClass = 'bg-sky-950 text-sky-300 border-sky-700/80';
@@ -13114,9 +13117,9 @@ async function syncMubasherDirectAll() {
                 }
 
                 // Targets and Stop Loss
-                const target1 = +(cur * 1.15).toFixed(2);
+                const target1 = item.targetPrice || +(cur * 1.15).toFixed(2);
                 const target2 = +(fair * 1.05).toFixed(2);
-                const stopLoss = +(cur * 0.93).toFixed(2);
+                const stopLoss = item.stopLoss || +(cur * 0.93).toFixed(2);
                 const expectedGainPct = cur > 0 ? (((target1 - cur) / cur) * 100).toFixed(1) : '15.0';
 
                 return {
