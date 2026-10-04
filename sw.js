@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v15.6 (Claude Review #6 & Navigation Reorganization)
-const CACHE_NAME = 'egx-sharia-v15.6';
+// EGX Sharia Portal - Advanced PWA Service Worker v16.0 (Market Pulse Full Rebuild)
+const CACHE_NAME = 'egx-sharia-v16.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
