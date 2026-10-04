@@ -537,9 +537,145 @@
         #fundsHoldingsTableContainer::-webkit-scrollbar-thumb:hover {
             background: #10b981;
         }
+
+        /* Master Security Lock & PIN Keypad Styles */
+        .pin-dot.active {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.15);
+        }
+        @keyframes pinShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .pin-shake {
+            animation: pinShake 0.4s ease-in-out;
+        }
+        .app-locked-blur {
+            filter: blur(16px) !important;
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+    
 </style>
 </head>
 <body class="bg-[#080c14] text-slate-100 min-h-screen selection:bg-emerald-500 font-sans selection:text-white pb-24">
+
+    <!-- ================= MASTER SECURITY LOCK SCREEN ================= -->
+    <div id="masterSecurityLockScreen" class="fixed inset-0 z-[9999] bg-[#060a12]/98 backdrop-blur-3xl flex flex-col items-center justify-center p-4 transition-all duration-300 select-none hidden" dir="rtl">
+        <div id="masterSecurityLockCard" class="glass-card rounded-3xl p-6 sm:p-7 max-w-sm w-full border border-slate-800 bg-slate-900/95 shadow-2xl text-center space-y-4 animate-scaleUp">
+            
+            <!-- App Icon & Lock Badge -->
+            <div class="relative inline-block mx-auto">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 flex items-center justify-center text-3xl shadow-xl shadow-emerald-500/20">
+                    ⚡
+                </div>
+                <div class="absolute -bottom-1 -left-1 w-6 h-6 rounded-full bg-rose-600 border-2 border-slate-900 flex items-center justify-center text-xs text-white shadow">
+                    🔒
+                </div>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <div class="space-y-1">
+                <h2 class="text-base font-extrabold text-white">المنصة مغلقة بحماية الأمان</h2>
+                <p class="text-[11px] text-slate-400">أدخل كلمة المرور السرية الخاصة بك لفتح المحفظة والبيانات</p>
+            </div>
+
+            <!-- Masked Passcode Input Box -->
+            <div class="relative max-w-[240px] mx-auto">
+                <div id="pinDisplayContainer" class="bg-slate-950 border-2 border-slate-700 focus-within:border-emerald-500 rounded-2xl px-4 py-2.5 flex items-center justify-center gap-1.5 min-h-[48px] shadow-inner font-mono text-xl tracking-[0.3em] text-emerald-400">
+                    <span id="pinMaskedText"></span>
+                    <span id="pinCaret" class="w-2 h-5 bg-emerald-400 rounded-sm animate-pulse"></span>
+                </div>
+            </div>
+
+            <!-- Error Notice -->
+            <div id="pinErrorMessage" class="text-xs text-rose-400 font-bold min-h-[16px] transition-all opacity-0">
+                ⚠️ كلمة المرور غير صحيحة، يرجى المحاولة ثانية
+            </div>
+
+            <!-- On-Screen Numeric Keypad -->
+            <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto pt-0.5" dir="ltr">
+                <button type="button" onclick="enterPinDigit('1')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">1</button>
+                <button type="button" onclick="enterPinDigit('2')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">2</button>
+                <button type="button" onclick="enterPinDigit('3')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">3</button>
+
+                <button type="button" onclick="enterPinDigit('4')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">4</button>
+                <button type="button" onclick="enterPinDigit('5')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">5</button>
+                <button type="button" onclick="enterPinDigit('6')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">6</button>
+
+                <button type="button" onclick="enterPinDigit('7')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">7</button>
+                <button type="button" onclick="enterPinDigit('8')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">8</button>
+                <button type="button" onclick="enterPinDigit('9')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">9</button>
+
+                <button type="button" onclick="clearPinInput()" class="pin-key h-11 rounded-2xl bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-white font-medium text-xs transition shadow-sm active:scale-95">مسح</button>
+                <button type="button" onclick="enterPinDigit('0')" class="pin-key h-11 rounded-2xl bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-lg font-mono transition shadow-sm active:scale-95">0</button>
+                <button type="button" onclick="backspacePinDigit()" class="pin-key h-11 rounded-2xl bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-white font-bold text-base transition shadow-sm active:scale-95">⌫</button>
+            </div>
+
+            <!-- Unlock Action Button -->
+            <button type="button" onclick="validatePinSubmission()" class="w-full max-w-[240px] mx-auto py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2">
+                <span>🔓</span>
+                <span>فتح المنصة (دخول)</span>
+            </button>
+
+            <!-- Options: Remember Device & Change PIN -->
+            <div class="pt-2 border-t border-slate-800 space-y-1.5 text-xs">
+                <label class="flex items-center justify-center gap-2 text-slate-300 cursor-pointer select-none">
+                    <input id="pinRememberDeviceCheck" type="checkbox" checked class="w-4 h-4 rounded accent-emerald-500 bg-slate-800 border-slate-700">
+                    <span class="text-[11px]">تذكر تسجيل الدخول على هذا الجهاز</span>
+                </label>
+                <div class="flex items-center justify-center text-[10px] text-slate-400 pt-0.5">
+                    <button type="button" onclick="openChangePinModal()" class="text-indigo-400 hover:text-indigo-300 font-bold underline">
+                        تغيير كلمة المرور
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- ================= MODAL: CHANGE PIN ================= -->
+    <div id="changePinModal" class="fixed inset-0 z-[10000] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden" onclick="if(event.target===this) closeChangePinModal()" dir="rtl">
+        <div class="glass-card rounded-2xl p-5 max-w-sm w-full border border-slate-800 bg-slate-900 space-y-3 shadow-2xl text-right animate-scaleUp">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🔐</span>
+                    <h3 class="font-bold text-white text-sm">تغيير رمز الحماية السري (PIN)</h3>
+                </div>
+                <button type="button" onclick="closeChangePinModal()" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+            </div>
+            <div class="space-y-2 text-xs">
+                <div>
+                    <label class="block text-slate-300 mb-1 font-medium">الرمز الحالي:</label>
+                    <input id="currentPinInput" type="password" maxlength="6" placeholder="••••" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-center font-mono tracking-widest text-white text-sm focus:border-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1 font-medium">الرمز الجديد (4 أرقام):</label>
+                    <input id="newPinInput" type="password" maxlength="6" placeholder="••••" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-center font-mono tracking-widest text-white text-sm focus:border-emerald-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-slate-300 mb-1 font-medium">تأكيد الرمز الجديد:</label>
+                    <input id="confirmNewPinInput" type="password" maxlength="6" placeholder="••••" 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-center font-mono tracking-widest text-white text-sm focus:border-emerald-500 outline-none">
+                </div>
+            </div>
+            <div id="changePinStatus" class="hidden text-xs text-rose-400 font-bold"></div>
+            <div class="flex items-center gap-2 pt-2">
+                <button type="button" onclick="saveNewSecurityPin()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 shadow">
+                    حفظ الرمز الجديد ✓
+                </button>
+                <button type="button" onclick="closeChangePinModal()" class="px-3 py-2 bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+    
 
     <!-- Smart PWA Mobile Install Banner -->
     <div id="pwaInstallBanner" class="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/80 px-3.5 py-2.5 flex items-center justify-between shadow-lg hidden">
@@ -607,6 +743,15 @@
             </div>
 
             <!-- Left side: Dark / Light Mode Toggle -->
+            <!-- Lock Application Button -->
+            <button id="visibleLockBtn" onclick="lockApplicationNow()" title="قفل المنصة الآن برمز الأمان"
+                class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-rose-900/60
+                       bg-rose-950/40 text-rose-300 hover:text-white hover:bg-rose-900/60
+                       transition-all active:scale-95 select-none text-[11px] font-bold shadow-sm">
+                <span>🔒</span>
+                <span>قفل</span>
+            </button>
+
             <button id="visibleThemeToggleBtn" onclick="toggleThemeMode()" title="تبديل الوضع الليلي / النهاري"
                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border
                        transition-all active:scale-95 select-none text-[11.5px] font-bold
@@ -3774,7 +3919,29 @@
         <style>
             .tab-btn.text-emerald-400 { color:#34d399 !important; }
             .tab-btn.text-emerald-400 span:first-child { filter: drop-shadow(0 0 6px rgba(52,211,153,0.5)); }
-        </style>
+        
+        /* Master Security Lock & PIN Keypad Styles */
+        .pin-dot.active {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.15);
+        }
+        @keyframes pinShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .pin-shake {
+            animation: pinShake 0.4s ease-in-out;
+        }
+        .app-locked-blur {
+            filter: blur(16px) !important;
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+    
+</style>
     </nav>
 
         <!-- Interactive Advanced Stock Hub Modal (Full-Screen on Mobile, Card on Desktop) -->
@@ -4920,8 +5087,227 @@
 
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16.5')
+            
+    // =========================================================================
+    // MASTER SECURITY PIN & PRIVACY SHIELD SYSTEM (حماية وأمان المنصة)
+    // =========================================================================
+    let _pinBuffer = "";
+    const DEFAULT_MASTER_PIN = "3601896";
+
+    function getMasterPin() {
+        return localStorage.getItem('egx_security_pin') || DEFAULT_MASTER_PIN;
+    }
+
+    function isAppUnlocked() {
+        return localStorage.getItem('egx_auth_unlocked') === 'true' || sessionStorage.getItem('egx_auth_unlocked') === 'true';
+    }
+
+    function initMasterSecurityLock() {
+        if (!isAppUnlocked()) {
+            showSecurityLockScreen();
+        } else {
+            hideSecurityLockScreen();
+        }
+
+        // Global Keyboard Handler for PIN Entry
+        window.addEventListener('keydown', (e) => {
+            const screen = document.getElementById('masterSecurityLockScreen');
+            if (!screen || screen.classList.contains('hidden')) return;
+
+            if (e.key >= '0' && e.key <= '9') {
+                enterPinDigit(e.key);
+            } else if (e.key === 'Backspace') {
+                backspacePinDigit();
+            } else if (e.key === 'Enter') {
+                validatePinSubmission();
+            } else if (e.key === 'Escape') {
+                clearPinInput();
+            }
+        });
+    }
+
+    function showSecurityLockScreen() {
+        _pinBuffer = "";
+        updatePinDisplayUI();
+        const screen = document.getElementById('masterSecurityLockScreen');
+        const main = document.querySelector('main');
+        const header = document.querySelector('header');
+        const nav = document.getElementById('bottomNav');
+
+        if (screen) screen.classList.remove('hidden');
+        if (main) main.classList.add('app-locked-blur');
+        if (header) header.classList.add('app-locked-blur');
+        if (nav) nav.classList.add('app-locked-blur');
+        document.body.style.overflow = 'hidden';
+        window.focus();
+        setTimeout(() => {
+            const card = document.getElementById('masterSecurityLockCard');
+            if (card) { card.setAttribute('tabindex', '-1'); card.focus(); }
+        }, 50);
+    }
+
+    function hideSecurityLockScreen() {
+        const screen = document.getElementById('masterSecurityLockScreen');
+        const main = document.querySelector('main');
+        const header = document.querySelector('header');
+        const nav = document.getElementById('bottomNav');
+
+        if (screen) screen.classList.add('hidden');
+        if (main) main.classList.remove('app-locked-blur');
+        if (header) header.classList.remove('app-locked-blur');
+        if (nav) nav.classList.remove('app-locked-blur');
+        document.body.style.overflow = '';
+    }
+
+    function lockApplicationNow() {
+        triggerHaptic('medium');
+        localStorage.removeItem('egx_auth_unlocked');
+        sessionStorage.removeItem('egx_auth_unlocked');
+        showSecurityLockScreen();
+        if (typeof showToast === 'function') {
+            showToast('🔒 تم قفل المنصة بنجاح.');
+        }
+    }
+
+    function updatePinDisplayUI() {
+        const maskedEl = document.getElementById('pinMaskedText');
+        const caretEl = document.getElementById('pinCaret');
+        if (maskedEl) {
+            maskedEl.innerText = "●".repeat(_pinBuffer.length);
+        }
+        if (caretEl) {
+            caretEl.style.display = _pinBuffer.length >= 10 ? 'none' : 'inline-block';
+        }
+        const err = document.getElementById('pinErrorMessage');
+        if (err) err.style.opacity = '0';
+    }
+
+    function enterPinDigit(digit) {
+        if (_pinBuffer.length >= 12) return;
+        triggerHaptic('light');
+        _pinBuffer += digit;
+        updatePinDisplayUI();
+
+        // Auto-validate when buffer matches target length
+        const expectedPin = getMasterPin();
+        if (_pinBuffer.length === expectedPin.length) {
+            setTimeout(validatePinSubmission, 120);
+        }
+    }
+
+    function backspacePinDigit() {
+        if (_pinBuffer.length > 0) {
+            triggerHaptic('light');
+            _pinBuffer = _pinBuffer.slice(0, -1);
+            updatePinDisplayUI();
+        }
+    }
+
+    function clearPinInput() {
+        triggerHaptic('light');
+        _pinBuffer = "";
+        updatePinDisplayUI();
+    }
+
+    function validatePinSubmission() {
+        const expectedPin = getMasterPin();
+        if (_pinBuffer === expectedPin) {
+            triggerHaptic('success');
+            const rememberCheck = document.getElementById('pinRememberDeviceCheck');
+            if (rememberCheck && rememberCheck.checked) {
+                localStorage.setItem('egx_auth_unlocked', 'true');
+            } else {
+                sessionStorage.setItem('egx_auth_unlocked', 'true');
+            }
+            hideSecurityLockScreen();
+            if (typeof showToast === 'function') {
+                showToast('🔓 تم فتح المنصة بنجاح. أهلاً بك!');
+            }
+        } else {
+            triggerHaptic('error');
+            const card = document.getElementById('masterSecurityLockCard');
+            const err = document.getElementById('pinErrorMessage');
+            if (err) err.style.opacity = '1';
+            if (card) {
+                card.classList.add('pin-shake');
+                setTimeout(() => card.classList.remove('pin-shake'), 450);
+            }
+            setTimeout(() => {
+                _pinBuffer = "";
+                updatePinDisplayUI();
+            }, 600);
+        }
+    }
+
+    function openChangePinModal() {
+        triggerHaptic('selection');
+        const modal = document.getElementById('changePinModal');
+        const cur = document.getElementById('currentPinInput');
+        const nw = document.getElementById('newPinInput');
+        const cnf = document.getElementById('confirmNewPinInput');
+        const st = document.getElementById('changePinStatus');
+
+        if (cur) cur.value = '';
+        if (nw) nw.value = '';
+        if (cnf) cnf.value = '';
+        if (st) st.classList.add('hidden');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeChangePinModal() {
+        triggerHaptic('light');
+        const modal = document.getElementById('changePinModal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function saveNewSecurityPin() {
+        triggerHaptic('medium');
+        const cur = (document.getElementById('currentPinInput')?.value || '').trim();
+        const nw = (document.getElementById('newPinInput')?.value || '').trim();
+        const cnf = (document.getElementById('confirmNewPinInput')?.value || '').trim();
+        const st = document.getElementById('changePinStatus');
+
+        if (!st) return;
+
+        const expected = getMasterPin();
+        if (cur !== expected) {
+            st.className = 'text-xs text-rose-400 font-bold block';
+            st.innerText = '⚠️ كلمة المرور الحالية غير صحيحة!';
+            return;
+        }
+
+        if (nw.length < 4 || nw.length > 12) {
+            st.className = 'text-xs text-rose-400 font-bold block';
+            st.innerText = '⚠️ يجب أن تتكون كلمة المرور من 4 أرقام أو حروف على الأقل.';
+            return;
+        }
+
+        if (nw !== cnf) {
+            st.className = 'text-xs text-rose-400 font-bold block';
+            st.innerText = '⚠️ كلمة المرور الجديدة وتأكيدها غير متطابقين!';
+            return;
+        }
+
+        localStorage.setItem('egx_security_pin', nw);
+        st.className = 'text-xs text-emerald-400 font-bold block';
+        st.innerText = '✓ تم حفظ كلمة المرور الجديدة بنجاح!';
+        triggerHaptic('success');
+
+        setTimeout(() => {
+            closeChangePinModal();
+            if (typeof showToast === 'function') {
+                showToast('🔐 تم تحديث كلمة المرور بنجاح.');
+            }
+        }, 1000);
+    }
+
+    // Call init on load
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initMasterSecurityLock, 50);
+    });
+    
+window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js?v=16.7')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
