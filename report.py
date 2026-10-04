@@ -2583,64 +2583,29 @@ def generate_rule_based_daily_summary(stocks_data, indices_data, fx_gold_data, g
 
 
 def export_and_sync_market_data(stocks_data, indices_data, fx_gold_data, summary_text=""):
-    """تصدير ملف market_data.json المحدث ورفعه سحابياً لتغذية تطبيق الويب PWA تلقائياً."""
+    """تحديث ملخص ai_pulse في market_data.json بأمان مع الحفاظ الكامل على مخطط Schema v2.0."""
     try:
-        now_iso = datetime.now(timezone(timedelta(hours=3))).isoformat()
-        payload = {
-            "updated_at": now_iso,
-            "indices": {
-                "EGX33": {"close": 3380.45, "chgPct": 1.15},
-                "EGX30": {"close": 31450.20, "chgPct": 0.82}
-            },
-            "fx_gold": {
-                "usd_egp": {"close": 52.26, "chgPct": 0.46},
-                "gold_24k": {"close": 7015.00, "chgPct": 1.11}
-            },
-            "ai_pulse": {
-                "sentiment": "bullish",
-                "score": 78,
-                "lead_sector": "الأسمدة والبتروكيماويات والتصدير",
-                "text": summary_text[:400] if summary_text else "يشهد مؤشر الشريعة EGX33 حركة تجميع إيجابية بقيادة قطاع البتروكيماويات والتصدير."
-            }
-        }
-        if indices_data:
-            for k, v in indices_data.items():
-                if isinstance(v, dict):
-                    payload["indices"][k] = {"close": v.get("close", 0), "chgPct": v.get("chgPct", 0)}
-        if fx_gold_data:
-            usd = fx_gold_data.get("USD/EGP")
-            gold = fx_gold_data.get("GOLD")
-            if isinstance(usd, dict):
-                payload["fx_gold"]["usd_egp"] = {"close": usd.get("close", 52.26), "chgPct": usd.get("chgPct", 0)}
-            if isinstance(gold, dict):
-                payload["fx_gold"]["gold_24k"] = {"close": gold.get("close", 7015.00), "chgPct": gold.get("chgPct", 0)}
-        
-        with open("market_data.json", "w", encoding="utf-8") as f:
-            json.dump(payload, f, ensure_ascii=False, indent=2)
-        print("Exported market_data.json locally.")
-        
-        repo_name = os.getenv("GITHUB_REPOSITORY", "mahereasybakery-web/egypt-sharia-stock-report")
-        if GH_PAT:
-            try:
-                content_b64 = base64.b64encode(json.dumps(payload, ensure_ascii=False, indent=2).encode('utf-8')).decode('utf-8')
-                url = f"https://api.github.com/repos/{repo_name}/contents/market_data.json"
-                headers = {"Authorization": f"token {GH_PAT}", "Accept": "application/vnd.github.v3+json", "User-Agent": "EGX-Sharia-Bot"}
-                sha = None
-                try:
-                    r_check = requests.get(url, headers=headers, timeout=10)
-                    if r_check.status_code == 200:
-                        sha = r_check.json().get("sha")
-                except Exception:
-                    pass
-                body = {"message": "Auto-sync live market_data.json", "content": content_b64, "branch": "main"}
-                if sha:
-                    body["sha"] = sha
-                requests.put(url, headers=headers, json=body, timeout=15)
-                print("Synced market_data.json to GitHub successfully!")
-            except Exception as push_err:
-                print("Notice pushing market_data.json:", push_err)
+        if not os.path.exists("market_data.json"):
+            print("Notice: market_data.json not found locally; skipping report.py export.")
+            return
+
+        with open("market_data.json", "r", encoding="utf-8") as f:
+            mdata = json.load(f)
+
+        # Update only ai_pulse summary if available
+        if summary_text:
+            if "ai_pulse" not in mdata or not isinstance(mdata["ai_pulse"], dict):
+                mdata["ai_pulse"] = {"sentiment": "bullish", "score": 78, "lead_sector": "الأسمدة والبتروكيماويات"}
+            mdata["ai_pulse"]["text"] = summary_text[:600]
+
+        # Atomic local write
+        temp_file = "market_data.json.tmp"
+        with open(temp_file, "w", encoding="utf-8") as tf:
+            json.dump(mdata, tf, ensure_ascii=False, indent=2)
+        os.replace(temp_file, "market_data.json")
+        print("Safely merged ai_pulse into market_data.json without schema destruction.")
     except Exception as e:
-        print("Error in export_and_sync_market_data:", e)
+        print("Notice in export_and_sync_market_data:", e)
 
 def send_daily_summary():
     ctx = get_session_context()

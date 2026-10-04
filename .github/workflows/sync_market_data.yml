@@ -9,8 +9,8 @@ on:
     types: [market-sync-trigger]
 
 concurrency:
-  group: market-sync
-  cancel-in-progress: false
+  group: market-data-sync
+  cancel-in-progress: true
 
 permissions:
   contents: write

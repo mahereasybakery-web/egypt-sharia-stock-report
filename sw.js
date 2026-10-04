@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v16.7 (Master Security Lock & Privacy Shield)
-const CACHE_NAME = 'egx-sharia-v16.7';
+// EGX Sharia Portal - Advanced PWA Service Worker v17.0 (Unified Schema v2.0 & P0 Fixes)
+const CACHE_NAME = 'egx-sharia-v17.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
