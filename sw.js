@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v16.3 (Dual-Slicer Recommendations & AI Financial Brain)
-const CACHE_NAME = 'egx-sharia-v16.3';
+// EGX Sharia Portal - Advanced PWA Service Worker v16.4 (Multi-Tier Natural Language AI & Live Market Sync)
+const CACHE_NAME = 'egx-sharia-v16.4';
 const STATIC_ASSETS = [
   './',
   './index.html',
