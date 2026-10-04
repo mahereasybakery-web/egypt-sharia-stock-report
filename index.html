@@ -863,8 +863,8 @@
                 </button>
                 <button id="slicerFundsBtn" onclick="setAssetSlicer('funds')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
                     <span>🕌</span>
-                    <span>صناديق الاستثمار والذهب</span>
-                    <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">5 أصول</span>
+                    <span>صناديق الاستثمار والذهب والدولار</span>
+                    <span id="slicerFundsBadge" class="text-[10px] font-mono bg-slate-900 text-amber-300 border border-slate-700 px-1.5 py-0.2 rounded-full">6 أصول</span>
                 </button>
             </div>
 
@@ -1571,11 +1571,12 @@
 
                         <!-- Funds Dedicated Filters Bar -->
                         <div id="fundsFiltersWrapperTop" class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs py-1">
-                            <button onclick="setFundsFilter('all', this)" class="funds-filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition active:scale-95 text-xs">🌐 جميع الصناديق والذهب (5)</button>
+                            <button onclick="setFundsFilter('all', this)" class="funds-filter-pill bg-amber-600 text-white font-bold px-3 py-1 rounded-lg whitespace-nowrap shadow-sm transition active:scale-95 text-xs">🌐 جميع الأصول والصناديق (6)</button>
+                            <button onclick="setFundsFilter('usd', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">💵 الدولار والسيولة الأجنبية (USD)</button>
                             <button onclick="setFundsFilter('gold', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">🪙 الذهب الخالص والتحوط (AZG / Thndr)</button>
                             <button onclick="setFundsFilter('equity_funds', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">📈 صناديق الأسهم الشرعية (CMS / BWA / NMF)</button>
-                            <button onclick="setFundsFilter('high_yield', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">🏆 الأعلى نمواً وتوزيعاً</button>
-                            <button onclick="setFundsFilter('daily_liquidity', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">⚡ تداول وسيولة لحظية</button>
+                            <button onclick="setFundsFilter('high_yield', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">🏆 الأعلى تحوطاً وتوزيعاً</button>
+                            <button onclick="setFundsFilter('daily_liquidity', this)" class="funds-filter-pill bg-slate-800 text-slate-300 hover:text-white px-3 py-1 rounded-lg whitespace-nowrap transition active:scale-95 text-xs flex items-center gap-1">⚡ تداول وسيولة فورية</button>
                         </div>
 
                         <!-- Funds List Container -->
@@ -3583,7 +3584,8 @@
                         <div class="flex-1">
                             <label class="block text-[10px] text-slate-400 mb-1">تصفية حسب الصندوق الاستثماري:</label>
                             <select id="newsFundFilterSelect" onchange="applyNewsFilters()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white outline-none">
-                                <option value="all">جميع صناديق الاستثمار</option>
+                                <option value="all">جميع الصناديق والذهب والعملات (6 أصول)</option>
+                                <option value="USD_EGP">USD_EGP - الدولار الأمريكي والسيولة الأجنبية (USD)</option>
                                 <option value="CMS">CMS - صندوق مؤشر CI EGX33 الشريعة (مصر شريعة إكويتي)</option>
                                 <option value="BWA">BWA - صندوق بلتون وفرة للأسهم الشرعية</option>
                                 <option value="NMF">NMF - صندوق نعيم مصر للشريعة</option>
@@ -5109,7 +5111,8 @@
             { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.0, open: 7000.0, high: 7050.0, low: 6950.0, chg: -0.83, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط" },
             { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.3976, open: 21.5283, high: 21.80, low: 21.30, chg: -0.61, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
             { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.0733, open: 2.0874, high: 2.12, low: 2.06, chg: -0.68, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 48.9200, open: 49.04, high: 49.50, low: 48.80, chg: -0.24, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" }
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 48.9200, open: 49.04, high: 49.50, low: 48.80, chg: -0.24, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "USD_EGP", name: "الدولار الأمريكي والسيولة الدولارية (USD)", close: 52.26, open: 52.28, high: 52.45, low: 52.10, chg: -0.04, rsi: 48.5, pe: null, type: "currency", rec: "تحوط واحتفاظ استراتيجي", sector: "النقد الأجنبي والملاذات" }
         ];
 
                 // 3. Valuation Scenarios Database (100% Comprehensive for all 38 EGX Assets)
@@ -5607,6 +5610,19 @@
                 support: 49.10,
                 resistance: 56.00,
                 analysis: "محفظة متوازنة تجمع بين الأسهم الإسلامية عالية التوزيعات والصكوك، مما يمنح عائداً استثمارياً متزناً بتذبذب منخفض."
+            },
+            "USD_EGP": {
+                name: "الدولار الأمريكي والسيولة الدولارية (USD)",
+                current: 52.26,
+                bull: 56.00,
+                base: 52.50,
+                bear: 48.50,
+                margin: 0.5,
+                pe: null,
+                pb: 1.00,
+                support: 49.50,
+                resistance: 54.00,
+                analysis: "الأصل الملاذ والتحوطي الرئيسي؛ تسعير الصرف مدعوم بتدفقات النقد الأجنبي، تحويلات المصريين بالخارج، واحتياطي البنك المركزي، مع استقرار نسبي مدعوم بصفقات الاستثمار المباشر."
             }
         };
 
@@ -6067,6 +6083,11 @@
             return tr;
         }
 
+        function isCurrencyAsset(h) {
+            if (!h) return false;
+            return h.ticker === 'USD_EGP' || h.type === 'currency' || (h.sector && (h.sector.includes('نقد أجنبي') || h.sector.includes('النقد الأجنبي') || h.sector.includes('دولار')));
+        }
+
         function isGoldAsset(h) {
             if (!h) return false;
             return h.ticker === 'THNDR_GOLD' || (h.sector && h.sector.includes('الذهب الخالص'));
@@ -6074,10 +6095,15 @@
 
         function isFundAsset(h) {
             if (!h) return false;
-            if (isGoldAsset(h)) return false;
+            if (isGoldAsset(h) || isCurrencyAsset(h)) return false;
             return h.isFund === true || 
                    ['NMF', 'AZG', 'BWA', 'CMS'].includes(h.ticker) ||
                    (h.sector && h.sector.includes('صندوق'));
+        }
+
+        function isNonEquityAsset(h) {
+            if (!h) return false;
+            return isFundAsset(h) || isGoldAsset(h) || isCurrencyAsset(h) || h.ticker === 'USD_EGP' || h.type === 'fund' || h.type === 'currency';
         }
 
         function renderHoldingsTable() {
@@ -6796,10 +6822,11 @@
             });
             select.appendChild(optgroupStocks);
 
-            // Group: Sharia Funds
+            // Group: Sharia Funds & Currencies
             const optgroupFunds = document.createElement('optgroup');
-            optgroupFunds.label = "── صناديق الاستثمار والذهب الشرعية ──";
+            optgroupFunds.label = "── صناديق الاستثمار والذهب والسيولة الدولارية ──";
             const fundsList = [
+                { ticker: "USD_EGP", name: "الدولار والسيولة الدولارية (USD)", close: 52.26 },
                 { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.6040 },
                 { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.00 },
                 { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.3976 },
@@ -7377,19 +7404,22 @@
             const priceEl = document.getElementById('modalChartPrice');
             if (priceEl) priceEl.innerText = `${safeFixed(data.close, 2)} ج.م`;
 
-            const isFundAsset = ['AZG', 'THNDR_GOLD', 'CMS', 'BWA', 'NMF'].includes(ticker) || (data.sector && (data.sector.includes('صندوق') || data.sector.includes('ذهب')));
+            const isFundAsset = ['AZG', 'THNDR_GOLD', 'CMS', 'BWA', 'NMF', 'USD_EGP'].includes(ticker) || (data.sector && (data.sector.includes('صندوق') || data.sector.includes('ذهب') || data.sector.includes('نقد') || data.sector.includes('دولار')));
             
             // Dynamic Header Icon
             const modalIcon = document.getElementById('modalHeaderIcon');
             if (modalIcon) {
-                if (ticker === 'AZG' || ticker === 'THNDR_GOLD') modalIcon.innerText = '🪙';
+                if (ticker === 'USD_EGP') modalIcon.innerText = '💵';
+                else if (ticker === 'AZG' || ticker === 'THNDR_GOLD') modalIcon.innerText = '🪙';
                 else if (isFundAsset) modalIcon.innerText = '🕌';
                 else modalIcon.innerText = '📈';
             }
 
             const shariaBadge = document.getElementById('modalShariaBadge');
             if (shariaBadge) {
-                if (ticker === 'AZG' || ticker === 'THNDR_GOLD') {
+                if (ticker === 'USD_EGP') {
+                    shariaBadge.innerText = 'نقد أجنبي وتحوط شرعي 100% 💵 (ضوابط الصرف)';
+                } else if (ticker === 'AZG' || ticker === 'THNDR_GOLD') {
                     shariaBadge.innerText = 'ذهب خالص عيار 24 🪙 (شريعة 100%)';
                 } else if (isFundAsset) {
                     shariaBadge.innerText = 'صندوق استثماري شرعي 100% 🕌';
@@ -9257,9 +9287,9 @@ async function syncMubasherDirectAll() {
                 if (fundsBtn)  fundsBtn.className  = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-amber-600 text-white shadow-md active:scale-95";
                 if (stocksBtn) stocksBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
 
-                if (pulseBtn) pulseBtn.innerHTML = `<span>⚡</span> <span>نبض الصناديق</span>`;
-                if (aiBtn)    aiBtn.innerHTML    = `<span>🤖</span> <span>مستشار الصناديق</span>`;
-                if (fairBtn)  fairBtn.innerHTML  = `<span>📊</span> <span>تقييم الوثائق</span>`;
+                if (pulseBtn) pulseBtn.innerHTML = `<span>⚡</span> <span>نبض الصناديق والعملات</span>`;
+                if (aiBtn)    aiBtn.innerHTML    = `<span>🤖</span> <span>مستشار الصناديق والتحوط</span>`;
+                if (fairBtn)  fairBtn.innerHTML  = `<span>📊</span> <span>تقييم الوثائق والعملات</span>`;
 
                 if (fdView) fdView.classList.remove('hidden');
                 if (eqView) eqView.classList.add('hidden');
@@ -9292,20 +9322,30 @@ async function syncMubasherDirectAll() {
             const legacyContainer = document.getElementById('stocksContainer');
             if (!container && !legacyContainer) return;
 
-            let fundsAssets = STOCKS_DATA.filter(s => isFundAsset(s) || isGoldAsset(s));
+            // Sync USD close price with live ticker if available
+            const usdItem = STOCKS_DATA.find(s => s.ticker === 'USD_EGP');
+            if (usdItem && typeof _liveTickerCache !== 'undefined' && _liveTickerCache.usd && _liveTickerCache.usd.price > 0) {
+                usdItem.close = _liveTickerCache.usd.price;
+                usdItem.chg = _liveTickerCache.usd.chg !== undefined ? _liveTickerCache.usd.chg : usdItem.chg;
+            }
 
-            if (filter === 'gold') {
+            let fundsAssets = STOCKS_DATA.filter(s => isNonEquityAsset(s));
+
+            if (filter === 'usd') {
+                fundsAssets = fundsAssets.filter(s => isCurrencyAsset(s) || s.ticker === 'USD_EGP');
+            } else if (filter === 'gold') {
                 fundsAssets = fundsAssets.filter(s => isGoldAsset(s) || s.ticker === 'AZG' || s.ticker.includes('GOLD'));
             } else if (filter === 'equity_funds') {
-                fundsAssets = fundsAssets.filter(s => !isGoldAsset(s) && s.ticker !== 'AZG' && !s.ticker.includes('GOLD'));
+                fundsAssets = fundsAssets.filter(s => isFundAsset(s) && !isGoldAsset(s) && !isCurrencyAsset(s) && s.ticker !== 'AZG' && !s.ticker.includes('GOLD'));
             } else if (filter === 'high_yield') {
-                fundsAssets = fundsAssets.filter(s => ['THNDR_GOLD', 'AZG', 'CMS'].includes(s.ticker));
+                fundsAssets = fundsAssets.filter(s => ['THNDR_GOLD', 'AZG', 'CMS', 'USD_EGP'].includes(s.ticker));
             } else if (filter === 'daily_liquidity') {
-                fundsAssets = fundsAssets.filter(s => ['AZG', 'THNDR_GOLD'].includes(s.ticker));
+                fundsAssets = fundsAssets.filter(s => ['AZG', 'THNDR_GOLD', 'USD_EGP'].includes(s.ticker));
             }
 
             const cardsHtml = fundsAssets.map(s => {
                 const isGold = isGoldAsset(s) || s.ticker.includes('GOLD') || s.ticker === 'AZG';
+                const isUsd = isCurrencyAsset(s) || s.ticker === 'USD_EGP';
                 const isPos = (s.chg || 0) >= 0;
                 const chgColor = isPos ? 'text-emerald-400' : 'text-rose-400';
                 const sign = isPos ? '+' : '';
@@ -9315,7 +9355,12 @@ async function syncMubasherDirectAll() {
                 let ytdReturn = '+30.0%';
                 let liquidityInfo = 'استرداد أسبوعي';
 
-                if (s.ticker === 'AZG') {
+                if (isUsd) {
+                    manager = 'البنك المركزي المصري • البنوك والسوق المصرفي';
+                    assetDesc = 'السيولة الدولارية والتحوط ضد التضخم وتقلبات العملة مع إمكانية التوظيف في أوعية إسلامية وأذون خزانة';
+                    ytdReturn = '+68.5%';
+                    liquidityInfo = 'سيولة فورية T+0';
+                } else if (s.ticker === 'AZG') {
                     manager = 'أزيموت مصر (Azimut)';
                     assetDesc = 'صندوق استثمار في الذهب الفعلي عيار 24 المودع بخزائن البنك المركزي';
                     ytdReturn = '+38.2%';
@@ -9343,10 +9388,10 @@ async function syncMubasherDirectAll() {
                 }
 
                 return `
-                    <div class="glass-card rounded-2xl p-3.5 space-y-2.5 border ${isGold ? 'border-amber-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/20' : 'border-indigo-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/20'} hover:border-slate-600 transition">
+                    <div class="glass-card rounded-2xl p-3.5 space-y-2.5 border ${isUsd ? 'border-emerald-800/60 bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950/25' : (isGold ? 'border-amber-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-amber-950/20' : 'border-indigo-900/60 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/20')} hover:border-slate-600 transition">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="font-mono font-bold text-xs px-2 py-0.5 rounded-lg bg-slate-950 border ${isGold ? 'border-amber-700 text-amber-300' : 'border-indigo-700 text-indigo-300'}">${s.ticker}</span>
+                                <span class="font-mono font-bold text-xs px-2 py-0.5 rounded-lg bg-slate-950 border ${isUsd ? 'border-emerald-600 text-emerald-300' : (isGold ? 'border-amber-700 text-amber-300' : 'border-indigo-700 text-indigo-300')}">${s.ticker}</span>
                                 <div>
                                     <h4 class="font-bold text-xs text-white">${s.name}</h4>
                                     <span class="text-[10px] text-slate-400">${manager}</span>
@@ -9354,8 +9399,8 @@ async function syncMubasherDirectAll() {
                             </div>
                             <div class="text-left font-mono">
                                 <div class="text-xs font-bold text-white flex items-center justify-end gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full ${isGold ? 'bg-amber-400' : 'bg-emerald-400'} pulse-live"></span>
-                                    <span class="text-sm font-bold text-amber-300">${(s.type === 'fund' && s.ticker !== 'THNDR_GOLD') ? (s.close || 0).toFixed(4) : (s.close && s.close % 1 !== 0 && s.close.toString().split('.')[1]?.length > 2) ? s.close.toFixed(4) : (s.close || 0).toFixed(2)} ج</span>
+                                    <span class="w-1.5 h-1.5 rounded-full ${isUsd ? 'bg-emerald-400' : (isGold ? 'bg-amber-400' : 'bg-emerald-400')} pulse-live"></span>
+                                    <span class="text-sm font-bold ${isUsd ? 'text-emerald-300' : 'text-amber-300'}">${(s.type === 'fund' && s.ticker !== 'THNDR_GOLD') ? (s.close || 0).toFixed(4) : (s.close && s.close % 1 !== 0 && s.close.toString().split('.')[1]?.length > 2) ? s.close.toFixed(4) : (s.close || 0).toFixed(2)} ج</span>
                                 </div>
                                 <span class="inline-block text-[10px] font-bold px-1.5 py-0.2 rounded border ${isPos ? 'bg-emerald-950/70 border-emerald-800 text-emerald-400' : 'bg-rose-950/70 border-rose-800 text-rose-400'} mt-0.5">
                                     ${sign}${(s.chg || 0).toFixed(2)}%
@@ -9363,14 +9408,14 @@ async function syncMubasherDirectAll() {
                             </div>
                         </div>
                         <div class="flex items-center justify-between text-[9.5px] bg-slate-950/90 px-2.5 py-1 rounded-lg border border-slate-800/80 font-sans">
-                            <span class="text-slate-400 flex items-center gap-1"><span>📅</span> <span>${s.last_nav_date ? `إفصاح ${s.last_nav_date}` : 'إفصاح معتمد'}</span></span>
-                            <span class="text-emerald-400 font-mono font-bold">${s.source || '✓ Thndr / إفصاح المدير الرسمي'}</span>
+                            <span class="text-slate-400 flex items-center gap-1"><span>📅</span> <span>${isUsd ? 'سعر الصرف اللحظي بالبنوك' : (s.last_nav_date ? `إفصاح ${s.last_nav_date}` : 'إفصاح معتمد')}</span></span>
+                            <span class="text-emerald-400 font-mono font-bold">${isUsd ? '✓ البنك المركزي المصري / إنتربنك' : (s.source || '✓ Thndr / إفصاح المدير الرسمي')}</span>
                         </div>
 
                         <!-- Asset Metrics -->
                         <div class="grid grid-cols-3 gap-1.5 p-2 bg-slate-950/80 rounded-xl border border-slate-800 text-[10.5px]">
                             <div>
-                                <span class="block text-[8.5px] text-slate-500 font-sans">العائد السنوي المتراكم:</span>
+                                <span class="block text-[8.5px] text-slate-500 font-sans">العائد / تحرك الصرف:</span>
                                 <b class="text-emerald-400 font-mono font-bold">${ytdReturn}</b>
                             </div>
                             <div>
@@ -9379,7 +9424,7 @@ async function syncMubasherDirectAll() {
                             </div>
                             <div>
                                 <span class="block text-[8.5px] text-slate-500 font-sans">تصنيف الأصل:</span>
-                                <b class="${isGold ? 'text-amber-300' : 'text-sky-300'} font-sans text-[10px]">${isGold ? 'ذهب خالص 🪙' : 'أسهم شريعة 📈'}</b>
+                                <b class="${isUsd ? 'text-emerald-300' : (isGold ? 'text-amber-300' : 'text-sky-300')} font-sans text-[10px]">${isUsd ? 'نقد أجنبي وملاذ 💵' : (isGold ? 'ذهب خالص 🪙' : 'أسهم شريعة 📈')}</b>
                             </div>
                         </div>
 
@@ -9387,10 +9432,10 @@ async function syncMubasherDirectAll() {
 
                         <!-- Actions -->
                         <div class="flex items-center justify-between pt-1 border-t border-slate-800/60 text-xs flex-wrap gap-1.5">
-                            <span class="text-[9.5px] text-slate-400 font-sans">مطابق لأحكام الشريعة الإسلامية 100% 🕌</span>
+                            <span class="text-[9.5px] text-slate-400 font-sans">${isUsd ? 'نقد أجنبي متوافق مع ضوابط الصرف الشرعية 100% 💵' : 'مطابق لأحكام الشريعة الإسلامية 100% 🕌'}</span>
                             <div class="flex items-center gap-1">
                                 <button onclick="openStockChart('${s.ticker}')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
-                                    <span>📈</span> <span>الشارت التاريخي</span>
+                                    <span>📈</span> <span>${isUsd ? 'شارت الصرف' : 'الشارت التاريخي'}</span>
                                 </button>
                                 <button onclick="askAiAboutStock('${s.ticker}')" class="px-2.5 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 text-[10px] font-bold transition active:scale-95 flex items-center gap-1">
                                     <span>🤖</span> <span>تحليل AI</span>
@@ -10469,7 +10514,7 @@ async function syncMubasherDirectAll() {
 
             // Filtering with Main Asset Slicer & Extended Professional Filters
             let filtered = STOCKS_DATA.filter(s => {
-                const isFund = isFundAsset(s) || isGoldAsset(s);
+                const isFund = isNonEquityAsset(s);
 
                 // 1. Slicer Segregation: Stocks vs Funds
                 if (currentAssetSlicer === 'stocks' && isFund) return false;
@@ -10730,8 +10775,8 @@ async function syncMubasherDirectAll() {
                 selectEl.setAttribute('data-slicer', targetSlicer);
 
                 const list = isFunds 
-                    ? STOCKS_DATA.filter(s => isFundAsset(s) || isGoldAsset(s))
-                    : STOCKS_DATA.filter(s => !isFundAsset(s) && !isGoldAsset(s));
+                    ? STOCKS_DATA.filter(s => isNonEquityAsset(s))
+                    : STOCKS_DATA.filter(s => !isNonEquityAsset(s));
 
                 list.forEach(s => {
                     const opt = document.createElement('option');
@@ -11012,10 +11057,13 @@ async function syncMubasherDirectAll() {
 
         const _fundsAiPillsHtml = `
             <button onclick="filterAiQuestions('all', this)" class="ai-cat-btn active px-3 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-600 text-white transition whitespace-nowrap shadow-sm border border-indigo-500/30 flex items-center gap-1 active:scale-95">
-                <span>✨</span> <span>الكل (6)</span>
+                <span>✨</span> <span>الكل (8)</span>
+            </button>
+            <button onclick="filterAiQuestions('usd', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                <span>💵</span> <span>الدولار والعملات (2)</span>
             </button>
             <button onclick="filterAiQuestions('nav', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
-                <span>📊</span> <span>تقييم وNAV (2)</span>
+                <span>📊</span> <span>صناديق الأسهم (2)</span>
             </button>
             <button onclick="filterAiQuestions('gold', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
                 <span>🪙</span> <span>الذهب والتحوط (2)</span>
@@ -11115,6 +11163,36 @@ async function syncMubasherDirectAll() {
                     <span>تحليل فوري</span><span>←</span>
                 </div>
             </div>
+
+            <!-- Fund Card 7: توقعات سعر صرف الدولار والجنيه -->
+            <div data-cat="usd" onclick="askAiMarketAdvisor('ما هي أحدث توقعات سعر صرف الدولار مقابل الجنيه (USD/EGP) وما هو التقييم العادل وقرارات البنك المركزي؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💵</div>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">USD/EGP مباشر</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">توقعات سعر صرف الدولار</h4>
+                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">التقييم العادل للجنيه واحتياطي النقد وتأثير مرونة سعر الصرف</p>
+                </div>
+                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
+                    <span>تحليل فوري</span><span>←</span>
+                </div>
+            </div>
+
+            <!-- Fund Card 8: توصيات حائزي الأصول الدولارية والتحوط -->
+            <div data-cat="usd" onclick="askAiMarketAdvisor('ما هي أفضل توصيات إدارة الأصول والسيولة الدولارية لحفظ القوة الشرائية: الاحتفاظ أم التحوط أم الاستثمار في أدوات عوائد دولارية وصناديق؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🛡️</div>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/80 text-teal-400 border border-teal-800/50 font-medium">إدارة الثروة</span>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-teal-300 transition-colors line-clamp-1">توصيات الأصول الدولارية</h4>
+                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">استراتيجيات التوظيف والتحوط وتوزيع السيولة بين العملات والذهب والأسهم</p>
+                </div>
+                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-teal-400 font-medium">
+                    <span>تحليل فوري</span><span>←</span>
+                </div>
+            </div>
         `;
 
         function updateAiMarketAdvisorView(slicer = currentAssetSlicer) {
@@ -11132,7 +11210,7 @@ async function syncMubasherDirectAll() {
                 if (inputEl) inputEl.placeholder = "اسأل عن أي صندوق استثماري أو وثائق الذهب (مثال: أزيموت جولد، صندوق مصر شريعة)...";
                 if (pillsContainer) pillsContainer.innerHTML = _fundsAiPillsHtml;
                 if (grid) grid.innerHTML = _fundsAiCardsHtml;
-                if (countEl) countEl.innerText = "6 استشارات صناديق متاحة";
+                if (countEl) countEl.innerText = "8 استشارات متاحة (صناديق • ذهب • دولار)";
             } else {
                 if (titleEl) titleEl.innerText = "المستشار المالي والشرعي الذكي";
                 if (subTitleEl) subTitleEl.innerText = "تحليل لحظي يربط أسعار EGX الحالية بالقيمة العادلة ومؤشرات RSI ومحفظتك";
@@ -11503,6 +11581,40 @@ async function syncMubasherDirectAll() {
                                     <div>• <b>أفضل طريقة للاستثمار:</b> ننصح بالاستثمار عبر <b>صندوق أزيموت للذهب (AZG)</b> أو سبائك BTC المغلفة لتجنب دفع مصنعية ودمغة مرتفعة ولتسهيل التسييل اللحظي 24/7.</div>
                                 </div>
                                 <p class="text-[10px] text-slate-400">💡 النسبة الموصى بها للتحوط في المحفظة الشخصية: 15% إلى 25% من إجمالي الثروة.</p>
+                            </div>
+                        `;
+                    } else if (question.includes('سعر صرف') || question.includes('أصول دولارية') || question.includes('السيولة الدولارية') || question.includes('توقعات الدولار') || question.includes('usd/egp') || (currentAssetSlicer === 'funds' && (question.includes('دولار') || question.includes('usd')))) {
+                        const usdP = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.price) ? _liveTickerCache.usd.price : 52.26;
+                        const usdChg = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.chg !== undefined) ? _liveTickerCache.usd.chg : -0.02;
+                        ans = `
+                            <div class="space-y-2">
+                                ${sessionHeader}
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                    <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+                                        <span>💵</span> <span>تقرير وتحليل سعر صرف الدولار والسيولة الدولارية (USD/EGP):</span>
+                                    </span>
+                                    <span class="font-mono font-bold text-white text-xs">${usdP.toFixed(2)} ج.م (${usdChg >= 0 ? '+' : ''}${usdChg.toFixed(2)}%)</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
+                                    <div>سعر الصرف اللحظي: <b class="text-emerald-300 font-mono">${usdP.toFixed(2)} ج</b></div>
+                                    <div>القيمة العادلة المرجعية (PPP): <b class="text-sky-300 font-mono">49.50 - 52.00 ج</b></div>
+                                    <div>صافي احتياطي النقد الأجنبي: <b class="text-emerald-400 font-mono">+46.5 مليار $</b></div>
+                                    <div>مستوى الدعم المؤسسي: <b class="text-slate-300 font-mono">49.20 ج</b></div>
+                                    <div>مستوى المقاومة الفنية: <b class="text-slate-300 font-mono">53.50 ج</b></div>
+                                    <div>التصنيف المؤسسي: <b class="text-amber-300">أصل تحوط وحفظ قوة شرائية</b></div>
+                                </div>
+                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1.5 pt-1">
+                                    <div>🎯 <b>التوصية الاستراتيجية لحائزي الأصول الدولارية:</b>
+                                        <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px] mt-1 mr-1">
+                                            <li><b>الاحتفاظ والتحوط (Strategic Hold):</b> عدم التسرع في تحويل السيولة الدولارية إلى الجنيه في ظل التضخم، والاحتفاظ بها كصمام أمان استثماري استراتيجي.</li>
+                                            <li><b>تعظيم العائد الدولاري الخالي من المخاطر:</b> توظيف الأصول الدولارية في أوعية إسلامية مقومة بالدولار أو أذون خزانة دولارية حكومية بعوائد تتراوح بين 5% إلى 7% سنوياً بدلاً من تجميدها نقداً دون عائد.</li>
+                                            <li><b>التوازن مع الذهب والأسهم:</b> التوزيع الأمثل للثروة المقومة هو: <b>40% أسهم شريعة تصديرية ذات تدفقات دولارية</b> (مثل موبكو والسويدي وأبو قير)، <b>30% ذهب صافي عيار 24 (AZG/سبائك)</b>، و<b>30% سيولة وأصول دولارية</b> لحماية رأس المال.</li>
+                                        </ul>
+                                    </div>
+                                    <div class="text-[10px] text-slate-400 bg-slate-950 p-2 rounded-lg border border-slate-800">
+                                        💡 <b>الرؤية الكلية:</b> سياسة مرونة سعر الصرف التي يطبقها البنك المركزي تضمن عدم نشوء سوق موازية وتدعم تنافسية الصادرات وتدفقات الاستثمار الأجنبي المباشر (FDI).
+                                    </div>
+                                </div>
                             </div>
                         `;
                     } else if (question.includes('دولار') || question.includes('تصدير') || question.includes('تضخم')) {
@@ -12711,6 +12823,45 @@ async function syncMubasherDirectAll() {
                 "impact_label": "استقرار نقدي واقتصادي 🟢",
                 "summary": "تزايد التدفقات النقدية من الاستثمار الأجنبي المباشر وعوائد السياحة والصادرات يعزز استقرار سوق الصرف وثقة المؤسسات الدولية في الاقتصاد المصري.",
                 "url": "https://hapijournal.com/?s=MACRO"
+        },
+        {
+                "id": "n_usd_1",
+                "ticker": "USD_EGP",
+                "stock_name": "الدولار والسيولة الدولارية (USD)",
+                "category": "funds",
+                "title": "استقرار سعر صرف الدولار مقابل الجنيه بالبنوك مع تدفقات نقدية قوية من الصادرات والسياحة",
+                "source": "البنك المركزي المصري • رويترز",
+                "time": "منذ 40 دقيقة",
+                "impact": "positive",
+                "impact_label": "استقرار نقدي 🟢",
+                "summary": "تداولات سوق الصرف المصري (الإنتربنك) تسجل وتيرة توازن هادئة حول مستويات 52 جنيهاً مع انتظام تلبية كافة طلبات استيراد السلع ومستلزمات الإنتاج دون تراكمات.",
+                "url": "https://cbe.org.eg/"
+        },
+        {
+                "id": "n_usd_2",
+                "ticker": "USD_EGP",
+                "stock_name": "الدولار والسيولة الدولارية (USD)",
+                "category": "funds",
+                "title": "البنك المركزي: صافي احتياطي النقد الأجنبي يسجل أعلى مستوياته التاريخية متجاوزاً 46.5 مليار دولار",
+                "source": "البيانات الإحصائية للبنك المركزي (CBE)",
+                "time": "منذ ساعتين",
+                "impact": "positive",
+                "impact_label": "احتياطي تاريخي 🟢",
+                "summary": "قفزة قياسية في صافي الأصول الأجنبية للقطاع المصرفي ونمو قوي في تحويلات المصريين بالخارج تدعم قوة الملاءة المالية والوفاء بالالتزامات الخارجية.",
+                "url": "https://cbe.org.eg/"
+        },
+        {
+                "id": "n_usd_3",
+                "ticker": "USD_EGP",
+                "stock_name": "الدولار والسيولة الدولارية (USD)",
+                "category": "funds",
+                "title": "الفيدرالي الأمريكي: مراقبة وتيرة التضخم وسوق العمل لتحديد مسار الفائدة على أدوات الدين الدولارية",
+                "source": "بلومبرغ الشرق للأخبار",
+                "time": "أمس",
+                "impact": "cautious",
+                "impact_label": "أسعار الفائدة العالمية 🟡",
+                "summary": "توقعات السياسة النقدية الأمريكية تؤكد بقاء عوائد السندات وأذون الخزانة الدولارية في مستويات جاذبة لحائزي السيولة النقدية الباحثين عن عوائد آمنة.",
+                "url": "https://asharqbusiness.com/"
         }
 ];
 
@@ -15627,7 +15778,7 @@ async function syncMubasherDirectAll() {
             const sectorFilter = document.getElementById('newsSectorFilterSelect')?.value || 'all';
             const tickerFilter = document.getElementById('newsStockTickerSelect')?.value || 'all';
 
-            const fundTickers = ['CMS', 'BWA', 'NMF', 'AZG', 'THNDR_GOLD'];
+            const fundTickers = ['CMS', 'BWA', 'NMF', 'AZG', 'THNDR_GOLD', 'USD_EGP'];
             const nList = (typeof NEWS_DATA !== 'undefined') ? NEWS_DATA : [];
 
             const filtered = nList.filter(n => {
@@ -15853,8 +16004,8 @@ async function syncMubasherDirectAll() {
             const navContainer = document.getElementById('newsFundsNavList');
             if (!container) return;
 
-            // 1. Render NAV Cards
-            const funds = STOCKS_DATA.filter(s => s.type === 'fund');
+            // 1. Render NAV Cards (Funds, Gold & Currencies)
+            const funds = STOCKS_DATA.filter(s => s.type === 'fund' || s.ticker === 'USD_EGP');
             if (navContainer) {
                 let navHtml = '';
                 funds.forEach(f => {
