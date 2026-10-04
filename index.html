@@ -598,36 +598,12 @@
                 </span>
             </div>
 
-            <!-- Center: App branding & Desktop Navigation (Seamless on Desktop / Laptop) -->
+            <!-- Center: App branding -->
             <div class="flex items-center gap-3">
                 <span class="text-[12px] font-extrabold text-slate-200 tracking-wide whitespace-nowrap flex items-center gap-1.5 cursor-pointer" onclick="switchTab('portfolio', null)">
                     <span class="text-emerald-400 text-sm">⚡</span>
                     <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent font-bold">الأسهم الشرعية EGX</span>
                 </span>
-                
-                <!-- Desktop Navigation Tabs (Visible on screens >= 768px, hidden on mobile) -->
-                <nav class="hidden md:flex items-center gap-1 bg-slate-950/90 p-1 rounded-2xl border border-slate-800 shadow-inner">
-                    <button onclick="switchTab('portfolio', this)" id="desktopTab_portfolio" class="desktop-tab-btn px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-emerald-400 bg-emerald-950/80 border border-emerald-500/40 shadow-sm">
-                        <span>💼</span>
-                        <span>محفظتي والأداء</span>
-                    </button>
-                    <button onclick="switchTab('radar', this)" id="desktopTab_radar" class="desktop-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80">
-                        <span>⚡</span>
-                        <span>نبض السوق</span>
-                    </button>
-                    <button onclick="switchTab('recommendations', this)" id="desktopTab_recommendations" class="desktop-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80">
-                        <span>🎯</span>
-                        <span>قراراتي</span>
-                    </button>
-                    <button onclick="switchTab('news_hub', this)" id="desktopTab_news_hub" class="desktop-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80">
-                        <span>📰</span>
-                        <span>الأخبار والإفصاحات</span>
-                    </button>
-                    <button onclick="switchTab('tools', this)" id="desktopTab_tools" class="desktop-tab-btn px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/80">
-                        <span>🛠️</span>
-                        <span>أدواتي والتدقيق</span>
-                    </button>
-                </nav>
             </div>
 
             <!-- Left side: Dark / Light Mode Toggle -->
@@ -3609,8 +3585,8 @@
 
     </main>
 
-        <!-- Bottom Navigation Bar — Reorganized v15.5 Mobile-Only 5 Golden Tabs (Hidden on Desktop md:hidden) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-50 max-w-lg mx-auto" style="background:rgba(8,12,20,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding-bottom:env(safe-area-inset-bottom,0px)">
+        <!-- Bottom Navigation Bar — 5 Golden Tabs (Fixed at Bottom for Mobile & Desktop) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 max-w-lg md:max-w-xl mx-auto md:bottom-2.5 md:rounded-2xl md:border md:border-slate-800/90 shadow-2xl" style="background:rgba(8,12,20,0.97);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.08);padding-bottom:env(safe-area-inset-bottom,0px)">
         <div class="grid grid-cols-5 text-center" style="padding:4px 2px 6px">
             <!-- 1. محفظتي والأداء -->
             <button onclick="switchTab('portfolio', this)" id="tabBtn_portfolio" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-90 text-emerald-400 font-bold" style="font-size:10px">
@@ -4789,7 +4765,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=15.0')
+                navigator.serviceWorker.register('sw.js?v=15.6')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -9250,8 +9226,8 @@ async function syncMubasherDirectAll() {
                             </div>
                         </div>
                         <div class="flex items-center justify-between text-[9.5px] bg-slate-950/90 px-2.5 py-1 rounded-lg border border-slate-800/80 font-sans">
-                            <span class="text-slate-400 flex items-center gap-1"><span>📅</span> <span>إفصاح الخميس 1 أكتوبر 2026</span></span>
-                            <span class="text-emerald-400 font-mono font-bold">✓ Thndr / إفصاح المدير الرسمي</span>
+                            <span class="text-slate-400 flex items-center gap-1"><span>📅</span> <span>${s.last_nav_date ? `إفصاح ${s.last_nav_date}` : 'إفصاح معتمد'}</span></span>
+                            <span class="text-emerald-400 font-mono font-bold">${s.source || '✓ Thndr / إفصاح المدير الرسمي'}</span>
                         </div>
 
                         <!-- Asset Metrics -->
