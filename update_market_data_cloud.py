@@ -89,16 +89,16 @@ if len(stocks_data) == 0:
         print(f"Could not load previous stocks: {prev_err}")
 
 # 2. Automated Multi-Source Mutual Funds NAV Engine (Thndr + FoudaLens + Snduk + Official Issuers)
-# Verified baseline NAVs as declared on Thursday, October 1, 2026
+# Verified baseline NAVs as declared on Sunday, October 4, 2026
 funds_data = {
     "CMS": {
         "name": "مصر شريعة إكويتي (CMS)",
         "manager": "CI Capital Asset Management",
-        "close": 21.3976,
-        "chg": -0.61,
+        "close": 22.0470,
+        "chg": 3.03,
         "type": "equity_sharia",
         "valuation_cycle": "يومي معتمد / إقفال الجلسة",
-        "last_nav_date": "2026-10-01",
+        "last_nav_date": "2026-10-04",
         "source": "تطبيق Thndr / إفصاح سي آي لإدارة الأصول (CIAM)"
     },
     "AZG": {
@@ -108,7 +108,7 @@ funds_data = {
         "chg": 0.44,
         "type": "gold_bullion",
         "valuation_cycle": "يومي / تسعير الصندوق",
-        "last_nav_date": "2026-10-01",
+        "last_nav_date": "2026-10-03",
         "source": "تطبيق Thndr / إفصاح أزيموت مصر للذهب"
     },
     "THNDR_GOLD": {
@@ -118,27 +118,27 @@ funds_data = {
         "chg": -0.83,
         "type": "gold_bullion",
         "valuation_cycle": "لحظي / الصاغة والبورصة السلعية",
-        "last_nav_date": "2026-10-01",
+        "last_nav_date": "2026-10-04",
         "source": "تطبيق Thndr / تسعير الذهب الفعلي عيار 24"
     },
     "BWA": {
         "name": "بلتون وفرة (BWA)",
         "manager": "Beltone Asset Management",
-        "close": 2.0733,
-        "chg": -0.68,
+        "close": 2.1384,
+        "chg": 3.14,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / بلتون القابضة",
-        "last_nav_date": "2026-10-01",
+        "last_nav_date": "2026-10-04",
         "source": "تطبيق Thndr / إفصاح بلتون المالية"
     },
     "NMF": {
         "name": "نعيم مصر للشريعة (NMF)",
         "manager": "Naeem Financial Investments",
-        "close": 48.9200,
-        "chg": -0.24,
+        "close": 49.5900,
+        "chg": 1.37,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
-        "last_nav_date": "2026-10-01",
+        "last_nav_date": "2026-10-04",
         "source": "تطبيق Thndr / إفصاح النعيم للاستثمارات"
     }
 }
@@ -150,9 +150,9 @@ print("Fetching latest declared NAVs from Multi-Source Hybrid Engine (Thndr + Fo
 try:
     fl_req = urllib.request.Request(
         "https://foudalens.com/ar/funds",
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     )
-    with urllib.request.urlopen(fl_req, timeout=8) as fl_resp:
+    with urllib.request.urlopen(fl_req, timeout=10) as fl_resp:
         fl_html = fl_resp.read().decode("utf-8", errors="ignore")
         fl_patterns = {
             'BWA': r'Beltone Wafra[^\}]*?\"last_nav\":([0-9.]+)[^\}]*?\"last_nav_date\":\"([0-9-]+)\"',
@@ -186,9 +186,9 @@ for f_sym, f_url in snduk_fund_urls.items():
     try:
         f_req = urllib.request.Request(
             f_url,
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
         )
-        with urllib.request.urlopen(f_req, timeout=6) as f_resp:
+        with urllib.request.urlopen(f_req, timeout=12) as f_resp:
             f_html = f_resp.read().decode('utf-8', errors='ignore')
             m_price = re.findall(r'currentPrice[^\w]{1,6}([0-9.]+)', f_html)
             m_date = re.findall(r'lastPriceUpdate[^\w]{1,6}([0-9-]+)', f_html)

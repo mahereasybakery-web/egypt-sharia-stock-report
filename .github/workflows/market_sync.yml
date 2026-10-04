@@ -2,10 +2,12 @@ name: Automated EGX & Funds Market Data Sync
 
 on:
   schedule:
-    # 1. Trading Hours Sync: Every 10 minutes during EGX trading session (10:00 - 15:30 Cairo = 07:00 - 12:30 UTC)
+    # 1. Trading Hours Sync: Every 10 minutes during EGX trading session (10:00 - 15:30 Cairo = 07:00 - 12:30 UTC, Sun-Thu)
     - cron: '*/10 7-12 * * 0,1,2,3,4'
-    # 2. Evening Mutual Funds NAV Sync: Every 30 minutes during official Fund NAV disclosures window (17:00 - 21:30 Cairo = 14:00 - 18:30 UTC)
-    - cron: '*/30 14-18 * * 0,1,2,3,4'
+    # 2. Evening Mutual Funds NAV Sync: Every 20 minutes during official Fund NAV disclosures window (17:00 - 23:59 Cairo = 14:00 - 21:00 UTC, Sun-Thu)
+    - cron: '*/20 14-21 * * 0,1,2,3,4'
+    # 3. Midnight & Early Morning NAV Disclosures Sync (12:00 AM - 06:00 AM Cairo = 21:00 - 03:00 UTC, daily)
+    - cron: '15 21,22,23,0,1,2,3,4,5,6 * * *'
   workflow_dispatch:
 
 concurrency:
@@ -36,4 +38,4 @@ jobs:
           git config --global user.name "EGX-Sharia-AutoSync[bot]"
           git config --global user.email "auto-sync@mahereasybakery.internal"
           git add market_data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: automated market data sync [skip ci]" && git pull --rebase origin main && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: automated market data sync" && git pull --rebase origin main && git push)

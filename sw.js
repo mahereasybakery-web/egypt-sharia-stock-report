@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v16.1 (Market Pulse & USD Integration)
-const CACHE_NAME = 'egx-sharia-v16.1';
+// EGX Sharia Portal - Advanced PWA Service Worker v16.2 (Live Funds Multi-Source Sync & Snduk Alignment)
+const CACHE_NAME = 'egx-sharia-v16.2';
 const STATIC_ASSETS = [
   './',
   './index.html',

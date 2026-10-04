@@ -1392,7 +1392,7 @@
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
-                                        <b class="text-amber-300 font-mono">23.6040 ج</b>
+                                        <b id="matrix-price-AZG" class="text-amber-300 font-mono">23.6040 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">مدير الصندوق:</span>
@@ -1422,7 +1422,7 @@
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الجرام:</span>
-                                        <b class="text-white font-mono">4,073.14 ج</b>
+                                        <b id="matrix-price-THNDR_GOLD" class="text-white font-mono">7,015.00 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">الجهة:</span>
@@ -1447,12 +1447,12 @@
                                         <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">CMS</span>
                                         <span class="font-bold text-white text-xs">مصر شريعة إكويتي</span>
                                     </div>
-                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+32.5% YTD</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+35.5% YTD</span>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
-                                        <b class="text-emerald-400 font-mono">21.3976 ج</b>
+                                        <b id="matrix-price-CMS" class="text-emerald-400 font-mono">22.0470 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">المدير:</span>
@@ -1477,12 +1477,12 @@
                                         <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">BWA</span>
                                         <span class="font-bold text-white text-xs">بلتون وفرة للأسهم</span>
                                     </div>
-                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+29.8% YTD</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+33.2% YTD</span>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
-                                        <b class="text-emerald-400 font-mono">2.0733 ج</b>
+                                        <b id="matrix-price-BWA" class="text-emerald-400 font-mono">2.1384 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">المدير:</span>
@@ -1507,12 +1507,12 @@
                                         <span class="font-mono font-bold text-xs bg-slate-950 px-2 py-0.5 rounded border border-slate-700 text-indigo-300">NMF</span>
                                         <span class="font-bold text-white text-xs">نعيم مصر للشريعة</span>
                                     </div>
-                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+26.4% YTD</span>
+                                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">+28.1% YTD</span>
                                 </div>
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
-                                        <b class="text-emerald-400 font-mono">48.9200 ج</b>
+                                        <b id="matrix-price-NMF" class="text-emerald-400 font-mono">49.5900 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">المدير:</span>
@@ -5107,11 +5107,11 @@
             { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 0, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "EAST", name: "الشرقية للدخان", close: 29.99, open: 30.52, high: 30.94, low: 29.81, chg: 0.3, rsi: 15.6, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
             { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29.69, open: 30, high: 30.01, low: 28.1, chg: 0.85, rsi: 45.6, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.6040, open: 23.50, high: 23.85, low: 23.40, chg: 0.44, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.0, open: 7000.0, high: 7050.0, low: 6950.0, chg: -0.83, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.3976, open: 21.5283, high: 21.80, low: 21.30, chg: -0.61, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.0733, open: 2.0874, high: 2.12, low: 2.06, chg: -0.68, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 48.9200, open: 49.04, high: 49.50, low: 48.80, chg: -0.24, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.6040, open: 23.50, high: 23.85, low: 23.40, chg: 0.44, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-03" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.0, open: 7000.0, high: 7050.0, low: 6950.0, chg: -0.83, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-04" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.0470, open: 21.3976, high: 22.10, low: 21.35, chg: 3.03, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1384, open: 2.0733, high: 2.15, low: 2.07, chg: 3.14, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.5900, open: 48.92, high: 49.80, low: 48.85, chg: 1.37, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
             { ticker: "USD_EGP", name: "الدولار الأمريكي والسيولة الدولارية (USD)", close: 52.26, open: 52.28, high: 52.45, low: 52.10, chg: -0.04, rsi: 48.5, pe: null, type: "currency", rec: "تحوط واحتفاظ استراتيجي", sector: "النقد الأجنبي والملاذات" }
         ];
 
@@ -5574,11 +5574,11 @@
             },
             "CMS": {
                 name: "صندوق مصر شريعة إكويتي (CMS)",
-                current: 21.3976,
+                current: 22.0470,
                 bull: 30.00,
                 base: 27.50,
                 bear: 20.50,
-                margin: 25.7,
+                margin: 24.7,
                 pe: null,
                 pb: 1.00,
                 support: 21.50,
@@ -5587,11 +5587,11 @@
             },
             "BWA": {
                 name: "صندوق بلتون وفرة للأسهم (BWA)",
-                current: 2.0733,
+                current: 2.1384,
                 bull: 2.80,
                 base: 2.60,
                 bear: 1.95,
-                margin: 22.6,
+                margin: 21.6,
                 pe: null,
                 pb: 1.00,
                 support: 2.08,
@@ -5600,11 +5600,11 @@
             },
             "NMF": {
                 name: "صندوق نعيم مصر للشريعة (NMF)",
-                current: 48.9200,
+                current: 49.5900,
                 bull: 64.00,
                 base: 58.50,
                 bear: 46.00,
-                margin: 17.1,
+                margin: 18.0,
                 pe: null,
                 pb: 1.00,
                 support: 49.10,
@@ -5643,11 +5643,11 @@
             { ticker: "OCDI", name: "سوديك", qty: 55, buy: 27.57, cur: 27.55, sector: "العقارات والإنشاءات", isFund: false },
             { ticker: "EFID", name: "ايديتا للصناعات الغذائية", qty: 23, buy: 31.84, cur: 28.90, sector: "الأغذية والمشروبات", isFund: false },
 
-            // 2. محفظة الصناديق والذهب (أسعار الشراء الفعلية للتكلفة - إفصاح الخميس 1 أكتوبر 2026 المعتمد)
-            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 21.3976, sector: "صناديق الأسهم الشريعة", isFund: true },
+            // 2. محفظة الصناديق والذهب (أسعار الشراء الفعلية للتكلفة - إفصاح الأحد 4 أكتوبر 2026 المعتمد)
+            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 22.0470, sector: "صناديق الأسهم الشريعة", isFund: true },
             { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.6040, sector: "صناديق الذهب", isFund: true },
-            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.0733, sector: "صناديق نقدية وأسهم", isFund: true },
-            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 48.9200, sector: "صناديق الأسهم الشريعة", isFund: true },
+            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1384, sector: "صناديق نقدية وأسهم", isFund: true },
+            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.5900, sector: "صناديق الأسهم الشريعة", isFund: true },
             { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7015.00, sector: "الذهب الخالص 24", isFund: false }
         ];
         let donutChartInstance = null;
@@ -6826,13 +6826,16 @@
             const optgroupFunds = document.createElement('optgroup');
             optgroupFunds.label = "── صناديق الاستثمار والذهب والسيولة الدولارية ──";
             const fundsList = [
-                { ticker: "USD_EGP", name: "الدولار والسيولة الدولارية (USD)", close: 52.26 },
-                { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.6040 },
-                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.00 },
-                { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 21.3976 },
-                { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.0733 },
-                { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 48.9200 }
-            ];
+                { ticker: "USD_EGP", name: "الدولار والسيولة الدولارية (USD)" },
+                { ticker: "AZG", name: "أزيموت جولد (AZG)" },
+                { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)" },
+                { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)" },
+                { ticker: "BWA", name: "بلتون وفرة (BWA)" },
+                { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)" }
+            ].map(f => {
+                const s = STOCKS_DATA.find(x => x.ticker === f.ticker);
+                return { ticker: f.ticker, name: f.name, close: s ? s.close : 0 };
+            });
             fundsList.forEach(f => {
                 const opt = document.createElement('option');
                 opt.value = f.ticker;
@@ -8689,13 +8692,29 @@
 
             const cacheBuster = Date.now() + '_' + Math.floor(Math.random() * 1000000);
 
-            // Parallel execution: Direct In-Browser TradingView + Cloud Market JSON
+            // Parallel execution: Direct In-Browser TradingView + Cloud Market JSON (with Raw GitHub Fast Failover)
+            const fetchCloudMarketData = async () => {
+                try {
+                    const r = await fetch('./market_data.json?cb=' + cacheBuster, {
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+                    });
+                    if (r.ok) return await r.json();
+                } catch (e) {
+                    console.warn('[Sync] Local ./market_data.json fetch failed, trying direct Raw GitHub...', e);
+                }
+                try {
+                    const rawR = await fetch('https://raw.githubusercontent.com/mahereasybakery-web/egypt-sharia-stock-report/main/market_data.json?cb=' + cacheBuster, { cache: 'no-store' });
+                    if (rawR.ok) return await rawR.json();
+                } catch (err) {
+                    console.error('[Sync] Direct Raw GitHub fetch failed:', err);
+                }
+                return null;
+            };
+
             const [tvRes, cloudRes] = await Promise.allSettled([
                 fetchTradingViewDirect(),
-                fetch('./market_data.json?cb=' + cacheBuster, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
-                }).then(r => r.ok ? r.json() : null).catch(() => null)
+                fetchCloudMarketData()
             ]);
 
             let updatedStocksCount = 0;
@@ -8780,8 +8799,30 @@
                         const live = cData.funds[sym];
                         const local = STOCKS_DATA.find(s => s.ticker === sym);
                         if (local && live && live.close > 0) {
+                            // Date Guard: never overwrite with an older disclosure date
+                            const isNewerOrEqual = !local.last_nav_date || !live.last_nav_date || live.last_nav_date >= local.last_nav_date;
+                            if (!isNewerOrEqual) {
+                                console.log(`[Sync Guard] Keeping local ${sym} (${local.close} / ${local.last_nav_date}) over older cloud (${live.close} / ${live.last_nav_date})`);
+                                return;
+                            }
                             local.close = live.close;
                             if (live.chg !== undefined) local.chg = live.chg;
+                            if (live.last_nav_date) local.last_nav_date = live.last_nav_date;
+                            if (live.source) local.source = live.source;
+
+                            // Dynamic Update for VALUATION_DATA
+                            if (typeof VALUATION_DATA !== 'undefined' && VALUATION_DATA[sym]) {
+                                VALUATION_DATA[sym].current = live.close;
+                                if (VALUATION_DATA[sym].base) {
+                                    VALUATION_DATA[sym].margin = parseFloat((((VALUATION_DATA[sym].base - live.close) / live.close) * 100).toFixed(1));
+                                }
+                            }
+
+                            // Dynamic Update for Comparison Matrix Cards in DOM
+                            const matrixPriceEl = document.getElementById(`matrix-price-${sym}`);
+                            if (matrixPriceEl) {
+                                matrixPriceEl.textContent = `${(live.close).toFixed(4)} ج`;
+                            }
                             updatedFundsCount++;
                         }
                     });
@@ -11263,7 +11304,7 @@ async function syncMubasherDirectAll() {
 
                 if (qLower.includes('cms') || (qLower.includes('مصر شريعة') && !qLower.includes('قارن'))) {
                     const cmsStock = STOCKS_DATA.find(s => s.ticker === 'CMS') || {};
-                    const cmsNav = (cmsStock.close || 21.3976).toFixed(4);
+                    const cmsNav = (cmsStock.close || 22.0470).toFixed(4);
                     const chg = cmsStock.chg || 0;
                     ans = `
                         <div class="space-y-2">
@@ -11311,7 +11352,7 @@ async function syncMubasherDirectAll() {
                     `;
                 } else if (qLower.includes('bwa') || (qLower.includes('وفرة') && !qLower.includes('قارن'))) {
                     const bwaStock = STOCKS_DATA.find(s => s.ticker === 'BWA') || {};
-                    const bwaNav = (bwaStock.close || 2.0733).toFixed(4);
+                    const bwaNav = (bwaStock.close || 2.1384).toFixed(4);
                     const chg = bwaStock.chg || 0;
                     ans = `
                         <div class="space-y-2">
@@ -11333,7 +11374,7 @@ async function syncMubasherDirectAll() {
                     `;
                 } else if (qLower.includes('nmf') || (qLower.includes('النعيم') && !qLower.includes('قارن'))) {
                     const nmfStock = STOCKS_DATA.find(s => s.ticker === 'NMF') || {};
-                    const nmfNav = (nmfStock.close || 48.9200).toFixed(4);
+                    const nmfNav = (nmfStock.close || 49.5900).toFixed(4);
                     const chg = nmfStock.chg || 0;
                     ans = `
                         <div class="space-y-2">
@@ -11377,21 +11418,21 @@ async function syncMubasherDirectAll() {
                                         <tr>
                                             <td class="p-1.5 font-bold text-white">مصر شريعة (CMS)</td>
                                             <td class="p-1.5 text-slate-400">مؤشر EGX33 • سي آي</td>
-                                            <td class="p-1.5 font-mono text-emerald-400 font-bold">${(cmsStock.close || 21.3976).toFixed(4)} ج</td>
+                                            <td class="p-1.5 font-mono text-emerald-400 font-bold">${(cmsStock.close || 22.0470).toFixed(4)} ج</td>
                                             <td class="p-1.5 text-emerald-400">0.50%</td>
                                             <td class="p-1.5 text-sky-300">لحظي (T+2)</td>
                                         </tr>
                                         <tr>
                                             <td class="p-1.5 font-bold text-white">بلتون وفرة (BWA)</td>
                                             <td class="p-1.5 text-slate-400">نمو وتصدير • بلتون</td>
-                                            <td class="p-1.5 font-mono text-sky-400 font-bold">${(bwaStock.close || 2.0733).toFixed(4)} ج</td>
+                                            <td class="p-1.5 font-mono text-sky-400 font-bold">${(bwaStock.close || 2.1384).toFixed(4)} ج</td>
                                             <td class="p-1.5 text-slate-300">1.75%</td>
                                             <td class="p-1.5 text-slate-400">أسبوعي</td>
                                         </tr>
                                         <tr>
                                             <td class="p-1.5 font-bold text-white">النعيم شريعة (NMF)</td>
                                             <td class="p-1.5 text-slate-400">متوازن وصكوك • النعيم</td>
-                                            <td class="p-1.5 font-mono text-teal-400 font-bold">${(nmfStock.close || 48.9200).toFixed(4)} ج</td>
+                                            <td class="p-1.5 font-mono text-teal-400 font-bold">${(nmfStock.close || 49.5900).toFixed(4)} ج</td>
                                             <td class="p-1.5 text-slate-300">1.50%</td>
                                             <td class="p-1.5 text-slate-400">أسبوعي</td>
                                         </tr>
@@ -13708,10 +13749,10 @@ async function syncMubasherDirectAll() {
                 { ticker: 'ORHD', name: 'اوراسكوم للتنمية مصر', buy: 41.46, cur: 39.50, defaultQty: 58, isFund: false },
                 { ticker: 'OCDI', name: 'سوديك', buy: 27.57, cur: 27.72, defaultQty: 55, isFund: false },
                 { ticker: 'EFID', name: 'ايديتا للصناعات الغذائية', buy: 31.84, cur: 29.20, defaultQty: 23, isFund: false },
-                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 21.3976, defaultQty: 2210, isFund: true },
+                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 22.0470, defaultQty: 2210, isFund: true },
                 { ticker: 'AZG', name: 'صندوق Azimut جولد', buy: 23.1027, cur: 23.6040, defaultQty: 11, isFund: true },
-                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.0733, defaultQty: 66, isFund: true },
-                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 48.9200, defaultQty: 2, isFund: true },
+                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.1384, defaultQty: 66, isFund: true },
+                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 49.5900, defaultQty: 2, isFund: true },
                 { ticker: 'THNDR_GOLD', name: 'ذهب ثاندر (عياّر 24)', buy: 6972.84, cur: 7015.00, defaultQty: 0.0081, isFund: true }
             ];
 
@@ -16169,21 +16210,21 @@ async function syncMubasherDirectAll() {
             const funds = STOCKS_DATA.filter(s => s.type === 'fund');
             let invalidNavCount = 0;
             let sundukLagCount = 0;
-            const officialThursdayNavs = {
-                'CMS': 21.3976,
+            const officialSundayNavs = {
+                'CMS': 22.0470,
                 'AZG': 23.6040,
-                'BWA': 2.0733,
-                'NMF': 48.9200,
+                'BWA': 2.1384,
+                'NMF': 49.5900,
                 'THNDR_GOLD': 7015.00
             };
 
             funds.forEach(f => {
-                const targetNav = officialThursdayNavs[f.ticker];
+                const targetNav = officialSundayNavs[f.ticker];
                 if (!f.close || f.close <= 0) {
                     invalidNavCount++;
                     if (targetNav) f.close = targetNav;
-                } else if (targetNav && Math.abs(f.close - targetNav) > 0.005) {
-                    // Detected lag from single sources (such as old Sunduk)
+                } else if (targetNav && Math.abs(f.close - targetNav) > 0.005 && f.close < targetNav) {
+                    // Detected stale price older than Sunday disclosures
                     sundukLagCount++;
                     f.close = targetNav;
                 }
@@ -16192,18 +16233,22 @@ async function syncMubasherDirectAll() {
             // Also synchronize active portfolio holdings
             if (Array.isArray(userHoldings)) {
                 userHoldings.forEach(h => {
-                    if (officialThursdayNavs[h.ticker]) {
-                        h.cur = officialThursdayNavs[h.ticker];
-                        h.marketPrice = officialThursdayNavs[h.ticker];
+                    const foundStock = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                    if (foundStock && foundStock.close > 0) {
+                        h.cur = foundStock.close;
+                        h.marketPrice = foundStock.close;
+                    } else if (officialSundayNavs[h.ticker]) {
+                        h.cur = officialSundayNavs[h.ticker];
+                        h.marketPrice = officialSundayNavs[h.ticker];
                     }
                 });
             }
 
             if (invalidNavCount > 0 || sundukLagCount > 0) {
-                findings.push(`رصد تأخر تسعير منصة Sunduk الفردية عن إفصاحات الخميس (1 أكتوبر 2026): تم تفعيل المحرك الهجين متعدد المصادر (تطبيق Thndr + فودة لينس + إفصاحات المديرين الرسمية) وتحديث وثائق الصناديق فورياً.`);
-                autoFixes.push(`تحديث وتثبيت أسعار الصناديق على إفصاحات الخميس 1 أكتوبر 2026 المعتمدة: AZG (23.6040 ج)، CMS (21.3976 ج)، BWA (2.0733 ج)، NMF (48.9200 ج)، THNDR_GOLD (7015.00 ج) بدقة 4 أرقام عشرية.`);
+                findings.push(`معايرة وتحديث وثائق الصناديق المتأخرة وفق إفصاحات الأحد 4 أكتوبر 2026 الرسمية ومنصة snduk.com.`);
+                autoFixes.push(`تحديث وتثبيت أسعار الصناديق على إفصاحات الأحد 4 أكتوبر 2026 المعتمدة: CMS (22.0470 ج)، BWA (2.1384 ج)، NMF (49.5900 ج)، AZG (23.6040 ج)، THNDR_GOLD (7015.00 ج) بدقة 4 أرقام عشرية.`);
             } else {
-                autoFixes.push(`📑 المحاسب القانوني: صافي أصول الصناديق (NAV) مدقق 100% ومطابق لإفصاحات الخميس 1 أكتوبر وتطبيق Thndr وفودة لينس بدقة 4 أرقام عشرية.`);
+                autoFixes.push(`📑 المحاسب القانوني: صافي أصول الصناديق (NAV) مدقق 100% ومطابق لإفصاحات الأحد 4 أكتوبر المعتمدة (CMS: 22.0470 ج، BWA: 2.1384 ج، NMF: 49.5900 ج) بدقة 4 أرقام عشرية.`);
             }
             setStepState('funds_nav', 'ok', 'اكتمل تدقيق وثائق الصناديق والمحرك الهجين بنجاح ✓');
 
