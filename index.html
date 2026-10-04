@@ -1079,7 +1079,11 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button onclick="pasteAndSaveGeminiKey()" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 shadow active:scale-95" title="لصق فوري للمفتاح من الحافظة وتفعيله بنقرة واحدة">
+                                <span>⚡</span>
+                                <span>لصق وتفعيل فوري</span>
+                            </button>
                             <button onclick="openGeminiSettingsModal()" id="geminiKeyBtnAction" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow active:scale-95">
                                 <span>🔑</span>
                                 <span id="geminiKeyBtnLabel">إدخال / ضبط المفتاح</span>
@@ -13386,6 +13390,76 @@ async function syncMubasherDirectAll() {
             if (statusBox) statusBox.classList.add('hidden');
             if (input) input.value = localStorage.getItem('egx_gemini_api_key') || '';
             if (modal) modal.classList.remove('hidden');
+
+            // Auto-check clipboard for newly copied key
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText().then(text => {
+                    const trimmed = (text || '').trim();
+                    if (trimmed.startsWith('AIzaSy') && trimmed.length >= 35 && trimmed.length <= 45) {
+                        if (input && (!input.value || input.value !== trimmed)) {
+                            input.value = trimmed;
+                            if (statusBox) {
+                                statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-950/90 border border-emerald-700 text-emerald-200 block animate-fadeIn';
+                                statusBox.innerHTML = `
+                                    <div class="font-bold flex items-center justify-between flex-wrap gap-2">
+                                        <span class="flex items-center gap-1.5"><span>⚡</span><span>تم رصد مفتاح Gemini تلقائياً من الحافظة!</span></span>
+                                        <button type="button" onclick="saveGeminiApiKey()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1 rounded-lg text-xs shadow transition active:scale-95">
+                                            حفظ وتفعيل فوري الآن ✓
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                }).catch(() => {});
+            }
+        };
+
+        window.pasteAndSaveGeminiKey = async function() {
+            triggerHaptic('medium');
+            const statusBox = document.getElementById('geminiModalTestStatus');
+            const modal = document.getElementById('geminiSettingsModal');
+            if (modal && modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            }
+            try {
+                if (!navigator.clipboard || !navigator.clipboard.readText) {
+                    if (statusBox) {
+                        statusBox.className = 'p-3 rounded-xl text-xs bg-amber-950/80 border border-amber-800 text-amber-200 block';
+                        statusBox.innerHTML = '⚠️ المتصفح لم يمنح الإذن بقراءة الحافظة تلقائياً. يرجى لصق المفتاح في الحقل أدناه بالضغط المطول أو (Ctrl+V).';
+                    }
+                    return;
+                }
+                const text = await navigator.clipboard.readText();
+                const trimmed = (text || '').trim();
+                if (trimmed.startsWith('AIzaSy') && trimmed.length >= 35 && trimmed.length <= 45) {
+                    const input = document.getElementById('geminiApiKeyInput');
+                    if (input) input.value = trimmed;
+                    saveGeminiApiKey();
+                    setTimeout(() => {
+                        testGeminiApiKey();
+                    }, 400);
+                } else {
+                    if (statusBox) {
+                        statusBox.className = 'p-3 rounded-xl text-xs bg-amber-950/80 border border-amber-800 text-amber-200 block space-y-1.5';
+                        statusBox.innerHTML = `
+                            <div class="font-bold flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>لم يتم العثور على مفتاح Gemini صالح في الحافظة</span>
+                            </div>
+                            <div class="text-[10.5px] text-slate-300 leading-relaxed">
+                                • مفتاح Gemini يبدأ دائماً بـ <code class="font-mono text-emerald-300 bg-slate-900 px-1 py-0.5 rounded">AIzaSy...</code><br>
+                                • اضغط على زر <b>Copy</b> في صفحة Google AI Studio (المفتوحة في المتصفح الآن) ثم اضغط هذا الزر مجدداً للتفعيل الفوري!
+                            </div>
+                        `;
+                    }
+                }
+            } catch (err) {
+                if (statusBox) {
+                    statusBox.className = 'p-2.5 rounded-xl text-xs bg-rose-950/80 border border-rose-800 text-rose-300 block';
+                    statusBox.innerHTML = '⚠️ يرجى السماح للمتصفح بالوصول للحافظة عند ظهور الإشعار، أو لصق المفتاح يدوياً.';
+                }
+            }
         };
 
         window.closeGeminiSettingsModal = function() {
@@ -13579,6 +13653,21 @@ async function syncMubasherDirectAll() {
         setTimeout(() => {
             if (typeof updateGeminiUiState === 'function') updateGeminiUiState();
         }, 300);
+
+        // Listen to window focus (e.g. returning from Google AI Studio tab)
+        window.addEventListener('focus', () => {
+            const existingKey = (localStorage.getItem('egx_gemini_api_key') || '').trim();
+            if (!existingKey && navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText().then(text => {
+                    const trimmed = (text || '').trim();
+                    if (trimmed.startsWith('AIzaSy') && trimmed.length >= 35 && trimmed.length <= 45) {
+                        if (typeof showToast === 'function') {
+                            showToast('⚡ تم رصد مفتاح Gemini في الحافظة! انقر على زر اللصق السريع للتفعيل الفوري 🚀');
+                        }
+                    }
+                }).catch(() => {});
+            }
+        });
 
         // HTML Output Sanitizer for AI Responses (Guards against XSS)
         function sanitizeAiHtml(str) {
@@ -20627,14 +20716,24 @@ ${holdingsContext}
                     </p>
                 </div>
 
-                <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between flex-wrap gap-2">
-                    <span>💡 ليس لديك مفتاح بعد؟ احصل على مفتاح مجاني في 10 ثوانٍ:</span>
+                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between flex-wrap gap-2">
+                    <div class="space-y-0.5">
+                        <span class="font-bold text-slate-200 flex items-center gap-1.5"><span>🌐</span><span>صفحة مطوري Google AI Studio:</span></span>
+                        <p class="text-[10px] text-slate-400">اضغط <b>Create API Key</b> ثم <b>Copy</b>، ثم اضغط زر اللصق السريع أدناه.</p>
+                    </div>
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" 
-                       class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-1 rounded-lg text-[10.5px] transition active:scale-95">
+                       class="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-800/80 px-3 py-1.5 rounded-xl text-[11px] transition active:scale-95 shadow">
                         <span>فتح Google AI Studio ↗</span>
                     </a>
                 </div>
             </div>
+
+            <!-- 1-Click Clipboard Instant Activation -->
+            <button type="button" onclick="pasteAndSaveGeminiKey()" 
+                    class="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg active:scale-95 border border-emerald-400/40">
+                <span class="text-base">📋</span>
+                <span>⚡ لصق المفتاح من الحافظة والتفعيل الفوري (بنقرة واحدة)</span>
+            </button>
 
             <div class="space-y-1.5">
                 <label class="block text-[11px] font-bold text-slate-300">مفتاح API الخاص بك (Gemini API Key):</label>
