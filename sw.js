@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v16.4 (Multi-Tier Natural Language AI & Live Market Sync)
-const CACHE_NAME = 'egx-sharia-v16.4';
+// EGX Sharia Portal - Advanced PWA Service Worker v16.5 (Interactive Gemini AI Cloud Integration & Generative Reasoning)
+const CACHE_NAME = 'egx-sharia-v16.5';
 const STATIC_ASSETS = [
   './',
   './index.html',

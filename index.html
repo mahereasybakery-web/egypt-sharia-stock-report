@@ -920,6 +920,32 @@
                         </button>
                     </div>
 
+                    <!-- Dynamic Gemini Engine Status & Quick Key Manager Banner -->
+                    <div id="geminiInlineKeyBar" class="p-3 rounded-2xl border border-indigo-900/60 bg-gradient-to-r from-slate-900 via-indigo-950/30 to-slate-900 text-xs shadow-sm flex items-center justify-between flex-wrap gap-2.5">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-base">🤖</span>
+                            <div>
+                                <div class="flex items-center gap-2 font-bold text-white text-xs">
+                                    <span>محرك التفكير التوليدي (Google Gemini AI)</span>
+                                    <span id="geminiKeyStatusBadge" class="text-[9.5px] px-2 py-0.5 rounded-full font-mono bg-slate-800 text-slate-300 border border-slate-700">المحرك الداخلي نشط</span>
+                                </div>
+                                <p id="geminiKeyStatusDesc" class="text-[10px] text-slate-400 mt-0.5">
+                                    المستشار يعمل حالياً بالمحرك الكمي المالي. يمكنك إدخال مفتاح API المجاني لتمكين التفكير التوليدي الحر.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openGeminiSettingsModal()" id="geminiKeyBtnAction" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow active:scale-95">
+                                <span>🔑</span>
+                                <span id="geminiKeyBtnLabel">إدخال / ضبط المفتاح</span>
+                            </button>
+                            <button id="geminiQuickTestBtn" onclick="testGeminiApiKey()" class="hidden px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-indigo-300 hover:text-white border border-slate-700 text-[11px] font-mono transition active:scale-95">
+                                <span>⚡ فحص</span>
+                            </button>
+                        </div>
+                    </div>
+
+
                     <!-- Quick Advisor Categories & Filter Tabs (Optimized Responsive Grid for Mobile & Desktop) -->
                     <div class="space-y-2 pt-1">
                         <div class="flex items-center justify-between text-[11px] text-slate-400 px-0.5">
@@ -4895,7 +4921,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16.4')
+                navigator.serviceWorker.register('sw.js?v=16.5')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -11356,11 +11382,13 @@ async function syncMubasherDirectAll() {
         window.quickAskMarketAi = function(q) { return askAiMarketAdvisor(q); };
         window.askAiMarketAdvisor = askAiMarketAdvisor;
 
-        // Modal Helpers for Gemini API Key
+        // Modal & Inline Helpers for Gemini API Key & Generative AI
         window.openGeminiSettingsModal = function() {
             triggerHaptic('selection');
             const modal = document.getElementById('geminiSettingsModal');
             const input = document.getElementById('geminiApiKeyInput');
+            const statusBox = document.getElementById('geminiModalTestStatus');
+            if (statusBox) statusBox.classList.add('hidden');
             if (input) input.value = localStorage.getItem('egx_gemini_api_key') || '';
             if (modal) modal.classList.remove('hidden');
         };
@@ -11371,18 +11399,84 @@ async function syncMubasherDirectAll() {
             if (modal) modal.classList.add('hidden');
         };
 
+        window.toggleGeminiKeyVisibility = function() {
+            const input = document.getElementById('geminiApiKeyInput');
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        window.updateGeminiUiState = function() {
+            const key = localStorage.getItem('egx_gemini_api_key');
+            const badge = document.getElementById('geminiKeyStatusBadge');
+            const desc = document.getElementById('geminiKeyStatusDesc');
+            const btnLabel = document.getElementById('geminiKeyBtnLabel');
+            const quickTestBtn = document.getElementById('geminiQuickTestBtn');
+            const dot = document.getElementById('geminiLiveStatusDot');
+
+            if (key && key.trim().length > 10) {
+                if (badge) {
+                    badge.className = 'text-[9.5px] px-2 py-0.5 rounded-full font-mono bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold';
+                    badge.innerHTML = '🟢 Gemini 1.5 Flash مفعل';
+                }
+                if (desc) {
+                    desc.innerHTML = 'نموذج التفكير التوليدي السحابي متصل ويعمل بحرية كاملة مع بيانات محفظتك وأسعار EGX اللحظية.';
+                }
+                if (btnLabel) btnLabel.innerText = 'تعديل أو مسح المفتاح';
+                if (quickTestBtn) quickTestBtn.classList.remove('hidden');
+                if (dot) {
+                    dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live';
+                }
+            } else {
+                if (badge) {
+                    badge.className = 'text-[9.5px] px-2 py-0.5 rounded-full font-mono bg-slate-800 text-slate-300 border border-slate-700';
+                    badge.innerHTML = 'المحرك الداخلي نشط';
+                }
+                if (desc) {
+                    desc.innerHTML = 'المستشار يعمل حالياً بالمحرك الكمي المالي. يمكنك إدخال مفتاح API المجاني لتمكين التفكير التوليدي الحر.';
+                }
+                if (btnLabel) btnLabel.innerText = 'إدخال مفتاح Gemini API';
+                if (quickTestBtn) quickTestBtn.classList.add('hidden');
+                if (dot) {
+                    dot.className = 'w-1.5 h-1.5 rounded-full bg-indigo-400';
+                }
+            }
+        };
+
         window.saveGeminiApiKey = function() {
             triggerHaptic('medium');
             const input = document.getElementById('geminiApiKeyInput');
             const key = (input ? input.value : '').trim();
+            const statusBox = document.getElementById('geminiModalTestStatus');
+
             if (key) {
                 localStorage.setItem('egx_gemini_api_key', key);
-                alert('تم حفظ وتفعيل مفتاح Gemini API بنجاح! سيقوم المستشار الذكي الآن بالاتصال السحابي المباشر.');
+                updateGeminiUiState();
+                if (statusBox) {
+                    statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-950/80 border border-emerald-800 text-emerald-300 space-y-1 block';
+                    statusBox.innerHTML = `
+                        <div class="font-bold flex items-center gap-1.5">
+                            <span>✓</span>
+                            <span>تم حفظ وتفعيل مفتاح Gemini API بنجاح!</span>
+                        </div>
+                        <div class="text-[10.5px] text-emerald-400/90">
+                            سيعمل المستشار الذكي الآن بالتفكير التوليدي الحر السحابي المباشر عبر Google AI Studio.
+                        </div>
+                    `;
+                }
+                setTimeout(() => {
+                    closeGeminiSettingsModal();
+                }, 1200);
             } else {
                 localStorage.removeItem('egx_gemini_api_key');
-                alert('تم تفعيل المحرك الكمي الداخلي الفائق بدون مفتاح سحابي.');
+                updateGeminiUiState();
+                if (statusBox) {
+                    statusBox.className = 'p-2.5 rounded-xl text-xs bg-slate-800 text-slate-300 block';
+                    statusBox.innerHTML = 'تم مسح المفتاح والعودة للمحرك الكمي الداخلي الفائق.';
+                }
+                setTimeout(() => {
+                    closeGeminiSettingsModal();
+                }, 1000);
             }
-            closeGeminiSettingsModal();
         };
 
         window.clearGeminiApiKey = function() {
@@ -11390,11 +11484,174 @@ async function syncMubasherDirectAll() {
             localStorage.removeItem('egx_gemini_api_key');
             const input = document.getElementById('geminiApiKeyInput');
             if (input) input.value = '';
-            alert('تم مسح المفتاح والعودة للمحرك الكمي الداخلي.');
-            closeGeminiSettingsModal();
+            const statusBox = document.getElementById('geminiModalTestStatus');
+            if (statusBox) {
+                statusBox.className = 'p-2.5 rounded-xl text-xs bg-slate-800 text-slate-300 block';
+                statusBox.innerHTML = 'تم مسح المفتاح والعودة للمحرك المالي والكمي الداخلي.';
+            }
+            updateGeminiUiState();
+            setTimeout(() => {
+                closeGeminiSettingsModal();
+            }, 800);
         };
 
-        // Master Stock Aliases & Keyword Dictionary for Natural Language Processing
+        window.testGeminiApiKey = async function() {
+            triggerHaptic('selection');
+            const input = document.getElementById('geminiApiKeyInput');
+            const key = (input && input.value ? input.value : localStorage.getItem('egx_gemini_api_key') || '').trim();
+            const statusBox = document.getElementById('geminiModalTestStatus');
+
+            if (!key) {
+                if (statusBox) {
+                    statusBox.className = 'p-2.5 rounded-xl text-xs bg-rose-950/80 border border-rose-800 text-rose-300 block';
+                    statusBox.innerHTML = '⚠️ يرجى إدخال مفتاح API أولاً لتتمكن من اختباره.';
+                }
+                return;
+            }
+
+            if (statusBox) {
+                statusBox.className = 'p-2.5 rounded-xl text-xs bg-indigo-950/80 border border-indigo-800 text-indigo-300 block';
+                statusBox.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 pulse-live"></span>
+                        <span>جاري اختبار الاتصال بسحابة Google Gemini...</span>
+                    </div>
+                `;
+            }
+
+            try {
+                const testPrompt = "أجب في جملة واحدة باللغة العربية: هل الاتصال السحابي يعمل بنجاح للبورصة المصرية؟";
+                const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+                let success = false;
+                let reply = '';
+                let usedModel = '';
+
+                for (const m of modelsToTry) {
+                    try {
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`;
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ role: 'user', parts: [{ text: testPrompt }] }]
+                            })
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                            if (reply) {
+                                success = true;
+                                usedModel = m;
+                                break;
+                            }
+                        }
+                    } catch (err) {}
+                }
+
+                if (success) {
+                    if (statusBox) {
+                        statusBox.className = 'p-3 rounded-xl text-xs bg-emerald-950/90 border border-emerald-800 text-emerald-300 space-y-1 block';
+                        statusBox.innerHTML = `
+                            <div class="font-bold flex items-center gap-1.5 text-xs">
+                                <span>✅</span>
+                                <span>الاتصال السحابي ناجح بنسبة 100%! (${usedModel})</span>
+                            </div>
+                            <div class="text-[10px] text-emerald-400 leading-relaxed font-mono bg-emerald-950 p-1.5 rounded-lg border border-emerald-800/60 mt-1">
+                                "${reply.trim()}"
+                            </div>
+                        `;
+                    }
+                } else {
+                    throw new Error('لم يستجب النموذج، تأكد من صحة المفتاح وتفعيله في Google AI Studio.');
+                }
+            } catch (err) {
+                if (statusBox) {
+                    statusBox.className = 'p-2.5 rounded-xl text-xs bg-rose-950/90 border border-rose-800 text-rose-300 block space-y-1';
+                    statusBox.innerHTML = `
+                        <div class="font-bold flex items-center gap-1">
+                            <span>❌</span>
+                            <span>فشل اختبار الاتصال:</span>
+                        </div>
+                        <div class="text-[10px] text-rose-300/90">
+                            ${err.message || 'خطأ في الشبكة أو مفتاح غير صالح.'}
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        // Initialize state on load
+        setTimeout(() => {
+            if (typeof updateGeminiUiState === 'function') updateGeminiUiState();
+        }, 300);
+
+        // Advanced Cloud Gemini API Caller
+        async function callCloudGeminiApi(userPrompt, apiKey, isLive) {
+            const holdingsContext = (typeof THNDR_ACTUAL_HOLDINGS !== 'undefined' && Array.isArray(THNDR_ACTUAL_HOLDINGS))
+                ? THNDR_ACTUAL_HOLDINGS.map(h => `${h.name} (${h.ticker}): سعر شرائه ${h.buy}ج، حالي ${h.cur}ج، ربحه ${(((h.cur-h.buy)/h.buy)*100).toFixed(1)}%`).join(' | ')
+                : 'محفظة مستثمر بالبورصة المصرية';
+
+            const systemContext = `أنت الخبير المالي والمحاسبي الأول للبورصة المصرية (EGX) ومؤشر الشريعة EGX33.
+السوق حالياً: ${isLive ? 'جلسة التداول مفتوحة لحظياً وبث الأسعار مباشر' : 'خارج أوقات التداول الرسمية'}.
+البيانات الاقتصادية الكلية الحالية لمصر:
+- فائدة البنك المركزي المصري (CBE): 27.25% سنوي
+- التضخم الأساسي: 26.2%
+- الدولار مقابل الجنيه: 52.26 ج
+- الذهب عيار 24: 7,015 ج
+- مؤشر الشريعة EGX33 يتداول عند 3,444.68 (+1.90%).
+محفظة المستثمر الحالية في ثندر:
+${holdingsContext}
+
+تعليمات الرد المالي:
+1. أجب باللغة العربية الفصحى الاحترافية والواضحة مع تنسيق أنيق ومريح للقراءة.
+2. استخدم القواعد المالية الأكاديمية والعملية:
+   - التحليل الأساسي والقيمة العادلة (بنيامين جراهام وأسوان داموداران وهامش الأمان).
+   - التحليل الفني (جون ميرفي: مستويات الدعم والمقاومة، مؤشر القوة النسبية RSI، خطوط الاتجاه).
+   - إدارة المخاطر: وقف خسارة صارم، جني أرباح عند المقاومات، واستراتيجية التبريد الذكي (DCA) على دفعتين فقط.
+3. تجنب الإنشائيات العامة، واذكر دائماً أرقاماً محددة ونسباً واضحة ونصائح تنفيذية تناسب واقع الاقتصاد المصري.`;
+
+            const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+            let lastError = null;
+
+            for (const model of modelsToTry) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [
+                                { role: 'user', parts: [{ text: `${systemContext}\n\nسؤال واستشارة المستثمر:\n${userPrompt}` }] }
+                            ]
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        if (rawText) {
+                            // Format response into beautiful HTML
+                            let formatted = rawText
+                                .replace(/\n\n/g, '<br><br>')
+                                .replace(/\n/g, '<br>')
+                                .replace(/\*\*(.*?)\*\*/g, '<b class="text-white font-bold">$1</b>')
+                                .replace(/\*(.*?)\*/g, '<span class="text-indigo-200">$1</span>')
+                                .replace(/^###\s+(.*)$/gm, '<h4 class="text-sm font-bold text-amber-300 mt-2 mb-1 flex items-center gap-1.5"><span>📌</span><span>$1</span></h4>')
+                                .replace(/^##\s+(.*)$/gm, '<h3 class="text-sm font-bold text-emerald-300 mt-2 mb-1">$1</h3>');
+                            return { text: formatted, model: model };
+                        }
+                    } else {
+                        const errData = await res.json().catch(() => ({}));
+                        lastError = new Error(errData?.error?.message || `HTTP ${res.status}`);
+                    }
+                } catch (e) {
+                    lastError = e;
+                }
+            }
+
+            throw lastError || new Error('فشل استدعاء نموذج Gemini');
+        }
+
         const EGX_STOCK_ALIASES = [
             { ticker: 'TMGH', names: ['طلعت مصطفى', 'طلعت', 'مجموعة طلعت', 'tmgh'] },
             { ticker: 'ETEL', names: ['المصرية للاتصالات', 'اتصالات', 'وي', 'we', 'telecom egypt', 'etel'] },
@@ -11466,23 +11723,44 @@ async function syncMubasherDirectAll() {
                      <span>البورصة مغلقة حالياً (${mState.isWeekend ? 'عطلة أسبوعية رسمية' : 'خارج أوقات التداول'}) — التحليل يعتمد على إغلاق الجلسة الأخيرة (${mState.nextSessionCountdownText || 'استئناف 10:00 ص'})</span>
                    </div>`;
 
-            // 3. Check for Custom Gemini API Key
-            const customApiKey = localStorage.getItem('egx_gemini_api_key');
-            if (customApiKey) {
+            // 3. Check for Custom Gemini API Key & Generative Cloud Reasoning
+            const customApiKey = (localStorage.getItem('egx_gemini_api_key') || '').trim();
+            if (customApiKey && customApiKey.length > 10) {
+                textEl.innerHTML = `
+                    <div class="flex items-center gap-2 text-indigo-300 py-3.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 pulse-live"></span>
+                        <div class="space-y-0.5">
+                            <span class="font-bold text-xs">جاري الاتصال بنموذج Google Gemini السحابي...</span>
+                            <p class="text-[10px] text-slate-400">تحليل حر وتفكير توليدي يدمج بيانات محفظتك وأسعار EGX اللحظية</p>
+                        </div>
+                    </div>
+                `;
                 try {
-                    const cloudAns = await callCloudGeminiApi(trimmedQ, customApiKey, isMarketActive);
-                    if (cloudAns) {
+                    const cloudRes = await callCloudGeminiApi(trimmedQ, customApiKey, isMarketActive);
+                    if (cloudRes && cloudRes.text) {
                         const finalHtml = `
-                            <div class="space-y-2">
+                            <div class="space-y-2.5 animate-fadeIn">
                                 ${sessionHeader}
-                                <div class="flex items-center justify-between border-b border-indigo-900/60 pb-1.5">
-                                    <span class="font-bold text-indigo-300 text-xs flex items-center gap-1">
-                                        <span>✨</span> <span>تحليل Gemini 1.5 Flash السحابي المباشر:</span>
-                                    </span>
-                                    <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800">Cloud Live</span>
+                                <div class="flex items-center justify-between border-b border-indigo-900/60 pb-2 flex-wrap gap-2">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-sm">✨</span>
+                                        <span class="font-bold text-indigo-300 text-xs">تحليل Google Gemini السحابي (تفكير توليدي حر):</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">
+                                            ${cloudRes.model || 'Gemini 1.5'}
+                                        </span>
+                                        <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                                            Cloud Active
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-2">
-                                    ${cloudAns}
+                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-2 bg-slate-900/60 p-3 rounded-xl border border-indigo-900/40">
+                                    ${cloudRes.text}
+                                </div>
+                                <div class="flex items-center justify-between text-[9.5px] text-slate-500 pt-1 border-t border-slate-800/80 font-mono">
+                                    <span>المستشار متصل عبر مفتاح API الخاص بك</span>
+                                    <span>${new Date().toLocaleTimeString('ar-EG')}</span>
                                 </div>
                             </div>
                         `;
@@ -11493,7 +11771,24 @@ async function syncMubasherDirectAll() {
                         return;
                     }
                 } catch (e) {
-                    console.warn('[Gemini Cloud API] Fallback to Local Quantitative Engine:', e);
+                    console.warn('[Gemini Cloud API] Error occurred, falling back with user notification:', e);
+                    // Add warning banner but proceed to local quantitative engine
+                    const warningBanner = `
+                        <div class="p-2.5 rounded-xl bg-amber-950/70 border border-amber-800/80 text-amber-200 text-xs mb-2 flex items-center justify-between flex-wrap gap-2">
+                            <div class="flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>تعذر استدعاء نموذج Gemini (${e.message || 'خطأ في المفتاح أو الشبكة'}). تم الانتقال للمحرك المالي الداخلي:</span>
+                            </div>
+                            <button onclick="openGeminiSettingsModal()" class="text-[10px] bg-amber-900/80 hover:bg-amber-800 text-white px-2 py-0.5 rounded-lg border border-amber-700 transition">
+                                فحص المفتاح
+                            </button>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        const localAns = generateAdvancedFinancialAnalysis(trimmedQ, sessionHeader, isMarketActive);
+                        textEl.innerHTML = warningBanner + localAns;
+                    }, 200);
+                    return;
                 }
             }
 
@@ -17363,39 +17658,63 @@ async function syncMubasherDirectAll() {
 
     <!-- ================= MODAL: GEMINI API KEY SETTINGS ================= -->
     <div id="geminiSettingsModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3.5" onclick="if(event.target===this) closeGeminiSettingsModal()">
-        <div class="glass-card rounded-2xl p-5 max-w-md w-full border border-indigo-800/80 bg-slate-900/95 space-y-4 shadow-2xl text-right animate-scaleUp">
+        <div class="glass-card rounded-2xl p-5 max-w-lg w-full border border-indigo-800/80 bg-slate-900/95 space-y-4 shadow-2xl text-right animate-scaleUp">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="text-xl">🤖</span>
                     <div>
-                        <h3 class="font-bold text-white text-sm">إعدادات محرك الذكاء الاصطناعي (Gemini Core)</h3>
-                        <p class="text-[10px] text-slate-400">ربط مباشر بنموذج Gemini 1.5 Flash السحابي أو الاعتماد على المحرك الكمي الداخلي</p>
+                        <h3 class="font-bold text-white text-sm">إعدادات محرك Gemini للتفكير التوليدي الحر</h3>
+                        <p class="text-[10px] text-slate-400">ربط مباشر بنموذج Google Gemini 1.5 Flash السحابي أو الاعتماد على المحرك الكمي الداخلي</p>
                     </div>
                 </div>
                 <button onclick="closeGeminiSettingsModal()" class="text-slate-400 hover:text-white p-1 rounded-lg text-lg">✕</button>
             </div>
 
-            <div class="space-y-2 text-xs text-slate-300 leading-relaxed">
-                <p>
-                    يعمل المستشار الذكي تلقائياً عبر <b>المحرك الكمي والمالي الداخلي الفائق</b> (المربوط ببيانات جلسة التداول اللحظية ومؤشرات RSI والقيمة العادلة).
-                </p>
-                <p class="text-[11px] text-slate-400">
-                    💡 يمكنك اختيارياً إدخال مفتاح <b>Google Gemini API Key</b> (المجاني من Google AI Studio) لتمكين النموذج اللغوي السحابي من التفكير الحر والإجابة التوليدية المباشرة:
-                </p>
+            <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                <div class="p-3 bg-indigo-950/40 rounded-xl border border-indigo-800/60 space-y-1.5">
+                    <div class="font-bold text-indigo-300 flex items-center gap-1.5 text-xs">
+                        <span>✨</span>
+                        <span>ماذا يقدم لك الربط السحابي مع Gemini؟</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300">
+                        يتيح للذكاء الاصطناعي <b>التفكير التوليدي المفتوح</b>، ومناقشة أي سيناريو مالي مركب، والتحليل الحر لأي سهم أو استفسار خارج القوالب المحددة، مع تغذية النموذج تلقائياً ببيانات محفظتك الحقيقية في ثندر وأسعار السوق اللحظية.
+                    </p>
+                </div>
+
+                <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 flex items-center justify-between flex-wrap gap-2">
+                    <span>💡 ليس لديك مفتاح بعد؟ احصل على مفتاح مجاني في 10 ثوانٍ:</span>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold bg-emerald-950/80 border border-emerald-800/80 px-2.5 py-1 rounded-lg text-[10.5px] transition active:scale-95">
+                        <span>فتح Google AI Studio ↗</span>
+                    </a>
+                </div>
             </div>
 
             <div class="space-y-1.5">
                 <label class="block text-[11px] font-bold text-slate-300">مفتاح API الخاص بك (Gemini API Key):</label>
-                <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy..." 
-                       class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none font-mono">
-                <p class="text-[9.5px] text-slate-500">يتم حفظ المفتاح محلياً في متصفحك فقط ولا يُرسل لأي خادم وسيط.</p>
+                <div class="relative">
+                    <input id="geminiApiKeyInput" type="password" placeholder="AIzaSy..." 
+                           class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none font-mono tracking-wider">
+                    <button type="button" onclick="toggleGeminiKeyVisibility()" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-xs px-1">
+                        👁️
+                    </button>
+                </div>
+                <p class="text-[9.5px] text-slate-500">🔒 يتم حفظ المفتاح محلياً في متصفحك فقط (localStorage) ولا يُرسل لأي خادم وسيط على الإطلاق.</p>
             </div>
 
-            <div class="flex items-center gap-2 pt-2">
-                <button onclick="saveGeminiApiKey()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition active:scale-95 shadow">
-                    حفظ وتفعيل المفتاح ✓
+            <!-- Test Status Banner -->
+            <div id="geminiModalTestStatus" class="hidden p-2.5 rounded-xl text-xs leading-relaxed"></div>
+
+            <div class="flex items-center gap-2 pt-2 flex-wrap">
+                <button onclick="saveGeminiApiKey()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95 shadow flex items-center justify-center gap-1.5">
+                    <span>✓</span>
+                    <span>حفظ وتفعيل المفتاح السحابي</span>
                 </button>
-                <button onclick="clearGeminiApiKey()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs transition">
+                <button onclick="testGeminiApiKey()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-750 text-indigo-300 hover:text-white border border-slate-700 rounded-xl text-xs transition flex items-center gap-1 active:scale-95 font-bold">
+                    <span>⚡</span>
+                    <span>اختبار الاتصال</span>
+                </button>
+                <button onclick="clearGeminiApiKey()" class="px-3 py-2.5 bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-800/80 rounded-xl text-xs transition">
                     مسح المفتاح
                 </button>
             </div>
