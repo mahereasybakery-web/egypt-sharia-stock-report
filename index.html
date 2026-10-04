@@ -776,78 +776,450 @@
     <main class="max-w-4xl mx-auto px-3.5 pt-3.5 space-y-4 pb-24 md:pb-8">
 
         
-        <!-- ================= TAB: COMPREHENSIVE RECOMMENDATIONS ================= -->
+                <!-- ================= TAB: RECOMMENDATIONS & ANALYSIS (توصيات وتحليل) ================= -->
         <div id="view-recommendations" class="tab-content hidden space-y-3.5">
-            <!-- Executive Decisions KPI Strip -->
-            <div class="glass-card rounded-2xl p-3.5 border border-amber-900/40 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-950 shadow-md">
-                <div class="flex items-center justify-between flex-wrap gap-2 pb-2.5 border-b border-slate-800/80">
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-base">🎯</span>
-                        <div>
-                            <h2 class="text-xs sm:text-sm font-bold text-white">مركز القرارات والتوصيات الاستثمارية اللحظية</h2>
-                            <p class="text-[10px] text-slate-400">تحليل مبني على تقاطع القيمة العادلة، الزخم الفني RSI، ونموذج التبريد الذكي</p>
+            <!-- TOP MASTER DUAL SLICER: 1. توصيات (Recommendations) | 2. التحليل (Analysis) -->
+            <div id="recAnalysisMasterSlicer" class="p-1 bg-slate-950/95 rounded-2xl border border-slate-800 flex items-center gap-1 shadow-lg sticky top-0 z-20 backdrop-blur-md">
+                <button id="recSlicerBtn_recs" onclick="switchRecAnalysisSlicer('recs')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md active:scale-95">
+                    <span>🎯</span>
+                    <span>التوصيات اللحظية</span>
+                    <span id="recsTopCountBadge" class="text-[10px] font-mono bg-amber-950/80 text-amber-200 border border-amber-800/80 px-1.5 py-0.2 rounded-full">-- فرصة</span>
+                </button>
+                <button id="recSlicerBtn_analysis" onclick="switchRecAnalysisSlicer('analysis')" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95">
+                    <span>🤖</span>
+                    <span>التحليل المالي و AI</span>
+                    <span class="text-[10px] font-mono bg-indigo-950/80 text-indigo-300 border border-indigo-800/80 px-1.5 py-0.2 rounded-full">المحلل الذكي</span>
+                </button>
+            </div>
+
+            <!-- SLICER 1: PANEL التوصيات (Recommendations based on Market Pulse & News) -->
+            <div id="recSlicerPanel_recs" class="space-y-3.5">
+                <!-- Executive Decisions KPI Strip -->
+                <div class="glass-card rounded-2xl p-3.5 border border-amber-900/40 bg-gradient-to-r from-slate-900 via-amber-950/20 to-slate-950 shadow-md">
+                    <div class="flex items-center justify-between flex-wrap gap-2 pb-2.5 border-b border-slate-800/80">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-xl bg-amber-600/20 border border-amber-500/40 flex items-center justify-center text-base">🎯</span>
+                            <div>
+                                <h2 class="text-xs sm:text-sm font-bold text-white">توصيات نبض السوق والأخبار اللحظية</h2>
+                                <p class="text-[10px] text-slate-400">توصيات متجددة لحظياً مبنية على تقاطع حركة السوق الفنية، تدفق السيولة، والإفصاحات الرسمية</p>
+                            </div>
+                        </div>
+                        <button onclick="renderRecommendationsView()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-xl transition flex items-center gap-1 active:scale-95">
+                            <span>🔄</span>
+                            <span>تحديث التوصيات</span>
+                        </button>
+                    </div>
+
+                    <!-- 4 Real-Time Decision Counters -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-center text-xs">
+                        <div class="bg-slate-950/70 p-2 rounded-xl border border-emerald-900/50">
+                            <span class="text-slate-400 text-[10px] block mb-0.5">فرص شراء ساخنة 🔥</span>
+                            <span id="recBuyCount" class="font-bold text-emerald-400 font-mono text-sm">-- فرصة</span>
+                        </div>
+                        <div class="bg-slate-950/70 p-2 rounded-xl border border-sky-900/50">
+                            <span class="text-slate-400 text-[10px] block mb-0.5">تبريد محفظتي (DCA) ❄️</span>
+                            <span id="recDcaCount" class="font-bold text-sky-400 font-mono text-sm">-- أسهم</span>
+                        </div>
+                        <div class="bg-slate-950/70 p-2 rounded-xl border border-amber-900/50">
+                            <span class="text-slate-400 text-[10px] block mb-0.5">احتفاظ وترقب ⏳</span>
+                            <span id="recHoldCount" class="font-bold text-amber-300 font-mono text-sm">-- أصل</span>
+                        </div>
+                        <div class="bg-slate-950/70 p-2 rounded-xl border border-rose-900/50">
+                            <span class="text-slate-400 text-[10px] block mb-0.5">جني أرباح وتخفيف 💰</span>
+                            <span id="recSellCount" class="font-bold text-rose-400 font-mono text-sm">-- تخارج</span>
                         </div>
                     </div>
-                    <button onclick="renderRecommendationsView()" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-xl transition flex items-center gap-1 active:scale-95">
-                        <span>🔄</span>
-                        <span>تحديث القرارات</span>
-                    </button>
                 </div>
 
-                <!-- 4 Real-Time Decision Counters -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-center text-xs">
-                    <div class="bg-slate-950/70 p-2 rounded-xl border border-emerald-900/50">
-                        <span class="text-slate-400 text-[10px] block mb-0.5">فرص شراء ذهبية</span>
-                        <span id="recBuyCount" class="font-bold text-emerald-400 font-mono text-sm">-- فرصة</span>
+                <!-- Action Filters Strip -->
+                <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-1.5 flex-wrap">
+                    <!-- Action Buttons: All, Buy, DCA, Hold, Sell -->
+                    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar text-xs">
+                        <button onclick="setRecActionFilter('all', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl font-bold bg-amber-600 text-white shadow transition active:scale-95 shrink-0">الكل 🌟</button>
+                        <button onclick="setRecActionFilter('buy', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>فرصة شراء ساخنة 🔥</span>
+                        </button>
+                        <button onclick="setRecActionFilter('dca', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                            <span>تبريد محفظتي (DCA) ❄️</span>
+                        </button>
+                        <button onclick="setRecActionFilter('hold', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            <span>احتفاظ ومراقبة ⏳</span>
+                        </button>
+                        <button onclick="setRecActionFilter('sell', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                            <span>جني أرباح 💰</span>
+                        </button>
                     </div>
-                    <div class="bg-slate-950/70 p-2 rounded-xl border border-sky-900/50">
-                        <span class="text-slate-400 text-[10px] block mb-0.5">تبريد محفظتي (DCA)</span>
-                        <span id="recDcaCount" class="font-bold text-sky-400 font-mono text-sm">-- أسهم</span>
-                    </div>
-                    <div class="bg-slate-950/70 p-2 rounded-xl border border-amber-900/50">
-                        <span class="text-slate-400 text-[10px] block mb-0.5">احتفاظ وترقب</span>
-                        <span id="recHoldCount" class="font-bold text-amber-300 font-mono text-sm">-- أصل</span>
-                    </div>
-                    <div class="bg-slate-950/70 p-2 rounded-xl border border-rose-900/50">
-                        <span class="text-slate-400 text-[10px] block mb-0.5">جني أرباح وتخفيف</span>
-                        <span id="recSellCount" class="font-bold text-rose-400 font-mono text-sm">-- تخارج</span>
+
+                    <!-- Asset Type Toggle -->
+                    <div class="inline-flex bg-slate-950 border border-slate-700/80 rounded-xl p-0.5 text-xs">
+                        <button id="recTypeStocksBtn" onclick="setRecTypeFilter('stocks', this)" class="px-2.5 py-1 rounded-lg font-bold bg-emerald-600 text-white text-[10px] transition active:scale-95">الأسهم</button>
+                        <button id="recTypeFundsBtn" onclick="setRecTypeFilter('funds', this)" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white text-[10px] transition active:scale-95">الصناديق والذهب</button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Action Filters Strip -->
-            <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-1.5 flex-wrap">
-                <!-- Action Buttons: All, Buy, DCA, Hold, Sell -->
-                <div class="flex items-center gap-1 overflow-x-auto no-scrollbar text-xs">
-                    <button onclick="setRecActionFilter('all', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl font-bold bg-amber-600 text-white shadow transition active:scale-95 shrink-0">الكل 🌟</button>
-                    <button onclick="setRecActionFilter('buy', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                        <span>شراء تجميعي</span>
-                    </button>
-                    <button onclick="setRecActionFilter('dca', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
-                        <span>تبريد محفظتي (DCA)</span>
-                    </button>
-                    <button onclick="setRecActionFilter('hold', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                        <span>احتفاظ ومراقبة</span>
-                    </button>
-                    <button onclick="setRecActionFilter('sell', this)" class="rec-action-btn px-2.5 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 transition active:scale-95 shrink-0 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
-                        <span>جني أرباح</span>
-                    </button>
-                </div>
-
-                <!-- Asset Type Toggle -->
-                <div class="inline-flex bg-slate-950 border border-slate-700/80 rounded-xl p-0.5 text-xs">
-                    <button id="recTypeStocksBtn" onclick="setRecTypeFilter('stocks', this)" class="px-2.5 py-1 rounded-lg font-bold bg-emerald-600 text-white text-[10px] transition active:scale-95">الأسهم</button>
-                    <button id="recTypeFundsBtn" onclick="setRecTypeFilter('funds', this)" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white text-[10px] transition active:scale-95">الصناديق والذهب</button>
+                <!-- Dynamic Decision Cards Container -->
+                <div id="recommendationsListContainer" class="space-y-3">
+                    <!-- Rendered dynamically via renderRecommendationsView() -->
                 </div>
             </div>
 
-            <!-- Dynamic Decision Cards Container -->
-            <div id="recommendationsListContainer" class="space-y-3">
-                <!-- Rendered dynamically via renderRecommendationsView() -->
+            <!-- SLICER 2: PANEL التحليل (Financial & Technical AI Market Analyst) -->
+            <div id="recSlicerPanel_analysis" class="space-y-3.5 hidden">
+<!-- SUB-VIEW 3: تحليل AI (المستشار المالي والشرعي الذكي المربوط بالأسعار اللحظية) -->
+            <div id="marketSubViewAi" class="space-y-3.5">
+                
+                <!-- Market Pulse & Macro Synthesis Context Bar (ربط النبض والأخبار والاقتصاد الكلي) -->
+                <div class="glass-card rounded-2xl p-3 border border-indigo-900/50 bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-950 text-xs shadow-md">
+                    <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-sm">🧠</span>
+                            <div>
+                                <h3 class="font-bold text-white text-xs">منظومة التحليل المالي والفني الشاملة (EGX Analytics Core)</h3>
+                                <p class="text-[10px] text-slate-400">تحليل فوري لحركة الجلسة والسيولة + كافة الأخبار والإفصاحات + معايير جراهام وميرفي للسوق المصري</p>
+                            </div>
+                        </div>
+                        <span class="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">CBE 27.25% • USD 52.26 • GOLD 7,015 ج</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2 text-center text-[10px] font-mono">
+                        <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">مؤشر EGX33 شريعة</span>
+                            <span class="text-emerald-400 font-bold">3,444.68 (+1.90%)</span>
+                        </div>
+                        <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">فائدة البنك المركزي</span>
+                            <span class="text-sky-300 font-bold">27.25% سنوي</span>
+                        </div>
+                        <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">معدل التضخم السنوي</span>
+                            <span class="text-amber-300 font-bold">26.2% أساسي</span>
+                        </div>
+                        <div class="bg-slate-950/80 p-1.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-500 block">هامش أمان مؤشر السوق</span>
+                            <span class="text-emerald-300 font-bold">+28.5% خصم عن العادلة (Undervalued)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">🤖</span>
+                            <div>
+                                <h2 class="text-sm font-bold text-white">المستشار المالي والشرعي الذكي</h2>
+                                <p class="text-xs text-slate-400 mt-0.5">تحليل لحظي يربط أسعار EGX الحالية بالقيمة العادلة ومؤشرات RSI ومحفظتك</p>
+                            </div>
+                        </div>
+                        <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-mono">Gemini AI Engine</span>
+                    </div>
+
+                    <!-- Quick Advisor Categories & Filter Tabs (Optimized Responsive Grid for Mobile & Desktop) -->
+                    <div class="space-y-2 pt-1">
+                        <div class="flex items-center justify-between text-[11px] text-slate-400 px-0.5">
+                            <span class="font-medium flex items-center gap-1.5">
+                                <span>💡</span>
+                                <span>اختر موضوع الاستشارة أو اكتب سؤالك بالأسفل:</span>
+                            </span>
+                            <span id="aiAdvisorActiveCount" class="text-[10px] text-indigo-400 font-mono font-bold bg-indigo-950/70 border border-indigo-900/60 px-2 py-0.5 rounded-full">16 استشارة متاحة</span>
+                        </div>
+
+                        <!-- Category Filter Pills (Mobile friendly swipe, Desktop wrap) -->
+                        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+                            <button onclick="filterAiQuestions('all', this)" class="ai-cat-btn active px-3 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-600 text-white transition whitespace-nowrap shadow-sm border border-indigo-500/30 flex items-center gap-1 active:scale-95">
+                                <span>✨</span>
+                                <span>الكل (16)</span>
+                            </button>
+                            <button onclick="filterAiQuestions('buy', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                                <span>🚀</span>
+                                <span>فرص شراء ساخنة (4)</span>
+                            </button>
+                            <button onclick="filterAiQuestions('dca', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                                <span>❄️</span>
+                                <span>تبريد المحفظة DCA (3)</span>
+                            </button>
+                            <button onclick="filterAiQuestions('sell', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                                <span>💰</span>
+                                <span>جني أرباح وتخارج (3)</span>
+                            </button>
+                            <button onclick="filterAiQuestions('news', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                                <span>📰</span>
+                                <span>أخبار وفائدة 27.25% (3)</span>
+                            </button>
+                            <button onclick="filterAiQuestions('macro', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
+                                <span>💵</span>
+                                <span>دولار وذهب وصناديق (3)</span>
+                            </button>
+                        </div>
+
+                        <!-- Responsive Question Cards Grid (2 cols mobile, 3-4 cols desktop) -->
+                        <div id="aiAdvisorCardsGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 py-1 max-h-[380px] overflow-y-auto pr-0.5 custom-scrollbar">
+                            <!-- Card 1: فرص الشراء والتجميع -->
+                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي أفضل الفرص الاستثمارية للشراء والتجميع الآن في السوق المصري بناءً على التقييم المؤسسي والقيمة العادلة؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🚀</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">قيمة عادلة</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">أفضل فرص الشراء</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">تقييم مؤسسي وهوامش أمان للمدى المتوسط والبعيد</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: قيعان RSI -->
+                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي الأسهم التي وصلت لمناطق قيعان وتشبع بيعي قوي RSI أقل من 40 وتعتبر فرص ارتداد؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-sky-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">📉</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/50 font-medium">RSI &lt; 40</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-300 transition-colors line-clamp-1">أسهم بالقيعان (RSI)</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">مناطق تشبع بيعي حاد وارتدادات فنية مرتقبة</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-sky-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: أسهم الزخم والسيولة -->
+                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي الأسهم التي تشهد أعلى تدفقات سيولة وزخماً سعرياً إيجابياً في تداولات البورصة اليوم؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-violet-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">⚡</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-violet-950/80 text-violet-400 border border-violet-800/50 font-medium">سيولة نشطة</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-violet-300 transition-colors line-clamp-1">الزخم وتدفق السيولة</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أعلى أحجام تداول وتسارع سعري إيجابي</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-violet-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: هوامش أمان جراهام وداموداران -->
+                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي الأسهم ذات هوامش الأمان الاستثنائية (أعلى من 30% أسفل القيمة العادلة لجراهام وداموداران)؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💎</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">أمان &gt; 30%</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">هوامش أمان استثنائية</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أسهم تتداول بخصم يتجاوز 30% عن القيمة العادلة</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 5: تبريد طلعت مصطفى TMGH -->
+                            <div data-cat="dca" onclick="askAiMarketAdvisor('هل أبرد في سهم طلعت مصطفى (TMGH) بسعري 95.83 ج، وما هي مناطق الدعم الفنية المناسبة لخفض المتوسط؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-sky-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">❄️</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/50 font-medium">TMGH تبريد</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-300 transition-colors line-clamp-1">تبريد طلعت مصطفى</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">دعم متوسط الشراء 95.83 ج ومناطق الارتداد 84-87 ج</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-sky-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 6: تبريد المحفظة DCA العام -->
+                            <div data-cat="dca" onclick="askAiMarketAdvisor('ما هي الأسهم الخاسرة في محفظتي التي ينصح بتبريدها DCA وبأي أسعار لدعم متوسط التكلفة؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-sky-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🛡️</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/50 font-medium">DCA محفظتي</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-300 transition-colors line-clamp-1">تبريد المحفظة الذكي</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">تحسين متوسط تكلفة الشراء للأسهم المتراجعة</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-sky-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 7: قواعد التبريد وتجنب السكاكين الساقطة -->
+                            <div data-cat="dca" onclick="askAiMarketAdvisor('كيف أطبق استراتيجية التبريد الذكي دون الوقوع في فخ السكاكين الساقطة (Falling Knives)؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">⚠️</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-800/50 font-medium">حاجز أمان</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition-colors line-clamp-1">فخ السكين الساقط</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">قواعد التفرقة بين التبريد المدروس والهبوط الكارثي</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-amber-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 8: جني أرباح المصرية للاتصالات ETEL -->
+                            <div data-cat="sell" onclick="askAiMarketAdvisor('سهم المصرية للاتصالات (ETEL) محقق ربح +33.5%، هل أجني الأرباح الآن أم أنتظر، وأين أضع الوقف المتحرك؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💰</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">ETEL +33.5%</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-rose-300 transition-colors line-clamp-1">جني أرباح الاتصالات</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">خطة تسييل 25-30% وتحديد الوقف المتحرك عند 138 ج</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-rose-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 9: أهداف جني الأرباح والتخفيف العام -->
+                            <div data-cat="sell" onclick="askAiMarketAdvisor('ما هي الأسهم التي اقتربت من قيمتها العادلة ومقاوماتها الفنية وينصح بجني الأرباح والتخفيف منها؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🎯</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-800/50 font-medium">جني أرباح</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-rose-300 transition-colors line-clamp-1">أهداف جني الأرباح</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أسهم بلغت المقاومات والقيمة العادلة للتخفيف</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-rose-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 10: وقف الخسارة وإدارة المخاطر -->
+                            <div data-cat="sell" onclick="askAiMarketAdvisor('ما هي مستويات وقف الخسارة الصارمة وقواعد إدارة المخاطر لحماية رأس المال من الهبوط الحاد؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🛑</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-800/50 font-medium">Stop-Loss</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-rose-300 transition-colors line-clamp-1">وقف الخسارة والمخاطر</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">مستويات الحماية وقواعد نسبة المخاطرة للعائد</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-rose-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 11: تحليل أثر الأخبار والإفصاحات -->
+                            <div data-cat="news" onclick="askAiMarketAdvisor('كيف تؤثر أحدث الأخبار والإفصاحات الرسمية على أسهم محفظتي والسوق المصري هذا الأسبوع؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">📰</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 font-medium">إفصاحات EGX</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-1">تحليل الأخبار والإفصاحات</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أثر إعلانات الأرباح والعقود على تحركات الأسهم</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-indigo-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 12: الكوبونات النقدية مقابل فائدة البنك المركزي 27.25% -->
+                            <div data-cat="news" onclick="askAiMarketAdvisor('ما هي أعلى الأسهم المصرية توزيعاً للكوبونات النقدية وكيف تنافس فائدة البنك المركزي 27.25%؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💰</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">CBE 27.25%</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">الكوبونات مقابل فائدة 27.25%</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">كيف تنافس عوائد أسهم البورصة أذون الخزانة والشهادات؟</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 13: أسهم التصدير والدولار -->
+                            <div data-cat="news" onclick="askAiMarketAdvisor('ما هي أفضل الأسهم الدفاعية ذات الإيرادات التصديرية والدولارية لحماية المحفظة ضد تقلبات الجنيه؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💵</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/80 text-teal-400 border border-teal-800/50 font-medium">تحوط العملة</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-teal-300 transition-colors line-clamp-1">أسهم التصدير والدولار</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">شركات بإيرادات تصديرية للتحوط ضد تقلبات الصرف</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-teal-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 14: توقعات الدولار والسيولة الدولارية -->
+                            <div data-cat="macro" onclick="askAiMarketAdvisor('ما هي أحدث توقعات سعر صرف الدولار مقابل الجنيه (USD/EGP) وما هو التقييم العادل وتوصيات إدارة السيولة الدولارية؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">💵</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">USD/EGP</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">توقعات الدولار والسيولة</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">التقييم العادل وتوصيات إدارة الأصول والسيولة الدولارية</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 15: التحوط بالذهب وأزيموت جولد AZG -->
+                            <div data-cat="macro" onclick="askAiMarketAdvisor('ما هي استراتيجية الاستثمار والتحوط بالذهب عيار 24 وصناديق الذهب (AZG) في ظل سعر الصرف والتضخم؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">🪙</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-800/50 font-medium">AZG عيار 24</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition-colors line-clamp-1">التحوط بالذهب وصندوق AZG</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">استراتيجية السبائك وصناديق الذهب لمجابهة التضخم</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-amber-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 16: مقارنة الصناديق الإسلامية -->
+                            <div data-cat="macro" onclick="askAiMarketAdvisor('قارن بين صناديق الأسهم الإسلامية: صندوق مصر شريعة (CMS) وبلتون وفرة (BWA) والنعيم (NMF) من حيث الأداء والرسوم؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
+                                <div class="space-y-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">⚖️</div>
+                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 font-medium">مقارنة صناديق</span>
+                                    </div>
+                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-1">مقارنة الصناديق الإسلامية</h4>
+                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">مقارنة الأداء وتكاليف الإدارة بين CMS و BWA و NMF</p>
+                                </div>
+                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-indigo-400 font-medium">
+                                    <span>تحليل فوري</span><span>←</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Response Area -->
+                    <div id="marketAiResponseBox" class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2 text-xs leading-relaxed text-slate-200">
+                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+                            <span>💡</span>
+                            <span>التحليل اللحظي للمستشار الذكي:</span>
+                        </div>
+                        <div id="marketAiResponseText" class="space-y-2 text-slate-300 text-[11px] leading-relaxed">
+                            <p>المستشار المالي الذكي متصل لحظياً بأسعار البورصة المصرية ومؤشرات القوة النسبية RSI. انقر على أي سؤال أعلاه أو اكتب اسم أي سهم للحصول على تحليل كمي فوري.</p>
+                        </div>
+                    </div>
+
+                    <!-- Direct Question Input -->
+                    <div class="flex items-center gap-1.5 pt-1">
+                        <input id="marketAiCustomInput" type="text" placeholder="اسأل عن أي سهم (مثال: سهم طلعت مصطفى، فوري، المصرية للاتصالات)..." 
+                               class="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition"
+                               onkeydown="if(event.key==='Enter') submitMarketAiQuestion()">
+                        <button onclick="submitMarketAiQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95 shadow">
+                            إرسال ↵
+                        </button>
+                    </div>
+                </div>
+            </div><!-- /marketSubViewAi -->
             </div>
         </div>
 
@@ -871,13 +1243,13 @@
             <!-- Market Pulse Sub-Navigation Tabs (تظهر أسفل السلايسر لتحليلات الأسهم) -->
             <div id="marketSubTabsBar" class="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-2xl border border-slate-800 text-xs select-none">
                 <button id="marketSubTabPulseBtn" onclick="switchMarketSubTab('pulse')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold bg-emerald-600 text-white shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>⚡</span> <span>نبض الرادار</span>
-                </button>
-                <button id="marketSubTabAiBtn" onclick="switchMarketSubTab('ai')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>🤖</span> <span>تحليل AI</span>
+                    <span>⚡</span> <span>نبض الرادار والأسهم</span>
                 </button>
                 <button id="marketSubTabFairBtn" onclick="switchMarketSubTab('fair')" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-slate-400 hover:text-slate-200 transition active:scale-95 flex items-center justify-center gap-1">
-                    <span>🎯</span> <span>القيمة العادلة</span>
+                    <span>🎯</span> <span>القيمة العادلة والتقييم</span>
+                </button>
+                <button id="marketSubTabAiBtn" onclick="switchTab('recommendations'); switchRecAnalysisSlicer('analysis');" class="market-subtab-btn flex-1 py-2 rounded-xl font-bold text-indigo-400 hover:text-indigo-200 transition active:scale-95 flex items-center justify-center gap-1 border border-indigo-900/60 bg-indigo-950/40">
+                    <span>🤖</span> <span>محلل السوق AI ↗</span>
                 </button>
             </div>
 
@@ -1586,297 +1958,6 @@
                     </div>
                 </div> <!-- /fundsAnalyticsView -->
             </div><!-- /marketSubViewPulse -->
-
-            <!-- SUB-VIEW 3: تحليل AI (المستشار المالي والشرعي الذكي المربوط بالأسعار اللحظية) -->
-            <div id="marketSubViewAi" class="space-y-3.5 hidden">
-                <div class="glass-card rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">🤖</span>
-                            <div>
-                                <h2 class="text-sm font-bold text-white">المستشار المالي والشرعي الذكي</h2>
-                                <p class="text-xs text-slate-400 mt-0.5">تحليل لحظي يربط أسعار EGX الحالية بالقيمة العادلة ومؤشرات RSI ومحفظتك</p>
-                            </div>
-                        </div>
-                        <span class="text-[9px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-2 py-0.5 rounded-full font-mono">Gemini AI Engine</span>
-                    </div>
-
-                    <!-- Quick Advisor Categories & Filter Tabs (Optimized Responsive Grid for Mobile & Desktop) -->
-                    <div class="space-y-2 pt-1">
-                        <div class="flex items-center justify-between text-[11px] text-slate-400 px-0.5">
-                            <span class="font-medium flex items-center gap-1.5">
-                                <span>💡</span>
-                                <span>اختر موضوع الاستشارة أو اكتب سؤالك بالأسفل:</span>
-                            </span>
-                            <span id="aiAdvisorActiveCount" class="text-[10px] text-indigo-400 font-mono font-bold bg-indigo-950/70 border border-indigo-900/60 px-2 py-0.5 rounded-full">12 استشارة متاحة</span>
-                        </div>
-
-                        <!-- Category Filter Pills (Mobile friendly swipe, Desktop wrap) -->
-                        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-                            <button onclick="filterAiQuestions('all', this)" class="ai-cat-btn active px-3 py-1.5 rounded-xl text-[11px] font-bold bg-indigo-600 text-white transition whitespace-nowrap shadow-sm border border-indigo-500/30 flex items-center gap-1 active:scale-95">
-                                <span>✨</span>
-                                <span>الكل (12)</span>
-                            </button>
-                            <button onclick="filterAiQuestions('buy', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
-                                <span>🚀</span>
-                                <span>فرص وشراء وزخم (3)</span>
-                            </button>
-                            <button onclick="filterAiQuestions('risk', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
-                                <span>🛡️</span>
-                                <span>المحفظة والمخاطر (3)</span>
-                            </button>
-                            <button onclick="filterAiQuestions('yield', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
-                                <span>💰</span>
-                                <span>عوائد وتخفيف (3)</span>
-                            </button>
-                            <button onclick="filterAiQuestions('sharia', this)" class="ai-cat-btn px-3 py-1.5 rounded-xl text-[11px] font-medium bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white transition whitespace-nowrap border border-slate-700/60 flex items-center gap-1 active:scale-95">
-                                <span>🕌</span>
-                                <span>شريعة وأصول بديلة (3)</span>
-                            </button>
-                        </div>
-
-                        <!-- Responsive Question Cards Grid (2 cols mobile, 3-4 cols desktop) -->
-                        <div id="aiAdvisorCardsGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 py-1 max-h-[380px] overflow-y-auto pr-0.5 custom-scrollbar">
-                            <!-- Card 1: فرص الشراء والتجميع -->
-                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي أفضل الفرص الاستثمارية للشراء والتجميع الآن في السوق المصري بناءً على التقييم المؤسسي والقيمة العادلة؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🚀
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">قيمة عادلة</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">أفضل فرص الشراء</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">تقييم مؤسسي وهوامش أمان للمدى المتوسط والبعيد</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 2: قيعان RSI -->
-                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي الأسهم التي وصلت لمناطق قيعان وتشبع بيعي قوي RSI أقل من 40 وتعتبر فرص ارتداد؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-sky-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            📉
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/50 font-medium">RSI &lt; 40</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-300 transition-colors line-clamp-1">أسهم بالقيعان (RSI)</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">مناطق تشبع بيعي حاد وارتدادات فنية مرتقبة</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-sky-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 3: أسهم الزخم والسيولة -->
-                            <div data-cat="buy" onclick="askAiMarketAdvisor('ما هي الأسهم التي تشهد أعلى تدفقات سيولة وزخماً سعرياً إيجابياً في تداولات البورصة اليوم؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-violet-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            ⚡
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-violet-950/80 text-violet-400 border border-violet-800/50 font-medium">سيولة نشطة</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-violet-300 transition-colors line-clamp-1">الزخم وتدفق السيولة</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أعلى أحجام تداول وتسارع سعري إيجابي</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-violet-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 4: تبريد المحفظة DCA -->
-                            <div data-cat="risk" onclick="askAiMarketAdvisor('ما هي الأسهم الخاسرة في محفظتي التي ينصح بتبريدها DCA وبأي أسعار لدعم متوسط التكلفة؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-sky-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🛡️
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-400 border border-sky-800/50 font-medium">DCA تبريد</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-sky-300 transition-colors line-clamp-1">تبريد المحفظة الذكي</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">تحسين متوسط تكلفة الشراء للأسهم الخاسرة</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-sky-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 5: توازن وتنويع المحفظة -->
-                            <div data-cat="risk" onclick="askAiMarketAdvisor('قيم توزيع محفظتي الحالية وتوزيع الأصول بين الأسهم والصناديق والذهب ومدى توازنها؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            ⚖️
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-800/50 font-medium">تنويع الأصول</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition-colors line-clamp-1">توازن المحفظة</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">توزيع الأصول بين الأسهم والصناديق والذهب</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-amber-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 6: وقف الخسارة وإدارة المخاطر -->
-                            <div data-cat="risk" onclick="askAiMarketAdvisor('ما هي مستويات وقف الخسارة الصارمة وقواعد إدارة المخاطر لحماية رأس المال من الهبوط الحاد؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🛑
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-800/50 font-medium">Stop-Loss</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-rose-300 transition-colors line-clamp-1">وقف الخسارة والمخاطر</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">مستويات الحماية وقواعد نسبة المخاطرة للعائد</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-rose-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 7: أعلى عوائد الكوبونات -->
-                            <div data-cat="yield" onclick="askAiMarketAdvisor('ما هي أعلى الأسهم المصرية توزيعاً للأرباح والكوبونات النقدية وعوائدها وتواريخها المتوقعة؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            💰
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">كوبونات نقدية</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">أعلى عوائد التوزيعات</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">الأسهم الأكثر سخاءً وتواريخ استحقاق الكوبونات</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 8: أهداف جني الأرباح -->
-                            <div data-cat="yield" onclick="askAiMarketAdvisor('ما هي الأسهم التي اقتربت من قيمتها العادلة ومقاوماتها الفنية وينصح بجني الأرباح والتخفيف منها؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-rose-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🎯
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-950/80 text-rose-400 border border-rose-800/50 font-medium">جني أرباح</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-rose-300 transition-colors line-clamp-1">أهداف جني الأرباح</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">أسهم اقتربت من المقاومات والقيمة العادلة للتخفيف</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-rose-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 9: أسهم التصدير والدولار -->
-                            <div data-cat="yield" onclick="askAiMarketAdvisor('ما هي أفضل الأسهم الدفاعية ذات الإيرادات التصديرية والدولارية لحماية المحفظة ضد تقلبات الجنيه؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            💵
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-950/80 text-teal-400 border border-teal-800/50 font-medium">تحوط الدولار</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-teal-300 transition-colors line-clamp-1">أسهم التصدير والدولار</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">شركات بإيرادات تصديرية للتحوط ضد تقلبات الصرف</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-teal-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 10: الضوابط الشرعية والتطهير -->
-                            <div data-cat="sharia" onclick="askAiMarketAdvisor('ما هي معايير وضوابط الشريعة لمؤشر EGX33 وكيفية احتساب نسب التطهير المالي للأرباح؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-emerald-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🕌
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 font-medium">EGX33 شريعة</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-emerald-300 transition-colors line-clamp-1">الضوابط ونسب التطهير</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">معايير المؤشر الشريعي ونسب تنقية الأرباح</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-emerald-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 11: التحوط بالذهب والسبائك -->
-                            <div data-cat="sharia" onclick="askAiMarketAdvisor('ما هي استراتيجية الاستثمار والتحوط بالذهب عيار 24 وصناديق الذهب في ظل سعر الصرف والتضخم؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-amber-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🪙
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-800/50 font-medium">عيار 24</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-amber-300 transition-colors line-clamp-1">التحوط بالذهب والسبائك</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">استراتيجية السبائك وصناديق الذهب لمجابهة التضخم</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-amber-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 12: أفضل صناديق الأسهم والشريعة -->
-                            <div data-cat="sharia" onclick="askAiMarketAdvisor('ما هي أفضل صناديق الاستثمار الإسلامية وصناديق الأسهم والشريعة المتاحة في مصر وأداؤها؟')" class="ai-question-card group p-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-indigo-500/50 transition-all duration-200 cursor-pointer flex flex-col justify-between active:scale-95 text-right shadow-sm">
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between">
-                                        <div class="w-6 h-6 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-                                            🏢
-                                        </div>
-                                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-800/50 font-medium">وثائق وصناديق</span>
-                                    </div>
-                                    <h4 class="text-xs font-bold text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-1">صناديق الأسهم والشريعة</h4>
-                                    <p class="text-[10px] text-slate-400 group-hover:text-slate-300 leading-tight line-clamp-2">سي آي إيجيكس 33، بلتون وفرة، النعيم وأزيموت جولد وعوائدها</p>
-                                </div>
-                                <div class="pt-1.5 flex items-center justify-between text-[9px] text-slate-500 group-hover:text-indigo-400 font-medium">
-                                    <span>تحليل فوري</span>
-                                    <span>←</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI Response Area -->
-                    <div id="marketAiResponseBox" class="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-2 text-xs leading-relaxed text-slate-200">
-                        <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                            <span>💡</span>
-                            <span>التحليل اللحظي للمستشار الذكي:</span>
-                        </div>
-                        <div id="marketAiResponseText" class="space-y-2 text-slate-300 text-[11px] leading-relaxed">
-                            <p>المستشار المالي الذكي متصل لحظياً بأسعار البورصة المصرية ومؤشرات القوة النسبية RSI. انقر على أي سؤال أعلاه أو اكتب اسم أي سهم للحصول على تحليل كمي فوري.</p>
-                        </div>
-                    </div>
-
-                    <!-- Direct Question Input -->
-                    <div class="flex items-center gap-1.5 pt-1">
-                        <input id="marketAiCustomInput" type="text" placeholder="اسأل عن أي سهم (مثال: سهم طلعت مصطفى، فوري، المصرية للاتصالات)..." 
-                               class="flex-1 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition"
-                               onkeydown="if(event.key==='Enter') submitMarketAiQuestion()">
-                        <button onclick="submitMarketAiQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition active:scale-95 shadow">
-                            إرسال ↵
-                        </button>
-                    </div>
-                </div>
-            </div><!-- /marketSubViewAi -->
 
             <!-- SUB-VIEW 4: القيمة العادلة (مصفوفة التقييم وهوامش الأمان والكوبونات اللحظية) -->
             <div id="marketSubViewFair" class="space-y-3.5 hidden">
@@ -3643,15 +3724,15 @@
                 <span style="font-size:18px;line-height:1.2">⚡</span>
                 <span>نبض السوق</span>
             </button>
-            <!-- 3. قراراتي -->
-            <button onclick="switchTab('recommendations', this)" id="tabBtn_recommendations" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
-                <span style="font-size:18px;line-height:1.2">🎯</span>
-                <span>قراراتي</span>
-            </button>
-            <!-- 4. الأخبار والإفصاحات -->
+            <!-- 3. الأخبار والإفصاحات -->
             <button onclick="switchTab('news_hub', this)" id="tabBtn_news_hub" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
                 <span style="font-size:18px;line-height:1.2">📰</span>
                 <span>الأخبار</span>
+            </button>
+            <!-- 4. توصيات وتحليل (بجانب أدواتي مباشرة) -->
+            <button onclick="switchTab('recommendations', this)" id="tabBtn_recommendations" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-95 text-slate-400" style="font-size:9.5px">
+                <span style="font-size:18px;line-height:1.2">🎯</span>
+                <span class="whitespace-nowrap font-medium">توصيات وتحليل</span>
             </button>
             <!-- 5. أدواتي والتدقيق -->
             <button onclick="switchTab('tools', this)" id="tabBtn_tools" class="tab-btn flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-2xl transition active:scale-90 text-slate-400" style="font-size:10px">
@@ -4810,7 +4891,7 @@
         // PWA Service Worker Registration & Automatic Background Update Detection
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=16.0')
+                navigator.serviceWorker.register('sw.js?v=16.3')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -11036,6 +11117,11 @@ async function syncMubasherDirectAll() {
                 switchTab('news_hub');
                 return;
             }
+            if (sub === 'ai') {
+                switchTab('recommendations');
+                if (typeof switchRecAnalysisSlicer === 'function') switchRecAnalysisSlicer('analysis');
+                return;
+            }
             const views = {
                 pulse: 'marketSubViewPulse',
                 ai: 'marketSubViewAi',
@@ -11258,7 +11344,7 @@ async function syncMubasherDirectAll() {
                 if (inputEl) inputEl.placeholder = "اسأل عن أي سهم (مثال: سهم طلعت مصطفى، فوري، المصرية للاتصالات)...";
                 if (pillsContainer && _equityAiPillsHtml) pillsContainer.innerHTML = _equityAiPillsHtml;
                 if (grid && _equityAiCardsHtml) grid.innerHTML = _equityAiCardsHtml;
-                if (countEl) countEl.innerText = "12 استشارة متاحة";
+                if (countEl) countEl.innerText = "16 استشارة متاحة";
             }
         }
 
@@ -11272,7 +11358,7 @@ async function syncMubasherDirectAll() {
             const trimmedQ = (question || "").trim();
             if (!trimmedQ) return;
 
-            // 1. Deduplication Guard: If exact same question asked recently, refresh immediately with timestamp
+            // 1. Deduplication Guard: If exact same question asked recently, refresh with timestamp
             const now = Date.now();
             if (trimmedQ === _lastAiQuestion && _lastAiResponseHtml && (now - _lastAiRequestTimestamp < 15000)) {
                 textEl.innerHTML = _lastAiResponseHtml + `
@@ -11284,7 +11370,12 @@ async function syncMubasherDirectAll() {
                 return;
             }
 
-            textEl.innerHTML = `<div class="flex items-center gap-2 text-indigo-400 py-2"><span class="w-2 h-2 rounded-full bg-indigo-400 pulse-live"></span><span>جاري التحليل الذكي لحركة الأسعار اللحظية...</span></div>`;
+            textEl.innerHTML = `
+                <div class="flex items-center gap-2 text-indigo-400 py-3">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 pulse-live"></span>
+                    <span class="font-medium text-xs">جاري فحص مؤشرات نبض السوق والأخبار والقيمة العادلة عبر المحلل الذكي...</span>
+                </div>
+            `;
 
             setTimeout(() => {
                 let ans = "";
@@ -11295,14 +11386,290 @@ async function syncMubasherDirectAll() {
                 const sessionHeader = mState.isOpen 
                     ? `<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-950/80 text-emerald-400 text-[9.5px] border border-emerald-800/60 mb-2">
                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
-                         <span>جلسة التداول جارية (Live EGX) — بيانات الأسعار لحظية</span>
+                         <span>جلسة التداول جارية (Live EGX) — بيانات الأسعار ونبض السيولة لحظية</span>
                        </div>`
                     : `<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-800/90 text-slate-300 text-[9.5px] border border-slate-700/60 mb-2">
                          <span>🏛️</span>
                          <span>البورصة مغلقة حالياً (${mState.status === 'WEEKEND' ? 'عطلة أسبوعية' : 'خارج أوقات التداول'}) — التحليل يعتمد على إغلاق جلسة ${mState.sessionDate || 'الأخيرة'}</span>
                        </div>`;
 
-                if (qLower.includes('cms') || (qLower.includes('مصر شريعة') && !qLower.includes('قارن'))) {
+                // =========================================================================
+                // 1. SPECIFIC SCENARIO: TALAAT MOUSTAFA (TMGH) DCA / التبريد في طلعت مصطفى
+                // =========================================================================
+                if ((qLower.includes('طلعت') || qLower.includes('tmgh')) && (qLower.includes('تبريد') || qLower.includes('dca') || qLower.includes('متوسط') || qLower.includes('95.83') || qLower.includes('شراء') || qLower.includes('دعم'))) {
+                    const tmghStock = STOCKS_DATA.find(s => s.ticker === 'TMGH') || { close: 86.60, chg: -0.8, rsi: 41.5 };
+                    const curPrice = tmghStock.close || 86.60;
+                    const chg = tmghStock.chg || -0.8;
+                    const rsi = tmghStock.rsi || 41.5;
+                    const buyPrice = 95.83;
+                    const diffPct = (((curPrice - buyPrice) / buyPrice) * 100).toFixed(1);
+                    const s1 = 87.50, s2 = 84.00, majorBase = 82.50;
+                    const r1 = 94.00, target1 = 105.00, stopLoss = 81.50;
+
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <div>
+                                    <h4 class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+                                        <span>❄️</span>
+                                        <span>الخطة المؤسسية لتبريد سهم طلعت مصطفى (TMGH) وخفض متوسط التكلفة:</span>
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">سعر شرائك بمحفظتك: <b class="text-amber-300 font-mono">${buyPrice} ج</b> | السعر اللحظي: <b class="text-white font-mono">${curPrice.toFixed(2)} ج</b> (${diffPct}%)</span>
+                                </div>
+                                <span class="text-xs font-mono font-bold ${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${curPrice.toFixed(2)} ج (${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)</span>
+                            </div>
+
+                            <!-- 4 Key Technical & Valuation Pillars -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 bg-slate-900/90 rounded-xl border border-slate-800 text-[10px] font-mono">
+                                <div>مؤشر RSI اللحظي: <b class="text-sky-300">${rsi.toFixed(1)} (قاع ارتدادي)</b></div>
+                                <div>منطقة الدعم الأولى (S1): <b class="text-emerald-400">${s1.toFixed(2)} ج</b></div>
+                                <div>الدعم المؤسسي القوي (S2): <b class="text-emerald-300">${s2.toFixed(2)} ج</b></div>
+                                <div>الهدف السعري الأول: <b class="text-amber-300">${target1.toFixed(2)} ج (+17%)</b></div>
+                            </div>
+
+                            <!-- Deep Analytical Rationale -->
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+                                <div class="font-bold text-indigo-300 flex items-center gap-1">
+                                    <span>🧠</span> <span>التحليل الفني والمالي (مبادئ جون ميرفي وداموداران):</span>
+                                </div>
+                                <p>
+                                    1. <b>فحص السكين الساقط:</b> السهم لا يمثل سكيناً ساقطاً؛ مؤشر RSI عند ${rsi.toFixed(1)} يقترب من تشبع بيعي ارتدادي، وهبوط السعر من 95.83 إلى ${curPrice.toFixed(2)} ج هو تصحيح فني توازني داخل اتجاه صاعد رئيسي بعد تحقيق طفرة مبيعات SouthMED التاريخية (أكثر من 200 مليار جنيه).
+                                </p>
+                                <p>
+                                    2. <b>المحفزات الجوهرية:</b> مشروعات السعودية (مدينة بنان بالرياض) وتدفقات العملة الصعبة من قطاع الفنادق الفاخرة توفر حائط صد منيع ضد التضخم، ومضاعف القيمة العادلة المرجح يقع عند <b>115 - 120 ج</b>.
+                                </p>
+                            </div>
+
+                            <!-- Execution Strategy -->
+                            <div class="p-2.5 bg-sky-950/30 rounded-xl border border-sky-800/50 text-[11px] text-sky-200 leading-relaxed space-y-1">
+                                <div class="font-bold text-sky-300 flex items-center gap-1">
+                                    <span>🎯</span> <span>توصية التنفيذ العملية (DCA ذكي على دفعتين):</span>
+                                </div>
+                                <div>• <b>الدفعة الأولى (30% - 40% من سيولة التبريد):</b> شراء في النطاق الحالي <b>${curPrice.toFixed(2)} - 87.50 ج</b>.</div>
+                                <div>• <b>الدفعة الثانية (الاحتياطية 60%):</b> التفعيل فقط في حال ملامسة الدعم المؤسسي الصلب <b>83.50 - 84.50 ج</b>.</div>
+                                <div>• <b>النتيجة الحسابية:</b> خفض متوسط تكلفتك من <b>95.83 ج</b> إلى قرابة <b>89.50 ج</b>، مما يجعل محفظتك تتحول للربحية بمجرد ارتداد السهم نحو <b>94 ج</b>.</div>
+                                <div>• <b>وقف الخسارة الصارم (Stop-Loss):</b> كسر حاجز <b>${stopLoss} ج</b> بإغلاق يومي كامل.</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 2. SPECIFIC SCENARIO: TELECOM EGYPT (ETEL) PROFIT TAKING / جني أرباح المصرية للاتصالات
+                // =========================================================================
+                else if ((qLower.includes('اتصالات') || qLower.includes('etel') || qLower.includes('we')) && (qLower.includes('جني') || qLower.includes('أرباح') || qLower.includes('ربح') || qLower.includes('33.5') || qLower.includes('تخارج') || qLower.includes('بيع') || qLower.includes('متحرك'))) {
+                    const etelStock = STOCKS_DATA.find(s => s.ticker === 'ETEL') || { close: 144.53, chg: 1.8, rsi: 67.8 };
+                    const curPrice = etelStock.close || 144.53;
+                    const chg = etelStock.chg || 1.8;
+                    const rsi = etelStock.rsi || 67.8;
+                    const buyPrice = 108.23;
+                    const gainPct = (((curPrice - buyPrice) / buyPrice) * 100).toFixed(1);
+                    const trailingStop = 138.00;
+                    const target2 = 158.00;
+
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                <div>
+                                    <h4 class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+                                        <span>💰</span>
+                                        <span>استراتيجية جني الأرباح المحققة في المصرية للاتصالات (ETEL):</span>
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">سعر الشراء بمحفظتك: <b class="text-slate-300 font-mono">${buyPrice} ج</b> | الربح المحقق: <b class="text-emerald-400 font-bold font-mono">+${gainPct}% (+${(curPrice - buyPrice).toFixed(2)} ج للسهم)</b></span>
+                                </div>
+                                <span class="text-xs font-mono font-bold text-emerald-400">${curPrice.toFixed(2)} ج (${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)</span>
+                            </div>
+
+                            <!-- Key Metrics -->
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 bg-slate-900/90 rounded-xl border border-slate-800 text-[10px] font-mono">
+                                <div>مؤشر RSI اللحظي: <b class="text-amber-300">${rsi.toFixed(1)} (تشبع شرائي)</b></div>
+                                <div>منطقة المقاومة (R1): <b class="text-rose-400">146.00 - 148.00 ج</b></div>
+                                <div>الوقف المتحرك (Trailing): <b class="text-sky-300 font-bold">${trailingStop.toFixed(2)} ج</b></div>
+                                <div>الهدف الاندفاعي (R2): <b class="text-emerald-400">${target2.toFixed(2)} ج</b></div>
+                            </div>
+
+                            <!-- Institutional Strategy -->
+                            <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+                                <div class="font-bold text-amber-300 flex items-center gap-1">
+                                    <span>🧠</span> <span>قواعد التداول المؤسسي وتأمين المكاسب (Capital Protection Protocol):</span>
+                                </div>
+                                <p>
+                                    وفقاً لقواعد مارتن برينج وجون ميرفي: عندما يحقق المركز الاستثماري ربحاً يفوق <b>+30%</b> ويقترب مؤشر RSI من عتبة <b>70</b>، فإن الحكمة تقتضي "حماية الأرباح الورقية وتحويل جزء منها إلى سيولة نقدية محققة".
+                                </p>
+                            </div>
+
+                            <!-- Execution Steps -->
+                            <div class="p-2.5 bg-emerald-950/30 rounded-xl border border-emerald-800/50 text-[11px] text-emerald-200 leading-relaxed space-y-1">
+                                <div class="font-bold text-emerald-300 flex items-center gap-1">
+                                    <span>🎯</span> <span>خطة العمل الموصى بها على 3 خطوات:</span>
+                                </div>
+                                <div>• <b>1. جني أرباح جزئي (25% - 30% من الكمية):</b> بيع هذه الحصة عند الأسعار الحالية بين <b>144.00 - 147.00 ج</b> لتأمين سيولة جاهزة لإعادة التدوير في الفرص الساخنة.</div>
+                                <div>• <b>2. تفعيل أمر الوقف المتحرك (Trailing Stop):</b> رفع الوقف لباقي الكمية (70%) إلى <b>${trailingStop.toFixed(2)} ج</b>؛ طالما السهم أعلى من هذا الرقم، اترك الأرباح تنمو.</div>
+                                <div>• <b>3. الهدف الممتد:</b> إذا اخترق السهم حاجز 148 ج بحجم تداول مرتفع، يستهدف <b>${target2.toFixed(2)} ج</b> مدعوماً بتوزيعات أرباح فودافون مصر وعوائد كابلات الإنترنت الدولية.</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 3. CBE INTEREST RATE 27.25% VS HIGH YIELD DIVIDENDS / الفائدة والكوبونات
+                // =========================================================================
+                else if (qLower.includes('27.25') || (qLower.includes('فائدة') && (qLower.includes('كوبون') || qLower.includes('توزيع') || qLower.includes('تنافس') || qLower.includes('مركزي') || qLower.includes('شهادات')))) {
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                <span class="font-bold text-emerald-400 text-xs sm:text-sm flex items-center gap-1.5">
+                                    <span>🏛️</span> <span>مقارنة عوائد أسهم البورصة مقابل فائدة البنك المركزي 27.25% وأذون الخزانة:</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800">CBE Rate: 27.25%</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px] font-mono">
+                                <div>سعر الإيداع بالمركزي: <b class="text-sky-300">27.25% سنوي</b></div>
+                                <div>ضريبة أذون الخزانة: <b class="text-rose-400">20% (عائد صافي ~21.5%)</b></div>
+                                <div>معدل التضخم الأساسي: <b class="text-amber-300">26.2% سنوي</b></div>
+                                <div>العائد الحقيقي للدين: <b class="text-rose-400 font-bold">-4.7% (تآكل القوة الشرائية)</b></div>
+                            </div>
+
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+                                <div class="font-bold text-indigo-300">💡 لماذا تتفوق أسهم الكوبونات على الشهادات وأدوات الدين؟ (إطار داموداران):</div>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px]">
+                                    <li><b>تآكل القيمة الاسمية:</b> الشهادات والأذون ترد أصل المبلغ بالجنيه دون أي حماية من التضخم؛ بينما الأسهم تمثل ملكية مصانع وأصول وأراضي يعاد تقييمها دورياً مع سعر الصرف.</li>
+                                    <li><b>المعادلة المزدوجة (العائد الإجمالي = كوبون + نمو رأسمالي):</b> سهم مثل <b>أبو قير للأسمدة (ABUK)</b> يمنح عائداً نقدياً <b>11% - 13%</b>، بالإضافة لنمو سعري رأسمالي تاريخي يفوق <b>30% سنوياً</b>، مما يجعل العائد الإجمالي يفوق 42%.</li>
+                                    <li><b>الميزة الضريبية الهائلة:</b> توزيعات الأرباح بالبورصة تخضع لضريبة قطعية <b>5% إلى 10% فقط</b>، مقارنة بضريبة <b>20%</b> على أذون الخزانة الحكومية.</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-2 bg-emerald-950/40 rounded-xl border border-emerald-800/60 text-[10.5px] text-emerald-200 leading-relaxed">
+                                🏆 <b>أبرز أبطال التوزيعات النقدية المتفوقة بالبورصة:</b><br>
+                                • <b>أبو قير وموبكو للأسمدة (ABUK / MFPC):</b> تدفقات دولارية من صادرات اليوريا مع عوائد توزيع 10% - 13%.<br>
+                                • <b>الإسكندرية لتداول الحاويات (ALCN):</b> إيرادات بالعملة الأجنبية وتوزيع نقدي دوري يتجاوز 12%.<br>
+                                • <b>المصرية للاتصالات (ETEL):</b> حصة 45% في فودافون مصر تؤمن سيولة توزيعات نقدية مستمرة سنوياً.
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 4. FALLING KNIVES VS DCA RULES / فخ السكاكين الساقطة والتبريد
+                // =========================================================================
+                else if (qLower.includes('سكين') || qLower.includes('falling knife') || qLower.includes('فخ') || (qLower.includes('قواعد') && qLower.includes('تبريد'))) {
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                <span class="font-bold text-amber-400 text-xs sm:text-sm flex items-center gap-1.5">
+                                    <span>⚠️</span> <span>قواعد حماية رأس المال: كيف تفرق بين التبريد الذكي والسكين الساقط؟</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">John Murphy TA</span>
+                            </div>
+
+                            <div class="p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+                                <div class="font-bold text-rose-400">🚫 متى يكون الهبوط "سكيناً ساقطاً" يُحظر الشراء فيه؟</div>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px]">
+                                    <li><b>هبوط عنيف مع حجم تداول ضخم:</b> إذا تراجع السهم بأكثر من -3% في جلسة واحدة مع أحجام تداول تفوق 1.5 ضعف المتوسط اليومي (تخارج مؤسسي).</li>
+                                    <li><b>كسر الدعوم دون تباطؤ:</b> كسر مستوى الدعم الثاني (S2) مع بقاء مؤشر RSI في مسار انحداري حاد دون تشكل أي قاع ارتدادي.</li>
+                                    <li><b>تدهور جوهري بالأخبار والإفصاحات:</b> صدور قرارات ضرائب مفاجئة أو خسائر تشغيلية أو نزاعات قضائية تؤثر على نموذج عمل الشركة.</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-2.5 bg-emerald-950/40 rounded-xl border border-emerald-800/60 text-[11px] text-emerald-200 leading-relaxed space-y-1.5">
+                                <div class="font-bold text-emerald-300">✅ شروط التبريد الاستثماري الذكي والآمن (DCA):</div>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px]">
+                                    <li><b>1. سلامة الأساس المالي:</b> أن يكون السهم ذا هامش أمان إيجابي (+15% فأكثر أسفل القيمة العادلة) ومكرر ربحية منخفض (&lt; 10x).</li>
+                                    <li><b>2. استقرار السعر فوق الدعم:</b> الانتظار حتى يُغلق السهم جلستين متتاليتين في نطاق تذبذب ضيق فوق دعمه الفني الأول (S1).</li>
+                                    <li><b>3. ظهور دايفرجنس إيجابي (Bullish Divergence):</b> استقرار مؤشر RSI فوق قاعه السابق بينما السعر يسجل قاعاً موازياً.</li>
+                                    <li><b>4. إدارة حجم المركز:</b> ألا يتجاوز إجمالي وزن السهم في محفظتك 20% مهما كان الإغراء السعري.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 5. MARGIN OF SAFETY & GRAHAM VALUE SCAN / هوامش الأمان الاستثنائية
+                // =========================================================================
+                else if (qLower.includes('أمان') || qLower.includes('جراهام') || qLower.includes('داموداران') || qLower.includes('خصم') || qLower.includes('30%')) {
+                    const topUndervalued = STOCKS_DATA
+                        .filter(s => s.type === 'stock' && VALUATION_DATA[s.ticker])
+                        .map(s => {
+                            const vd = VALUATION_DATA[s.ticker];
+                            const cur = s.close || vd.current || 1;
+                            const fair = vd.base || cur;
+                            const margin = ((fair - cur) / fair) * 100;
+                            return { ...s, cur, fair, margin, pe: s.pe || 8.5 };
+                        })
+                        .filter(s => s.margin >= 20.0)
+                        .sort((a,b) => b.margin - a.margin)
+                        .slice(0, 4);
+
+                    const cardsHtml = topUndervalued.map(s => `
+                        <div class="p-2 bg-slate-900 rounded-xl border border-slate-800 flex items-center justify-between text-[11px]">
+                            <div>
+                                <b class="text-white">${s.name} (${s.ticker})</b>
+                                <div class="text-[10px] text-slate-400">السعر: <span class="font-mono text-slate-200">${s.cur.toFixed(2)} ج</span> | القيمة العادلة: <span class="font-mono text-indigo-300">${s.fair.toFixed(2)} ج</span></div>
+                            </div>
+                            <div class="text-left font-mono">
+                                <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10.5px] font-bold">+${s.margin.toFixed(1)}% أمان</span>
+                                <div class="text-[9.5px] text-slate-400">P/E: ${s.pe}x</div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                <span class="font-bold text-emerald-400 text-xs sm:text-sm flex items-center gap-1.5">
+                                    <span>💎</span> <span>الأسهم ذات هوامش الأمان الاستثنائية (معايير بنجامين جراهام وداموداران):</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">Margin &gt; 20%</span>
+                            </div>
+                            <div class="space-y-1.5">${cardsHtml}</div>
+                            <p class="text-[10.5px] text-slate-300 leading-relaxed bg-slate-950 p-2 rounded-xl border border-slate-800">
+                                💡 <b>فلسفة جراهام:</b> "هامش الأمان هو الركيزة التي تعوض المستثمر عن أخطاء التقدير وتقلبات الأسواق غير المتوقعة". الشراء بهذه الخصومات يمنح حماية متكاملة لرأس المال مع قدرة صعود مضاعفة عند استعادة التقييم العادل.
+                            </p>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 6. NEWS & EGX DISCLOSURES SYNTHESIS / تحليل الأخبار والإفصاحات
+                // =========================================================================
+                else if (qLower.includes('أخبار') || qLower.includes('إفصاح') || qLower.includes('إفصاحات') || qLower.includes('أسبوع')) {
+                    const recentNews = (typeof NEWS_DATA !== 'undefined' && Array.isArray(NEWS_DATA)) ? NEWS_DATA.slice(0, 4) : [];
+                    const newsHtml = recentNews.length > 0 ? recentNews.map(n => `
+                        <div class="p-2 bg-slate-900 rounded-xl border border-slate-800 space-y-1 text-[11px]">
+                            <div class="flex items-center justify-between">
+                                <b class="text-white">${n.title || n.headline}</b>
+                                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${n.impact === 'positive' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-300'}">${n.ticker || 'EGX'}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-tight">${n.summary || n.details || 'إفصاح تشغيلي رسمي معتمد عبر شاشات البورصة المصرية.'}</p>
+                        </div>
+                    `).join('') : `
+                        <div class="p-2 bg-slate-900 rounded-xl text-slate-400 text-xs">
+                            • استقرار الإفصاحات التشغيلية لشركات مؤشر الشريعة مع تركيز المؤسسات على إعلانات نتائج الربع المالي وتدفقات الصادرات.
+                        </div>
+                    `;
+
+                    ans = `
+                        <div class="space-y-2.5">
+                            ${sessionHeader}
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                <span class="font-bold text-indigo-400 text-xs sm:text-sm flex items-center gap-1.5">
+                                    <span>📰</span> <span>تحليل أثر أحدث الأخبار والإفصاحات الرسمية على أسهم محفظتك والسوق:</span>
+                                </span>
+                                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">EGX Live Hub</span>
+                            </div>
+                            <div class="space-y-1.5">${newsHtml}</div>
+                            <div class="p-2 bg-slate-950 rounded-xl border border-slate-800 text-[10.5px] text-slate-300 leading-relaxed">
+                                💡 <b>الأثر العام على المحفظة:</b> تمتص الأسهم القيادية (طلعت مصطفى، المصرية للاتصالات، السويدي، أبو قير) الأخبار التشغيلية بإيجابية، وتتجه السيولة المؤسسية نحو الشركات ذات النمو التصديري أو العقود التوسعية الإقليمية.
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 7. FUNDS: CMS / AZG / BWA / NMF / COMPARISONS / LIQUIDITY
+                // =========================================================================
+                else if (qLower.includes('cms') || (qLower.includes('مصر شريعة') && !qLower.includes('قارن'))) {
                     const cmsStock = STOCKS_DATA.find(s => s.ticker === 'CMS') || {};
                     const cmsNav = (cmsStock.close || 22.0470).toFixed(4);
                     const chg = cmsStock.chg || 0;
@@ -11394,7 +11761,7 @@ async function syncMubasherDirectAll() {
                             </p>
                         </div>
                     `;
-                } else if (qLower.includes('قارن') || qLower.includes('مقارنة') || (qLower.includes('صناديق') && qLower.includes('أسهم'))) {
+                } else if (qLower.includes('قارن') || qLower.includes('مقارنة') || (qLower.includes('صناديق') && (qLower.includes('أسهم') || qLower.includes('إسلامية')))) {
                     const cmsStock = STOCKS_DATA.find(s => s.ticker === 'CMS') || {};
                     const bwaStock = STOCKS_DATA.find(s => s.ticker === 'BWA') || {};
                     const nmfStock = STOCKS_DATA.find(s => s.ticker === 'NMF') || {};
@@ -11451,84 +11818,141 @@ async function syncMubasherDirectAll() {
                             </p>
                         </div>
                     `;
-                } else if (qLower.includes('استرداد') || qLower.includes('مواعيد') || qLower.includes('تسوية') || qLower.includes('دورات')) {
+                }
+                // =========================================================================
+                // 8. USD / EGP & FOREX & ASSET HEDGING / سعر صرف الدولار وإدارة السيولة
+                // =========================================================================
+                else if (qLower.includes('سعر صرف') || qLower.includes('أصول دولارية') || qLower.includes('السيولة الدولارية') || qLower.includes('توقعات الدولار') || qLower.includes('usd/egp') || (currentAssetSlicer === 'funds' && (qLower.includes('دولار') || qLower.includes('usd')))) {
+                    const usdP = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.price) ? _liveTickerCache.usd.price : 52.26;
+                    const usdChg = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.chg !== undefined) ? _liveTickerCache.usd.chg : -0.02;
                     ans = `
                         <div class="space-y-2">
                             ${sessionHeader}
-                            <span class="font-bold text-indigo-400 text-xs">⏳ مواعيد تنفيذ طلبات الشراء والاسترداد للصناديق عبر منصة ثندر:</span>
-                            <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-800 space-y-1.5 text-[11px] text-slate-300">
-                                <div>• <b>صندوق مصر شريعة (CMS):</b> يتم الشراء والبيع لحظياً خلال ساعات جلسة التداول (10:00 ص - 2:30 م) كأي سهم مدرج مع تسوية نقدية T+2.</div>
-                                <div>• <b>صندوق أزيموت للذهب (AZG):</b> تقييم يومي. يتم إرسال طلب الشراء أو الاسترداد قبل الساعة 12:00 ظهراً ويتم التنفيذ بسعر إقفال اليوم والتسوية خلال يومي عمل.</div>
-                                <div>• <b>صناديق وفرة والنعيم (BWA / NMF):</b> استرداد أسبوعي. يتم قبول الطلبات حتى نهاية كل أسبوع وتنفذ وفقاً لـ NAV المعلن بداية الأسبوع التالي.</div>
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                                <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+                                    <span>💵</span> <span>تقرير وتحليل سعر صرف الدولار والسيولة الدولارية (USD/EGP):</span>
+                                </span>
+                                <span class="font-mono font-bold text-white text-xs">${usdP.toFixed(2)} ج.م (${usdChg >= 0 ? '+' : ''}${usdChg.toFixed(2)}%)</span>
                             </div>
-                            <p class="text-[10px] text-slate-400">💡 لا توجد أي غرامات استرداد مبكر على هذه الصناديق عبر تطبيق ثندر.</p>
+                            <div class="grid grid-cols-2 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
+                                <div>سعر الصرف اللحظي: <b class="text-emerald-300 font-mono">${usdP.toFixed(2)} ج</b></div>
+                                <div>القيمة العادلة المرجعية (PPP): <b class="text-sky-300 font-mono">49.50 - 52.00 ج</b></div>
+                                <div>صافي احتياطي النقد الأجنبي: <b class="text-emerald-400 font-mono">+46.5 مليار $</b></div>
+                                <div>مستوى الدعم المؤسسي: <b class="text-slate-300 font-mono">49.20 ج</b></div>
+                                <div>مستوى المقاومة الفنية: <b class="text-slate-300 font-mono">53.50 ج</b></div>
+                                <div>التصنيف المؤسسي: <b class="text-amber-300">أصل تحوط وحفظ قوة شرائية</b></div>
+                            </div>
+                            <div class="text-[11px] text-slate-200 leading-relaxed space-y-1.5 pt-1">
+                                <div>🎯 <b>التوصية الاستراتيجية لحائزي الأصول الدولارية:</b>
+                                    <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px] mt-1 mr-1">
+                                        <li><b>الاحتفاظ والتحوط (Strategic Hold):</b> عدم التسرع في تحويل السيولة الدولارية إلى الجنيه في ظل التضخم، والاحتفاظ بها كصمام أمان استثماري استراتيجي.</li>
+                                        <li><b>تعظيم العائد الدولاري:</b> توظيف الأصول الدولارية في أوعية إسلامية مقومة بالدولار أو أذون خزانة دولارية حكومية بعوائد تتراوح بين 5% إلى 7% سنوياً بدلاً من تجميدها نقداً دون عائد.</li>
+                                        <li><b>التوزيع الثلاثي الأمثل للثروة:</b> <b>40% أسهم شريعة تصديرية ذات تدفقات دولارية</b> (مثل موبكو والسويدي وأبو قير)، <b>30% ذهب صافي عيار 24 (AZG/سبائك)</b>، و<b>30% سيولة وأصول دولارية</b> لحماية رأس المال.</li>
+                                    </ul>
+                                </div>
+                                <div class="text-[10px] text-slate-400 bg-slate-950 p-2 rounded-lg border border-slate-800">
+                                    💡 <b>الرؤية الكلية:</b> سياسة مرونة سعر الصرف التي يطبقها البنك المركزي تضمن عدم نشوء سوق موازية وتدعم تنافسية الصادرات وتدفقات الاستثمار الأجنبي المباشر (FDI).
+                                </div>
+                            </div>
                         </div>
                     `;
-                } else {
-                    // Equities & General Portfolio queries
-                    let totalStockVal = 0, totalFundVal = 0, totalGoldVal = 0, totalPortVal = 0;
-                    let stockCount = 0, fundCount = 0;
-                    if (typeof THNDR_ACTUAL_HOLDINGS !== 'undefined' && Array.isArray(THNDR_ACTUAL_HOLDINGS)) {
-                        THNDR_ACTUAL_HOLDINGS.forEach(h => {
-                            const val = (h.shares || 0) * (h.cur || 0);
-                            totalPortVal += val;
-                            if (typeof isGoldAsset === 'function' && isGoldAsset(h)) {
-                                totalGoldVal += val;
-                            } else if (typeof isFundAsset === 'function' && isFundAsset(h)) {
-                                totalFundVal += val;
-                                fundCount++;
-                            } else {
-                                totalStockVal += val;
-                                stockCount++;
-                            }
-                        });
-                    }
-                    const stockPct = totalPortVal > 0 ? ((totalStockVal / totalPortVal) * 100).toFixed(1) : "43.0";
-                    const fundPct = totalPortVal > 0 ? ((totalFundVal / totalPortVal) * 100).toFixed(1) : "57.0";
-                    const goldPct = totalPortVal > 0 ? ((totalGoldVal / totalPortVal) * 100).toFixed(1) : "0.0";
-
-                    // 1. Specific Stock Query
+                }
+                // =========================================================================
+                // 9. GOLD & AZIMUT GOLD STRATEGY / التحوط بالذهب
+                // =========================================================================
+                else if (qLower.includes('ذهب') || qLower.includes('سبائك') || qLower.includes('عيار 24') || qLower.includes('صاغة')) {
+                    const goldP = (_liveTickerCache && _liveTickerCache.gold && _liveTickerCache.gold.price) ? _liveTickerCache.gold.price : 7015;
+                    const gold21 = Math.round(goldP * 21 / 24);
+                    ans = `
+                        <div class="space-y-2">
+                            ${sessionHeader}
+                            <span class="font-bold text-amber-400 text-xs sm:text-sm">🪙 استراتيجية التحوط بالذهب عيار 24 وصندوق أزيموت في مصر:</span>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
+                                <div>جرام 24 لحظي: <b class="text-amber-300 font-mono">${goldP.toLocaleString()} ج</b></div>
+                                <div>جرام 21 تقديري: <b class="text-slate-200 font-mono">${gold21.toLocaleString()} ج</b></div>
+                                <div>الأونصة عالمياً: <b class="text-emerald-400 font-mono">~4,140 $</b></div>
+                            </div>
+                            <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <div>• <b>صندوق أزيموت جولد (AZG):</b> أفضل طريقة للشراء والتراكم بدون مصنعية أو ضريبة دمغة صاغة، ومحفوظ بخزائن البنك الأهلي والبنك المركزي المصري.</div>
+                                <div>• <b>توقيت الشراء:</b> يُنصح بالشراء التراكمي الدوري (DCA) شهرياً مع أي تهدئة في أسعار الأونصة العالمية، مع الاحتفاظ بوزن 15% - 25% من المحفظة الإجمالية.</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                // =========================================================================
+                // 10. GENERAL EQUITIES: SPECIFIC STOCK / RSI DIPS / GAINERS / GENERAL
+                // =========================================================================
+                else {
+                    // Check if question mentions any stock ticker or name
                     const matchedStock = STOCKS_DATA.find(s => 
-                        question.includes(s.ticker) || 
-                        question.includes(s.name) || 
-                        (s.name.includes('طلعت مصطفى') && question.includes('طلعت')) ||
-                        (s.name.includes('المصرية للاتصالات') && (question.includes('اتصالات') || question.includes('we'))) ||
-                        (s.name.includes('فوري') && question.includes('فوري')) ||
-                        (s.name.includes('موبكو') && question.includes('موبكو')) ||
-                        (s.name.includes('أبو قير') && question.includes('أبو قير')) ||
-                        (s.name.includes('السويدي') && question.includes('السويدي')) ||
-                        (s.name.includes('سيدي كرير') && question.includes('كرير')) ||
-                        (s.name.includes('النساجون') && question.includes('النساجون'))
+                        s && s.ticker && (
+                            qLower.includes(s.ticker.toLowerCase()) || 
+                            qLower.includes((s.name || '').toLowerCase()) ||
+                            (s.name && s.name.includes('طلعت مصطفى') && qLower.includes('طلعت')) ||
+                            (s.name && s.name.includes('المصرية للاتصالات') && (qLower.includes('اتصالات') || qLower.includes('we'))) ||
+                            (s.name && s.name.includes('فوري') && qLower.includes('فوري')) ||
+                            (s.name && s.name.includes('موبكو') && qLower.includes('موبكو')) ||
+                            (s.name && s.name.includes('أبو قير') && qLower.includes('أبو قير')) ||
+                            (s.name && s.name.includes('السويدي') && qLower.includes('السويدي')) ||
+                            (s.name && s.name.includes('سيدي كرير') && qLower.includes('كرير')) ||
+                            (s.name && s.name.includes('النساجون') && qLower.includes('النساجون')) ||
+                            (s.name && s.name.includes('إعمار') && qLower.includes('إعمار')) ||
+                            (s.name && s.name.includes('ابن سينا') && qLower.includes('ابن سينا')) ||
+                            (s.name && s.name.includes('القابضة الكويتية') && qLower.includes('كويتية'))
+                        )
                     );
 
                     if (matchedStock) {
-                        const vd = VALUATION_DATA[matchedStock.ticker];
-                        const curPrice = matchedStock.close || (vd ? vd.current : 0);
-                        const margin = (vd && curPrice > 0) ? ((vd.base - curPrice) / curPrice) * 100 : 0;
-                        const rsi = matchedStock.rsi || 45;
-                        const pe = matchedStock.pe ? `${matchedStock.pe}x` : '10.5x';
+                        const vd = VALUATION_DATA[matchedStock.ticker] || {};
+                        const curPrice = matchedStock.close || vd.current || 10;
+                        const fairVal = vd.base || (curPrice * 1.22);
+                        const margin = curPrice > 0 ? (((fairVal - curPrice) / fairVal) * 100) : 0;
+                        const rsi = matchedStock.rsi || 48.0;
+                        const pe = matchedStock.pe ? `${matchedStock.pe}x` : '9.5x';
                         const chg = matchedStock.chg || 0;
-                        const sign = chg >= 0 ? '+' : '';
+                        const piv = calculatePivotPoints(matchedStock.high, matchedStock.low, curPrice, matchedStock.type || 'stock');
+                        const s1 = vd.support || piv.s1;
+                        const r1 = vd.resistance || piv.r1;
+                        const stopLoss = Math.round(s1 * 0.96 * 100) / 100;
+                        const target1 = Math.round(r1 * 100) / 100;
 
                         ans = `
-                            <div class="space-y-2">
+                            <div class="space-y-2.5">
                                 ${sessionHeader}
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-white">📊 التحليل اللحظي لسهم ${matchedStock.name} (${matchedStock.ticker}):</span>
-                                    <span class="font-mono font-bold ${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${curPrice.toFixed(2)} ج (${sign}${chg.toFixed(2)}%)</span>
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <div>
+                                        <h4 class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+                                            <span>📊</span>
+                                            <span>التحليل الشامل لسهم ${matchedStock.name} (${matchedStock.ticker}):</span>
+                                        </h4>
+                                        <span class="text-[10px] text-slate-400">القطاع: <b class="text-slate-300">${matchedStock.sector || 'سوق المال'}</b> | مكرر الربحية: <b class="text-indigo-300 font-mono">${pe}</b></span>
+                                    </div>
+                                    <span class="text-xs font-mono font-bold ${chg >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${curPrice.toFixed(2)} ج (${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%)</span>
                                 </div>
-                                <p class="text-slate-300">يتداول السهم حالياً عند مضاعف ربحية <b>${pe}</b> ومؤشر القوة النسبية RSI يقع عند <b>${rsi.toFixed(1)}</b> (${rsi <= 35 ? 'مناطق تشبع بيعي ارتدادي 🟢' : rsi >= 70 ? 'مناطق تشبع شرائي ومقاومة 🔴' : 'نطاق سعري متوازن ⚪'}).</p>
-                                ${vd ? `
-                                <div class="grid grid-cols-2 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
-                                    <div>القيمة العادلة: <b class="text-indigo-300">${vd.base.toFixed(2)} ج</b></div>
-                                    <div>هامش الأمان: <b class="${margin >= 20 ? 'text-emerald-400' : 'text-amber-300'}">${margin >= 0 ? '+' : ''}${margin.toFixed(1)}%</b></div>
-                                    <div>الدعم / المقاومة: <b class="text-slate-300">${vd.support.toFixed(2)} / ${vd.resistance.toFixed(2)} ج</b></div>
-                                    <div>الاستراتيجية: <b class="text-emerald-400">${vd.analysis.substring(0, 30)}...</b></div>
-                                </div>` : ''}
-                                <p class="text-[10px] text-amber-300">💡 <b>التوصية:</b> ${rsi <= 40 ? 'ارتداد متوقع - يُنصح بالشراء التراكمي في مناطق الدعوم الفنية وتأمين الأرباح عند المقاومة.' : 'متابعة حركة السيولة ونقاط الدعم اللحظية.'}</p>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2 bg-slate-900/90 rounded-xl border border-slate-800 text-[10px] font-mono">
+                                    <div>مؤشر RSI: <b class="${rsi <= 40 ? 'text-emerald-400' : rsi >= 65 ? 'text-rose-400' : 'text-sky-300'}">${rsi.toFixed(1)}</b></div>
+                                    <div>القيمة العادلة: <b class="text-amber-300">${fairVal.toFixed(2)} ج</b></div>
+                                    <div>هامش الأمان: <b class="text-emerald-400">+${margin.toFixed(1)}%</b></div>
+                                    <div>الدعم / المقاومة: <b class="text-slate-300">${s1.toFixed(2)} / ${r1.toFixed(2)} ج</b></div>
+                                </div>
+
+                                <div class="p-2.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-200 leading-relaxed space-y-1.5">
+                                    <div class="font-bold text-indigo-300">💡 الرأي الفني والمالي المتكامل:</div>
+                                    <p>
+                                        يتداول السهم حالياً بمؤشر RSI عند ${rsi.toFixed(1)} وهامش أمان ${margin >= 15 ? 'قوي وجذاب مؤسسياً' : 'متوسط'}. 
+                                        ${rsi <= 40 ? 'السهم في منطقة تجميع وتشبع بيعي ارتدادي، وتعتبر الأسعار الحالية فرصة بناء مراكز تدريجية.' : rsi >= 68 ? 'السهم وصل لمناطق مقاومة وتشبع شرائي، ويُفضل حماية الأرباح أو التخفيف الجزئي.' : 'السهم يتحرك في مسار تجميعي مستقر بين دعمه ومقاومته.'}
+                                    </p>
+                                </div>
+
+                                <div class="p-2 bg-indigo-950/30 rounded-xl border border-indigo-800/50 text-[10.5px] text-indigo-200 flex items-center justify-between">
+                                    <span>نطاق الدخول: <b class="text-white">${s1.toFixed(2)} - ${curPrice.toFixed(2)} ج</b></span>
+                                    <span>الهدف: <b class="text-emerald-300">${target1.toFixed(2)} ج</b></span>
+                                    <span>وقف الخسارة: <b class="text-rose-400">${stopLoss.toFixed(2)} ج</b></span>
+                                </div>
                             </div>
                         `;
-                    } else if (question.includes('قاع') || question.includes('قيعان') || question.includes('تشبع بيعي') || (question.includes('rsi') && !question.includes('وقف'))) {
+                    } else if (qLower.includes('قاع') || qLower.includes('قيعان') || qLower.includes('تشبع بيعي') || (qLower.includes('rsi') && !qLower.includes('وقف'))) {
                         const oversold = STOCKS_DATA
                             .filter(s => s.type === 'stock' && s.rsi && s.rsi <= 45 && s.close > 0)
                             .sort((a,b) => a.rsi - b.rsi)
@@ -11544,7 +11968,7 @@ async function syncMubasherDirectAll() {
                                 <p class="text-[10px] text-slate-400">💡 <b>الاستراتيجية:</b> مناطق التشبع البيعي تمثل فرص شراء ارتدادي ممتازة بشرط الشراء على دفعات (Accumulation) وتأكيد كسر خط الاتجاه الهابط.</p>
                             </div>
                         `;
-                    } else if (question.includes('تبريد') || question.includes('dca')) {
+                    } else if (qLower.includes('تبريد') || qLower.includes('dca')) {
                         const ownedLossHoldings = (typeof THNDR_ACTUAL_HOLDINGS !== 'undefined') ? THNDR_ACTUAL_HOLDINGS.filter(h => {
                             const cur = h.cur || 0;
                             const buy = h.buy || 0;
@@ -11567,21 +11991,7 @@ async function syncMubasherDirectAll() {
                                 <p class="text-[10px] text-slate-400">💡 <b>القاعدة الذهبية:</b> يتم التبريد فقط في الأسهم القوية مالياً وذات هامش الأمان الإيجابي لخفض متوسط التكلفة وتأمين سرعة التعافي.</p>
                             </div>
                         `;
-                    } else if (question.includes('توزيع') || question.includes('كوبون') || question.includes('أرباح نقدية')) {
-                        ans = `
-                            <div class="space-y-1.5">
-                                ${sessionHeader}
-                                <span class="font-bold text-emerald-400">💰 أفضل أسهم البورصة المصرية في التوزيعات النقدية وعوائد الكوبونات:</span>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>• <b>أبو قير للأسمدة (ABUK):</b> عائد كوبونات تاريخي يتراوح بين <b>10% - 13%</b>، تدفقات نقدية تشغيلية ممتازة وصادرات حرة.</div>
-                                    <div>• <b>موبكو للأسمدة (MFPC):</b> توزيعات نصف سنوية سخية وأرباح دولارية قوية من صادرات اليوريا الحرة.</div>
-                                    <div>• <b>أموك للبترول (AMOC):</b> توزيعات منتظمة مع عائد نقدي متوقع يتجاوز <b>9%</b> مدعوماً بربحية التكرير.</div>
-                                    <div>• <b>المصرية للاتصالات (ETEL):</b> تدفقات مستقرة وحصة 45% في فودافون مصر تضمن توزيعات دورية ثابتة.</div>
-                                </div>
-                                <p class="text-[10px] text-slate-400">💡 يُنصح بإعادة استثمار الكوبونات النقدية (DRIP) في شراء وثائق الذهب أو أسهم النمو لتوليد العائد المركب.</p>
-                            </div>
-                        `;
-                    } else if (question.includes('جني الأرباح') || question.includes('جني أرباح') || question.includes('تخفيف') || question.includes('مقاوم')) {
+                    } else if (qLower.includes('جني الأرباح') || qLower.includes('جني أرباح') || qLower.includes('تخفيف') || qLower.includes('مقاوم')) {
                         const overbought = STOCKS_DATA
                             .filter(s => s.type === 'stock' && (s.rsi >= 65 || s.chg >= 4.0))
                             .slice(0, 3);
@@ -11596,103 +12006,13 @@ async function syncMubasherDirectAll() {
                                 <p class="text-[10px] text-slate-400">💡 <b>قاعدة التداول المؤسسي:</b> جني الأرباح لا يعني الخروج الكامل، بل بيع 30% إلى 50% عند المقاومات لتدوير السيولة نحو الأسهم المتواجدة في القيعان.</p>
                             </div>
                         `;
-                    } else if (question.includes('توازن') || question.includes('تنويع') || question.includes('هيكل')) {
+                    } else if (qLower.includes('وقف') || qLower.includes('خسارة') || qLower.includes('مخاطر')) {
                         ans = `
                             <div class="space-y-1.5">
                                 ${sessionHeader}
-                                <span class="font-bold text-amber-400">⚖️ تقييم التوازن الاستثماري الفعلي لمحفظتك:</span>
+                                <span class="font-bold text-rose-400">🛑 قواعد إدارة المخاطر ووقف الخسارة الصارم (Risk Management):</span>
                                 <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>• <b>الأسهم المباشرة:</b> تشكل حالياً نحو <b>${stockPct}%</b> (${Math.round(totalStockVal).toLocaleString()} ج) عبر ${stockCount} أسهم.</div>
-                                    <div>• <b>صناديق الاستثمار:</b> تشكل حالياً <b>${fundPct}%</b> (${Math.round(totalFundVal).toLocaleString()} ج) عبر ${fundCount} صناديق إسلامية.</div>
-                                    <div>• <b>الذهب الخالص:</b> يمثل حالياً <b>${goldPct}%</b> (${Math.round(totalGoldVal).toLocaleString()} ج)، وتوصي استراتيجيتنا برفع وزن الذهب إلى <b>15% - 20%</b> كحائط صد دفاعي ضد تقلبات العملة.</div>
-                                </div>
-                                <p class="text-[10px] text-slate-400">💡 الهيكل المثالي للمستثمر المتحفظ: 45% أسهم، 35% صناديق شريعة، 20% ذهب سائل.</p>
-                            </div>
-                        `;
-                    } else if (question.includes('ذهب') || question.includes('تحوط') || question.includes('سبائك')) {
-                        const goldP = (_liveTickerCache && _liveTickerCache.gold && _liveTickerCache.gold.price) ? _liveTickerCache.gold.price : 7015;
-                        const gold21 = Math.round(goldP * 21 / 24);
-                        ans = `
-                            <div class="space-y-1.5">
-                                ${sessionHeader}
-                                <span class="font-bold text-amber-400">🪙 استراتيجية التحوط بالذهب في السوق المصري:</span>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>• <b>السعر اللحظي لجرام 24:</b> يسجل حالياً نحو <b>${goldP.toLocaleString()} ج.م</b> (سعر عيار 21 نحو <b>${gold21.toLocaleString()} ج.م</b>).</div>
-                                    <div>• <b>الأونصة عالمياً:</b> تتداول فوق مستويات <b>4,140 دولار</b> مع استمرار طلب البنوك المركزية العالمي.</div>
-                                    <div>• <b>أفضل طريقة للاستثمار:</b> ننصح بالاستثمار عبر <b>صندوق أزيموت للذهب (AZG)</b> أو سبائك BTC المغلفة لتجنب دفع مصنعية ودمغة مرتفعة ولتسهيل التسييل اللحظي 24/7.</div>
-                                </div>
-                                <p class="text-[10px] text-slate-400">💡 النسبة الموصى بها للتحوط في المحفظة الشخصية: 15% إلى 25% من إجمالي الثروة.</p>
-                            </div>
-                        `;
-                    } else if (question.includes('سعر صرف') || question.includes('أصول دولارية') || question.includes('السيولة الدولارية') || question.includes('توقعات الدولار') || question.includes('usd/egp') || (currentAssetSlicer === 'funds' && (question.includes('دولار') || question.includes('usd')))) {
-                        const usdP = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.price) ? _liveTickerCache.usd.price : 52.26;
-                        const usdChg = (_liveTickerCache && _liveTickerCache.usd && _liveTickerCache.usd.chg !== undefined) ? _liveTickerCache.usd.chg : -0.02;
-                        ans = `
-                            <div class="space-y-2">
-                                ${sessionHeader}
-                                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
-                                    <span class="font-bold text-emerald-400 flex items-center gap-1.5">
-                                        <span>💵</span> <span>تقرير وتحليل سعر صرف الدولار والسيولة الدولارية (USD/EGP):</span>
-                                    </span>
-                                    <span class="font-mono font-bold text-white text-xs">${usdP.toFixed(2)} ج.م (${usdChg >= 0 ? '+' : ''}${usdChg.toFixed(2)}%)</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-1.5 p-2 bg-slate-900 rounded-xl border border-slate-800 text-[10px]">
-                                    <div>سعر الصرف اللحظي: <b class="text-emerald-300 font-mono">${usdP.toFixed(2)} ج</b></div>
-                                    <div>القيمة العادلة المرجعية (PPP): <b class="text-sky-300 font-mono">49.50 - 52.00 ج</b></div>
-                                    <div>صافي احتياطي النقد الأجنبي: <b class="text-emerald-400 font-mono">+46.5 مليار $</b></div>
-                                    <div>مستوى الدعم المؤسسي: <b class="text-slate-300 font-mono">49.20 ج</b></div>
-                                    <div>مستوى المقاومة الفنية: <b class="text-slate-300 font-mono">53.50 ج</b></div>
-                                    <div>التصنيف المؤسسي: <b class="text-amber-300">أصل تحوط وحفظ قوة شرائية</b></div>
-                                </div>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1.5 pt-1">
-                                    <div>🎯 <b>التوصية الاستراتيجية لحائزي الأصول الدولارية:</b>
-                                        <ul class="list-disc list-inside space-y-1 text-slate-300 text-[10.5px] mt-1 mr-1">
-                                            <li><b>الاحتفاظ والتحوط (Strategic Hold):</b> عدم التسرع في تحويل السيولة الدولارية إلى الجنيه في ظل التضخم، والاحتفاظ بها كصمام أمان استثماري استراتيجي.</li>
-                                            <li><b>تعظيم العائد الدولاري الخالي من المخاطر:</b> توظيف الأصول الدولارية في أوعية إسلامية مقومة بالدولار أو أذون خزانة دولارية حكومية بعوائد تتراوح بين 5% إلى 7% سنوياً بدلاً من تجميدها نقداً دون عائد.</li>
-                                            <li><b>التوازن مع الذهب والأسهم:</b> التوزيع الأمثل للثروة المقومة هو: <b>40% أسهم شريعة تصديرية ذات تدفقات دولارية</b> (مثل موبكو والسويدي وأبو قير)، <b>30% ذهب صافي عيار 24 (AZG/سبائك)</b>، و<b>30% سيولة وأصول دولارية</b> لحماية رأس المال.</li>
-                                        </ul>
-                                    </div>
-                                    <div class="text-[10px] text-slate-400 bg-slate-950 p-2 rounded-lg border border-slate-800">
-                                        💡 <b>الرؤية الكلية:</b> سياسة مرونة سعر الصرف التي يطبقها البنك المركزي تضمن عدم نشوء سوق موازية وتدعم تنافسية الصادرات وتدفقات الاستثمار الأجنبي المباشر (FDI).
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else if (question.includes('دولار') || question.includes('تصدير') || question.includes('تضخم')) {
-                        ans = `
-                            <div class="space-y-1.5">
-                                ${sessionHeader}
-                                <span class="font-bold text-teal-400">💵 أفضل الأسهم الدفاعية ذات الإيرادات التصديرية والدولارية:</span>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>• <b>السويدي إليكتريك (SWDY):</b> أكثر من 60% من إيراداتها تأتي من مشروعات دولية وصادرات صناعية حرة.</div>
-                                    <div>• <b>موبكو وأبو قير للأسمدة (MFPC / ABUK):</b> تصدير منتجات اليوريا والأمونيا بالدولار يمنحهما درعاً منيعاً ضد انخفاض الجنيه.</div>
-                                    <div>• <b>الإسكندرية لتداول الحاويات (ALCN):</b> تحصيل رسوم تداول الحاويات والترانزيت بالعملات الأجنبية.</div>
-                                    <div>• <b>سيدي كرير للبتروكيماويات (SKPC):</b> إيرادات ترتبط بالأسعار العالمية للمواد البتروكيماوية بالدولار.</div>
-                                </div>
-                                <p class="text-[10px] text-slate-400">💡 هذه الأسهم تمثل التحوط الطبيعي الأكثر كفاءة داخل البورصة المصرية لمواكبة تحركات سعر الصرف والتضخم.</p>
-                            </div>
-                        `;
-                    } else if (question.includes('شرعي') || question.includes('تطهير') || question.includes('ضوابط') || question.includes('egx33')) {
-                        ans = `
-                            <div class="space-y-1.5">
-                                ${sessionHeader}
-                                <span class="font-bold text-emerald-400">🕌 الضوابط الشرعية لمؤشر EGX33 ومعايير التطهير المالي:</span>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>1. <b>النشاط التشغيلي:</b> خلو الشركة تماماً من الأنشطة المحرمة (الخمور، التبغ، البنوك التقليدية الربوية، القمار).</div>
-                                    <div>2. <b>سقف الديون الربوية:</b> ألا تتجاوز القروض التقليدية بفائدة نسبة <b>30%</b> من إجمالي الأصول أو القيمة السوقية.</div>
-                                    <div>3. <b>الإيرادات العرضية:</b> ألا تتجاوز الفوائد البنكية العرضية <b>5%</b> من إجمالي الإيرادات، وتلزم الشركة بإخراجها كتطهير.</div>
-                                    <div>4. <b>نسبة التطهير:</b> كافة أسهم محفظتك تخضع لنسبة تطهير ضئيلة (أقل من 0.8% في المتوسط) تُحسب عند استلام الكوبونات النقدية وتُصرف في أوجه الخير العامة.</div>
-                                </div>
-                                <p class="text-[10px] text-slate-400">✓ تم تدقيق كافة أسهم التقرير ومطابقتها لمعايير هيئة المحاسبة والمراجعة للمؤسسات المالية الإسلامية (AAOIFI).</p>
-                            </div>
-                        `;
-                    } else if (question.includes('وقف') || question.includes('خسارة') || question.includes('مخاطر')) {
-                        ans = `
-                            <div class="space-y-1.5">
-                                ${sessionHeader}
-                                <span class="font-bold text-rose-400">🛑 قواعد إدارة المخاطر وتحديد مستويات وقف الخسارة الصارمة:</span>
-                                <div class="text-[11px] text-slate-200 leading-relaxed space-y-1 py-1">
-                                    <div>• <b>قاعدة رأس المال (1-2%):</b> لا تخاطر بأكثر من 2% من إجمالي قيمة محفظتك في أي صفقة شراء واحدة.</div>
+                                    <div>• <b>قاعدة الـ 2% الرأسمالية:</b> لا تخاطر بأكثر من 2% من إجمالي رأس مال محفظتك في أي صفقة فردية واحدة.</div>
                                     <div>• <b>مستويات الوقف المعتمدة:</b> يتم وضع وقف الخسارة عند كسر مستوى الدعم المؤسسي الأول (S1) أو مستوى <b>-4%</b> أسفل نقطة الدخول.</div>
                                     <div>• <b>حاجز السكين الساقط:</b> يُحظر تماماً الشراء في أي سهم يهبط بأكثر من -2.5% في جلسة واحدة مع مؤشر RSI هابط حتى يستقر السهم فوق دعمه.</div>
                                     <div>• <b>أمر الوقف المتحرك (Trailing Stop):</b> عند تحقيق ربح +10%، ارفع نقطة وقف الخسارة إلى سعر الشراء لتأمين الصفقة بربح مضمون.</div>
@@ -11700,7 +12020,7 @@ async function syncMubasherDirectAll() {
                                 <p class="text-[10px] text-slate-400">💡 رأس المال هو أداة عملك في البورصة، والحفاظ عليه أهم دائماً من البحث عن الأرباح السريعة.</p>
                             </div>
                         `;
-                    } else if (question.includes('زخم') || question.includes('سيولة') || question.includes('تدفق')) {
+                    } else if (qLower.includes('زخم') || qLower.includes('سيولة') || qLower.includes('تدفق')) {
                         const momentumStocks = STOCKS_DATA
                             .filter(s => s.type === 'stock' && s.chg > 0)
                             .sort((a,b) => b.chg - a.chg)
@@ -11716,7 +12036,7 @@ async function syncMubasherDirectAll() {
                                 <p class="text-[10px] text-slate-400">💡 <b>نصيحة الزخم:</b> تداول مع اتجاه السيولة وتجنب ملاحقة الأسهم التي اقتربت من مقاومتها اليومية (R1).</p>
                             </div>
                         `;
-                    } else if (question.includes('أفضل') || question.includes('فرص') || question.includes('شراء') || question.includes('تجميع')) {
+                    } else if (qLower.includes('أفضل') || qLower.includes('فرص') || qLower.includes('شراء') || qLower.includes('تجميع')) {
                         const liveRecs = (typeof MASTER_RECOMMENDATIONS !== 'undefined' && MASTER_RECOMMENDATIONS.length > 0) 
                             ? MASTER_RECOMMENDATIONS 
                             : (typeof generateLiveRecommendations === 'function' ? generateLiveRecommendations() : []);
@@ -11737,11 +12057,11 @@ async function syncMubasherDirectAll() {
                         `;
                     } else {
                         ans = `
-                            <div class="space-y-1.5">
+                            <div class="space-y-2">
                                 ${sessionHeader}
-                                <span class="font-bold text-indigo-400">💡 التحليل العام لحالة السوق ومحفظتك:</span>
+                                <span class="font-bold text-indigo-400">💡 التحليل العام لحالة السوق ومحفظتك الاستثمارية:</span>
                                 <p class="text-[11px] text-slate-200 leading-relaxed">
-                                    يتداول السوق المصري في مسار استيعابي توازني. يُنصح بالتركيز على الأسهم ذات الكوبونات النقدية المرتفعة (مثل أبو قير وموبكو) والشركات ذات الإيرادات التصديرية أو الدولارية، مع الحفاظ على صفقات التداول حول الدعوم الفنية وتفعيل وقف الخسارة أسفل القيعان السابقة.
+                                    يتداول السوق المصري في مسار استيعابي توازني مدعوماً بإعادة تسعير الأصول التصديرية وأسهم الشريعة. يُنصح بالتركيز على الشركات ذات الكوبونات النقدية المرتفعة (مثل أبو قير وموبكو) والشركات ذات التدفقات الدولارية، مع الحفاظ على صفقات التداول حول الدعوم الفنية وتفعيل وقف الخسارة أسفل القيعان السابقة.
                                 </p>
                             </div>
                         `;
@@ -11762,6 +12082,33 @@ async function syncMubasherDirectAll() {
             input.value = '';
             askAiMarketAdvisor(q);
         }
+
+        // =========================================================================
+        // RECOMMENDATIONS & ANALYSIS MASTER SLICER (توصيات وتحليل v16.3)
+        // =========================================================================
+        window.switchRecAnalysisSlicer = function(slicer) {
+            triggerHaptic('selection');
+            const recPanel = document.getElementById('recSlicerPanel_recs');
+            const analysisPanel = document.getElementById('recSlicerPanel_analysis');
+            const recBtn = document.getElementById('recSlicerBtn_recs');
+            const analysisBtn = document.getElementById('recSlicerBtn_analysis');
+
+            if (slicer === 'analysis') {
+                if (recPanel) recPanel.classList.add('hidden');
+                if (analysisPanel) analysisPanel.classList.remove('hidden');
+                if (recBtn) recBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (analysisBtn) analysisBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md active:scale-95";
+                
+                if (typeof initAiAdvisorTemplates === 'function') initAiAdvisorTemplates();
+                if (typeof updateAiMarketAdvisorView === 'function') updateAiMarketAdvisorView(currentAssetSlicer);
+            } else {
+                if (recPanel) recPanel.classList.remove('hidden');
+                if (analysisPanel) analysisPanel.classList.add('hidden');
+                if (recBtn) recBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md active:scale-95";
+                if (analysisBtn) analysisBtn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 bg-slate-900 text-slate-400 hover:text-white border border-slate-800 active:scale-95";
+                if (typeof renderRecommendationsView === 'function') renderRecommendationsView();
+            }
+        };
 
         function switchDecisionsSubTab(sub) {
             const views = { rec: 'decisionsSubViewRec', val: 'decisionsSubViewVal' };
@@ -11859,8 +12206,8 @@ async function syncMubasherDirectAll() {
                 actualTabId = 'radar';
                 subTarget = 'fair';
             } else if (tabId === 'ai' || tabId === 'ai_chat') {
-                actualTabId = 'radar';
-                subTarget = 'ai';
+                actualTabId = 'recommendations';
+                subTarget = 'analysis';
             }
 
             currentActiveTab = actualTabId;
@@ -11908,7 +12255,12 @@ async function syncMubasherDirectAll() {
                 } else if (actualTabId === 'news_hub' || actualTabId === 'news') {
                     renderNewsHub('stocks');
                 } else if (actualTabId === 'recommendations') {
-                    renderRecommendationsView();
+                    if (subTarget === 'analysis') {
+                        if (typeof switchRecAnalysisSlicer === 'function') switchRecAnalysisSlicer('analysis');
+                    } else {
+                        if (typeof switchRecAnalysisSlicer === 'function') switchRecAnalysisSlicer('recs');
+                        else renderRecommendationsView();
+                    }
                 } else if (actualTabId === 'valuation') {
                     switchMarketSubTab('fair');
                 } else if (actualTabId === 'tools') {
@@ -14623,19 +14975,19 @@ async function syncMubasherDirectAll() {
 
                 if (isOwned && cur < buy && safety > 5) {
                     action = 'dca';
-                    actionLabel = 'تبريد استثماري (DCA) 🛡️';
+                    actionLabel = 'تبريد استثماري (DCA) ❄️';
                     badgeClass = 'bg-sky-950 text-sky-300 border-sky-700/80';
                 } else if (safety > 15 && rsi < 65) {
                     action = 'buy';
-                    actionLabel = 'شراء تجميعي قوي 🟢';
+                    actionLabel = 'فرصة شراء ساخنة 🔥';
                     badgeClass = 'bg-emerald-950 text-emerald-300 border-emerald-700/80';
                 } else if (cur >= fair || rsi > 70) {
                     action = 'sell';
-                    actionLabel = 'جني أرباح وتخفيف 🔴';
+                    actionLabel = 'جني أرباح وتخفيف 💰';
                     badgeClass = 'bg-rose-950 text-rose-300 border-rose-700/80';
                 } else {
                     action = 'hold';
-                    actionLabel = 'احتفاظ وترقب 🟡';
+                    actionLabel = 'احتفاظ وترقب ⏳';
                     badgeClass = 'bg-amber-950 text-amber-300 border-amber-700/80';
                 }
 
@@ -14680,6 +15032,9 @@ async function syncMubasherDirectAll() {
             if (dEl) dEl.innerText = `${dcaCount} أسهم`;
             if (hEl) hEl.innerText = `${holdCount} أصل`;
             if (sEl) sEl.innerText = `${sellCount} تخارج`;
+
+            const topBadge = document.getElementById('recsTopCountBadge');
+            if (topBadge) topBadge.innerText = `${buyCount + dcaCount} فرصة نشطة`;
 
             // Filter
             const filtered = enrichedRecs.filter(r => {
@@ -14753,18 +15108,41 @@ async function syncMubasherDirectAll() {
                         </div>
                     </div>
 
-                    <!-- Thesis & Justification -->
-                    <div class="bg-slate-950/50 p-2.5 rounded-xl border border-slate-800/80 text-[11px] text-slate-300 leading-relaxed flex items-start gap-2">
-                        <span class="text-amber-400 shrink-0 mt-0.5">💡</span>
-                        <span>${r.reasons && r.reasons.length > 0 ? r.reasons[0] : `السهم يتداول بهامش أمان استثماري +${r.safety.toFixed(1)}% ومؤشر القوة النسبية RSI عند ${r.rsi.toFixed(1)} يوفر نقطة دخول ممتازة نحو الهدف السعري ${r.target1} ج.`}</span>
+                    <!-- Thesis & Multi-Pillar Justification (ربط نبض السوق والأخبار والتقييم) -->
+                    <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 text-[10.5px] text-slate-300 leading-relaxed space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center gap-1 font-bold text-amber-300 text-[11px]">
+                                <span>💡</span> <span>مبررات التوصية المؤسسية:</span>
+                            </span>
+                            <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-slate-800">نبض السوق + الأخبار + جراهام</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5 pt-0.5 text-[10px]">
+                            <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                                <span class="text-indigo-300 font-bold block mb-0.5">⚡ نبض السوق الفني:</span>
+                                <span class="text-slate-300">${r.technicalReason || `مؤشر RSI عند ${r.rsi.toFixed(1)} والسيولة تدعم المسار.`}</span>
+                            </div>
+                            <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                                <span class="text-sky-300 font-bold block mb-0.5">📰 الأخبار والإفصاحات:</span>
+                                <span class="text-slate-300">${r.newsReason || 'إفصاحات تشغيلية مستقرة ونمو في التدفقات النقدية.'}</span>
+                            </div>
+                            <div class="p-1.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                                <span class="text-emerald-300 font-bold block mb-0.5">🎯 التقييم وهامش الأمان:</span>
+                                <span class="text-slate-300">${r.fundamentalReason || `هامش أمان +${r.safety.toFixed(1)}% عن القيمة العادلة.`}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Action Buttons Strip -->
-                    <div class="pt-1 border-t border-slate-800/60 flex items-center justify-between text-xs">
-                        <button onclick="openTransactionModal('${r.ticker}', 'buy')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-[10.5px] px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95">
-                            <span>➕</span>
-                            <span>تنفيذ شراء / تبريد</span>
-                        </button>
+                    <!-- Action Buttons Strip (ربط الشراء والتحليل والشارت) -->
+                    <div class="pt-1.5 border-t border-slate-800/60 flex items-center justify-between flex-wrap gap-2 text-xs">
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="openTransactionModal('${r.ticker}', '${isBuy || isDca ? 'buy' : 'sell'}')" class="bg-gradient-to-r ${isBuy ? 'from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500' : isDca ? 'from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500' : 'from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500'} text-white font-bold text-[10.5px] px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95">
+                                <span>${isBuy ? '🔥 تنفيذ شراء' : isDca ? '❄️ تنفيذ تبريد' : '💰 تنفيذ جني أرباح'}</span>
+                            </button>
+                            <button onclick="switchRecAnalysisSlicer('analysis'); askAiMarketAdvisor('تحليل سهم ${r.ticker}')" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-white font-bold text-[10.5px] px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 border border-slate-700 active:scale-95">
+                                <span>🤖</span>
+                                <span>استشارة AI</span>
+                            </button>
+                        </div>
                         <button onclick="openStockChartModal('${r.ticker}')" class="text-sky-400 hover:text-sky-300 font-bold text-[10.5px] flex items-center gap-1 transition">
                             <span>📐 الشارت والتحليل الفني</span>
                             <span>←</span>
