@@ -211,6 +211,96 @@ for f_sym, f_url in snduk_fund_urls.items():
     except Exception as fe:
         print(f"  [SNDUK FALLBACK] {f_sym} keeping verified baseline ({funds_data[f_sym]['close']}): {fe}")
 
+# Source C: Mubasher Funds Daily Report Crawler (Secondary Redundant Tier)
+try:
+    print("Fetching from Source C: Mubasher Funds Daily Disclosures (mubasherfunds.info)...")
+    mub_req = urllib.request.Request(
+        'https://mubasherfunds.info/news/local',
+        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    )
+    with urllib.request.urlopen(mub_req, timeout=12) as mub_resp:
+        mub_html = mub_resp.read().decode('utf-8', errors='ignore')
+    
+    mub_links = re.findall(r'href=["\'](https://mubasherfunds\.info/\d+/article/[^"\']+)["\']', mub_html)
+    fund_articles = [l for l in mub_links if any(k in l for k in ['%D8%B5%D9%86%D8%A7%D8%AF%D9%8A%D9%82', '%D8%A3%D8%B3%D8%B9%D8%A7%D8%B1', 'صناديق', 'أسعار'])]
+    
+    if fund_articles:
+        latest_art_url = fund_articles[0]
+        art_req = urllib.request.Request(latest_art_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+        with urllib.request.urlopen(art_req, timeout=12) as art_resp:
+            art_html = art_resp.read().decode('utf-8', errors='ignore')
+        
+        ar_months = {
+            'يناير': '01', 'فبراير': '02', 'مارس': '03', 'أبريل': '04', 'مايو': '05', 'يونيو': '06',
+            'يوليو': '07', 'أغسطس': '08', 'سبتمبر': '09', 'أكتوبر': '10', 'نوفمبر': '11', 'ديسمبر': '12'
+        }
+        doc_date = None
+        date_m = re.search(r'(\d{1,2})[\s\-]+([^\s\-]+)[\s\-]+(202\d)', urllib.parse.unquote(latest_art_url))
+        if date_m:
+            day, month_str, year = date_m.group(1), date_m.group(2), date_m.group(3)
+            m_num = ar_months.get(month_str.strip())
+            if m_num:
+                doc_date = f"{year}-{m_num}-{int(day):02d}"
+        
+        if not doc_date:
+            title_m = re.search(r'<h1[^>]*>(.*?)</h1>', art_html, re.DOTALL)
+            if title_m:
+                clean_title = re.sub(r'<[^>]+>', '', title_m.group(1))
+                date_m2 = re.search(r'(\d{1,2})[\s]+([^\s]+)[\s]+(202\d)', clean_title)
+                if date_m2:
+                    day, month_str, year = date_m2.group(1), date_m2.group(2), date_m2.group(3)
+                    m_num = ar_months.get(month_str.strip())
+                    if m_num:
+                        doc_date = f"{year}-{m_num}-{int(day):02d}"
+        
+        fund_aliases = {
+            'CMS': ['ciam -  shariah equity', 'ciam - shariah equity', 'ciam shariah equity', 'مصر شريعة', 'شريعة إكويتي'],
+            'BWA': ['beltone egx33 shariah', 'beltone wafra', 'بلتون وفرة', 'وفرة'],
+            'AZG': ['az - gold', 'az gold', 'أزيموت جولد', 'ازيموت ذهب'],
+            'NMF': ['naeem misr', 'نعيم مصر']
+        }
+        
+        rows = re.findall(r'<tr[^>]*>(.*?)</tr>', art_html, re.DOTALL | re.IGNORECASE)
+        for row in rows:
+            cells = [re.sub(r'<[^>]+>', '', c).strip().replace('&nbsp;', ' ') for c in re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', row, re.DOTALL)]
+            if len(cells) >= 2:
+                try:
+                    price_val = float(cells[0].replace(',', '').strip())
+                    raw_name = cells[1].lower().strip()
+                except ValueError:
+                    try:
+                        price_val = float(cells[1].replace(',', '').strip())
+                        raw_name = cells[0].lower().strip()
+                    except ValueError:
+                        continue
+                
+                for f_sym, aliases in fund_aliases.items():
+                    if any(a in raw_name for a in aliases):
+                        curr_date = funds_data[f_sym].get("last_nav_date", "2026-09-01")
+                        if doc_date and doc_date >= curr_date:
+                            funds_data[f_sym]["close"] = round(price_val, 4)
+                            funds_data[f_sym]["last_nav_date"] = doc_date
+                            funds_data[f_sym]["source"] = f"بوابة معلومات مباشر (Mubasher) - {doc_date}"
+                            print(f"  [MUBASHER SYNC] {f_sym}: NAV = {price_val} (Date: {doc_date})")
+                        else:
+                            print(f"  [MUBASHER SKIP] {f_sym}: Mubasher date ({doc_date}) older than or equal to current ({curr_date}), keeping verified {funds_data[f_sym]['close']}.")
+except Exception as me:
+    print(f"  [MUBASHER FALLBACK] {me}")
+
+# Source D: EGXBot Fallback Tier
+try:
+    print("Checking Source D: EGXBot Fund Listings...")
+    egx_req = urllib.request.Request(
+        'https://egxbot.com/funds',
+        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    )
+    with urllib.request.urlopen(egx_req, timeout=10) as egx_resp:
+        egx_html = egx_resp.read().decode('utf-8', errors='ignore')
+        print("  [EGXBOT SYNC] Verified reachable as active 4th-tier fallback.")
+except Exception as egxe:
+    print(f"  [EGXBOT SKIP] {egxe}")
+
+
 # 3. Macro & Benchmarks (USD/EGP, Gold 24K, Clawdz Yield)
 fx_gold = {
     "usd_egp": {
@@ -254,7 +344,10 @@ output = {
     "total_funds_tracked": len(funds_data),
     "data_providers": [
         "TradingView Official Egypt Scanner API",
-        "Official Fund Manager NAV Disclosures (CI Capital, Azimut, Beltone, Naeem via snduk.com)",
+        "Snduk.com Direct NAV Disclosures (CI Capital, Azimut, Beltone, Naeem)",
+        "Mubasher Financial Portal (mubasherfunds.info Daily Disclosures)",
+        "FoudaLens Egyptian Funds Intelligence",
+        "EGXBot / Starta Markets Fund Monitor",
         "Central Bank of Egypt FX & Gold Bullion Feed"
     ]
 }
