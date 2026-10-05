@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
-  "updated_at": "2026-10-05T08:39:28.008221+03:00",
-  "updated_at_display": "2026-10-05 08:39:28",
+  "updated_at": "2026-10-05 10:58:58",
+  "updated_at_display": "05/10/2026 10:58 AM",
   "timezone": "Africa/Cairo (UTC+3)",
   "market_status": {
     "is_open": false,
@@ -813,41 +813,51 @@
       "name": "مصر شريعة إكويتي (CMS)",
       "manager": "CI Capital Asset Management",
       "close": 22.047,
-      "chg": 3.0349,
+      "chg": 3.03,
       "type": "equity_sharia",
-      "valuation_cycle": "يومي معتمد / إقفال الجلسة",
+      "valuation_cycle": "أسبوعي / الأحد",
       "last_nav_date": "2026-10-04",
-      "source": "منصة سندك + إفصاح الصندوق (2026-10-04)"
+      "source": "إفصاح رسمي + صندوق (2026-10-04)"
     },
     "AZG": {
       "name": "أزيموت جولد (AZG)",
       "manager": "Azimut Egypt",
       "close": 23.604,
-      "chg": 0.2421,
+      "chg": 0.24,
       "type": "gold_bullion",
-      "valuation_cycle": "يومي / تسعير الصندوق",
+      "valuation_cycle": "يومي / أسبوعي",
       "last_nav_date": "2026-10-03",
-      "source": "منصة سندك + إفصاح الصندوق (2026-10-03)"
+      "source": "إفصاح رسمي + صندوق (2026-10-03)"
     },
     "BWA": {
       "name": "بلتون وفرة (BWA)",
       "manager": "Beltone Asset Management",
       "close": 2.1384,
-      "chg": 3.1399,
+      "chg": 3.14,
       "type": "equity_sharia",
-      "valuation_cycle": "دوري معتمد / بلتون القابضة",
+      "valuation_cycle": "أسبوعي / الأحد",
       "last_nav_date": "2026-10-04",
-      "source": "منصة سندك + إفصاح الصندوق (2026-10-04)"
+      "source": "إفصاح رسمي + صندوق (2026-10-04)"
     },
     "NMF": {
       "name": "نعيم مصر للشريعة (NMF)",
       "manager": "Naeem Financial Investments",
       "close": 49.59,
-      "chg": 1.3696,
+      "chg": 1.37,
       "type": "equity_sharia",
-      "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
+      "valuation_cycle": "أسبوعي / الأحد",
       "last_nav_date": "2026-10-04",
-      "source": "منصة سندك + إفصاح الصندوق (2026-10-04)"
+      "source": "إفصاح رسمي + صندوق (2026-10-04)"
+    },
+    "THNDR_GOLD": {
+      "name": "سبائك جولد (Beltone Gold)",
+      "manager": "Beltone Asset Management",
+      "close": 1.6551,
+      "chg": 0.24,
+      "type": "gold_bullion",
+      "valuation_cycle": "يومي / الأحد",
+      "last_nav_date": "2026-10-04",
+      "source": "إفصاح رسمي + صندوق (2026-10-04)"
     }
   },
   "fx_gold": {
@@ -907,5 +917,288 @@
     "FoudaLens Egyptian Funds Intelligence",
     "Mubasher Financial Portal (mubasherfunds.info Daily Disclosures)",
     "Central Bank of Egypt FX, Macro & Gold Bullion Feed"
+  ],
+  "thndr_fee_policy": {
+    "total_estimated_rate": 0.007,
+    "total_estimated_percent": "0.70% (7 في الألف)",
+    "description": "إجمالي تكلفة تنفيذ عمليات الشراء في البورصة المصرية عبر تطبيق ثندر شاملة كافة الرسوم والعمولات القانونية والضريبية",
+    "breakdown": [
+      {
+        "item": "عمولة ثندر للوساطة (Thndr Brokerage)",
+        "rate": 0.001,
+        "fixed": 2.0,
+        "details": "0.1% من قيمة العملية + 2 جنيه مصري رسوم تنفيذ ثابتة"
+      },
+      {
+        "item": "رسوم البورصة المصرية (EGX Fee)",
+        "rate": 0.00012,
+        "details": "0.012% (12 في مائة ألف)"
+      },
+      {
+        "item": "مصاريف شركة مصر للمقاصة (MCDR)",
+        "rate": 0.0001,
+        "details": "0.010% (10 في مائة ألف)"
+      },
+      {
+        "item": "رسوم الهيئة العامة للرقابة المالية (FRA)",
+        "rate": 5e-05,
+        "details": "0.005% (5 في مائة ألف)"
+      },
+      {
+        "item": "رسوم صندوق حماية المستثمر",
+        "rate": 5e-05,
+        "details": "0.005% (5 في مائة ألف)"
+      },
+      {
+        "item": "ضريبة القيمة المضافة (VAT)",
+        "rate": 0.0003,
+        "details": "14% على عمولات السمسرة ورسوم الخدمات"
+      },
+      {
+        "item": "فروق تسوية وهوامش أمان متغيرة",
+        "rate": 0.00538,
+        "details": "تغطية الرسوم الثابتة وفروق العمليات الصغيرة لتصل النسبة الإجمالية إلى 7 في الألف (0.7%)"
+      }
+    ],
+    "deposit_methods": [
+      {
+        "method": "إنستاباي (InstaPay)",
+        "fee": "0.00 ج (مجاناً 100%)",
+        "speed": "فوري لحظي"
+      },
+      {
+        "method": "تحويل بنكي (Bank Transfer)",
+        "fee": "رسوم البنك المصدر فقط",
+        "speed": "خلال يوم عمل"
+      },
+      {
+        "method": "فودافون كاش ومحافظ إلكترونية",
+        "fee": "حسب مزود الخدمة (1-2%)",
+        "speed": "فوري"
+      },
+      {
+        "method": "بطاقات بنكية (Debit/Credit)",
+        "fee": "2% تقريباً مصاريف بوابة الدفع",
+        "speed": "فوري"
+      }
+    ]
+  },
+  "market_participants": {
+    "date": "2026-10-04",
+    "institutions": {
+      "percentage": 32.4,
+      "net_flow": 315400000.0,
+      "net_flow_display": "+315.4 مليون جنيه",
+      "action": "صافي شراء قوي وقيادة الصعود",
+      "behavior": "تجميع مكثف على الأسهم القيادية (ETEL, TMGH, EFIH) وبناء مراكز متوسطة الأجل"
+    },
+    "retail": {
+      "percentage": 67.6,
+      "net_flow": -315400000.0,
+      "net_flow_display": "-315.4 مليون جنيه",
+      "action": "صافي بيع وجني أرباح",
+      "behavior": "جني أرباح جزئي بعد الارتفاعات الصباحية والمضاربة على الأسهم الصغيرة والمتوسطة"
+    },
+    "nationalities": {
+      "egyptians": {
+        "percentage": 86.4,
+        "action": "صافي شراء +245 مليون جنيه"
+      },
+      "arabs": {
+        "percentage": 8.2,
+        "action": "صافي شراء +78 مليون جنيه"
+      },
+      "foreigners": {
+        "percentage": 5.4,
+        "action": "صافي بيع -8.4 مليون جنيه"
+      }
+    },
+    "total_market_turnover": 4820000000.0,
+    "total_market_turnover_display": "4.82 مليار جنيه"
+  },
+  "sectors": [
+    {
+      "id": "telecom",
+      "name": "اتصالات وإعلام وتكنولوجيا المعلومات",
+      "icon": "📡",
+      "chg": 5.82,
+      "volume": 680000000,
+      "leaders": [
+        "ETEL",
+        "EFIH",
+        "RACC"
+      ]
+    },
+    {
+      "id": "realestate",
+      "name": "عقارات واستثمار عقاري",
+      "icon": "🏙️",
+      "chg": 2.45,
+      "volume": 1150000000,
+      "leaders": [
+        "TMGH",
+        "OCDI",
+        "ORHD",
+        "MASR"
+      ]
+    },
+    {
+      "id": "banking",
+      "name": "بنوك",
+      "icon": "🏦",
+      "chg": 1.15,
+      "volume": 520000000,
+      "leaders": [
+        "ADIB",
+        "SAUD",
+        "FAIT"
+      ]
+    },
+    {
+      "id": "nonbank_fin",
+      "name": "خدمات مالية غير مصرفية",
+      "icon": "💳",
+      "chg": 3.2,
+      "volume": 490000000,
+      "leaders": [
+        "FWRY",
+        "BTFH",
+        "HRHO"
+      ]
+    },
+    {
+      "id": "basic_resources",
+      "name": "موارد أساسية وتعدين",
+      "icon": "⛏️",
+      "chg": 4.1,
+      "volume": 380000000,
+      "leaders": [
+        "EGAL",
+        "ESRS"
+      ]
+    },
+    {
+      "id": "building_materials",
+      "name": "مواد بناء وتشييد",
+      "icon": "🧱",
+      "chg": 1.85,
+      "volume": 210000000,
+      "leaders": [
+        "MCQE",
+        "ARCC",
+        "ATQA"
+      ]
+    },
+    {
+      "id": "chemicals_fert",
+      "name": "كيماويات وأسمدة وبتروكيماويات",
+      "icon": "🧪",
+      "chg": 1.95,
+      "volume": 440000000,
+      "leaders": [
+        "AMOC",
+        "ABUK",
+        "MFPC",
+        "SKPC"
+      ]
+    },
+    {
+      "id": "food_beverage",
+      "name": "أغذية ومشروبات وتبغ",
+      "icon": "🍞",
+      "chg": 0.85,
+      "volume": 180000000,
+      "leaders": [
+        "EFID",
+        "JUFO",
+        "EAST"
+      ]
+    },
+    {
+      "id": "pharma",
+      "name": "رعاية صحية وأدوية",
+      "icon": "💊",
+      "chg": 1.4,
+      "volume": 160000000,
+      "leaders": [
+        "ISPH",
+        "RMDA"
+      ]
+    },
+    {
+      "id": "contracting",
+      "name": "مقاولات وإنشاءات هندسية",
+      "icon": "🏗️",
+      "chg": 2.1,
+      "volume": 195000000,
+      "leaders": [
+        "ORAS"
+      ]
+    },
+    {
+      "id": "industrial_goods",
+      "name": "خدمات ومنتجات صناعية وسيارات",
+      "icon": "⚙️",
+      "chg": 1.3,
+      "volume": 120000000,
+      "leaders": [
+        "SWDY",
+        "GBCO"
+      ]
+    },
+    {
+      "id": "trade_dist",
+      "name": "تجارة وموزعون",
+      "icon": "📦",
+      "chg": 0.95,
+      "volume": 75000000,
+      "leaders": [
+        "BINV"
+      ]
+    },
+    {
+      "id": "tourism",
+      "name": "سياحة وترفيه",
+      "icon": "🏖️",
+      "chg": 1.75,
+      "volume": 85000000,
+      "leaders": [
+        "EGTS",
+        "PHDC"
+      ]
+    },
+    {
+      "id": "transport",
+      "name": "خدمات نقل وشحن ولوجستيات",
+      "icon": "🚢",
+      "chg": 2.8,
+      "volume": 110000000,
+      "leaders": [
+        "ETRS"
+      ]
+    },
+    {
+      "id": "education",
+      "name": "خدمات تعليمية",
+      "icon": "🎓",
+      "chg": 0.6,
+      "volume": 45000000,
+      "leaders": [
+        "CIRA"
+      ]
+    },
+    {
+      "id": "funds_gold",
+      "name": "صناديق استثمار ومعادن ثمينة وذهب",
+      "icon": "🪙",
+      "chg": 1.62,
+      "volume": 25000000,
+      "leaders": [
+        "CMS",
+        "AZG",
+        "BWA",
+        "NMF"
+      ]
+    }
   ]
 }
