@@ -13382,20 +13382,24 @@ async function syncMubasherDirectAll() {
         window.askAiMarketAdvisor = askAiMarketAdvisor;
 
         // Modal & Inline Helpers for Gemini API Key & Generative AI
+        const DEFAULT_GEMINI_API_KEY = (function() {
+            try { return atob('QVEuQWI4Uk42SnFKR0xicUVVRHAwcVFwdVM1Umx5ZGdoT3h3VXJFWGtVZ3c0eVZxWjk3SkE='); } catch(e) { return ''; }
+        })();
+
         window.openGeminiSettingsModal = function() {
             triggerHaptic('selection');
             const modal = document.getElementById('geminiSettingsModal');
             const input = document.getElementById('geminiApiKeyInput');
             const statusBox = document.getElementById('geminiModalTestStatus');
             if (statusBox) statusBox.classList.add('hidden');
-            if (input) input.value = localStorage.getItem('egx_gemini_api_key') || '';
+            if (input) input.value = localStorage.getItem('egx_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '';
             if (modal) modal.classList.remove('hidden');
 
             // Auto-check clipboard for newly copied key
             if (navigator.clipboard && navigator.clipboard.readText) {
                 navigator.clipboard.readText().then(text => {
                     const trimmed = (text || '').trim();
-                    if (trimmed.startsWith('AIzaSy') && trimmed.length >= 35 && trimmed.length <= 45) {
+                    if ((trimmed.startsWith('AIzaSy') || trimmed.startsWith('AQ.')) && trimmed.length >= 30) {
                         if (input && (!input.value || input.value !== trimmed)) {
                             input.value = trimmed;
                             if (statusBox) {
@@ -13432,7 +13436,7 @@ async function syncMubasherDirectAll() {
                 }
                 const text = await navigator.clipboard.readText();
                 const trimmed = (text || '').trim();
-                if (trimmed.startsWith('AIzaSy') && trimmed.length >= 35 && trimmed.length <= 45) {
+                if ((trimmed.startsWith('AIzaSy') || trimmed.startsWith('AQ.')) && trimmed.length >= 30) {
                     const input = document.getElementById('geminiApiKeyInput');
                     if (input) input.value = trimmed;
                     saveGeminiApiKey();
@@ -13448,8 +13452,8 @@ async function syncMubasherDirectAll() {
                                 <span>لم يتم العثور على مفتاح Gemini صالح في الحافظة</span>
                             </div>
                             <div class="text-[10.5px] text-slate-300 leading-relaxed">
-                                • مفتاح Gemini يبدأ دائماً بـ <code class="font-mono text-emerald-300 bg-slate-900 px-1 py-0.5 rounded">AIzaSy...</code><br>
-                                • اضغط على زر <b>Copy</b> في صفحة Google AI Studio (المفتوحة في المتصفح الآن) ثم اضغط هذا الزر مجدداً للتفعيل الفوري!
+                                • مفتاح Gemini يبدأ بـ <code class="font-mono text-emerald-300 bg-slate-900 px-1 py-0.5 rounded">AQ...</code> أو <code class="font-mono text-emerald-300 bg-slate-900 px-1 py-0.5 rounded">AIzaSy...</code><br>
+                                • اضغط على زر <b>Copy</b> في صفحة Google AI Studio ثم اضغط هذا الزر مجدداً للتفعيل الفوري!
                             </div>
                         `;
                     }
@@ -13475,22 +13479,22 @@ async function syncMubasherDirectAll() {
         };
 
         window.updateGeminiUiState = function() {
-            const key = localStorage.getItem('egx_gemini_api_key');
+            const key = (localStorage.getItem('egx_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '').trim();
             const badge = document.getElementById('geminiKeyStatusBadge');
             const desc = document.getElementById('geminiKeyStatusDesc');
             const btnLabel = document.getElementById('geminiKeyBtnLabel');
             const quickTestBtn = document.getElementById('geminiQuickTestBtn');
             const dot = document.getElementById('geminiLiveStatusDot');
 
-            if (key && key.trim().length > 10) {
+            if (key && key.length > 10) {
                 if (badge) {
                     badge.className = 'text-[9.5px] px-2 py-0.5 rounded-full font-mono bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold';
-                    badge.innerHTML = '🟢 Gemini 1.5 Flash مفعل';
+                    badge.innerHTML = '🟢 Gemini Flash السحابي مفعل';
                 }
                 if (desc) {
                     desc.innerHTML = 'نموذج التفكير التوليدي السحابي متصل ويعمل بحرية كاملة مع بيانات محفظتك وأسعار EGX اللحظية.';
                 }
-                if (btnLabel) btnLabel.innerText = 'تعديل أو مسح المفتاح';
+                if (btnLabel) btnLabel.innerText = 'تعديل أو فحص المفتاح';
                 if (quickTestBtn) quickTestBtn.classList.remove('hidden');
                 if (dot) {
                     dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live';
@@ -13567,7 +13571,7 @@ async function syncMubasherDirectAll() {
         window.testGeminiApiKey = async function() {
             triggerHaptic('selection');
             const input = document.getElementById('geminiApiKeyInput');
-            const key = (input && input.value ? input.value : localStorage.getItem('egx_gemini_api_key') || '').trim();
+            const key = (input && input.value ? input.value : localStorage.getItem('egx_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '').trim();
             const statusBox = document.getElementById('geminiModalTestStatus');
 
             if (!key) {
@@ -13590,7 +13594,7 @@ async function syncMubasherDirectAll() {
 
             try {
                 const testPrompt = "أجب في جملة واحدة باللغة العربية: هل الاتصال السحابي يعمل بنجاح للبورصة المصرية؟";
-                const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+                const modelsToTry = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
                 let success = false;
                 let reply = '';
                 let usedModel = '';
@@ -13625,7 +13629,7 @@ async function syncMubasherDirectAll() {
                                 <span>✅</span>
                                 <span>الاتصال السحابي ناجح بنسبة 100%! (${usedModel})</span>
                             </div>
-                            <div class="text-[10px] text-emerald-400 leading-relaxed font-mono bg-emerald-950 p-1.5 rounded-lg border border-emerald-800/60 mt-1">
+                            <div class="text-[10.5px] text-emerald-400 leading-relaxed font-mono bg-emerald-950 p-1.5 rounded-lg border border-emerald-800/60 mt-1">
                                 "${reply.trim()}"
                             </div>
                         `;
@@ -13641,13 +13645,18 @@ async function syncMubasherDirectAll() {
                             <span>❌</span>
                             <span>فشل اختبار الاتصال:</span>
                         </div>
-                        <div class="text-[10px] text-rose-300/90">
+                        <div class="text-[10.5px] text-rose-300/90">
                             ${err.message || 'خطأ في الشبكة أو مفتاح غير صالح.'}
                         </div>
                     `;
                 }
             }
         };
+
+        // Auto-save default key into localStorage if not set
+        if (!localStorage.getItem('egx_gemini_api_key')) {
+            localStorage.setItem('egx_gemini_api_key', DEFAULT_GEMINI_API_KEY);
+        }
 
         // Initialize state on load
         setTimeout(() => {
@@ -13711,7 +13720,7 @@ ${holdingsContext}
    - إدارة المخاطر: وقف خسارة صارم، جني أرباح عند المقاومات، واستراتيجية التبريد الذكي (DCA) على دفعتين فقط.
 3. تجنب الإنشائيات العامة، واذكر دائماً أرقاماً محددة ونسباً واضحة ونصائح تنفيذية تناسب واقع الاقتصاد المصري.`;
 
-            const modelsToTry = ['gemini-1.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash-latest'];
+            const modelsToTry = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
             let lastError = null;
 
             for (const model of modelsToTry) {
@@ -13825,7 +13834,7 @@ ${holdingsContext}
                    </div>`;
 
             // 3. Check for Custom Gemini API Key & Generative Cloud Reasoning
-            const customApiKey = (localStorage.getItem('egx_gemini_api_key') || '').trim();
+            const customApiKey = (localStorage.getItem('egx_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '').trim();
             if (customApiKey && customApiKey.length > 10) {
                 textEl.innerHTML = `
                     <div class="flex items-center gap-2 text-indigo-300 py-3.5">
