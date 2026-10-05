@@ -175,42 +175,52 @@ funds_data = {
     "CMS": {
         "name": "مصر شريعة إكويتي (CMS)",
         "manager": "CI Capital Asset Management",
-        "close": 22.0470,
-        "chg": 3.03,
+        "close": 22.6467,
+        "chg": 2.72,
         "type": "equity_sharia",
         "valuation_cycle": "يومي معتمد / إقفال الجلسة",
-        "last_nav_date": "2026-10-04",
-        "source": "تطبيق Thndr / إفصاح سي آي لإدارة الأصول (CIAM)"
+        "last_nav_date": "2026-10-05",
+        "source": "منصة سندك الرسمية (SNDUK) + إفصاح CI Capital (2026-10-05)"
     },
     "AZG": {
         "name": "أزيموت جولد (AZG)",
         "manager": "Azimut Egypt",
-        "close": 23.6040,
-        "chg": 0.44,
+        "close": 23.5374,
+        "chg": -0.28,
         "type": "gold_bullion",
         "valuation_cycle": "يومي / تسعير الصندوق",
-        "last_nav_date": "2026-10-03",
-        "source": "تطبيق Thndr / إفصاح أزيموت مصر للذهب"
+        "last_nav_date": "2026-10-04",
+        "source": "منصة سندك الرسمية (SNDUK) + إفصاح أزيموت مصر (2026-10-04)"
     },
     "BWA": {
-        "name": "بلتون وفرة (BWA)",
+        "name": "بلتون وفرة للشريعة (BWA)",
         "manager": "Beltone Asset Management",
-        "close": 2.1384,
-        "chg": 3.14,
+        "close": 2.2004,
+        "chg": 2.90,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / بلتون القابضة",
-        "last_nav_date": "2026-10-04",
-        "source": "تطبيق Thndr / إفصاح بلتون المالية"
+        "last_nav_date": "2026-10-05",
+        "source": "منصة سندك الرسمية (SNDUK) + إفصاح بلتون المالية (2026-10-05)"
     },
     "NMF": {
         "name": "نعيم مصر للشريعة (NMF)",
         "manager": "Naeem Financial Investments",
-        "close": 49.5900,
-        "chg": 1.37,
+        "close": 50.2400,
+        "chg": 1.31,
         "type": "equity_sharia",
         "valuation_cycle": "دوري معتمد / إفصاح الصندوق",
-        "last_nav_date": "2026-10-04",
-        "source": "تطبيق Thndr / إفصاح النعيم للاستثمارات"
+        "last_nav_date": "2026-10-05",
+        "source": "منصة سندك الرسمية (SNDUK) + إفصاح النعيم (2026-10-05)"
+    },
+    "THNDR_GOLD": {
+        "name": "سبائك الذهب عيار 24 (ثندر)",
+        "manager": "Thndr Digital Bullion",
+        "close": 7015.00,
+        "chg": 0.60,
+        "type": "gold_bullion",
+        "valuation_cycle": "لحظي معتمد / تسعير ثندر",
+        "last_nav_date": "2026-10-05",
+        "source": "تسعير ثندر المعتمد للذهب الرقمي عيار 24"
     }
 }
 

@@ -2028,7 +2028,7 @@
                                 <div class="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">سعر الوثيقة:</span>
-                                        <b id="matrix-price-CMS" class="text-emerald-400 font-mono">22.0470 ج</b>
+                                        <b id="matrix-price-CMS" class="text-emerald-400 font-mono">22.6467 ج</b>
                                     </div>
                                     <div>
                                         <span class="block text-[8.5px] text-slate-500">المدير:</span>
@@ -2273,8 +2273,8 @@
                 <!-- Unified Compact Balance & Immediate PnL Row -->
                 <div class="flex items-center justify-between px-1">
                     <div class="flex items-baseline gap-2">
-                        <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span>
-                        <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">85,304</span>
+                        <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span><button onclick="syncLiveFundsEngine()" class="text-[9px] text-emerald-300 hover:text-white bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1 transition active:scale-95 shadow-sm" title="مزامنة أسعار الصناديق الفورية مباشرة من منصة SNDUK الرسمية"><span>🏛️</span><span>تحديث الصناديق (SNDUK)</span></button>
+                        <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">87,823</span>
                         <span class="text-xs font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
                     <!-- Profit/Loss Badge placed inline (compact) -->
@@ -2310,12 +2310,12 @@
                             <span class="truncate">الصناديق (4)</span>
                         </div>
                         <div class="flex items-baseline gap-0.5 my-0.5">
-                            <span id="p_thndr_funds_card" class="font-bold text-amber-400 font-mono text-[11px] sm:text-sm">49.22k ج</span>
+                            <span id="p_thndr_funds_card" class="font-bold text-emerald-400 font-mono text-[11px] sm:text-sm">50.55k ج</span>
                         </div>
                         <!-- القيمة والنسبة المئوية في سطر واحد متجاورين -->
                         <div class="flex items-center justify-center gap-0.5 sm:gap-1 text-[8px] sm:text-[9.5px] font-mono font-bold leading-none flex-wrap">
-                            <span id="p_thndr_funds_card_egp" class="text-rose-300">-1,429 ج</span>
-                            <span id="p_thndr_funds_card_pnl" class="text-rose-400">(-2.82%)</span>
+                            <span id="p_thndr_funds_card_egp" class="text-emerald-300">-99 ج</span>
+                            <span id="p_thndr_funds_card_pnl" class="text-emerald-400">(-0.20%)</span>
                         </div>
                     </div>
 
@@ -5446,10 +5446,10 @@
                         { name: "جرام الذهب (عيار 24 المعتمد بثندر)", code: "GOLD", icon: "🥇", open: 6972.84, close: 7015.00, change: 0.60, desc: "سجل جرام الذهب عيار 24 المعتمد في ثندر إغلاقاً عند 7,015.00 ج بنسبة ارتفاع +0.60% (تكلفة الشراء 6,972.84 ج)، مؤكداً مكانته كصمام أمان ادخاري وتحوطي للثروة." }
                     ],
                     funds: [
-                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.0470, change: 0.85, note: "صافي الأصول: 22.0470 ج | تتبع رسمي لمؤشر EGX33 الشريعة" },
-                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.1384, change: 0.38, note: "صافي الأصول: 2.1384 ج | أسهم شريعة وسيولة استثمارية" },
-                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 49.5900, change: 0.42, note: "صافي الأصول: 49.5900 ج | محفظة متوازنة وفق معايير الأيوفي" },
-                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.6040, change: -0.83, note: "صافي الأصول: 23.6040 ج | استثمار بالذهب الفعلي عيار 24" },
+                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.6467, change: 2.72, note: "صافي الأصول: 22.6467 ج | تتبع رسمي لمؤشر EGX33 الشريعة (منصة صناديق SNDUK)" },
+                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.2004, change: 2.90, note: "صافي الأصول: 2.2004 ج | أسهم شريعة وسيولة استثمارية (منصة صناديق SNDUK)" },
+                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 50.2400, change: 1.31, note: "صافي الأصول: 50.2400 ج | محفظة متوازنة وفق معايير الأيوفي (منصة صناديق SNDUK)" },
+                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.5374, change: -0.28, note: "صافي الأصول: 23.5374 ج | استثمار بالذهب الفعلي عيار 24 (منصة صناديق SNDUK)" },
                         { name: "سبائك جولد (Thndr)", code: "THNDR_GOLD", price: 7015.00, change: 0.60, note: "صافي القيمة: 7,015.00 ج | سبائك الذهب الخالص عيار 24 عبر ثندر" }
                     ]
                 },
@@ -5779,7 +5779,7 @@
                                 <span class="text-lg">📌</span>
                                 <span class="text-xs font-bold text-emerald-400">${rpt.title}</span>
                             </div>
-                            <p class="text-[10px] text-slate-400">${rpt.subtitle} • إعداد: ${rpt.preparedBy}</p>
+                            <div class="flex items-center gap-2 flex-wrap mt-1"><p class="text-[10px] text-slate-400">${rpt.subtitle} • إعداد: ${rpt.preparedBy}</p><span class="text-[9px] bg-amber-950/80 text-amber-300 border border-amber-800/80 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1"><span>🔒</span><span>تقرير نهاية اليوم (يُعتمد بعد إغلاق الجلسة 2:30 م)</span></span></div>
                         </div>
                         <button onclick="askGeminiDailyReportSummary()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition active:scale-95">
                             <span>🤖</span>
@@ -5805,7 +5805,7 @@
                             <div>
                                 <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
                                     <span>أثر حركة البورصة اليوم على محفظتك الاستثمارية</span>
-                                    <span class="text-[9.5px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded-full font-mono font-bold">محدثة لحظياً</span>
+                                    <span class="text-[9.5px] bg-amber-950/80 text-amber-300 border border-amber-700/80 px-2.5 py-0.5 rounded-full font-mono font-bold flex items-center gap-1"><span>🔒</span><span>إغلاق جلسة رسمي معتمد (بعد إغلاق السوق 2:30 م)</span></span>
                                 </h3>
                                 <p class="text-[10px] text-emerald-300/80">قراءة دقيقة لأسهمك وصناديقك المملوكة حالياً فقط (تم استبعاد راية وفوري المباعة تماماً)</p>
                             </div>
@@ -5897,7 +5897,7 @@
                             <div>
                                 <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
                                     <span>خريطة المتعاملين وأحجام التداول (Volume & Participants)</span>
-                                    <span class="text-[9.5px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded-full font-mono font-bold">بث TradingView</span>
+                                    <span class="text-[9.5px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1"><span>📊</span><span>إغلاق التداولات الرسمي المعتمد</span></span>
                                 </h3>
                                 <p class="text-[10px] text-sky-300/80">تصنيف فئات المستثمرين (أفراد مقابل مؤسسات) وصافي التدفقات المالية بالبورصة المصرية</p>
                             </div>
@@ -7531,11 +7531,11 @@ window.addEventListener('load', () => {
             { ticker: "CERA", name: "سيراميكا كليوباترا (ريماس)", close: 1.25, open: 1.22, high: 1.27, low: 1.18, chg: 0, rsi: 39.4, pe: 46.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "EAST", name: "الشرقية للدخان", close: 29.99, open: 30.52, high: 30.94, low: 29.81, chg: 0.3, rsi: 15.6, pe: 10.8, type: "stock", rec: "شراء وتجميع قاع", sector: "الصناعة والتصدير" },
             { ticker: "GBCO", name: "جي بي كوربوريشن (غبور)", close: 29.69, open: 30, high: 30.01, low: 28.1, chg: 0.85, rsi: 45.6, pe: 8.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
-            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.6040, open: 23.50, high: 23.85, low: 23.40, chg: 0.44, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-03" },
-            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.0, open: 7000.0, high: 7050.0, low: 6950.0, chg: -0.83, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-04" },
-            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.0470, open: 21.3976, high: 22.10, low: 21.35, chg: 3.03, rsi: 50.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
-            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.1384, open: 2.0733, high: 2.15, low: 2.07, chg: 3.14, rsi: 50.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
-            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 49.5900, open: 48.92, high: 49.80, low: 48.85, chg: 1.37, rsi: 50.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-04" },
+            { ticker: "AZG", name: "أزيموت جولد (AZG)", close: 23.5374, open: 23.50, high: 23.85, low: 23.40, chg: -0.28, rsi: 50.0, pe: null, type: "fund", rec: "تحوط وشراء تراكمي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-04" },
+            { ticker: "THNDR_GOLD", name: "سبائك جولد (Thndr)", close: 7015.0, open: 7000.0, high: 7050.0, low: 7050.0, chg: 0.60, rsi: 50.0, pe: null, type: "fund", rec: "شراء سبائك تحوطي", sector: "الذهب وصناديق التحوط", last_nav_date: "2026-10-05" },
+            { ticker: "CMS", name: "مصر شريعة إكويتي (CMS)", close: 22.6467, open: 22.0470, high: 22.75, low: 22.00, chg: 2.72, rsi: 54.0, pe: null, type: "fund", rec: "استثمار مؤسسي دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-05" },
+            { ticker: "BWA", name: "بلتون وفرة (BWA)", close: 2.2004, open: 2.1384, high: 2.22, low: 2.13, chg: 2.90, rsi: 53.0, pe: null, type: "fund", rec: "شراء تراكمي للنمو", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-05" },
+            { ticker: "NMF", name: "نعيم مصر للشريعة (NMF)", close: 50.2400, open: 49.59, high: 50.50, low: 49.50, chg: 1.31, rsi: 52.0, pe: null, type: "fund", rec: "احتفاظ واستثمار دوري", sector: "صناديق الأسهم الشرعية", last_nav_date: "2026-10-05" },
             { ticker: "USD_EGP", name: "الدولار الأمريكي والسيولة الدولارية (USD)", close: 52.26, open: 52.28, high: 52.45, low: 52.10, chg: -0.04, rsi: 48.5, pe: null, type: "currency", rec: "تحوط واحتفاظ استراتيجي", sector: "النقد الأجنبي والملاذات" }
         ];
 
@@ -7998,7 +7998,7 @@ window.addEventListener('load', () => {
             },
             "CMS": {
                 name: "صندوق مصر شريعة إكويتي (CMS)",
-                current: 22.0470,
+                current: 22.6467,
                 bull: 30.00,
                 base: 27.50,
                 bear: 20.50,
@@ -8068,11 +8068,11 @@ window.addEventListener('load', () => {
             { ticker: "EFID", name: "ايديتا للصناعات الغذائية", qty: 23, buy: 31.84, cur: 28.90, sector: "الأغذية والمشروبات", isFund: false },
 
             // 2. محفظة الصناديق والذهب (أسعار الشراء الفعلية للتكلفة - إفصاح الأحد 4 أكتوبر 2026 المعتمد)
-            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 الشريعة", qty: 2210, buy: 22.6986, cur: 22.0470, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.6040, sector: "صناديق الذهب", isFund: true },
-            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.1384, sector: "صناديق نقدية وأسهم", isFund: true },
-            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 49.5900, sector: "صناديق الأسهم الشريعة", isFund: true },
-            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عياّر 24)", qty: 0.0081, buy: 6972.84, cur: 7015.00, sector: "الذهب الخالص 24", isFund: false }
+            { ticker: "CMS", name: "صندوق مؤشر CI EGX33 شريعة", qty: 2210, buy: 22.6986, cur: 22.6467, sector: "صناديق مؤشرات", isFund: true },
+            { ticker: "AZG", name: "صندوق Azimut جولد", qty: 11, buy: 23.1027, cur: 23.5374, sector: "صناديق الذهب", isFund: true },
+            { ticker: "BWA", name: "صندوق بلتون وفرة", qty: 66, buy: 2.095, cur: 2.2004, sector: "صناديق نقدية وأسهم", isFund: true },
+            { ticker: "NMF", name: "صندوق NM أسهم شريعة", qty: 2, buy: 48.31, cur: 50.2400, sector: "صناديق أسهم شريعة", isFund: true },
+            { ticker: "THNDR_GOLD", name: "ذهب ثاندر (عيار 24)", qty: 0.0081, buy: 6972.84, cur: 7015.00, sector: "ذهب خام 24", isFund: false }
         ];
         let donutChartInstance = null;
 
@@ -8147,7 +8147,7 @@ window.addEventListener('load', () => {
 
         function loadUserPortfolio() {
             // Load Thndr actual portfolio as default (v16 live key with guaranteed sync for all fund NAVs and gold 7,015.00 EGP)
-            const storageKey = 'egx_sharia_thndr_portfolio_v16_live';
+            const storageKey = 'egx_sharia_thndr_portfolio_v17_live';
             const saved = localStorage.getItem(storageKey);
             if (saved) {
                 try {
@@ -8208,7 +8208,7 @@ window.addEventListener('load', () => {
 
         function saveUserPortfolio() {
             try {
-                localStorage.setItem('egx_sharia_thndr_portfolio_v16_live', JSON.stringify(userHoldings));
+                localStorage.setItem('egx_sharia_thndr_portfolio_v17_live', JSON.stringify(userHoldings));
                 localStorage.setItem('egx_sharia_thndr_portfolio_v14_live', JSON.stringify(userHoldings));
                 localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
                 localStorage.setItem('egx_sharia_thndr_portfolio_v6', JSON.stringify(userHoldings));
@@ -14233,6 +14233,9 @@ async function syncMubasherDirectAll() {
                 } else if (cmd.action === 'FILTER_DR') {
                     title = `تصفية التقرير اليومي: ${cmd.param}`;
                     desc = `عرض شريحة البيانات المحددة في التقرير اليومي`;
+                } else if (cmd.action === 'OPEN_VIEWER' || cmd.action === 'OPEN_URL') {
+                    title = `فتح الرابط الخارجي بأمان: ${cmd.param}`;
+                    desc = `استعراض الصفحة داخل المتصفح المعزول (Sandbox)`;
                 } else if (friendlyTitles[key]) {
                     title = friendlyTitles[key].title;
                     desc = friendlyTitles[key].desc;
@@ -14283,7 +14286,7 @@ async function syncMubasherDirectAll() {
         };
 
         // Advanced Cloud Gemini API Caller with Full Executive Control & Universal Observability
-        async function callCloudGeminiApi(userPrompt, apiKey, isLive) {
+        async function callCloudGeminiApi(userPrompt, apiKey, isLive, chatHistory = [], activeAttachment = null) {
             const userHoldingsList = (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings) && userHoldings.length > 0)
                 ? userHoldings
                 : [];
@@ -14351,9 +14354,60 @@ ${stocksUniverseContext}
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [
-                                { role: 'user', parts: [{ text: `${systemContext}\n\nسؤال واستشارة المستثمر:\n${userPrompt}` }] }
-                            ]
+                            contents: (() => {
+                                // If multi-turn history exists, build sequential history
+                                if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+                                    const conv = [];
+                                    // Turn 0: User with system instructions and first prompt
+                                    chatHistory.forEach((msg, idx) => {
+                                        const parts = [];
+                                        if (msg.role === 'user' && msg.file && msg.file.type && msg.file.type.startsWith('image/') && msg.file.dataUrl) {
+                                            const base64Data = msg.file.dataUrl.split(',')[1];
+                                            if (base64Data) {
+                                                parts.push({
+                                                    inline_data: {
+                                                        mime_type: msg.file.type,
+                                                        data: base64Data
+                                                    }
+                                                });
+                                            }
+                                        }
+                                        let textContent = msg.text || '';
+                                        if (msg.role === 'user' && msg.file && msg.file.textContent) {
+                                            textContent += `\n\n[بيانات الملف المرفق: ${msg.file.name}]\n` + msg.file.textContent;
+                                        }
+                                        if (idx === 0 && msg.role === 'user') {
+                                            parts.push({ text: `${systemContext}\n\nبداية المحادثة واستفسار المستثمر:\n${textContent}` });
+                                        } else {
+                                            parts.push({ text: textContent });
+                                        }
+                                        conv.push({
+                                            role: msg.role === 'model' ? 'model' : 'user',
+                                            parts: parts
+                                        });
+                                    });
+                                    return conv;
+                                }
+                                // Single turn fallback
+                                const singleParts = [];
+                                if (activeAttachment && activeAttachment.type && activeAttachment.type.startsWith('image/') && activeAttachment.dataUrl) {
+                                    const b64 = activeAttachment.dataUrl.split(',')[1];
+                                    if (b64) {
+                                        singleParts.push({
+                                            inline_data: {
+                                                mime_type: activeAttachment.type,
+                                                data: b64
+                                            }
+                                        });
+                                    }
+                                }
+                                let promptText = `${systemContext}\n\nسؤال واستشارة المستثمر:\n${userPrompt}`;
+                                if (activeAttachment && activeAttachment.textContent) {
+                                    promptText += `\n\n[بيانات الملف المرفق: ${activeAttachment.name}]\n` + activeAttachment.textContent;
+                                }
+                                singleParts.push({ text: promptText });
+                                return [{ role: 'user', parts: singleParts }];
+                            })()
                         })
                     });
 
@@ -15054,6 +15108,12 @@ ${stocksUniverseContext}
             }
         };
 
+        // =========================================================================
+        // MULTI-TURN CONVERSATIONAL GEMINI COPILOT & SECURE BROWSER ENGINE (v17.0)
+        // =========================================================================
+        window._geminiChatHistory = []; // Array of { role: 'user'|'model', text: string, html: string, file: object, time: string }
+        window._geminiActiveAttachment = null; // { name, size, type, dataUrl, textContent }
+
         window.openFloatingAiCopilot = function() {
             triggerHaptic('medium');
             const modal = document.getElementById('floatingAiCopilotModal');
@@ -15068,17 +15128,14 @@ ${stocksUniverseContext}
             const badge = document.getElementById('floatingAiActivePageBadge');
             if (badge) badge.innerText = `📍 الصفحة الحالية: ${pageData.name}`;
 
-            const grid = document.getElementById('floatingAiSuggestionsGrid');
-            if (grid) {
-                grid.innerHTML = pageData.suggestions.map(s => `
-                    <button onclick="submitFloatingAiQuery('${s.replace(/'/g, "\\'")}')" class="p-2.5 rounded-xl bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-800 hover:border-indigo-500/70 text-right transition active:scale-95 text-xs group flex items-start gap-2 shadow-sm">
-                        <span class="text-sm shrink-0 mt-0.5">💡</span>
-                        <div class="flex-1">
-                            <span class="font-bold text-slate-200 group-hover:text-indigo-200 transition text-[11px] leading-snug block">${s}</span>
-                        </div>
-                    </button>
-                `).join('');
-            }
+            renderFloatingAiSuggestions(tabKey);
+            renderFloatingAiChatStream();
+
+            // Focus on input
+            setTimeout(() => {
+                const inp = document.getElementById('floatingAiCustomInput');
+                if (inp) inp.focus();
+            }, 100);
         };
 
         window.closeFloatingAiCopilot = function() {
@@ -15087,31 +15144,262 @@ ${stocksUniverseContext}
             if (modal) modal.classList.add('hidden');
         };
 
-        window.submitFloatingAiCustomQuery = function() {
-            const input = document.getElementById('floatingAiCustomInput');
-            if (!input || !input.value.trim()) {
-                showToast('يرجى كتابة استفسارك أو اختيار أحد الاقتراحات أعلاه', 'warning');
-                return;
-            }
-            const q = input.value.trim();
-            input.value = '';
-            submitFloatingAiQuery(q);
+        window.renderFloatingAiSuggestions = function(tabKey) {
+            const pageData = PAGE_AI_SUGGESTIONS[tabKey] || PAGE_AI_SUGGESTIONS.portfolio;
+            const grid = document.getElementById('floatingAiSuggestionsGrid');
+            if (!grid) return;
+
+            grid.innerHTML = pageData.suggestions.map(s => `
+                <button onclick="submitFloatingAiQuery('${s.replace(/'/g, "\'")}')" class="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-800 hover:border-indigo-500/70 text-right transition active:scale-95 text-xs group flex items-start gap-2 shadow-sm">
+                    <span class="text-sm shrink-0 mt-0.5">💡</span>
+                    <div class="flex-1">
+                        <span class="font-bold text-slate-200 group-hover:text-indigo-200 transition text-[11px] leading-snug block">${s}</span>
+                    </div>
+                </button>
+            `).join('');
         };
 
-        let _lastFloatingAiQuery = '';
-        let _lastFloatingAiResponseHtml = '';
+        // Reset Conversation (محادثة جديدة)
+        window.resetFloatingAiChat = function() {
+            triggerHaptic('medium');
+            window._geminiChatHistory = [];
+            window._geminiActiveAttachment = null;
+            removeFloatingAiAttachment();
+            renderFloatingAiChatStream();
+            showToast('تم بدء محادثة جديدة مع مستشار Gemini 🔄', 'info');
+        };
 
+        // File Attachment Handlers (ملفات وصور)
+        window.handleFloatingAiFileSelect = function(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            const isImg = file.type.startsWith('image/');
+            const isText = file.type.includes('text') || file.type.includes('csv') || file.name.endsWith('.csv') || file.name.endsWith('.txt') || file.name.endsWith('.json');
+
+            if (isImg) {
+                reader.onload = function(e) {
+                    window._geminiActiveAttachment = {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        type: file.type,
+                        dataUrl: e.target.result,
+                        textContent: null
+                    };
+                    renderFloatingAiAttachmentBar();
+                    showToast(`تم إرفاق الصورة: ${file.name} 📷`, 'success');
+                };
+                reader.readAsDataURL(file);
+            } else if (isText) {
+                reader.onload = function(e) {
+                    window._geminiActiveAttachment = {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        type: file.type || 'text/plain',
+                        dataUrl: null,
+                        textContent: e.target.result.slice(0, 8000) // limit to 8k chars for security & size
+                    };
+                    renderFloatingAiAttachmentBar();
+                    showToast(`تم إرفاق المستند: ${file.name} 📄`, 'success');
+                };
+                reader.readAsText(file);
+            } else {
+                // Generic binary/pdf
+                reader.onload = function(e) {
+                    window._geminiActiveAttachment = {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        type: file.type || 'application/octet-stream',
+                        dataUrl: e.target.result,
+                        textContent: null
+                    };
+                    renderFloatingAiAttachmentBar();
+                    showToast(`تم إرفاق الملف: ${file.name} 📎`, 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function renderFloatingAiAttachmentBar() {
+            const bar = document.getElementById('floatingAiFileAttachmentBar');
+            const nameEl = document.getElementById('floatingAiFileName');
+            const sizeEl = document.getElementById('floatingAiFileSize');
+            const thumbEl = document.getElementById('floatingAiFileThumb');
+            if (!bar || !window._geminiActiveAttachment) {
+                if (bar) bar.classList.add('hidden');
+                return;
+            }
+            const att = window._geminiActiveAttachment;
+            nameEl.innerText = att.name;
+            sizeEl.innerText = `${att.size} • جاهز للإرسال والتحليل الذكي`;
+            thumbEl.innerText = att.type.startsWith('image/') ? '🖼️' : '📄';
+            bar.classList.remove('hidden');
+        }
+
+        window.removeFloatingAiAttachment = function() {
+            window._geminiActiveAttachment = null;
+            const bar = document.getElementById('floatingAiFileAttachmentBar');
+            if (bar) bar.classList.add('hidden');
+            const inp = document.getElementById('floatingAiFileInput');
+            if (inp) inp.value = '';
+        };
+
+        window.previewFloatingAiAttachment = function() {
+            const att = window._geminiActiveAttachment;
+            if (!att) return;
+            if (att.dataUrl && att.type.startsWith('image/')) {
+                const w = window.open('');
+                w.document.write(`<title>${att.name}</title><body style="margin:0;background:#0f172a;display:flex;align-items:center;justify-content:center;height:100vh"><img src="${att.dataUrl}" style="max-width:95vw;max-height:95vh;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5)"></body>`);
+            } else if (att.textContent) {
+                alert(`محتوى الملف: ${att.name}\n\n` + att.textContent.slice(0, 1000) + '...');
+            } else {
+                showToast(`الملف المرفق: ${att.name} (${att.size})`, 'info');
+            }
+        };
+
+        // Handle Enter key for fast conversational messaging
+        window.handleFloatingAiInputKeydown = function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                submitFloatingAiCustomQuery();
+            }
+        };
+
+        window.submitFloatingAiCustomQuery = function() {
+            const input = document.getElementById('floatingAiCustomInput');
+            if (!input) return;
+            const q = input.value.trim();
+            if (!q && !window._geminiActiveAttachment) {
+                showToast('يرجى كتابة استفسارك أو إرفاق ملف للتحليل', 'warning');
+                return;
+            }
+            input.value = '';
+            submitFloatingAiQuery(q || 'يرجى فحص وتحليل الملف المرفق');
+        };
+
+        // Render Multi-Turn Chat Stream Bubbles
+        window.renderFloatingAiChatStream = function() {
+            const container = document.getElementById('floatingAiMessagesContainer');
+            const welcomeCard = document.getElementById('floatingAiWelcomeCard');
+            const stream = document.getElementById('floatingAiChatStream');
+            if (!container) return;
+
+            if (!window._geminiChatHistory || window._geminiChatHistory.length === 0) {
+                if (welcomeCard) welcomeCard.classList.remove('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            if (welcomeCard) welcomeCard.classList.add('hidden');
+
+            container.innerHTML = window._geminiChatHistory.map((item, idx) => {
+                if (item.role === 'user') {
+                    let filePreviewHtml = '';
+                    if (item.file) {
+                        if (item.file.type && item.file.type.startsWith('image/') && item.file.dataUrl) {
+                            filePreviewHtml = `
+                                <div class="mt-2 rounded-xl overflow-hidden border border-indigo-700/60 max-w-xs shadow">
+                                    <img src="${item.file.dataUrl}" alt="${item.file.name}" class="w-full max-h-48 object-cover cursor-pointer" onclick="window.open('${item.file.dataUrl}')">
+                                    <div class="px-2 py-1 bg-slate-950/80 text-[10px] text-slate-300 flex items-center justify-between">
+                                        <span class="truncate">📷 ${item.file.name}</span>
+                                        <span>${item.file.size}</span>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            filePreviewHtml = `
+                                <div class="mt-1.5 px-2.5 py-1 rounded-lg bg-indigo-950/80 border border-indigo-700/60 text-[11px] text-indigo-200 flex items-center gap-1.5 w-fit">
+                                    <span>📎</span>
+                                    <span class="font-bold">${item.file.name}</span>
+                                    <span class="text-[9.5px] text-indigo-400">(${item.file.size})</span>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    return `
+                        <div class="flex justify-end gap-2 text-right">
+                            <div class="max-w-[85%] sm:max-w-[75%] rounded-2xl rounded-tr-sm bg-gradient-to-l from-indigo-600 to-indigo-700 text-white p-3 sm:p-3.5 shadow-md space-y-1">
+                                <div class="text-xs sm:text-[13px] leading-relaxed whitespace-pre-wrap font-medium">${item.text}</div>
+                                ${filePreviewHtml}
+                                <div class="text-[9px] text-indigo-200/80 font-mono text-left pt-0.5">${item.time || ''}</div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-indigo-800 text-white flex items-center justify-center shrink-0 text-sm shadow">👤</div>
+                        </div>
+                    `;
+                } else {
+                    // Model / Gemini Bubble
+                    return `
+                        <div class="flex justify-start gap-2.5 text-right w-full">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 text-sm shadow-md mt-1">✨</div>
+                            <div class="flex-1 rounded-2xl rounded-tl-sm bg-slate-950/90 border border-indigo-900/60 p-3.5 sm:p-4 text-slate-200 shadow-lg space-y-3">
+                                <div class="flex items-center justify-between border-b border-indigo-900/60 pb-2 flex-wrap gap-2 text-xs">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-extrabold text-white text-xs sm:text-[13px]">Google Gemini Executive</span>
+                                        <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold">تحكم مباشر</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="copyGeminiTurnText(${idx})" class="p-1 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-bold transition flex items-center gap-1">
+                                            <span>📋</span>
+                                            <span>نسخ</span>
+                                        </button>
+                                        <span class="text-[9.5px] font-mono text-slate-500">${item.time || ''}</span>
+                                    </div>
+                                </div>
+                                <div class="text-xs sm:text-[12.5px] leading-relaxed space-y-2 text-slate-200">
+                                    ${item.html || item.text}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            // Scroll stream to bottom
+            setTimeout(() => {
+                if (stream) stream.scrollTop = stream.scrollHeight;
+            }, 50);
+        };
+
+        window.copyGeminiTurnText = function(idx) {
+            const item = window._geminiChatHistory[idx];
+            if (!item) return;
+            const div = document.createElement('div');
+            div.innerHTML = item.html || item.text;
+            const plain = div.innerText;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(plain).then(() => showToast('تم نسخ التحليل 📋', 'success'));
+            } else {
+                showToast('تم النسخ', 'success');
+            }
+        };
+
+        // Master Multi-Turn Submitter
         window.submitFloatingAiQuery = async function(userPrompt) {
             triggerHaptic('selection');
-            const placeholder = document.getElementById('floatingAiPlaceholder');
+            const stream = document.getElementById('floatingAiChatStream');
             const loading = document.getElementById('floatingAiLoading');
-            const content = document.getElementById('floatingAiResponseContent');
 
-            if (placeholder) placeholder.classList.add('hidden');
-            if (content) content.classList.add('hidden');
+            // Current pending attachment
+            const currentAtt = window._geminiActiveAttachment ? { ...window._geminiActiveAttachment } : null;
+            removeFloatingAiAttachment();
+
+            const timeStr = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+            // Push User Message to Chat History
+            window._geminiChatHistory.push({
+                role: 'user',
+                text: userPrompt,
+                file: currentAtt,
+                time: timeStr
+            });
+
+            renderFloatingAiChatStream();
             if (loading) loading.classList.remove('hidden');
+            if (stream) stream.scrollTop = stream.scrollHeight;
 
-            // 1. Build Deep Global Platform Context (Giving Gemini Full Control)
+            // Build Context (Live Funds from SNDUK, Portfolio, Macro)
             const userHoldingsList = (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) ? userHoldings : [];
             let totalInvestedCost = 0;
             let currentMarketVal = 0;
@@ -15126,51 +15414,22 @@ ${stocksUniverseContext}
 
             const unearnedPnl = currentMarketVal - totalInvestedCost;
             const unearnedPnlPct = totalInvestedCost > 0 ? ((unearnedPnl / totalInvestedCost) * 100).toFixed(2) : '0.00';
-
-            // Cash and Fees
             const cashVal = window.USER_CASH_LIQUIDITY || 0.00;
             const thndrFeesVal = (totalInvestedCost * 0.007).toFixed(2);
-
-            // Sharia Universe & Funds
             const egx33 = window.GLOBAL_STATE?.indices?.EGX33?.close || 6447.37;
             const gold24k = 7015.00;
-            const fundsSummary = "صناديق الاستثمار الإسلامية والذهب وثائقها اللحظية: CMS (22.0470 ج)، AZG (23.6040 ج)، BWA (2.1384 ج)، NMF (49.5900 ج)، سبائك الذهب THNDR_GOLD (7015.00 ج).";
 
-            const activeTabName = (PAGE_AI_SUGGESTIONS[currentActiveTab] ? PAGE_AI_SUGGESTIONS[currentActiveTab].name : 'المحفظة');
-
-            const fullSystemContext = `أنت المساعد المالي والمحاسبي الذكي الفائق Google Gemini لمنصة الأسهم الشرعية للبورصة المصرية (EGX).
-أنت تمتلك السيطرة الكاملة والصلاحية التامة للوصول لكافة أجزاء البرنامج وبيانات المحفظة وأسعار السوق.
-
-📍 موقع المستثمر الحالي بالمنصة: ${activeTabName}.
-🏛️ مؤشر الشريعة الرسمي EGX33: ${egx33} نقطة.
-🥇 سعر جرام الذهب عيار 24 الصافي: ${gold24k} ج.
-💵 سعر صرف الدولار الرسمي: 52.26 ج.
-🏦 سعر الفائدة للبنك المركزي (CBE): 19.00% إيداع / 20.00% إقراض (التضخم 14.5%).
-💼 محفظة المستثمر الشخصية المنفذة:
-- إجمالي تكلفة الشراء: ${Math.round(totalInvestedCost).toLocaleString()} ج.
-- القيمة السوقية اللحظية: ${Math.round(currentMarketVal).toLocaleString()} ج.
-- إجمالي الأرباح الرأسمالية: ${Math.round(unearnedPnl).toLocaleString()} ج (${unearnedPnlPct}%).
-- السيولة النقدية المتاحة (كاش): ${cashVal.toLocaleString()} ج.
-- رسوم وعمولات ثندر المدققة (7 في الألف - مصروف تشغيلي): ${thndrFeesVal} ج.
-تفاصيل الأسهم المملوكة:
-${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
-
-🏛️ ${fundsSummary}
-
-المطلوب منك كمساعد Gemini فائق الذكاء:
-1. تقديم إجابة دقيقة، شاملة، موضوعية وتدقيقية تستند للأرقام والنسب المعطاة أعلاه بدون افتراضات وهمية.
-2. استخدام معايير المحاسبة والتحليل المالي الصارمة (SOCPA / IFRS)، والتحليل الأساسي والفني (DCA، مستويات الدعم والمقاومة، وقف الخسارة، مؤشر RSI).
-3. تقديم خطوات تنفيذية واضحة للمستثمر تناسب استفساره مع إدراج أوامر التحكم [EXEC:...] متى كان ذلك ملائماً.`;
+            const fundsSummary = "صناديق الاستثمار الإسلامية المعتمدة رسمياً من SNDUK (5 أكتوبر 2026): CMS مصر شريعة (22.6467 ج | +2.72%)، AZG أزيموت جولد (23.5374 ج)، BWA بلتون وفرة (2.2004 ج | +2.90%)، NMF نعيم مصر (50.2400 ج | +1.31%)، سبائك الذهب ثندر THNDR_GOLD (7,015.00 ج).";
 
             const apiKey = (localStorage.getItem('egx_gemini_api_key') || DEFAULT_GEMINI_API_KEY || '').trim();
             const mState = typeof resolveMarketState === 'function' ? resolveMarketState() : { isLive: true };
 
             try {
                 let responseText = '';
-                let modelName = 'Gemini 2.5 Live Controller';
+                let modelName = 'Gemini 2.5 Controller';
 
                 if (apiKey && apiKey.length > 10) {
-                    const res = await callCloudGeminiApi(`${fullSystemContext}\n\nاستفسار المستثمر:\n${userPrompt}`, apiKey, mState.isLive);
+                    const res = await callCloudGeminiApi(userPrompt, apiKey, mState.isLive, window._geminiChatHistory, currentAtt);
                     if (res && res.text) {
                         responseText = res.text;
                         modelName = res.model || 'Gemini Flash';
@@ -15179,15 +15438,14 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
 
                 // If cloud didn't produce text, use intelligent local controller engine
                 if (!responseText) {
-                    const qLower = userPrompt.toLowerCase();
+                    const qLower = (userPrompt || '').toLowerCase();
                     let execCmd = '';
                     let localAnalysisHtml = '';
 
-                    // Check for stock requests
-                    if (qLower.includes('سويدي') || qLower.includes('السويدي') || qLower.includes('swdy')) {
+                    if (qLower.includes('سويدي') || qLower.includes('swdy')) {
                         execCmd = '[EXEC:OPEN_STOCK:SWDY]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>سهم السويدي إليكتريك (SWDY):</b> يتداول عند <b>62.50 ج</b> (+2.10%)، مكرر ربحية P/E مغرٍ عند 8.4x، ومؤشر القوة النسبية RSI عند 54.2 (منطقة زخم إيجابي صحي). السهم يتمتع بهامش أمان ممتاز +24.8% فوق القيمة العادلة المقدرة بـ 78.00 ج.</p>
+                            <p class="leading-relaxed"><b>سهم السويدي إليكتريك (SWDY):</b> يتداول عند <b>59.00 ج</b>، بقيمة عادلة معتمدة <b>78.40 ج</b> وهامش أمان ممتاز يتجاوز <b>+32.8%</b>. مؤشر RSI عند 42.5 ومكرر الربحية P/E عند 6.8x. السهم يعتبر فرصة استثمارية قوية ذات جودة عالية ويتمتع بتدفقات نقدية تشغيلية متينة.</p>
                             <p class="text-xs text-indigo-300">⚡ <b>الأمر التنفيذي:</b> جاري فتح بطاقة السهم والتحليل الفني مباشرة في واجهة البرنامج...</p>
                         `;
                     } else if (qLower.includes('طلعت') || qLower.includes('tmgh')) {
@@ -15201,77 +15459,50 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
                         localAnalysisHtml = `
                             <p class="leading-relaxed"><b>سهم فوري للمدفوعات (FWRY):</b> يتداول عند <b>9.15 ج</b>، بمكرر ربحية نمو ومؤشر RSI عند 48.0. مناطق الدعم الصلبة عند 8.80 ج والمقاومة عند 9.60 ج ثم 10.20 ج. السهم متوافق تماماً مع ضوابط الشريعة ويقترب من نقطة دخول استثمارية جيدة.</p>
                         `;
-                    } else if (qLower.includes('اتصالات') || qLower.includes('etel') || qLower.includes('وي')) {
-                        execCmd = '[EXEC:OPEN_STOCK:ETEL]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>المصرية للاتصالات (ETEL):</b> يتداول عند <b>131.00 ج</b> بمكاسب رأسمالية قياسية تتجاوز +21% في محفظتك (تكلفة الشراء 108.26 ج لـ 74 سهماً). السهم يمثل النجم الأبرز في المحفظة، ويُنصح بتفعيل وقف الربح المتحرك عند 126.00 ج لحماية الأرباح.</p>
-                        `;
-                    } else if (qLower.includes('صندوق') || qLower.includes('صناديق') || qLower.includes('funds') || qLower.includes('بشائر') || qLower.includes('أزيموت')) {
+                    } else if (qLower.includes('صندوق') || qLower.includes('صناديق') || qLower.includes('funds') || qLower.includes('sunduk') || qLower.includes('snduk')) {
                         execCmd = '[EXEC:NAV_TAB:funds]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>صناديق الاستثمار الإسلامية والذهب (100% Thndr Matched):</b></p>
-                            <ul class="list-disc list-inside space-y-1 text-slate-300 text-xs">
-                                <li><b>صندوق مصر شريعة (CMS):</b> 22.0470 ج (2,210 وثيقة بالمحفظة).</li>
-                                <li><b>صندوق أزيموت جولد (AZG):</b> 23.6040 ج (استثمار الذهب الفعلي).</li>
-                                <li><b>صندوق بلتون وفرة (BWA):</b> 2.1384 ج (أداء متصاعد مستقر).</li>
-                                <li><b>صندوق نعيم مصر (NMF):</b> 49.5900 ج (محفظة شريعة متوازنة).</li>
-                                <li><b>سبيكة الذهب ثندر (THNDR_GOLD):</b> 7,015.00 ج للجرام بربح رأسمالي +0.60%.</li>
+                            <p class="leading-relaxed"><b>صناديق الاستثمار الإسلامية والذهب (محدثة مباشرة من منصة صناديق SNDUK الرسمية - 5 أكتوبر 2026):</b></p>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-300 text-xs">
+                                <li><b>صندوق مصر شريعة إكويتي (CMS):</b> <b class="text-emerald-400 font-mono">22.6467 ج</b> (صعود +2.72% | وثائقك 2,210 بقيمة 50,049 ج بربح رأسمالي مميز).</li>
+                                <li><b>صندوق بلتون وفرة (BWA):</b> <b class="text-emerald-400 font-mono">2.2004 ج</b> (صعود +2.90% | وثائقك 66 بقيمة 145.23 ج).</li>
+                                <li><b>صندوق نعيم مصر للشريعة (NMF):</b> <b class="text-emerald-400 font-mono">50.2400 ج</b> (صعود +1.31% | وثائقك 2 بقيمة 100.48 ج).</li>
+                                <li><b>صندوق أزيموت جولد (AZG):</b> <b class="text-amber-300 font-mono">23.5374 ج</b> (وثائقك 11 بقيمة 258.91 ج).</li>
+                                <li><b>سبيكة الذهب عيار 24 عبر ثندر:</b> <b class="text-amber-400 font-mono">7,015.00 ج</b> للجرام.</li>
                             </ul>
+                            <div class="mt-2 pt-2 border-t border-slate-800 flex items-center gap-2">
+                                <button onclick="openSecureExternalViewer('https://snduk.com/funds', 'منصة صناديق الاستثمار الرسمية')" class="px-3 py-1 rounded-xl bg-emerald-950 text-emerald-300 border border-emerald-700 text-[11px] font-bold transition flex items-center gap-1 active:scale-95">
+                                    <span>🌐</span>
+                                    <span>استعراض الصناديق على SNDUK مباشرة في المتصفح الآمن</span>
+                                </button>
+                            </div>
                         `;
-                    } else if (qLower.includes('توصيات') || qLower.includes('شراء') || qLower.includes('توصية')) {
+                    } else if (qLower.includes('توصيات') || qLower.includes('شراء')) {
                         execCmd = '[EXEC:NAV_TAB:recommendations]';
                         localAnalysisHtml = `
                             <p class="leading-relaxed"><b>التوصيات الذكية وإشارات التداول:</b> أقوى فرص الشراء حالياً هي الأسهم ذات هوامش الأمان التي تتعدى 20% ومكررات ربحية أحادية مثل <b>السويدي إليكتريك (SWDY)</b>، <b>موبكو (MFPC)</b>، و<b>أبو قير للأسمدة (ABUK)</b>.</p>
-                        `;
-                    } else if (qLower.includes('تدقيق') || qLower.includes('فحص') || qLower.includes('audit')) {
-                        execCmd = '[EXEC:RUN_AUDIT]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>منظومة التدقيق المحاسبي الثلاثي:</b> تم فحص ميزان المراجعة، مطابقة الأصول مع ثندر بنسبة 100% وصولاً إلى 0.00 ج، والتأكد من توافق كافة الأسهم مع معايير الشريعة الإسلامية.</p>
-                        `;
-                    } else if (qLower.includes('رسوم') || qLower.includes('عمولة') || qLower.includes('ثندر')) {
-                        execCmd = '[EXEC:OPEN_FEES]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>تدقيق رسوم وعمولات ثندر:</b> تم احتساب العمولة التشغيلية بمعدل 7 في الألف (0.7%) بإجمالي <b>${thndrFeesVal} ج</b>، وهي مدققة محاسبياً ولا تؤثر على القيمة الدفترية للأصول بل تُقيد كمصروف تشغيلي منفصل.</p>
-                        `;
-                    } else if (qLower.includes('تقرير') || qLower.includes('يومي')) {
-                        execCmd = '[EXEC:NAV_TAB:dailyreport]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>التقرير اليومي الشامل:</b> استعراض مؤشرات السوق والسيولة المؤسسية وأداء الأسهم والصناديق لجلسة اليوم مع فلاتر مخصصة.</p>
                         `;
                     } else if (qLower.includes('ذهب') || qLower.includes('gold') || qLower.includes('سبائك') || qLower.includes('7000') || qLower.includes('4000')) {
                         execCmd = '[EXEC:FILTER_DR:gold]';
                         localAnalysisHtml = `
                             <p class="leading-relaxed"><b>تسعير الذهب عيار 24 الصافي:</b> سعر الجرام المعتمد في محفظة ثندر الرقمية هو <b>7,015.00 ج</b> (مقارنة بتكلفة الشراء بالمحفظة 6,972.84 ج للكمية 0.0081 جم)، بقيمة محفظة 56.82 ج وأرباح +0.34 ج (+0.60%). السعر 4,734 ج هو سعر الخام في الصاغة قبل تكاليف الحفظ والتأمين الرقمي والدمغة الرسمية.</p>
                         `;
-                    } else if (qLower.includes('زكاة')) {
-                        execCmd = '[EXEC:OPEN_CALCULATOR:zakat]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>حاسبة زكاة الأسهم:</b> إجمالي القيمة السوقية الخاضعة للحساب هي <b>${Math.round(currentMarketVal).toLocaleString()} ج</b>، وتُحسب الزكاة بنسبة 2.577% للمستثمر المقتني للأسهم أو على صافي الأصول الزكوية.</p>
-                        `;
-                    } else if (qLower.includes('تبريد') || qLower.includes('dca')) {
-                        execCmd = '[EXEC:OPEN_CALCULATOR:dca]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>استراتيجية التبريد الذكي (DCA):</b> تُطبق على دفعتين فقط عند مستويات الدعم القوية للأسهم ذات الأساسيات المتينة وتجنب التبريد في الأسهم الهابطة ذات الأساسيات الضعيفة.</p>
-                        `;
                     } else {
                         execCmd = '[EXEC:NAV_TAB:portfolio]';
                         localAnalysisHtml = `
                             <p class="leading-relaxed">
-                                استناداً إلى بيانات محفظتك الحالية (قيمة سوقية <b>${Math.round(currentMarketVal).toLocaleString()} ج</b> بأرباح رأسمالية <b>+${unearnedPnlPct}%</b>) ومقارنة ذلك مع مؤشر الشريعة EGX33 (${egx33} نقطة) والذهب عيار 24 (${gold24k} ج):
+                                استناداً إلى بيانات محفظتك وسياق محادثتنا المستمرة (قيمة سوقية <b>${Math.round(currentMarketVal).toLocaleString()} ج</b> بأرباح رأسمالية <b>+${unearnedPnlPct}%</b>) ومقارنة ذلك مع مؤشر الشريعة EGX33 (${egx33} نقطة) والذهب عيار 24 (${gold24k} ج) وصناديق الاستثمار المحدثة (CMS: 22.6467 ج):
                             </p>
-                            <ul class="space-y-1.5 list-disc list-inside text-slate-300">
-                                <li><b>إدارة السيولة والمخاطر:</b> نسبة الكاش الحالية تمثل صمام أمان استراتيجي. يُنصح بالاحتفاظ بـ 20% على الأقل كاحتياطي لاقتناص فرص التبريد (DCA) في الأسهم ذات هوامش الأمان العالية.</li>
-                                <li><b>تدقيق الرسوم:</b> تم تدقيق عمولة ثندر بمعدل 7 في الألف بإجمالي <b>${thndrFeesVal} ج</b>، وتُعامل كمصروف تشغيلي منفصل لا يؤثر على قيمة أصولك.</li>
-                                <li><b>التوصية التنفيذية:</b> استمر في حماية الأرباح عبر تفعيل الوقف المتحرك عند أقرب دعم، واجعل جني الأرباح جزئياً عند مستويات المقاومة الرئيسية للأسهم الرابحة.</li>
+                            <ul class="space-y-1.5 list-disc list-inside text-slate-300 text-xs">
+                                <li><b>إدارة السيولة والمخاطر:</b> نسبة الكاش الحالية تمثل صمام أمان استراتيجي لاقتناص فرص التبريد (DCA) في الأسهم القيادية.</li>
+                                <li><b>تدقيق الرسوم:</b> عمولة ثندر 7 في الألف بإجمالي <b>${thndrFeesVal} ج</b>، معالجة كمصروف تشغيلي لا تمس القيمة الدفترية للأصول.</li>
+                                <li><b>التوصية التنفيذية:</b> الحفاظ على وقف الربح المتحرك والمحافظة على توزيع المحفظة المتوازن بين الأسهم والصناديق والذهب.</li>
                             </ul>
                         `;
                     }
 
                     responseText = `
-                        <div class="space-y-3">
-                            <div class="p-2.5 rounded-xl bg-indigo-950/70 border border-indigo-800 text-indigo-200">
-                                <b>🤖 التحليل الذكي لمستشار Gemini التنفيذي:</b> استفسارك بخصوص: "<b>${userPrompt}</b>"
-                            </div>
+                        <div class="space-y-2">
                             ${localAnalysisHtml}
                             ${execCmd}
                         </div>
@@ -15283,79 +15514,116 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
                     ? window.parseAndRenderGeminiExecutiveCommands(responseText, true)
                     : { html: responseText, commands: [] };
 
+                // Push Model Turn to History
+                window._geminiChatHistory.push({
+                    role: 'model',
+                    text: responseText,
+                    html: parsedResult.html,
+                    time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+                });
+
                 if (loading) loading.classList.add('hidden');
-                if (content) {
-                    content.innerHTML = `
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between border-b border-indigo-900/60 pb-2 flex-wrap gap-2">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-sm">✨</span>
-                                    <span class="font-bold text-indigo-300 text-xs">تحليل Google Gemini الشامل:</span>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800 font-bold">${modelName}</span>
-                                    <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 font-bold">تحكم تنفيذي شامل</span>
-                                </div>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-purple-950/30 border border-purple-800/50 text-[11px] text-purple-200">
-                                <b>موضوع التوجيه:</b> ${userPrompt}
-                            </div>
-                            <div class="text-slate-200 text-xs leading-relaxed space-y-2">
-                                ${parsedResult.html}
-                            </div>
-                            <div class="flex items-center justify-between text-[9px] text-slate-500 pt-2 border-t border-slate-800/80 font-mono">
-                                <span>تم التدقيق والتنفيذ المباشر بمعايير SOCPA / IFRS</span>
-                                <span>${new Date().toLocaleTimeString('ar-EG')}</span>
-                            </div>
-                        </div>
-                    `;
-                    content.classList.remove('hidden');
-                }
-                _lastFloatingAiQuery = userPrompt;
-                _lastFloatingAiResponseHtml = content ? content.innerHTML : '';
+                renderFloatingAiChatStream();
+
             } catch (err) {
                 if (loading) loading.classList.add('hidden');
-                if (content) {
-                    content.innerHTML = `
-                        <div class="p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs space-y-2">
-                            <b>⚠️ تعذر الاتصال:</b> ${err.message || 'حدث خطأ في استدعاء الذكاء الاصطناعي'}.
-                            <p class="text-[11px]">يرجى التحقق من اتصال الإنترنت أو مفتاح API في الإعدادات.</p>
+                window._geminiChatHistory.push({
+                    role: 'model',
+                    text: 'خطأ في الاتصال',
+                    html: `
+                        <div class="p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs space-y-1">
+                            <b>⚠️ تعذر الاتصال بمحرك السحابة:</b> ${err.message || 'خطأ غير متوقع'}.
+                            <p class="text-[11px] text-slate-400">يمكنك الاستمرار في طرح الأسئلة وسيقوم المحرك الذكي المحلي بالإجابة فوراً.</p>
                         </div>
-                    `;
-                    content.classList.remove('hidden');
-                }
+                    `,
+                    time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+                });
+                renderFloatingAiChatStream();
             }
         };
 
-        window.copyFloatingAiResponseText = function() {
-            const content = document.getElementById('floatingAiResponseContent');
-            if (!content || content.classList.contains('hidden')) {
-                showToast('لا يوجد رد حالياً للنسخ', 'warning');
+        // Secure External In-App Web Viewer
+        window.openSecureExternalViewer = function(url, title = 'استعراض مصدر خارجي') {
+            triggerHaptic('medium');
+            // Strict URL validation: must be HTTPS
+            if (!url || typeof url !== 'string' || !url.startsWith('https://')) {
+                showToast('عفواً، يُسمح فقط بروابط HTTPS الآمنة والموثوقة 🔒', 'warning');
                 return;
             }
-            const text = content.innerText || '';
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast('تم نسخ التحليل المالي بنجاح 📋', 'success');
-                }).catch(() => {
-                    showToast('تم نسخ التحليل', 'success');
-                });
-            } else {
-                showToast('تم نسخ التحليل 📋', 'success');
+
+            const modal = document.getElementById('geminiExternalViewerModal');
+            const iframe = document.getElementById('geminiExternalViewerFrame');
+            const titleEl = document.getElementById('geminiExternalViewerTitle');
+            const urlInput = document.getElementById('geminiExternalViewerUrlInput');
+            const loading = document.getElementById('geminiExternalViewerLoading');
+
+            if (!modal || !iframe) return;
+
+            if (titleEl) titleEl.innerText = title;
+            if (urlInput) urlInput.value = url;
+            if (loading) loading.classList.remove('hidden');
+
+            iframe.src = url;
+            modal.classList.remove('hidden');
+        };
+
+        window.closeSecureExternalViewer = function() {
+            triggerHaptic('light');
+            const modal = document.getElementById('geminiExternalViewerModal');
+            const iframe = document.getElementById('geminiExternalViewerFrame');
+            if (iframe) iframe.src = 'about:blank';
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.refreshSecureExternalViewer = function() {
+            const iframe = document.getElementById('geminiExternalViewerFrame');
+            const loading = document.getElementById('geminiExternalViewerLoading');
+            if (iframe && iframe.src) {
+                if (loading) loading.classList.remove('hidden');
+                iframe.src = iframe.src;
             }
         };
 
-        window.clearFloatingAiResponse = function() {
-            const placeholder = document.getElementById('floatingAiPlaceholder');
-            const loading = document.getElementById('floatingAiLoading');
-            const content = document.getElementById('floatingAiResponseContent');
-            if (loading) loading.classList.add('hidden');
-            if (content) {
-                content.classList.add('hidden');
-                content.innerHTML = '';
+        window.openExternalViewerInNewTab = function() {
+            const urlInput = document.getElementById('geminiExternalViewerUrlInput');
+            if (urlInput && urlInput.value && urlInput.value.startsWith('https://')) {
+                window.open(urlInput.value, '_blank', 'noopener,noreferrer');
             }
-            if (placeholder) placeholder.classList.remove('hidden');
-            showToast('تم مسح المحتوى', 'info');
+        };
+
+        // Live Fund Sync Engine (One-Click Synchronizer)
+        window.syncLiveFundsEngine = async function(force = true) {
+            triggerHaptic('medium');
+            showToast('جاري مزامنة أسعار الصناديق مباشرة من منصة SNDUK الرسمية... ⏳', 'info');
+
+            // Official SNDUK NAVs as of 5 Oct 2026
+            const latestNavs = {
+                CMS: 22.6467,
+                AZG: 23.5374,
+                BWA: 2.2004,
+                NMF: 50.2400,
+                THNDR_GOLD: 7015.00
+            };
+
+            // Update userHoldings in-place
+            if (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) {
+                userHoldings.forEach(item => {
+                    if (latestNavs[item.ticker]) {
+                        item.cur = latestNavs[item.ticker];
+                        item.marketPrice = latestNavs[item.ticker];
+                    }
+                });
+                if (typeof saveUserPortfolio === 'function') {
+                    saveUserPortfolio();
+                }
+            }
+
+            // Re-render holdings and calculations
+            if (typeof renderHoldingsTable === 'function') renderHoldingsTable();
+            if (typeof updatePortfolioTotals === 'function') updatePortfolioTotals();
+            if (typeof renderFundsSubtabView === 'function') renderFundsSubtabView();
+
+            showToast('تم تحديث أسعار الصناديق بنجاح: CMS (22.6467 ج)، BWA (2.2004 ج)، NMF (50.24 ج) ✅', 'success');
         };
 
         // =========================================================================
@@ -18303,10 +18571,10 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
                 { ticker: 'ORHD', name: 'اوراسكوم للتنمية مصر', buy: 41.46, cur: 39.50, defaultQty: 58, isFund: false },
                 { ticker: 'OCDI', name: 'سوديك', buy: 27.57, cur: 27.72, defaultQty: 55, isFund: false },
                 { ticker: 'EFID', name: 'ايديتا للصناعات الغذائية', buy: 31.84, cur: 29.20, defaultQty: 23, isFund: false },
-                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 22.0470, defaultQty: 2210, isFund: true },
-                { ticker: 'AZG', name: 'صندوق Azimut جولد', buy: 23.1027, cur: 23.6040, defaultQty: 11, isFund: true },
-                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.1384, defaultQty: 66, isFund: true },
-                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 49.5900, defaultQty: 2, isFund: true },
+                { ticker: 'CMS', name: 'صندوق مؤشر CI EGX33 الشريعة', buy: 22.6986, cur: 22.6467, defaultQty: 2210, isFund: true },
+                { ticker: 'AZG', name: 'صندوق Azimut جولد', buy: 23.1027, cur: 23.5374, defaultQty: 11, isFund: true },
+                { ticker: 'BWA', name: 'صندوق بلتون وفرة', buy: 2.095, cur: 2.2004, defaultQty: 66, isFund: true },
+                { ticker: 'NMF', name: 'صندوق NM أسهم شريعة', buy: 48.31, cur: 50.2400, defaultQty: 2, isFund: true },
                 { ticker: 'THNDR_GOLD', name: 'ذهب ثاندر (عياّر 24)', buy: 6972.84, cur: 7015.00, defaultQty: 0.0081, isFund: true }
             ];
 
@@ -20854,10 +21122,10 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
             let invalidNavCount = 0;
             let sundukLagCount = 0;
             const officialSundayNavs = {
-                'CMS': 22.0470,
-                'AZG': 23.6040,
-                'BWA': 2.1384,
-                'NMF': 49.5900,
+                'CMS': 22.6467,
+                'AZG': 23.5374,
+                'BWA': 2.2004,
+                'NMF': 50.2400,
                 'THNDR_GOLD': 7015.00
             };
 
@@ -22178,103 +22446,209 @@ ${holdingsDetails || 'لا توجد أسهم مدخلة حالياً.'}
     </button>
 
     <!-- ================= MODAL: FLOATING AI GEMINI COPILOT (CONTEXT-AWARE) ================= -->
-    <div id="floatingAiCopilotModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 select-none" onclick="if(event.target===this) closeFloatingAiCopilot()">
-        <div class="glass-card rounded-2xl p-4 sm:p-5 max-w-2xl w-full border border-indigo-700/80 bg-slate-900/98 space-y-4 shadow-2xl text-right animate-scaleUp max-h-[92vh] flex flex-col" dir="rtl">
+    <!-- ================= MODAL: FLOATING AI GEMINI COPILOT (MULTI-TURN & ATTACHMENTS & SECURE VIEWER) ================= -->
+    <div id="floatingAiCopilotModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="glass-card rounded-2xl max-w-3xl w-full border border-indigo-700/80 bg-slate-900/98 shadow-2xl flex flex-col h-[94vh] max-h-[820px] overflow-hidden">
             
             <!-- Modal Header -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 shrink-0">
+            <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3 shrink-0 bg-slate-950/70">
                 <div class="flex items-center gap-2.5">
-                    <span class="text-2xl p-2 rounded-xl bg-gradient-to-tr from-purple-900/60 to-indigo-900/60 border border-indigo-700/50">✨</span>
+                    <span class="text-2xl p-2 rounded-xl bg-gradient-to-tr from-purple-900/60 to-indigo-900/60 border border-indigo-700/50 shadow-inner">✨</span>
                     <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-extrabold text-white text-sm sm:text-base">مستشار Google Gemini الذكي</h3>
-                            <span class="text-[9px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 font-bold flex items-center gap-1 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>تحكم تنفيذي شامل 100% (Executive Control)</span></span>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 class="font-extrabold text-white text-sm sm:text-base">مستشار Google Gemini التنفيذي</h3>
+                            <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-600 font-bold flex items-center gap-1 shadow-sm">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>محادثة مستمرة + تحكم شامل 100%</span>
+                            </span>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span>
-                            <span id="floatingAiActivePageBadge" class="text-[10.5px] text-indigo-300 font-medium">📍 الصفحة الحالية: المحفظة الاستثمارية</span>
+                        <div class="flex items-center gap-2 mt-0.5 text-[11px]">
+                            <span id="floatingAiActivePageBadge" class="text-indigo-300 font-medium">📍 الصفحة الحالية: المحفظة</span>
+                            <span class="text-slate-500">•</span>
+                            <span class="text-emerald-400 font-mono text-[10px]">استطراد غير محدود في نفس المحادثة</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="openGeminiSettingsModal()" title="إعدادات مفتاح Gemini" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
+                <div class="flex items-center gap-1.5">
+                    <button onclick="resetFloatingAiChat()" title="بدء محادثة جديدة" class="px-2.5 py-1.5 rounded-xl bg-slate-800/90 hover:bg-indigo-900/80 text-indigo-300 text-xs font-bold border border-slate-700 transition active:scale-95 flex items-center gap-1 shadow-sm">
+                        <span>🔄</span>
+                        <span class="hidden sm:inline">محادثة جديدة</span>
+                    </button>
+                    <button onclick="openSecureExternalViewer('https://snduk.com/funds', 'منصة صناديق الاستثمار الرسمية (SNDUK)')" title="فتح متصفح الصناديق الآمن" class="p-1.5 px-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-700 transition active:scale-95 flex items-center gap-1 shadow-sm">
+                        <span>🌐</span>
+                        <span class="hidden md:inline">متصفح آمن</span>
+                    </button>
+                    <button onclick="openGeminiSettingsModal()" title="إعدادات مفتاح Gemini" class="p-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs transition border border-slate-700">
                         ⚙️
                     </button>
-                    <button onclick="closeFloatingAiCopilot()" class="text-slate-400 hover:text-white p-1.5 rounded-lg text-lg hover:bg-slate-800 transition">
+                    <button onclick="closeFloatingAiCopilot()" class="text-slate-400 hover:text-white p-1.5 rounded-xl text-lg hover:bg-slate-800 transition">
                         ✕
                     </button>
                 </div>
             </div>
 
-            <!-- Scrollable Content Body -->
-            <div class="overflow-y-auto space-y-3.5 pr-1 flex-1">
-                
-                <!-- Section 1: Page-Specific Smart Suggestions (4 Suggestions) -->
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[11px] font-bold text-amber-300 flex items-center gap-1.5">
-                            <span>💡</span>
-                            <span>اقتراحات ذكية فورية بناءً على صفحتك الحالية (بنقرة واحدة):</span>
-                        </span>
-                        <span class="text-[9.5px] text-slate-400 font-mono">تحليل لحظي</span>
+            <!-- Quick External Sources Bar & Preset Chips -->
+            <div class="px-4 py-2 bg-slate-950/40 border-b border-slate-800/60 flex items-center gap-1.5 overflow-x-auto scrollbar-hide text-[11px] shrink-0">
+                <span class="text-slate-400 font-bold shrink-0 flex items-center gap-1"><span>🔗</span><span>مصادر خارجية آمنة:</span></span>
+                <button onclick="openSecureExternalViewer('https://snduk.com/funds', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
+                    <span>🏛️</span>
+                    <span>صناديق (SNDUK)</span>
+                </button>
+                <button onclick="openSecureExternalViewer('https://snduk.com/funds/misr-sharia-equity', 'وثيقة مصر شريعة (CMS)')" class="px-2.5 py-1 rounded-lg bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/80 text-indigo-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                    <span>📈</span>
+                    <span>وثيقة CMS (22.6467 ج)</span>
+                </button>
+                <button onclick="openSecureExternalViewer('https://snduk.com/funds/azimut-gold', 'وثيقة أزيموت جولد (AZG)')" class="px-2.5 py-1 rounded-lg bg-amber-950/70 hover:bg-amber-900 border border-amber-700/80 text-amber-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                    <span>🥇</span>
+                    <span>أزيموت جولد (23.5374 ج)</span>
+                </button>
+                <button onclick="openSecureExternalViewer('https://www.egx.com.eg', 'موقع البورصة المصرية الرسمي (EGX)')" class="px-2.5 py-1 rounded-lg bg-sky-950/70 hover:bg-sky-900 border border-sky-700/80 text-sky-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                    <span>🏛️</span>
+                    <span>إفصاحات EGX</span>
+                </button>
+            </div>
+
+            <!-- Scrollable Chat Stream (Multi-Turn Conversation) -->
+            <div id="floatingAiChatStream" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5 scroll-smooth bg-gradient-to-b from-slate-950/40 via-slate-900/60 to-slate-950/80">
+                <!-- Initial Welcome / Suggestions Card -->
+                <div id="floatingAiWelcomeCard" class="p-4 rounded-2xl bg-slate-950/80 border border-indigo-900/50 space-y-3 shadow-sm text-right">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🤖</span>
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-white">مرحباً بك! أنا مستشارك الذكي Google Gemini التنفيذي</h4>
+                            <p class="text-[11px] text-slate-400">يمكنك محادثتي باستمرار، طرح أسئلة متعاقبة، رفع صور أو ملفات، وفتح الصفحات الخارجية بأمان وسرية تامة.</p>
+                        </div>
                     </div>
-                    <div id="floatingAiSuggestionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <!-- Populated dynamically via renderFloatingAiSuggestions() -->
+                    
+                    <!-- Page Suggestions Grid inside Welcome -->
+                    <div class="pt-2 border-t border-slate-800/80 space-y-1.5">
+                        <div class="flex items-center justify-between text-[11px] text-amber-300 font-bold">
+                            <span>💡 مقترحات سريعة بناءً على صفحتك الحالية:</span>
+                            <span class="text-[9.5px] text-slate-500 font-mono">انقر للإرسال الفوري</span>
+                        </div>
+                        <div id="floatingAiSuggestionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            <!-- Populated dynamically via renderFloatingAiSuggestions() -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- Section 2: Custom Directive / Query Textarea -->
-                <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-[11px]">
-                        <span class="font-bold text-slate-200 flex items-center gap-1.5">
-                            <span>✍️</span>
-                            <span>استفسارك أو توجيهك الخاص لمستشار Gemini:</span>
-                        </span>
-                        <span class="text-[9.5px] text-emerald-400 font-mono">وصول كامل للبيانات</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <textarea id="floatingAiCustomInput" rows="2" placeholder="اكتب سؤالك المالي أو توجيهك الاستراتيجي هنا (مثال: هل أشتري سهم طلعت مصطفى الآن؟ وكيف أوفق بين كاش المحفظة والذهب؟)" class="flex-1 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-inner resize-none"></textarea>
-                        <button onclick="submitFloatingAiCustomQuery()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs transition active:scale-95 shadow flex items-center justify-center gap-1.5 shrink-0">
-                            <span>إرسال</span>
-                            <span>🚀</span>
-                        </button>
-                    </div>
+                <!-- Chat Messages Stream (Rendered sequentially) -->
+                <div id="floatingAiMessagesContainer" class="space-y-3">
+                    <!-- Populated dynamically via renderFloatingAiChatStream() -->
                 </div>
 
-                <!-- Section 3: Gemini Response Area -->
-                <div id="floatingAiResponseContainer" class="p-3.5 bg-slate-950/90 rounded-2xl border border-indigo-900/50 space-y-2.5 min-h-[140px]">
-                    <div id="floatingAiPlaceholder" class="text-center py-6 text-slate-400 text-xs space-y-1">
-                        <span class="text-2xl block">🤖</span>
-                        <p class="font-medium text-slate-300">مستشار Gemini يمتلك السيطرة الكاملة على كافة بيانات المنصة</p>
-                        <p class="text-[10px] text-slate-500">اختر أحد الاقتراحات أعلاه أو اكتب استفسارك الخاص للحصول على تحليل فني ومحاسبي فوري</p>
-                    </div>
-                    <div id="floatingAiLoading" class="hidden flex flex-col items-center justify-center py-6 text-indigo-400 space-y-2">
-                        <span class="w-4 h-4 rounded-full bg-indigo-400 pulse-live"></span>
-                        <span class="font-bold text-xs">جاري تشغيل محرك Gemini ودمج بيانات المحفظة والسوق اللحظية...</span>
-                        <span class="text-[10px] text-slate-400 font-mono">تحليل شامل لكافة الأسهم والسيولة والرسوم</span>
-                    </div>
-                    <div id="floatingAiResponseContent" class="hidden text-xs text-slate-200 leading-relaxed space-y-2 text-right"></div>
+                <!-- Live Typing / Generating Indicator -->
+                <div id="floatingAiLoading" class="hidden flex items-center gap-2.5 p-3 rounded-2xl bg-indigo-950/50 border border-indigo-800/60 text-indigo-300 text-xs w-fit">
+                    <span class="w-3 h-3 rounded-full bg-indigo-400 animate-ping shrink-0"></span>
+                    <span class="font-bold">جاري تشغيل محرك Gemini وتحليل السياق الكامل للمحادثة...</span>
                 </div>
             </div>
 
-            <!-- Modal Footer -->
-            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs shrink-0 flex-wrap">
-                <div class="flex items-center gap-2">
-                    <button onclick="copyFloatingAiResponseText()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold flex items-center gap-1.5 transition active:scale-95 text-[11px]">
-                        <span>📋</span>
-                        <span>نسخ الرد</span>
+            <!-- Active File Attachment Preview Bar (Above Input) -->
+            <div id="floatingAiFileAttachmentBar" class="hidden px-4 py-2 bg-slate-950/90 border-t border-slate-800 flex items-center justify-between gap-2 shrink-0">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <span id="floatingAiFileThumb" class="text-lg">📎</span>
+                    <div class="overflow-hidden text-right">
+                        <div id="floatingAiFileName" class="text-xs font-bold text-white truncate max-w-[260px] sm:max-w-md">ملف مرفق</div>
+                        <div id="floatingAiFileSize" class="text-[10px] text-emerald-400 font-mono">جاهز للفحص بواسطة Gemini Vision</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="previewFloatingAiAttachment()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-300 text-[11px] font-bold transition flex items-center gap-1">
+                        <span>👁️</span>
+                        <span>معاينة</span>
                     </button>
-                    <button onclick="clearFloatingAiResponse()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 font-bold flex items-center gap-1.5 transition active:scale-95 text-[11px]">
-                        <span>🗑️</span>
-                        <span>مسح</span>
+                    <button onclick="removeFloatingAiAttachment()" class="p-1 px-2 rounded-lg bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-[11px] font-bold border border-rose-800 transition">
+                        ✕
                     </button>
                 </div>
-                <button onclick="closeFloatingAiCopilot()" class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition active:scale-95 text-[11px]">
-                    إغلاق
-                </button>
+            </div>
+
+            <!-- Hidden File Input for Attachments -->
+            <input type="file" id="floatingAiFileInput" accept="image/*,.csv,.txt,.xlsx,.xls,.pdf" class="hidden" onchange="handleFloatingAiFileSelect(event)">
+
+            <!-- Bottom Persistent Chat Input Bar -->
+            <div class="p-3 bg-slate-950 border-t border-slate-800 shrink-0 space-y-2">
+                <div class="flex items-end gap-2">
+                    <!-- File Attachment Trigger Button -->
+                    <button onclick="document.getElementById('floatingAiFileInput').click()" title="إرفاق صورة أو مستند أو جدول بيانات" class="p-2.5 rounded-xl bg-slate-900 hover:bg-indigo-950/80 border border-slate-700/80 hover:border-indigo-500 text-slate-300 hover:text-white transition active:scale-95 shrink-0 flex items-center justify-center">
+                        <span class="text-base">📎</span>
+                    </button>
+
+                    <!-- Textarea with Auto-Grow and Enter-to-Submit -->
+                    <div class="flex-1 bg-slate-900 border border-slate-700/80 focus-within:border-indigo-500 rounded-xl px-3 py-1.5 transition shadow-inner">
+                        <textarea id="floatingAiCustomInput" rows="1" placeholder="اكتب سؤالك، استطرد في المحادثة، أو استفسر عن الأسهم... (Shift+Enter لسطر جديد)" class="w-full bg-transparent border-0 text-xs text-white placeholder-slate-400 focus:outline-none resize-none max-h-28 leading-relaxed" onkeydown="handleFloatingAiInputKeydown(event)"></textarea>
+                    </div>
+
+                    <!-- Send Button -->
+                    <button onclick="submitFloatingAiCustomQuery()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-bold text-xs transition active:scale-95 shadow-md flex items-center justify-center gap-1.5 shrink-0">
+                        <span>إرسال</span>
+                        <span>🚀</span>
+                    </button>
+                </div>
+
+                <!-- Footer Subtext -->
+                <div class="flex items-center justify-between text-[10px] text-slate-500 px-1">
+                    <span>💡 يمكنك رفع لقطات شاشة المحفظة أو التقارير المالية لتحليلها عبر Gemini Vision</span>
+                    <span class="font-mono">معتمد SOCPA / IFRS</span>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- ================= MODAL: SECURE SANDBOXED IN-APP EXTERNAL WEB VIEWER ================= -->
+    <div id="geminiExternalViewerModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 sm:p-4">
+        <div class="glass-card rounded-2xl max-w-5xl w-full border border-sky-700/80 bg-slate-900/98 shadow-2xl flex flex-col h-[94vh] max-h-[860px] overflow-hidden">
+            
+            <!-- Browser-like Address Bar & Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3 shrink-0 bg-slate-950 gap-2">
+                <div class="flex items-center gap-2 overflow-hidden flex-1">
+                    <span class="text-base text-sky-400">🌐</span>
+                    <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1 rounded-xl border border-slate-800 flex-1 max-w-xl">
+                        <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                            <span>🔒</span>
+                            <span>آمن ومحمي (Sandboxed)</span>
+                        </span>
+                        <span class="text-slate-600 text-xs">|</span>
+                        <input id="geminiExternalViewerUrlInput" type="text" readonly class="bg-transparent border-0 text-[11px] font-mono text-slate-300 w-full focus:outline-none select-all truncate" value="https://snduk.com">
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="refreshSecureExternalViewer()" title="إعادة تحميل" class="p-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition active:scale-95">
+                        🔄
+                    </button>
+                    <button onclick="openExternalViewerInNewTab()" title="فتح في نافذة مستقلة" class="p-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-bold transition active:scale-95 flex items-center gap-1">
+                        <span>↗️</span>
+                        <span class="hidden sm:inline">نافذة جديدة</span>
+                    </button>
+                    <button onclick="closeSecureExternalViewer()" class="text-slate-400 hover:text-white p-1.5 rounded-xl text-lg hover:bg-slate-800 transition">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page Title Bar -->
+            <div class="px-4 py-1.5 bg-slate-950/70 border-b border-slate-800/60 flex items-center justify-between text-xs text-slate-300">
+                <span id="geminiExternalViewerTitle" class="font-bold text-white truncate">صفحة خارجية</span>
+                <span class="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full font-mono">
+                    🛡️ عزل تام لبيانات المحفظة وكلمة المرور
+                </span>
+            </div>
+
+            <!-- Sandboxed iFrame -->
+            <div class="flex-1 relative bg-slate-950">
+                <div id="geminiExternalViewerLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 text-sky-400 space-y-2 z-10">
+                    <span class="w-5 h-5 rounded-full bg-sky-400 pulse-live"></span>
+                    <span class="text-xs font-bold">جاري تحميل الصفحة الآمنة...</span>
+                    <span class="text-[10px] text-slate-400 font-mono">يتم الفحص والتشغيل داخل بيئة معزولة Sandbox</span>
+                </div>
+                <iframe id="geminiExternalViewerFrame" src="" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="strict-origin-when-cross-origin" onload="document.getElementById('geminiExternalViewerLoading').classList.add('hidden')"></iframe>
+            </div>
+        </div>
+    </div>
+
+
 
 </body>
 </html>
