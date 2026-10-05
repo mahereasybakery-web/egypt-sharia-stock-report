@@ -4497,6 +4497,11 @@
 
                     <!-- Action Suite (الشراء والبيع والتبريد والتوصيات المقترحة وحذف الأصل) -->
                     <div class="flex items-center gap-1.5 flex-wrap">
+                        <!-- زر استشارة وتحليل السهم بـ Gemini AI (المربع المحدد في الشارت) -->
+                        <button id="modalChartAiBtn" onclick="event.stopPropagation(); askGeminiForStockFromModal();" class="bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-700 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-indigo-950/60 border border-indigo-400/40 active:scale-95 shrink-0" title="استشارة وتحليل السهم لحظياً بذكاء Gemini الاصطناعي">
+                            <span class="text-sm">✨</span>
+                            <span>تحليل AI</span>
+                        </button>
                         <!-- زر خاص بالتوصيات المقترحة (بارز ومميز) -->
                         <button onclick="event.stopPropagation(); switchModalSubTab('targets');" class="bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 text-xs font-black px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-md active:scale-95 shrink-0" title="عرض التوصيات المقترحة ونقاط الدخول والمستهدفات">
                             <span>🎯</span>
@@ -5905,7 +5910,9 @@
         function renderDrDateBar() {
             const bar = document.getElementById('drDateBar');
             if (!bar) return;
-            bar.innerHTML = DAILY_REPORTS.map(r => {
+            // ترتيب زمني تصاعدي من اليمين لليسار: الأحد (10/4) على اليمين، ثم الإثنين (10/5) على يساره
+            const sortedReports = DAILY_REPORTS.slice().sort((a, b) => a.date.localeCompare(b.date));
+            bar.innerHTML = sortedReports.map(r => {
                 const isActive = r.date === _drSelectedDate;
                 return `<button onclick="selectDrDate('${r.date}')" class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition border ${
                     isActive
@@ -14460,7 +14467,11 @@ async function syncMubasherDirectAll() {
                 'RUN_AUDIT': { title: 'تشغيل الفحص والتدقيق المحاسبي', desc: 'فحص مطابقة الأصول وميزان المراجعة ومعايير الشريعة' },
                 'OPEN_FEES': { title: 'فتح تفاصيل رسوم ثندر', desc: 'تدقيق عمولة 7 في الألف ورسم الهيئة وتكلفة الصفقات' },
                 'OPEN_ACTIVITY': { title: 'فتح سجل نشاط السوق', desc: 'عرض الصفقات اللحظية وحركة السوق الحية' },
-                'SYNC_THNDR': { title: 'مزامنة ثندر الفورية', desc: 'تحديث أسعار وثائق الصناديق والذهب 7,015.00 ج لحظياً' }
+                'SYNC_THNDR': { title: 'مزامنة ثندر الفورية', desc: 'تحديث أسعار وثائق الصناديق والذهب 7,015.00 ج لحظياً' },
+                'OPEN_CALCULATOR:rebalance': { title: 'حاسبة إعادة توازن المحفظة', desc: 'حساب أفضل نسبة لإعادة توازن المحفظة بين الأسهم والصناديق والذهب' },
+                'OPEN_CALCULATOR:dca': { title: 'حاسبة التبريد الذكي DCA', desc: 'حساب متوسطات التكلفة والكميات المقترحة للتبريد' },
+                'OPEN_CALCULATOR:zakat': { title: 'حاسبة الزكاة والتطهير الشرعي', desc: 'حساب مقدار الزكاة والتطهير وفق معايير الأيوفي' },
+                'OPEN_CALCULATOR:liquidity': { title: 'حاسبة السيولة والكاش الاحتياطي', desc: 'فحص ملاءة السيولة وتغطية الطوارئ الاستثمارية' }
             };
 
             commands.forEach(cmd => {
@@ -14480,6 +14491,16 @@ async function syncMubasherDirectAll() {
                 } else if (cmd.action === 'OPEN_VIEWER' || cmd.action === 'OPEN_URL') {
                     title = `فتح الرابط الخارجي بأمان: ${cmd.param}`;
                     desc = `استعراض الصفحة داخل المتصفح المعزول (Sandbox)`;
+                } else if (cmd.action === 'OPEN_CALCULATOR') {
+                    const calcMap = {
+                        rebalance: { t: 'حاسبة إعادة توازن المحفظة', d: 'حساب أفضل نسبة لإعادة توازن المحفظة' },
+                        dca: { t: 'حاسبة التبريد الذكي DCA', d: 'حساب متوسطات التكلفة للتبريد' },
+                        zakat: { t: 'حاسبة الزكاة والتطهير', d: 'حساب زكاة الأسهم والمحفظة' },
+                        liquidity: { t: 'حاسبة السيولة والكاش', d: 'إدارة وتوزيع سيولة المحفظة' }
+                    };
+                    const cInfo = calcMap[cmd.param] || { t: `حاسبة ${cmd.param}`, d: 'أدوات التحليل المالي' };
+                    title = cInfo.t;
+                    desc = cInfo.d;
                 } else if (friendlyTitles[key]) {
                     title = friendlyTitles[key].title;
                     desc = friendlyTitles[key].desc;
@@ -14504,7 +14525,8 @@ async function syncMubasherDirectAll() {
                     </div>
                 `;
 
-                formattedText = formattedText.split(cmd.full).join(cardHtml);
+                const inlineBtn = `<button onclick="dispatchGeminiExecutiveCommand('${cmd.action}:${cmd.param}${cmd.extra ? ':' + cmd.extra : ''}', true)" class="inline-flex items-center gap-1 px-2.5 py-0.5 mx-1 my-0.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow align-middle active:scale-95 transition cursor-pointer border border-indigo-400/30"><span>⚡ ${title}</span><span>➔</span></button>`;
+                formattedText = formattedText.split(cmd.full).join(inlineBtn);
             });
 
             // Auto-execute the first command if requested
@@ -15355,8 +15377,53 @@ ${stocksUniverseContext}
         // =========================================================================
         // MULTI-TURN CONVERSATIONAL GEMINI COPILOT & SECURE BROWSER ENGINE (v17.0)
         // =========================================================================
-        window._geminiChatHistory = []; // Array of { role: 'user'|'model', text: string, html: string, file: object, time: string }
+        // Unified Chat History with LocalStorage Persistence
+        (() => {
+            try {
+                const saved = localStorage.getItem('egx_unified_gemini_chat_history');
+                window._geminiChatHistory = saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                window._geminiChatHistory = [];
+            }
+        })();
         window._geminiActiveAttachment = null; // { name, size, type, dataUrl, textContent }
+
+        
+        window.askGeminiForStockFromModal = function(tickerParam) {
+            triggerHaptic('heavy');
+            const ticker = (tickerParam || window.activeChartTicker || 'TMGH').toUpperCase();
+            const s = (typeof STOCKS_DATA !== 'undefined' && Array.isArray(STOCKS_DATA))
+                ? STOCKS_DATA.find(x => x.ticker === ticker)
+                : null;
+            const rec = (typeof MASTER_RECOMMENDATIONS !== 'undefined' && Array.isArray(MASTER_RECOMMENDATIONS))
+                ? MASTER_RECOMMENDATIONS.find(r => r.ticker === ticker)
+                : null;
+            const val = (typeof VALUATION_DATA !== 'undefined' && VALUATION_DATA[ticker]) ? VALUATION_DATA[ticker] : null;
+
+            const name = s?.name || ticker;
+            const curPrice = s?.close || 0;
+            const chg = s?.chg || 0;
+            const rsi = s?.rsi || 50;
+            const supp = s?.support || rec?.stopLoss || '—';
+            const res = s?.resistance || rec?.targetPrice || '—';
+            const fairVal = val?.base || rec?.fairValue || '—';
+
+            const prompt = `أرجو تقديم استشارة وتحليل مالي وفني وشرعي دقيق لسهم ${name} (${ticker}) من واقع شارت التداول:
+• السعر اللحظي: ${curPrice} ج (${chg >= 0 ? '+' : ''}${chg}%)
+• مؤشر القوة النسبية RSI: ${rsi}
+• مستويات الدعم والمقاومة: دعم ${supp} ج / مقاومة مستهدفة ${res} ج
+• القيمة العادلة المعتمدة: ${fairVal} ج
+• ما هو تقييمك للسهم حالياً وتوصيتك الفنية للمحفظة وفق إدارة المخاطر؟`;
+
+            window.openFloatingAiCopilot();
+            setTimeout(() => {
+                const inp = document.getElementById('floatingAiCustomInput');
+                if (inp) inp.value = prompt;
+                if (typeof submitFloatingAiQuery === 'function') {
+                    submitFloatingAiQuery(prompt);
+                }
+            }, 300);
+        };
 
         window.openFloatingAiCopilot = function() {
             triggerHaptic('medium');
@@ -15408,9 +15475,12 @@ ${stocksUniverseContext}
             triggerHaptic('medium');
             window._geminiChatHistory = [];
             window._geminiActiveAttachment = null;
+            try {
+                localStorage.removeItem('egx_unified_gemini_chat_history');
+            } catch (e) {}
             removeFloatingAiAttachment();
             renderFloatingAiChatStream();
-            showToast('تم بدء محادثة جديدة مع مستشار Gemini 🔄', 'info');
+            showToast('تم بدء محادثة جديدة وتصفير السجل بنجاح 🔄', 'info');
         };
 
         // File Attachment Handlers (ملفات وصور)
@@ -15638,6 +15708,9 @@ ${stocksUniverseContext}
                 file: currentAtt,
                 time: timeStr
             });
+            try {
+                localStorage.setItem('egx_unified_gemini_chat_history', JSON.stringify(window._geminiChatHistory));
+            } catch (e) {}
 
             renderFloatingAiChatStream();
             if (loading) loading.classList.remove('hidden');
@@ -15776,6 +15849,9 @@ ${stocksUniverseContext}
                     html: parsedResult.html,
                     time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
                 });
+                try {
+                    localStorage.setItem('egx_unified_gemini_chat_history', JSON.stringify(window._geminiChatHistory));
+                } catch (e) {}
 
                 if (loading) loading.classList.add('hidden');
                 renderFloatingAiChatStream();
@@ -21776,6 +21852,20 @@ ${stocksUniverseContext}
         // Point 14: Universal Gemini AI Consultation Copilot
         async function openGeminiConsultation(title, prompt, category = 'استشارة مالية') {
             triggerHaptic('heavy');
+            // توجيه كافة استشارات البرنامج إلى مستشار Gemini التنفيذي الموحد مع حفظ سجل المحادثة
+            if (typeof window.openFloatingAiCopilot === 'function') {
+                window.openFloatingAiCopilot();
+                if (prompt) {
+                    setTimeout(() => {
+                        const inp = document.getElementById('floatingAiCustomInput');
+                        if (inp) inp.value = prompt;
+                        if (typeof submitFloatingAiQuery === 'function') {
+                            submitFloatingAiQuery(prompt);
+                        }
+                    }, 250);
+                }
+                return;
+            }
             const modal = document.getElementById('geminiConsultationModal');
             const tEl = document.getElementById('geminiConsultationTitle');
             const cEl = document.getElementById('geminiConsultationCategory');
