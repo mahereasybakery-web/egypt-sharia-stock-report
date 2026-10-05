@@ -1,0 +1,41 @@
+name: Automated EOD 4:00 PM Daily Report & Disclosures Sync
+
+on:
+  schedule:
+    # 1. Primary Release: 16:00 Cairo Time (13:00 UTC, Sun-Thu)
+    # Immediately after close auction (14:45), institutional flow disclosures (15:15), and SNDUK fund NAVs (16:00)
+    - cron: '0 13 * * 0,1,2,3,4'
+    # 2. Post-4:00 PM Disclosures Sync: 16:30, 17:30, 18:30 Cairo (13:30, 14:30, 15:30 UTC, Sun-Thu)
+    # For any late fund NAV updates, post-close block trades, or revised settlement notices
+    - cron: '30 13,14,15 * * 0,1,2,3,4'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-report-eod-sync
+  cancel-in-progress: true
+
+jobs:
+  eod-audit-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch Live Market Quotes & Official SNDUK Mutual Funds NAVs
+        run: |
+          python update_market_data_cloud.py
+
+      - name: Commit and Push Updated Market Data & EOD Report
+        run: |
+          git config --global user.name "EGX-EOD-Auditor[bot]"
+          git config --global user.email "eod-audit@mahereasybakery.internal"
+          git add market_data.json index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(eod): automated 4:00 PM closing report & post-close disclosures update" && git pull --rebase origin main && git push)
