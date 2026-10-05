@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
-  "updated_at": "2026-10-05T18:39:32.414699+03:00",
-  "updated_at_display": "2026-10-05 18:39:32",
+  "updated_at": "2026-10-05T18:40:37.332987+03:00",
+  "updated_at_display": "2026-10-05 18:40:37",
   "timezone": "Africa/Cairo (UTC+3)",
   "market_status": {
     "is_open": false,
@@ -53,7 +53,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ORAS",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ISPH": {
       "close": 11.85,
@@ -72,7 +72,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ISPH",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ETEL": {
       "close": 149.93,
@@ -91,7 +91,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ETEL",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "MCQE": {
       "close": 207.86,
@@ -110,7 +110,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "MCQE",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "FWRY": {
       "close": 18.77,
@@ -129,7 +129,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "FWRY",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "JUFO": {
       "close": 25.58,
@@ -148,7 +148,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "JUFO",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "SKPC": {
       "close": 16.4,
@@ -167,7 +167,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "SKPC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ALCN": {
       "close": 35.07,
@@ -203,7 +203,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ORWE",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "POUL": {
       "close": 10.09,
@@ -239,7 +239,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "EFIH",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "HELI": {
       "close": 7.49,
@@ -258,7 +258,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "HELI",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CCAP": {
       "close": 6.77,
@@ -294,7 +294,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "SWDY",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ASCM": {
       "close": 59.48,
@@ -347,7 +347,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "AMOC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "GBCO": {
       "close": 31.88,
@@ -366,7 +366,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "GBCO",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CERA": {
       "close": 1.47,
@@ -385,7 +385,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "CERA",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ATQA": {
       "close": 12.02,
@@ -404,7 +404,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ATQA",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "RACC": {
       "close": 9.31,
@@ -440,7 +440,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ABUK",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ARAB": {
       "close": 0.26,
@@ -476,7 +476,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "TMGH",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "EFID": {
       "close": 18.92,
@@ -495,7 +495,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "EFID",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CICH": {
       "close": 12.01,
@@ -531,7 +531,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "EGAL",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "RMDA": {
       "close": 5.47,
@@ -550,7 +550,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "RMDA",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ORHD": {
       "close": 38.7,
@@ -569,7 +569,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ORHD",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "PHDC": {
       "close": 13.18,
@@ -588,7 +588,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "PHDC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CIRA": {
       "close": 40.19,
@@ -607,7 +607,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "CIRA",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "DOMT": {
       "close": 24.9,
@@ -643,7 +643,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ADIB",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "MFPC": {
       "close": 46.39,
@@ -662,7 +662,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "MFPC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "LCSW": {
       "close": 33.54,
@@ -681,7 +681,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "LCSW",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "FAIT": {
       "close": 44.84,
@@ -700,7 +700,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "FAIT",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ARCC": {
       "close": 72.21,
@@ -719,7 +719,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ARCC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ICFC": {
       "close": 23.5,
@@ -738,7 +738,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ICFC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "SAUD": {
       "close": 23.29,
@@ -757,7 +757,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "SAUD",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ACGC": {
       "close": 14.56,
@@ -776,7 +776,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "ACGC",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "BTFH": {
       "close": 2.81,
@@ -812,7 +812,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "EAST",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "MASR": {
       "close": 7.7,
@@ -831,7 +831,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "MASR",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "OCDI": {
       "close": 27.49,
@@ -850,7 +850,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "OCDI",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "COMI": {
       "close": 126.48,
@@ -869,7 +869,7 @@
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
       "source": "mubasher.info",
       "ticker": "COMI",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CIEB": {
       "ticker": "CIEB",
@@ -880,7 +880,7 @@
       "low": 24.16,
       "volume": 197449,
       "source": "mubasher.info",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "ESRS": {
       "ticker": "ESRS",
@@ -891,7 +891,7 @@
       "low": 138.16,
       "volume": 7434,
       "source": "mubasher.info",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     },
     "CLHO": {
       "ticker": "CLHO",
@@ -902,7 +902,7 @@
       "low": 15.45,
       "volume": 1788304,
       "source": "mubasher.info",
-      "ts": "18:39:32"
+      "ts": "18:40:37"
     }
   },
   "funds": {
