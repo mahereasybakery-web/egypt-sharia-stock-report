@@ -719,7 +719,7 @@
         <!-- ===== Visible Action Bar: Sync + Theme Toggle ===== -->
         <div class="flex items-center justify-between gap-2 mb-2" dir="rtl">
 
-            <!-- Right side: Sync Button + Live indicator -->
+            <!-- Right side: Sync Button + SNDUK Login + Live indicator -->
             <div class="flex items-center gap-2">
                 <button onclick="refreshData()" id="visibleSyncBtn" title="مزامنة الأسعار اللحظية"
                     class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl
@@ -727,6 +727,14 @@
                            hover:bg-emerald-900/90 active:scale-95 transition-all text-[11.5px] font-bold select-none">
                     <span id="visibleRefreshIcon" class="text-[15px] inline-block transition-transform duration-500">🔄</span>
                     <span>مزامنة</span>
+                </button>
+                <button onclick="openSecureExternalViewer('https://snduk.com/eg/auth/sign-in?lang=ar', 'تسجيل الدخول إلى منصة صناديق الاستثمار (SNDUK)')" id="visibleSndukLoginBtn" title="تسجيل الدخول المباشر إلى منصة صناديق (SNDUK)"
+                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-600/70
+                           bg-amber-950/60 text-amber-300 hover:text-white hover:bg-amber-900/70
+                           transition-all active:scale-95 select-none text-[11px] font-bold shadow-sm">
+                    <span>🔐</span>
+                    <span class="hidden sm:inline">دخول SNDUK</span>
+                    <span class="sm:hidden">SNDUK</span>
                 </button>
                 <span class="flex items-center gap-1 text-[10px] text-emerald-400 font-medium whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live inline-block"></span>
@@ -1837,9 +1845,23 @@
                                     <p class="text-[9.5px] text-slate-300 font-sans">تحديث لحظي متعدد المصادر يتجاوز تأخر المنصات الفردية ويعتمد إفصاحات الخميس 1 أكتوبر 2026</p>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-950 border border-indigo-700 text-indigo-300">
-                                ✓ Thndr | ✓ فودة لينس | ✓ EIMA | ✓ إفصاح المدير
-                            </span>
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/auth/sign-in?lang=ar', 'تسجيل الدخول إلى منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/60 text-amber-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
+                                    <span>🔐</span>
+                                    <span>دخول SNDUK</span>
+                                </button>
+                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/fund-prices?lang=ar', 'أسعار وثائق الصناديق اليومية (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
+                                    <span>📊</span>
+                                    <span>أسعار الوثائق</span>
+                                </button>
+                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/funds?lang=ar', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-700 text-indigo-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
+                                    <span>🌐</span>
+                                    <span>بوابة SNDUK</span>
+                                </button>
+                                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-950 border border-indigo-700 text-indigo-300">
+                                    ✓ Thndr | ✓ SNDUK | ✓ فودة لينس | ✓ EIMA
+                                </span>
+                            </div>
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1.5 border-t border-slate-800/80 text-[10.5px]">
                             <div class="bg-slate-950/70 p-2 rounded-xl border border-slate-800 space-y-0.5">
@@ -5904,6 +5926,7 @@
 
         let _drSelectedDate = '2026-10-05';
         let _drChartsInit = {};
+        window._drChartsInit = _drChartsInit;
 
 
         // =========================================================================
@@ -6726,8 +6749,8 @@
                     <!-- 8 Full In-Depth Trading Cards (الأسهم المملوكة فقط بعد استبعاد المباعة) -->
                     <div class="space-y-3">
                         ${rpt.holdingsSection.stocks.map((h, i) => {
-                            const userStock = (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) ? userHoldings.find(u => u.ticker === h.code) : null;
-                            const bPrice = userStock ? userStock.buyPrice : (h.open || h.close);
+                            const userStock = (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings)) ? userHoldings.find(u => (u.ticker === h.code || u.code === h.code)) : null;
+                            const bPrice = userStock ? (userStock.buy || userStock.buyPrice || h.open) : (h.open || h.close);
                             const pnl = (bPrice > 0 && typeof h.close === 'number') ? ((h.close - bPrice) / bPrice) * 100 : 0;
                             const sup = h.support || (typeof h.close === 'number' ? (h.close * 0.96).toFixed(2) + ' ج' : '—');
                             const res = h.resistance || (typeof h.close === 'number' ? (h.close * 1.05).toFixed(2) + ' ج' : '—');
@@ -7401,15 +7424,102 @@
                 // Slicer styling
                 if (slicerHoldingsBtn) slicerHoldingsBtn.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800";
                 if (slicerAllBtn) slicerAllBtn.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow ring-1 ring-emerald-400";
-                if (sec3Title) sec3Title.innerText = "3. كل الأسهم الشرعية ومؤشر EGX33 (التحليل التفصيلي والقرارات) — 33 سهماً";
+                if (sec3Title) sec3Title.innerText = "3. كل الأسهم الشرعية ومؤشر EGX33 (التحليل التفصيلي والقرارات) — كافة أسهم الشريعة المعتمدة";
                 if (sec3Icon) sec3Icon.innerText = "🕌";
-                if (sub1) sub1.innerText = "كافة الأسهم الشرعية (جلسة اليوم)";
-                if (sub2) sub2.innerText = "مناطق الزخم لكافة أسهم الشريعة";
+                if (sub1) sub1.innerText = `كافة الأسهم الشرعية (جلسة ${rpt.label || 'اليوم'})`;
+                if (sub2) sub2.innerText = "مناطق الزخم والقوة لكافة أسهم الشريعة";
 
-                // Build datasets for ALL Sharia stocks
-                const allStocks = (typeof STOCKS_DATA !== 'undefined' && Array.isArray(STOCKS_DATA)) 
-                    ? STOCKS_DATA.filter(s => s.type === 'stock') 
-                    : [];
+                // Build dynamic session universe for ALL Sharia stocks bound directly to active session report (rpt)
+                const sessionStockMap = new Map();
+
+                // 1. Portfolio owned stocks from active report session
+                (rpt.holdingsSection?.stocks || []).forEach(h => {
+                    sessionStockMap.set(h.code, {
+                        ticker: h.code,
+                        name: h.name,
+                        open: h.open,
+                        close: h.close,
+                        chg: typeof h.change === 'number' ? h.change : 0,
+                        rsi: typeof h.rsi === 'number' ? h.rsi : 50,
+                        support: h.support,
+                        resistance: h.resistance,
+                        signal: h.signal || 'احتفاظ',
+                        signalType: h.signalType || 'hold',
+                        rec: h.tomorrowRec || 'احتفاظ ومتابعة الزخم',
+                        isOwned: true
+                    });
+                });
+
+                // 2. Market opportunities top gainers
+                (rpt.marketOpportunities?.topGainers || []).forEach(s => {
+                    if (!sessionStockMap.has(s.code)) {
+                        sessionStockMap.set(s.code, {
+                            ticker: s.code,
+                            name: s.name,
+                            open: s.open,
+                            close: s.close,
+                            chg: typeof s.change === 'number' ? s.change : 0,
+                            rsi: typeof s.rsi === 'number' ? s.rsi : (s.change >= 5 ? 72.5 : 56.0),
+                            support: s.open ? (s.open * 0.97).toFixed(2) + ' ج' : '—',
+                            resistance: s.close ? (s.close * 1.05).toFixed(2) + ' ج' : '—',
+                            signal: s.signal || 'شراء',
+                            signalType: s.signalType || 'buy',
+                            rec: s.signal || 'شراء وتجميع صاعد',
+                            isOwned: false
+                        });
+                    }
+                });
+
+                // 3. Market opportunities top losers
+                (rpt.marketOpportunities?.topLosers || []).forEach(s => {
+                    if (!sessionStockMap.has(s.code)) {
+                        sessionStockMap.set(s.code, {
+                            ticker: s.code,
+                            name: s.name,
+                            open: s.open,
+                            close: s.close,
+                            chg: typeof s.change === 'number' ? s.change : 0,
+                            rsi: typeof s.rsi === 'number' ? s.rsi : (s.change <= -2 ? 29.0 : 41.5),
+                            support: s.close ? (s.close * 0.95).toFixed(2) + ' ج' : '—',
+                            resistance: s.open ? (s.open * 1.03).toFixed(2) + ' ج' : '—',
+                            signal: s.signal || 'محايد',
+                            signalType: s.signalType || 'hold',
+                            rec: s.signal || 'مراقبة واقتناص قاع',
+                            isOwned: false
+                        });
+                    }
+                });
+
+                // 4. Any remaining Sharia stocks from STOCKS_DATA (enriching them)
+                (typeof STOCKS_DATA !== 'undefined' ? STOCKS_DATA : [])
+                    .filter(s => s.type === 'stock')
+                    .forEach(s => {
+                        if (!sessionStockMap.has(s.ticker)) {
+                            sessionStockMap.set(s.ticker, {
+                                ticker: s.ticker,
+                                name: s.name,
+                                open: s.open,
+                                close: s.close,
+                                chg: (typeof s.chg === 'number' && !isNaN(s.chg)) ? s.chg : 0,
+                                rsi: typeof s.rsi === 'number' ? s.rsi : 50,
+                                pe: s.pe,
+                                support: s.close ? (s.close * 0.96).toFixed(2) + ' ج' : '—',
+                                resistance: s.close ? (s.close * 1.05).toFixed(2) + ' ج' : '—',
+                                signal: s.rec ? s.rec.split(' ')[0] : 'محايد',
+                                signalType: (s.rec && s.rec.includes('شراء')) ? 'buy' : ((s.rec && s.rec.includes('بيع')) ? 'sell' : 'hold'),
+                                rec: s.rec || 'احتفاظ ومراقبة',
+                                sector: s.sector,
+                                isOwned: userHoldingsList.some(u => (u.ticker === s.ticker || u.code === s.ticker))
+                            });
+                        } else {
+                            const item = sessionStockMap.get(s.ticker);
+                            if (!item.sector) item.sector = s.sector;
+                            if (!item.pe) item.pe = s.pe;
+                        }
+                    });
+
+                // Convert map to array and sort by % change descending
+                const allStocks = Array.from(sessionStockMap.values()).sort((a, b) => b.chg - a.chg);
 
                 const codes = allStocks.map(s => s.ticker);
                 const changes = allStocks.map(s => typeof s.chg === 'number' ? s.chg : 0);
@@ -7421,12 +7531,12 @@
 
                 // Render all Sharia stock cards
                 container.innerHTML = allStocks.map((s, i) => {
-                    const isOwned = userHoldingsList.some(u => u.ticker === s.ticker);
-                    const userStock = userHoldingsList.find(u => u.ticker === s.ticker);
-                    const bPrice = userStock ? userStock.buyPrice : (s.open || s.close);
-                    const pnl = (userStock && bPrice > 0 && typeof s.close === 'number') ? ((s.close - bPrice) / bPrice) * 100 : s.chg;
-                    const sup = typeof s.close === 'number' ? (s.close * 0.96).toFixed(2) + ' ج' : '—';
-                    const res = typeof s.close === 'number' ? (s.close * 1.05).toFixed(2) + ' ج' : '—';
+                    const userStock = userHoldingsList.find(u => (u.ticker === s.ticker || u.code === s.ticker));
+                    const isOwned = Boolean(userStock || s.isOwned);
+                    const bPrice = userStock ? (userStock.buy || userStock.buyPrice || s.open) : null;
+                    const pnl = (bPrice && bPrice > 0 && typeof s.close === 'number') ? ((s.close - bPrice) / bPrice) * 100 : null;
+                    const sup = s.support || (typeof s.close === 'number' ? (s.close * 0.96).toFixed(2) + ' ج' : '—');
+                    const res = s.resistance || (typeof s.close === 'number' ? (s.close * 1.05).toFixed(2) + ' ج' : '—');
                     const action = s.rec || (s.chg >= 2 ? 'شراء وتجميع وزخم' : (s.chg <= -2 ? 'مراقبة واقتناص قاع' : 'احتفاظ ومراقبة'));
                     const rsiVal = typeof s.rsi === 'number' ? s.rsi : 50;
 
@@ -7440,8 +7550,8 @@
                                 <span class="text-[9.5px] text-slate-400">(${s.sector || 'السوق الرئيسي'})</span>
                             </div>
                             <div class="flex items-center gap-1.5 font-mono">
-                                ${isOwned ? `<span class="text-slate-400">شراء: <b class="text-white">${fmtP(bPrice)}</b> |</span>` : ''}
-                                <span class="text-slate-400">إغلاق: <b class="text-white">${fmtP(s.close)}</b></span>
+                                ${isOwned && bPrice ? `<span class="text-slate-400">شراء: <b class="text-white">${fmtP(bPrice)} ج</b> |</span>` : ''}
+                                <span class="text-slate-400">إغلاق: <b class="text-white">${fmtP(s.close)} ج</b></span>
                                 ${pctB(s.chg)}
                                 ${sigB(action, action.includes('شراء') ? 'buy' : (action.includes('بيع')||action.includes('جني') ? 'sell' : 'hold'))}
                             </div>
@@ -7450,7 +7560,7 @@
                             <div>مقاومة: <b class="text-rose-300">${res}</b></div>
                             <div>دعم: <b class="text-sky-300">${sup}</b></div>
                             <div>RSI: <b class="${rsiVal >= 70 ? 'text-rose-400' : (rsiVal <= 35 ? 'text-emerald-400' : 'text-sky-400')}">${rsiVal}</b></div>
-                            <div>مضاعف الربحية P/E: <b class="text-amber-300">${s.pe ? s.pe + 'x' : '—'}</b></div>
+                            ${isOwned && pnl !== null ? `<div>ربح/خسارة محفظتي: <b class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(1)}%</b></div>` : `<div>مضاعف الربحية P/E: <b class="text-amber-300">${s.pe ? s.pe + 'x' : '—'}</b></div>`}
                         </div>
                         <div class="text-[11px] text-emerald-400 font-bold flex items-center justify-between pt-1 border-t border-slate-800/60">
                             <span>القرار والتوصية: ${action}</span>
@@ -7465,7 +7575,7 @@
                 if (slicerAllBtn) slicerAllBtn.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800";
                 if (sec3Title) sec3Title.innerText = "3. أسهم المحفظة (التحليل التفصيلي والقرارات) — 8 أسهم مملوكة نشطة";
                 if (sec3Icon) sec3Icon.innerText = "💼";
-                if (sub1) sub1.innerText = "أسهم المحفظة (جلسة اليوم)";
+                if (sub1) sub1.innerText = `أسهم المحفظة (جلسة ${rpt.label || 'اليوم'})`;
                 if (sub2) sub2.innerText = "مناطق الزخم لمسار المحفظة";
 
                 // Build datasets for OWNED holdings
@@ -7480,8 +7590,8 @@
 
                 // Render owned holding stock cards
                 container.innerHTML = holdingStocks.map((h, i) => {
-                    const userStock = userHoldingsList.find(u => u.ticker === h.code);
-                    const bPrice = userStock ? userStock.buyPrice : (h.open || h.close);
+                    const userStock = userHoldingsList.find(u => (u.ticker === h.code || u.code === h.code));
+                    const bPrice = userStock ? (userStock.buy || userStock.buyPrice || h.open) : (h.open || h.close);
                     const pnl = (bPrice > 0 && typeof h.close === 'number') ? ((h.close - bPrice) / bPrice) * 100 : 0;
                     const sup = h.support || (typeof h.close === 'number' ? (h.close * 0.96).toFixed(2) + ' ج' : '—');
                     const res = h.resistance || (typeof h.close === 'number' ? (h.close * 1.05).toFixed(2) + ' ج' : '—');
@@ -7498,8 +7608,8 @@
                                 <span class="text-[9.5px] bg-emerald-950 text-emerald-300 border border-emerald-700 px-2 py-0.5 rounded-full font-bold">في محفظتك ✓</span>
                             </div>
                             <div class="flex items-center gap-1.5 font-mono">
-                                <span class="text-slate-400">شراء: <b class="text-white">${fmtP(bPrice)}</b></span>
-                                <span class="text-slate-400">| إغلاق: <b class="text-white">${fmtP(h.close)}</b></span>
+                                <span class="text-slate-400">شراء: <b class="text-white">${fmtP(bPrice)} ج</b></span>
+                                <span class="text-slate-400">| إغلاق: <b class="text-white">${fmtP(h.close)} ج</b></span>
                                 ${pctB(h.change)}
                                 ${sigB(action, action.includes('شراء') ? 'buy' : (action.includes('بيع')||action.includes('جني') ? 'sell' : 'hold'))}
                             </div>
@@ -7508,7 +7618,7 @@
                             <div>مقاومة: <b class="text-rose-300">${res}</b></div>
                             <div>دعم: <b class="text-sky-300">${sup}</b></div>
                             <div>RSI: <b class="${rsiVal >= 70 ? 'text-rose-400' : (rsiVal <= 35 ? 'text-emerald-400' : 'text-sky-400')}">${rsiVal}</b></div>
-                            <div>ربح/خسارة: <b class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(1)}%</b></div>
+                            <div>ربح/خسارة محفظتي: <b class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(1)}%</b></div>
                         </div>
                         <p class="text-[11px] text-slate-300 leading-relaxed">${note}</p>
                         <div class="text-[11px] text-emerald-400 font-bold flex items-center justify-between pt-1 border-t border-slate-800/60">
@@ -7521,7 +7631,7 @@
         };
 
         function _renderDrCharts(codes, changes, rsiVals, barColors, rsiColors) {
-            // Chart 1: Portfolio % Changes
+            // Chart 1: Portfolio / Universe % Changes
             const ctx1 = document.getElementById('drChartChanges');
             if (ctx1) {
                 if (_drChartsInit['changes']) { try { _drChartsInit['changes'].destroy(); } catch(e){} }
@@ -7532,16 +7642,38 @@
                         datasets: [{
                             data: changes,
                             backgroundColor: barColors,
-                            borderRadius: 6,
+                            borderRadius: 4,
                             borderWidth: 0
                         }]
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => (ctx.raw >= 0 ? '+' : '') + ctx.raw.toFixed(2) + '%' } } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `نسبة التغير اليومية: ${(ctx.raw >= 0 ? '+' : '')}${ctx.raw.toFixed(2)}%`
+                                }
+                            }
+                        },
                         scales: {
-                            x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
-                            y: { ticks: { color: '#94a3b8', font: { size: 9 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } }
+                            x: {
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: { size: codes.length > 15 ? 8 : 9, weight: 'bold' },
+                                    maxRotation: codes.length > 15 ? 60 : 0,
+                                    autoSkip: false
+                                },
+                                grid: { color: 'rgba(255,255,255,0.03)' }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: { size: 9 },
+                                    callback: v => (v >= 0 ? '+' : '') + v + '%'
+                                },
+                                grid: { color: 'rgba(255,255,255,0.06)' }
+                            }
                         }
                     }
                 });
@@ -7557,15 +7689,30 @@
                         datasets: [{
                             data: rsiVals,
                             backgroundColor: rsiColors,
-                            borderRadius: 6,
+                            borderRadius: 4,
                             borderWidth: 0
                         }]
                     },
                     options: {
                         responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => 'RSI(14): ' + ctx.raw.toFixed(1) } } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `مؤشر القوة النسبية RSI(14): ${ctx.raw.toFixed(1)}`
+                                }
+                            }
+                        },
                         scales: {
-                            x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                            x: {
+                                ticks: {
+                                    color: '#94a3b8',
+                                    font: { size: codes.length > 15 ? 8 : 9, weight: 'bold' },
+                                    maxRotation: codes.length > 15 ? 60 : 0,
+                                    autoSkip: false
+                                },
+                                grid: { color: 'rgba(255,255,255,0.03)' }
+                            },
                             y: {
                                 min: 0, max: 100,
                                 ticks: { color: '#94a3b8', font: { size: 9 } },
@@ -8012,18 +8159,18 @@ window.addEventListener('load', () => {
             { ticker: "ATQA", name: "حديد عتاقة", close: 11.9, open: 12.32, high: 12.32, low: 11.05, chg: 0.59, rsi: 45.2, pe: 5.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "EGAL", name: "مصر للألومنيوم", close: 347, open: 350, high: 356, low: 340, chg: 1.46, rsi: 44.1, pe: 14.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "FWRY", name: "فوري للمدفوعات", close: 18.45, open: 18.72, high: 18.8, low: 18.1, chg: 0.82, rsi: 37.0, pe: 18.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.17, open: 27.72, high: 27.72, low: 26.5, chg: 1.95, rsi: 32.4, pe: 9.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 87.95, open: 90.4, high: 90.4, low: 88.03, chg: 0.42, rsi: 24.5, pe: 12.8, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 12.82, open: 13.1, high: 13.2, low: 12.57, chg: 0.23, rsi: 25.6, pe: 9.3, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "OCDI", name: "سوديك للتنمية", close: 27.90, open: 27.58, high: 28.20, low: 27.40, chg: 1.16, rsi: 45.2, pe: 9.8, type: "stock", rec: "احتفاظ ومراقبة", sector: "العقارات والإنشاءات" },
+            { ticker: "TMGH", name: "مجموعة طلعت مصطفى", close: 89.60, open: 88.88, high: 90.00, low: 88.50, chg: 0.81, rsi: 38.2, pe: 12.8, type: "stock", rec: "شراء وتجميع", sector: "العقارات والإنشاءات" },
+            { ticker: "PHDC", name: "بالم هيلز للتعمير", close: 12.97, open: 13.06, high: 13.15, low: 12.90, chg: -0.69, rsi: 41.5, pe: 9.3, type: "stock", rec: "مراقبة واقتناص", sector: "العقارات والإنشاءات" },
             { ticker: "ISPH", name: "ابن سينا فارما", close: 11.85, open: 11.64, high: 11.79, low: 11.22, chg: 0.94, rsi: 37.8, pe: 8.6, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "ETEL", name: "المصرية للاتصالات", close: 136.88, open: 133, high: 139, low: 129, chg: 0.65, rsi: 69.3, pe: 10.1, type: "stock", rec: "جني أرباح وتخفيف", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "EFIH", name: "إي فاينانس", close: 22.3, open: 22.92, high: 23, low: 20.2, chg: 1.36, rsi: 40.7, pe: 12.4, type: "stock", rec: "احتفاظ ومراقبة", sector: "التكنولوجيا والمدفوعات" },
-            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 51.19, open: 51.9, high: 51.9, low: 49.05, chg: 1.51, rsi: 45.3, pe: 5.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "البنوك والخدمات المالية" },
-            { ticker: "SAUD", name: "بنك البركة مصر", close: 22.24, open: 22.34, high: 22.8, low: 21.6, chg: 1.69, rsi: 40.9, pe: 5.1, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
-            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.22, open: 7.15, high: 7.2, low: 6.82, chg: 2.85, rsi: 37.7, pe: 5.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
-            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 18.79, open: 29.2, high: 29.3, low: 27.81, chg: -33.91, rsi: 15.2, pe: 13.9, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
+            { ticker: "ETEL", name: "المصرية للاتصالات", close: 152.50, open: 150.08, high: 154.00, low: 149.00, chg: 1.61, rsi: 76.5, pe: 10.1, type: "stock", rec: "شراء وتجميع وزخم", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "EFIH", name: "إي فاينانس", close: 24.35, open: 23.99, high: 24.60, low: 23.80, chg: 1.50, rsi: 59.4, pe: 12.4, type: "stock", rec: "شراء وزخم", sector: "التكنولوجيا والمدفوعات" },
+            { ticker: "ADIB", name: "مصرف أبوظبي الإسلامي", close: 50.25, open: 49.90, high: 51.00, low: 49.50, chg: 0.70, rsi: 44.8, pe: 5.2, type: "stock", rec: "شراء وتجميع", sector: "البنوك والخدمات المالية" },
+            { ticker: "SAUD", name: "بنك البركة مصر", close: 22.24, open: 22.34, high: 22.80, low: 21.60, chg: 1.69, rsi: 40.9, pe: 5.1, type: "stock", rec: "شراء وتجميع قاع", sector: "البنوك والخدمات المالية" },
+            { ticker: "MASR", name: "مدينة مصر للإسكان", close: 7.95, open: 7.77, high: 8.05, low: 7.70, chg: 2.32, rsi: 55.4, pe: 5.5, type: "stock", rec: "شراء وزخم", sector: "العقارات والإنشاءات" },
+            { ticker: "EFID", name: "إيديتا للصناعات الغذائية", close: 19.65, open: 19.50, high: 19.80, low: 19.40, chg: 0.77, rsi: 46.5, pe: 13.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الأغذية والأدوية" },
             { ticker: "RMDA", name: "العاشر من رمضان (راميدا)", close: 5.44, open: 5.41, high: 5.72, low: 5.05, chg: 2.64, rsi: 35.7, pe: 36.7, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
-            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.18, open: 39.5, high: 39.8, low: 38.02, chg: 1.24, rsi: 36.5, pe: 7.2, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
+            { ticker: "ORHD", name: "أوراسكوم للتنمية مصر", close: 39.55, open: 39.27, high: 40.00, low: 39.10, chg: 0.71, rsi: 45.1, pe: 7.2, type: "stock", rec: "احتفاظ ومراقبة", sector: "العقارات والإنشاءات" },
             { ticker: "SWDY", name: "السويدي إليكتريك", close: 113.98, open: 113.45, high: 118.6, low: 108.01, chg: 1.32, rsi: 37.8, pe: 8.9, type: "stock", rec: "احتفاظ ومراقبة", sector: "الصناعة والتصدير" },
             { ticker: "JUFO", name: "جهينة للصناعات الغذائية", close: 25.29, open: 25.52, high: 25.87, low: 24.5, chg: 1.04, rsi: 35.4, pe: 24.3, type: "stock", rec: "شراء وتجميع قاع", sector: "الأغذية والأدوية" },
             { ticker: "ORAS", name: "أوراسكوم للإنشاء", close: 803.8, open: 809, high: 809, low: 780.01, chg: 1.6, rsi: 45.6, pe: 8.5, type: "stock", rec: "شراء وتجميع قاع", sector: "العقارات والإنشاءات" },
@@ -23117,7 +23264,11 @@ ${stocksUniverseContext}
             <!-- Quick External Sources Bar & Preset Chips -->
             <div class="px-4 py-2 bg-slate-950/40 border-b border-slate-800/60 flex items-center gap-1.5 overflow-x-auto scrollbar-hide text-[11px] shrink-0">
                 <span class="text-slate-400 font-bold shrink-0 flex items-center gap-1"><span>🔗</span><span>مصادر خارجية آمنة:</span></span>
-                <button onclick="openSecureExternalViewer('https://snduk.com/funds', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
+                <button onclick="openSecureExternalViewer('https://snduk.com/eg/auth/sign-in?lang=ar', 'تسجيل الدخول إلى منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/70 text-amber-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
+                    <span>🔐</span>
+                    <span>دخول SNDUK</span>
+                </button>
+                <button onclick="openSecureExternalViewer('https://snduk.com/eg/funds?lang=ar', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
                     <span>🏛️</span>
                     <span>صناديق (SNDUK)</span>
                 </button>
@@ -23255,9 +23406,16 @@ ${stocksUniverseContext}
                 </div>
             </div>
 
-            <!-- Page Title Bar -->
-            <div class="px-4 py-1.5 bg-slate-950/70 border-b border-slate-800/60 flex items-center justify-between text-xs text-slate-300">
-                <span id="geminiExternalViewerTitle" class="font-bold text-white truncate">صفحة خارجية</span>
+            <!-- Page Title Bar & Quick Switcher -->
+            <div class="px-4 py-1.5 bg-slate-950/70 border-b border-slate-800/60 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-300">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span id="geminiExternalViewerTitle" class="font-bold text-white truncate">صفحة خارجية</span>
+                    <div class="flex items-center gap-1 font-mono text-[10.5px]">
+                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/auth/sign-in?lang=ar', 'تسجيل الدخول إلى منصة صناديق الاستثمار (SNDUK)')" class="px-2 py-0.5 rounded bg-amber-950/70 text-amber-300 border border-amber-800 hover:bg-amber-900 transition">🔐 تسجيل دخول SNDUK</button>
+                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/fund-prices?lang=ar', 'أسعار وثائق الصناديق (SNDUK)')" class="px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800 hover:bg-emerald-900 transition">📊 أسعار الوثائق</button>
+                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/funds?lang=ar', 'بوابة الصناديق (SNDUK)')" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition">🏛️ بوابة الصناديق</button>
+                    </div>
+                </div>
                 <span class="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full font-mono">
                     🛡️ عزل تام لبيانات المحفظة وكلمة المرور
                 </span>
