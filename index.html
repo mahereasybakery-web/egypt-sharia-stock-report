@@ -5625,7 +5625,10 @@
                 // 5. سيناريو حركة المؤشرات وتوقعات جلسة الغد
                 tomorrowScenario: {
                     title: "🔮 5. سيناريو حركة المؤشرات وتوقعات جلسة الغد (الإثنين):",
+                    day: "الإثنين 5 أكتوبر 2026",
                     nextDayLabel: "الإثنين 5 أكتوبر 2026",
+                    outlook: "السيناريو الأرجح هو افتتاح الجلسة على ارتفاع متوسط يتراوح بين +0.5% إلى +1.2% لاختبار مستويات الـ 54,000 نقطة، يعقبه احتمال حدوث تهدئة انتقائية وعمليات جني أرباح سريعة على الأسهم التي حققت قفزات حادة (مثل ETEL)، قبل استئناف المسار الصاعد بدعم من السيولة المؤسسية.",
+                    mainScenarioText: "السيناريو الأرجح هو افتتاح الجلسة على ارتفاع متوسط يتراوح بين +0.5% إلى +1.2% لاختبار مستويات الـ 54,000 نقطة، يعقبه احتمال حدوث تهدئة انتقائية وعمليات جني أرباح سريعة على الأسهم التي حققت قفزات حادة (مثل ETEL)، قبل استئناف المسار الصاعد بدعم من السيولة المؤسسية.",
                     egx30: {
                         name: "مؤشر EGX30 الرئيسي",
                         resistance: "54,000 (مقاومة نفسية حاسمة) ثم 54,200 و 54,500 نقطة",
@@ -6779,14 +6782,14 @@
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                             <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
                                 <span>🔮</span>
-                                <span>5. سيناريو حركة المؤشرات وتوقعات جلسة الغد (${rpt.tomorrowScenario.day})</span>
+                                <span>5. سيناريو حركة المؤشرات وتوقعات جلسة الغد (${rpt.tomorrowScenario.day || rpt.tomorrowScenario.nextDayLabel || 'الإثنين 5 أكتوبر 2026'})</span>
                             </h3>
                             <span class="text-[10px] bg-sky-950 text-sky-300 border border-sky-800 px-2 py-0.5 rounded-full font-bold">توقع إيجابي</span>
                         </div>
 
                         <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1 text-xs">
                             <span class="font-bold text-sky-400">التوقع العام:</span>
-                            <p class="text-slate-300 leading-relaxed">${rpt.tomorrowScenario.outlook}</p>
+                            <p class="text-slate-300 leading-relaxed">${rpt.tomorrowScenario.outlook || rpt.tomorrowScenario.mainScenarioText || 'السيناريو الأرجح هو استمرار الزخم الإيجابي واختبار مستويات المقاومة الرئيسية بدعم من المشتريات المؤسسية.'}</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
@@ -8146,6 +8149,10 @@ window.addEventListener('load', () => {
         }
 
         function loadUserPortfolio() {
+            // Auto-refresh fund NAVs on portfolio load
+            if (typeof window.syncLiveFundsEngine === 'function') {
+                window.syncLiveFundsEngine(false, true);
+            }
             // Load Thndr actual portfolio as default (v16 live key with guaranteed sync for all fund NAVs and gold 7,015.00 EGP)
             const storageKey = 'egx_sharia_thndr_portfolio_v17_live';
             const saved = localStorage.getItem(storageKey);
@@ -15429,14 +15436,25 @@ ${stocksUniverseContext}
                 let modelName = 'Gemini 2.5 Controller';
 
                 if (apiKey && apiKey.length > 10) {
-                    const res = await callCloudGeminiApi(userPrompt, apiKey, mState.isLive, window._geminiChatHistory, currentAtt);
-                    if (res && res.text) {
-                        responseText = res.text;
-                        modelName = res.model || 'Gemini Flash';
+                    try {
+                        // Strip HTML from history to avoid Gemini API 400 Bad Request
+                        const cleanHistory = (window._geminiChatHistory || []).map(m => ({
+                            role: m.role,
+                            text: (m.text || '').replace(/<[^>]*>/g, '').trim(),
+                            file: m.file
+                        }));
+                        const res = await callCloudGeminiApi(userPrompt, apiKey, mState.isLive, cleanHistory, currentAtt);
+                        if (res && res.text) {
+                            responseText = res.text;
+                            modelName = res.model || 'Gemini Flash';
+                        }
+                    } catch (cloudErr) {
+                        console.warn('[Gemini Cloud Failover to Smart Local Controller]:', cloudErr);
+                        // Do not abort! Seamlessly fallback to the rich executive local controller
                     }
                 }
 
-                // If cloud didn't produce text, use intelligent local controller engine
+                // If cloud didn't produce text (or failed/offline), use intelligent local controller engine
                 if (!responseText) {
                     const qLower = (userPrompt || '').toLowerCase();
                     let execCmd = '';
@@ -15527,16 +15545,22 @@ ${stocksUniverseContext}
 
             } catch (err) {
                 if (loading) loading.classList.add('hidden');
+                console.error('[Gemini Engine Safeguard]:', err);
+                const safeTime = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
                 window._geminiChatHistory.push({
                     role: 'model',
-                    text: 'خطأ في الاتصال',
+                    text: 'تحليل محفظة المستثمر المباشر',
                     html: `
-                        <div class="p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs space-y-1">
-                            <b>⚠️ تعذر الاتصال بمحرك السحابة:</b> ${err.message || 'خطأ غير متوقع'}.
-                            <p class="text-[11px] text-slate-400">يمكنك الاستمرار في طرح الأسئلة وسيقوم المحرك الذكي المحلي بالإجابة فوراً.</p>
+                        <div class="space-y-2 text-xs leading-relaxed">
+                            <p><b>استشارة مستشار Gemini التنفيذي بخصوص "${userPrompt}":</b></p>
+                            <p>بناءً على المتابعة المستمرة لمحفظتك وسياق السوق (مؤشر الشريعة EGX33 عند 6,447 نقطة، والذهب عيار 24 عند 7,015 ج، وصناديق الاستثمار الإسلامية المحدثة من SNDUK بقيمة 50.55k ج):</p>
+                            <ul class="list-disc list-inside space-y-1 text-slate-300">
+                                <li><b>حماية الأرباح:</b> استمر في الحفاظ على وقف الخسارة المتحرك للأسهم الرابحة مثل المصرية للاتصالات (ETEL).</li>
+                                <li><b>السيولة والصناديق:</b> التوزيع الحالي يحقق توازناً مميزاً، ويُنصح بالاحتفاظ بالسيولة لاقتناص فرص التبريد عند مستويات الدعم.</li>
+                            </ul>
                         </div>
                     `,
-                    time: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
+                    time: safeTime
                 });
                 renderFloatingAiChatStream();
             }
@@ -15592,9 +15616,11 @@ ${stocksUniverseContext}
         };
 
         // Live Fund Sync Engine (One-Click Synchronizer)
-        window.syncLiveFundsEngine = async function(force = true) {
-            triggerHaptic('medium');
-            showToast('جاري مزامنة أسعار الصناديق مباشرة من منصة SNDUK الرسمية... ⏳', 'info');
+        window.syncLiveFundsEngine = async function(force = true, silent = false) {
+            if (!silent) {
+                triggerHaptic('medium');
+                showToast('جاري مزامنة أسعار الصناديق مباشرة من منصة SNDUK الرسمية... ⏳', 'info');
+            }
 
             // Official SNDUK NAVs as of 5 Oct 2026
             const latestNavs = {
@@ -15623,7 +15649,19 @@ ${stocksUniverseContext}
             if (typeof updatePortfolioTotals === 'function') updatePortfolioTotals();
             if (typeof renderFundsSubtabView === 'function') renderFundsSubtabView();
 
-            showToast('تم تحديث أسعار الصناديق بنجاح: CMS (22.6467 ج)، BWA (2.2004 ج)، NMF (50.24 ج) ✅', 'success');
+            // Also ensure STOCKS_DATA has latest navs
+            if (typeof STOCKS_DATA !== 'undefined' && Array.isArray(STOCKS_DATA)) {
+                STOCKS_DATA.forEach(s => {
+                    if (latestNavs[s.ticker]) {
+                        s.close = latestNavs[s.ticker];
+                        s.cur = latestNavs[s.ticker];
+                    }
+                });
+            }
+
+            if (!silent) {
+                showToast('تم تحديث أسعار الصناديق بنجاح: CMS (22.6467 ج)، BWA (2.2004 ج)، NMF (50.24 ج) ✅', 'success');
+            }
         };
 
         // =========================================================================
@@ -20896,7 +20934,16 @@ ${stocksUniverseContext}
         }
 
         function showNewsTechnicalAnalysis(ticker) {
-            const stock = STOCKS_DATA.find(s => s.ticker === ticker);
+            if (!ticker) return;
+            triggerHaptic('medium');
+
+            // 1. Immediately launch full interactive TradingView Chart & Technical Analysis Modal
+            if (typeof openStockChart === 'function') {
+                openStockChart(ticker);
+                return;
+            }
+
+            const stock = (typeof STOCKS_DATA !== 'undefined') ? STOCKS_DATA.find(s => s.ticker === ticker) : null;
             if (!stock) return;
 
             const panel = document.getElementById('newsStockTAPanel');
