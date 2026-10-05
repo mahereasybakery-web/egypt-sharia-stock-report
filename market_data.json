@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
-  "updated_at": "2026-10-05T17:37:41.479532+03:00",
-  "updated_at_display": "2026-10-05 17:37:41",
+  "updated_at": "2026-10-05T18:36:23.249416+03:00",
+  "updated_at_display": "2026-10-05 18:36:23",
   "timezone": "Africa/Cairo (UTC+3)",
   "market_status": {
     "is_open": false,
@@ -13,11 +13,8 @@
   },
   "indices": {
     "EGX30": {
-      "close": 53553.4,
-      "open": 53931.6,
-      "chgPct": -0.66,
-      "name": "مؤشر EGX30 الرئيسي",
-      "source": "TradingView Official Egypt Scanner"
+      "close": 53553.41,
+      "chgPct": -0.66
     },
     "EGX33": {
       "close": 6608.43,
@@ -27,11 +24,8 @@
       "source": "EGX Official / TradingView"
     },
     "EGX70": {
-      "close": 19776.3,
-      "open": 19972.8,
-      "chgPct": -0.89,
-      "name": "مؤشر EGX70 EWI للشركات المتوسطة والصغيرة",
-      "source": "TradingView Official Egypt Scanner"
+      "close": 19776.31,
+      "chgPct": -0.89
     },
     "EGX100": {
       "close": 26132.9,
@@ -43,7 +37,7 @@
   },
   "stocks": {
     "ORAS": {
-      "close": 824.92,
+      "close": 826.71,
       "chg": -1.2,
       "open": 834.98,
       "high": 835.0,
@@ -57,10 +51,12 @@
       "pe": 7.99,
       "pb": 1.84,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ORAS",
+      "ts": "18:36:23"
     },
     "ISPH": {
-      "close": 11.88,
+      "close": 11.85,
       "chg": -1.66,
       "open": 12.08,
       "high": 12.17,
@@ -74,10 +70,12 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ISPH",
+      "ts": "18:36:23"
     },
     "ETEL": {
-      "close": 151.0,
+      "close": 149.93,
       "chg": 0.61,
       "open": 150.08,
       "high": 156.0,
@@ -91,13 +89,15 @@
       "pe": 0.0,
       "pb": 3.5,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ETEL",
+      "ts": "18:36:23"
     },
     "MCQE": {
-      "close": 207.99,
+      "close": 207.86,
       "chg": -5.45,
       "open": 219.99,
-      "high": 219.99,
+      "high": 219.85,
       "low": 203.13,
       "volume": 1161327,
       "rsi": 48.8,
@@ -108,10 +108,12 @@
       "pe": 0.0,
       "pb": 6.58,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "MCQE",
+      "ts": "18:36:23"
     },
     "FWRY": {
-      "close": 18.85,
+      "close": 18.77,
       "chg": -1.31,
       "open": 19.1,
       "high": 19.2,
@@ -125,10 +127,12 @@
       "pe": 19.74,
       "pb": 7.08,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "FWRY",
+      "ts": "18:36:23"
     },
     "JUFO": {
-      "close": 25.91,
+      "close": 25.58,
       "chg": 0.43,
       "open": 25.8,
       "high": 26.05,
@@ -142,7 +146,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "JUFO",
+      "ts": "18:36:23"
     },
     "SKPC": {
       "close": 16.4,
@@ -159,7 +165,9 @@
       "pe": 0.0,
       "pb": 2.87,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "SKPC",
+      "ts": "18:36:23"
     },
     "ALCN": {
       "close": 35.07,
@@ -179,10 +187,10 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "ORWE": {
-      "close": 27.44,
+      "close": 27.39,
       "chg": -1.01,
       "open": 27.72,
-      "high": 27.72,
+      "high": 27.67,
       "low": 27.01,
       "volume": 913326,
       "rsi": 53.5,
@@ -193,7 +201,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ORWE",
+      "ts": "18:36:23"
     },
     "POUL": {
       "close": 10.09,
@@ -213,7 +223,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "EFIH": {
-      "close": 24.22,
+      "close": 24.14,
       "chg": 0.96,
       "open": 23.99,
       "high": 24.3,
@@ -227,7 +237,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "EFIH",
+      "ts": "18:36:23"
     },
     "HELI": {
       "close": 7.49,
@@ -244,7 +256,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "HELI",
+      "ts": "18:36:23"
     },
     "CCAP": {
       "close": 6.77,
@@ -278,7 +292,9 @@
       "pe": 0.0,
       "pb": 3.5,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "SWDY",
+      "ts": "18:36:23"
     },
     "ASCM": {
       "close": 59.48,
@@ -315,7 +331,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "AMOC": {
-      "close": 13.85,
+      "close": 13.77,
       "chg": -0.36,
       "open": 13.9,
       "high": 13.99,
@@ -329,7 +345,9 @@
       "pe": 0.0,
       "pb": 3.73,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "AMOC",
+      "ts": "18:36:23"
     },
     "GBCO": {
       "close": 31.88,
@@ -346,7 +364,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "GBCO",
+      "ts": "18:36:23"
     },
     "CERA": {
       "close": 1.47,
@@ -363,10 +383,12 @@
       "pe": 46.23,
       "pb": 3.39,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "CERA",
+      "ts": "18:36:23"
     },
     "ATQA": {
-      "close": 12.01,
+      "close": 12.02,
       "chg": 1.78,
       "open": 11.8,
       "high": 12.22,
@@ -380,7 +402,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ATQA",
+      "ts": "18:36:23"
     },
     "RACC": {
       "close": 9.31,
@@ -400,7 +424,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "ABUK": {
-      "close": 86.88,
+      "close": 86.06,
       "chg": -1.97,
       "open": 88.63,
       "high": 88.95,
@@ -414,7 +438,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ABUK",
+      "ts": "18:36:23"
     },
     "ARAB": {
       "close": 0.26,
@@ -434,7 +460,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "TMGH": {
-      "close": 88.9,
+      "close": 88.92,
       "chg": 0.02,
       "open": 88.88,
       "high": 89.59,
@@ -448,10 +474,12 @@
       "pe": 11.86,
       "pb": 2.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "TMGH",
+      "ts": "18:36:23"
     },
     "EFID": {
-      "close": 18.94,
+      "close": 18.92,
       "chg": -2.87,
       "open": 19.5,
       "high": 19.57,
@@ -465,7 +493,9 @@
       "pe": 12.66,
       "pb": 6.65,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "EFID",
+      "ts": "18:36:23"
     },
     "CICH": {
       "close": 12.01,
@@ -485,7 +515,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "EGAL": {
-      "close": 345.99,
+      "close": 345.96,
       "chg": 0.29,
       "open": 345.0,
       "high": 350.0,
@@ -499,10 +529,12 @@
       "pe": 13.29,
       "pb": 4.95,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "EGAL",
+      "ts": "18:36:23"
     },
     "RMDA": {
-      "close": 5.48,
+      "close": 5.47,
       "chg": -1.26,
       "open": 5.55,
       "high": 5.59,
@@ -516,10 +548,12 @@
       "pe": 32.35,
       "pb": 4.78,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "RMDA",
+      "ts": "18:36:23"
     },
     "ORHD": {
-      "close": 38.5,
+      "close": 38.7,
       "chg": -1.96,
       "open": 39.27,
       "high": 39.5,
@@ -533,10 +567,12 @@
       "pe": 0.0,
       "pb": 2.29,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ORHD",
+      "ts": "18:36:23"
     },
     "PHDC": {
-      "close": 13.25,
+      "close": 13.18,
       "chg": 1.45,
       "open": 13.06,
       "high": 13.25,
@@ -550,7 +586,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "PHDC",
+      "ts": "18:36:23"
     },
     "CIRA": {
       "close": 40.19,
@@ -567,7 +605,9 @@
       "pe": 0.0,
       "pb": 9.42,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "CIRA",
+      "ts": "18:36:23"
     },
     "DOMT": {
       "close": 24.9,
@@ -587,7 +627,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "ADIB": {
-      "close": 49.11,
+      "close": 49.24,
       "chg": -1.58,
       "open": 49.9,
       "high": 50.1,
@@ -601,10 +641,12 @@
       "pe": 4.76,
       "pb": 1.6,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ADIB",
+      "ts": "18:36:23"
     },
     "MFPC": {
-      "close": 46.4,
+      "close": 46.39,
       "chg": -1.9,
       "open": 47.3,
       "high": 47.4,
@@ -618,7 +660,9 @@
       "pe": 8.65,
       "pb": 2.96,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "MFPC",
+      "ts": "18:36:23"
     },
     "LCSW": {
       "close": 33.54,
@@ -635,10 +679,12 @@
       "pe": 0.0,
       "pb": 0.66,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "LCSW",
+      "ts": "18:36:23"
     },
     "FAIT": {
-      "close": 45.23,
+      "close": 44.84,
       "chg": 0.51,
       "open": 45.0,
       "high": 45.74,
@@ -652,10 +698,12 @@
       "pe": 0.0,
       "pb": 0.62,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "FAIT",
+      "ts": "18:36:23"
     },
     "ARCC": {
-      "close": 72.23,
+      "close": 72.21,
       "chg": -1.98,
       "open": 73.69,
       "high": 73.73,
@@ -669,10 +717,12 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ARCC",
+      "ts": "18:36:23"
     },
     "ICFC": {
-      "close": 23.19,
+      "close": 23.5,
       "chg": 0.83,
       "open": 23.0,
       "high": 23.67,
@@ -686,7 +736,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ICFC",
+      "ts": "18:36:23"
     },
     "SAUD": {
       "close": 23.29,
@@ -703,10 +755,12 @@
       "pe": 5.04,
       "pb": 1.05,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "SAUD",
+      "ts": "18:36:23"
     },
     "ACGC": {
-      "close": 14.6,
+      "close": 14.56,
       "chg": 0.14,
       "open": 14.58,
       "high": 14.68,
@@ -720,7 +774,9 @@
       "pe": 0.0,
       "pb": 0.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "ACGC",
+      "ts": "18:36:23"
     },
     "BTFH": {
       "close": 2.81,
@@ -740,7 +796,7 @@
       "source": "TradingView Official Egypt Scanner"
     },
     "EAST": {
-      "close": 29.02,
+      "close": 29.0,
       "chg": -1.29,
       "open": 29.4,
       "high": 29.6,
@@ -754,10 +810,12 @@
       "pe": 9.8,
       "pb": 6.0,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "EAST",
+      "ts": "18:36:23"
     },
     "MASR": {
-      "close": 7.73,
+      "close": 7.7,
       "chg": -0.51,
       "open": 7.77,
       "high": 7.78,
@@ -771,10 +829,12 @@
       "pe": 5.38,
       "pb": 1.26,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "MASR",
+      "ts": "18:36:23"
     },
     "OCDI": {
-      "close": 27.25,
+      "close": 27.49,
       "chg": -1.2,
       "open": 27.58,
       "high": 27.95,
@@ -788,10 +848,12 @@
       "pe": 8.75,
       "pb": 2.11,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "OCDI",
+      "ts": "18:36:23"
     },
     "COMI": {
-      "close": 126.05,
+      "close": 126.48,
       "chg": -0.74,
       "open": 126.99,
       "high": 128.0,
@@ -805,7 +867,42 @@
       "pe": 6.06,
       "pb": 1.8,
       "updated_at": "2026-10-05T17:37:41.479532+03:00",
-      "source": "TradingView Official Egypt Scanner"
+      "source": "mubasher.info",
+      "ticker": "COMI",
+      "ts": "18:36:23"
+    },
+    "CIEB": {
+      "ticker": "CIEB",
+      "close": 24.43,
+      "chg": -0.57,
+      "open": 24.64,
+      "high": 24.75,
+      "low": 24.16,
+      "volume": 197449,
+      "source": "mubasher.info",
+      "ts": "18:36:23"
+    },
+    "ESRS": {
+      "ticker": "ESRS",
+      "close": 141.0,
+      "chg": 0.0,
+      "open": 141.0,
+      "high": 142.0,
+      "low": 138.16,
+      "volume": 7434,
+      "source": "mubasher.info",
+      "ts": "18:36:23"
+    },
+    "CLHO": {
+      "ticker": "CLHO",
+      "close": 15.68,
+      "chg": -2.55,
+      "open": 16.05,
+      "high": 16.08,
+      "low": 15.45,
+      "volume": 1788304,
+      "source": "mubasher.info",
+      "ts": "18:36:23"
     }
   },
   "funds": {
@@ -917,5 +1014,7 @@
     "FoudaLens Egyptian Funds Intelligence",
     "Mubasher Financial Portal (mubasherfunds.info Daily Disclosures)",
     "Central Bank of Egypt FX, Macro & Gold Bullion Feed"
-  ]
+  ],
+  "data_source": "Mubasher.info Live",
+  "sync_count": 38
 }
