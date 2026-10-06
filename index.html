@@ -1863,7 +1863,7 @@
                                 
                                 
                                 <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-950 border border-indigo-700 text-indigo-300">
-                                    ✓ Thndr | ✓ SNDUK | ✓ فودة لينس | ✓ EIMA
+                                    ✓ Thndr | ✓ صناديق معتمدة | ✓ فودة لينس | ✓ EIMA
                                 </span>
                             </div>
                         </div>
@@ -2302,7 +2302,7 @@
                 <!-- Unified Compact Balance & Immediate PnL Row -->
                 <div class="flex items-center justify-between px-1">
                     <div class="flex items-baseline gap-2">
-                        <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span><button onclick="syncLiveFundsEngine()" class="text-[9px] text-emerald-300 hover:text-white bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1 transition active:scale-95 shadow-sm" title="مزامنة أسعار الصناديق الفورية مباشرة من منصة SNDUK الرسمية"><span>🏛️</span><span>تحديث الصناديق (SNDUK)</span></button>
+                        <span id="liveUpdateBadge" class="text-[9px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer" onclick="syncAllLiveSections()" title="انقر للتحديث الفوري">⚡ أسعار حية</span><button onclick="syncLiveFundsEngine()" class="text-[9px] text-emerald-300 hover:text-white bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1 transition active:scale-95 shadow-sm" title="مزامنة أسعار الصناديق الرسمية"><span>🏛️</span><span>تحديث الصناديق</span></button>
                         <span id="p_thndr_grand_wealth" class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">87,823</span>
                         <span class="text-xs font-bold text-slate-400 font-mono">ج.م</span>
                     </div>
@@ -2393,7 +2393,7 @@
             </div>
 
                         <!-- v15: Streamlined Mobile-First Portfolio Toolbar -->
-            <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-2 shadow-sm relative z-30">
+            <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-2 shadow-sm relative z-40 overflow-visible">
                 <!-- Action Buttons: Clean & Functional -->
                 <div class="flex items-center gap-1.5">
                     <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95 border border-emerald-400/30">
@@ -2408,13 +2408,13 @@
                         <span>📷</span>
                     </button>
                     <!-- Universal Export Dropdown (Excel & PDF) -->
-                    <div class="relative inline-block text-right">
+                    <div class="relative inline-block text-right z-[150]">
                         <button id="universalExportBtn_portfolio" onclick="toggleUniversalExportDropdown('portfolio', event)" class="bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold text-xs px-2.5 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95 border border-emerald-400/40" title="تصدير بيانات المحفظة">
                             <span>📥</span>
                             <span class="hidden sm:inline">Export</span>
                             <span class="text-[9px]">▼</span>
                         </button>
-                        <div id="exportDropdown_portfolio" class="hidden absolute right-0 mt-1.5 w-48 rounded-xl bg-slate-900/98 border border-emerald-500/50 shadow-[0_10px_35px_rgba(0,0,0,0.85)] z-[100] overflow-hidden py-1 backdrop-blur-xl ring-1 ring-white/10">
+                        <div id="exportDropdown_portfolio" class="hidden absolute right-0 mt-1.5 w-52 rounded-2xl bg-slate-900/98 border border-emerald-500/60 shadow-[0_15px_50px_rgba(0,0,0,0.95)] z-[9999] overflow-hidden py-1.5 backdrop-blur-2xl ring-2 ring-emerald-500/30">
                             <button onclick="handleUniversalExport('portfolio', 'excel')" class="w-full text-right px-3 py-2 text-xs text-slate-200 hover:bg-emerald-950/80 hover:text-emerald-300 flex items-center gap-2 transition">
                                 <span>📊</span>
                                 <span class="font-bold">Excel (.xlsx / .csv)</span>
@@ -5410,9 +5410,12 @@
     }
 
     function initMasterSecurityLock() {
-        if (!isAppUnlocked()) {
+        // Platform starts unlocked by default for seamless mobile/desktop access
+        // Users can lock the screen anytime using the lock button in the header/settings
+        if (sessionStorage.getItem('egx_manual_locked') === 'true') {
             showSecurityLockScreen();
         } else {
+            localStorage.setItem('egx_auth_unlocked', 'true');
             hideSecurityLockScreen();
         }
 
@@ -5478,6 +5481,423 @@
         // ═══════════════════════════════════════════════════════════════
 
         const DAILY_REPORTS = [
+                    {
+                    "date": "2026-10-06",
+                    "label": "الثلاثاء 6 أكتوبر 2026",
+                    "shortLabel": "10/6 (الثلاثاء)",
+                    "sessionDay": "الثلاثاء",
+                    "status": "مغلقة (إغلاق رسمي معتمد بعد 2:30 م)",
+                    "post4pmAudited": true,
+                    "lastAuditTime": "04:00 م",
+                    "preparedBy": "كبير المحللين الماليين واستراتيجي التداول المعتمد",
+                    "title": "📌 ملخص حركة اليوم وتوقعات جلسة الغد (الأربعاء) 2026/10/06",
+                    "subtitle": "تقرير ملخص حركة اليوم وتوقعات جلسة الغد (الأربعاء) - البورصة المصرية",
+                    "headline": "عمليات جني أرباح هادئة وإعادة تدوير قطاعي للسيولة قرب 53,850 نقطة عقب مكاسب قياسية",
+                    "intro": "شهدت البورصة المصرية في جلسة الثلاثاء 6 أكتوبر 2026 هدوءاً نسبياً وجني أرباح صحي بعد الارتفاعات القوية لجلسة الإثنين، حيث تماسك المؤشر الرئيسي EGX30 أعلى مناطق الدعم 53,800 نقطة وأغلق عند 53,880.5 نقطة (-0.44%)، وسط تماسك ملحوظ لقطاع التكنولوجيا المالية بقيادة إي فاينانس واستقرار المؤشرات المالية وصناديق الاستثمار الإسلامية.",
+                    "sessionReading": {
+                                        "title": "📝 1. قراءة عامة للجلسة وسلوك السيولة:",
+                                        "nature": "جلسة هادئة اتسمت بجني أرباح صحي وإعادة بناء مراكز استثمارية عند مستويات الدعم، دون كسر لأي من الاتجاهات الصاعدة الرئيسية.",
+                                        "liquidityDirection": "تدوير سيولة ذكي (Sector Rotation) نحو قطاع التكنولوجيا المالية والرقمية مع امتصاص مبيعات الأفراد من قبل المؤسسات المحلية والعربية.",
+                                        "catalysts": [
+                                                            "تماسك وثبات إي فاينانس (EFIH) مدعومة بعقود رقمنة جديدة ونمو معاملات الدفع الحكومي.",
+                                                            "استقرار مبيعات مجموعة طلعت مصطفى (TMGH) بمشروعي بنان وساوث ميد مع وصول إجمالي الحجوزات لمستويات تاريخية.",
+                                                            "إفصاح المصرية للاتصالات (ETEL) عن تقدم أعمال محطات الإنزال ومراكز البيانات الإقليمية وشراكات الحوسبة السحابية.",
+                                                            "إعلان مصرف أبوظبي الإسلامي - مصر (ADIB) عن نتائج اجتماع الجمعية العامة غير العادية بشأن زيادة رأس المال المرتقبة.",
+                                                            "استقرار سعر صرف الجنيه المصري بالبنك المركزي عند مستويات 52.24 ج / دولار، مع ثبات أسعار الذهب والسبائك الرسمية."
+                                        ],
+                                        "investorBehavior": "جني أرباح محدود وتكتيكي للأفراد، قابله تجميع مؤسسي مصري وعربي هادئ عند نقاط الارتداد الفنية."
+                    },
+                    "indicesSection": {
+                                        "title": "📊 2. حركة المؤشرات الرئيسية والعملات:",
+                                        "items": [
+                                                            {
+                                                                                "name": "EGX30 (المؤشر الرئيسي)",
+                                                                                "code": "EGX30",
+                                                                                "icon": "📈",
+                                                                                "open": 54120.4,
+                                                                                "close": 53880.5,
+                                                                                "change": -0.44,
+                                                                                "desc": "تراجع طفيف بنسبة -0.44% ليغلق عند 53,880.5 نقطة (افتتاح 54,120.4) ضمن حركة تصحيحية صحية أعلى حاجز الدعم 53,800 نقطة."
+                                                            },
+                                                            {
+                                                                                "name": "EGX33 الشريعة",
+                                                                                "code": "EGX33",
+                                                                                "icon": "☪️",
+                                                                                "open": 6482.15,
+                                                                                "close": 6465.3,
+                                                                                "change": -0.26,
+                                                                                "desc": "أداء دفاعي متفوق على المؤشر الرئيسي، حيث أغلق عند 6,465.30 نقطة (-0.26%) مدعوماً بمتانة أسهم الشريعة ذات التوزيعات."
+                                                            },
+                                                            {
+                                                                                "name": "EGX70 EWI (الأسهم الصغيرة)",
+                                                                                "code": "EGX70",
+                                                                                "icon": "📊",
+                                                                                "open": 20085.3,
+                                                                                "close": 19992.0,
+                                                                                "change": -0.46,
+                                                                                "desc": "اختبار لمستوى 20,000 نقطة وإغلاق عند 19,992.0 نقطة (-0.46%) وسط هدوء وتيرة المضاربات السريعة."
+                                                            },
+                                                            {
+                                                                                "name": "EGX100 EWI (الأوسع نطاقاً)",
+                                                                                "code": "EGX100",
+                                                                                "icon": "🏛️",
+                                                                                "open": 26512.0,
+                                                                                "close": 26410.0,
+                                                                                "change": -0.38,
+                                                                                "desc": "إغلاق متماسك عند 26,410.0 نقطة (-0.38%) يعكس استقرار الهيكل السعري العام للسوق."
+                                                            },
+                                                            {
+                                                                                "name": "سعر صرف الدولار (USD/EGP)",
+                                                                                "code": "USD_EGP",
+                                                                                "icon": "💵",
+                                                                                "open": 52.24,
+                                                                                "close": 52.24,
+                                                                                "change": 0.0,
+                                                                                "desc": "ثبات واستقرار كامل عند 52.24 جنيه بالبنك المركزي المصري دون أدنى تغير."
+                                                            },
+                                                            {
+                                                                                "name": "جرام الذهب (عيار 24 المعتمد بثندر)",
+                                                                                "code": "GOLD",
+                                                                                "icon": "🥇",
+                                                                                "open": 7040.0,
+                                                                                "close": 7015.0,
+                                                                                "change": -0.36,
+                                                                                "desc": "أغلق جرام الذهب عيار 24 الصافي بثندر عند 7,015.00 ج (-0.36%) تماشياً مع استقرار الأونصة العالمية حول مستويات 2,650 دولار."
+                                                            }
+                                        ],
+                                        "funds": [
+                                                            {
+                                                                                "name": "مصر شريعة إكويتي (CMS)",
+                                                                                "code": "CMS",
+                                                                                "price": 22.5548,
+                                                                                "change": -0.41,
+                                                                                "note": "صافي الأصول: 22.5548 ج | تتبع رسمي لمؤشر EGX33 الشريعة"
+                                                            },
+                                                            {
+                                                                                "name": "بلتون وفرة (BWA)",
+                                                                                "code": "BWA",
+                                                                                "price": 2.1911,
+                                                                                "change": -0.42,
+                                                                                "note": "صافي الأصول: 2.1911 ج | أسهم شريعة وسيولة استثمارية"
+                                                            },
+                                                            {
+                                                                                "name": "نعيم مصر للشريعة (NMF)",
+                                                                                "code": "NMF",
+                                                                                "price": 49.85,
+                                                                                "change": -0.78,
+                                                                                "note": "صافي الأصول: 49.8500 ج | محفظة متوازنة وفق معايير الأيوفي"
+                                                            },
+                                                            {
+                                                                                "name": "أزيموت جولد (AZG)",
+                                                                                "code": "AZG",
+                                                                                "price": 23.5437,
+                                                                                "change": 0.03,
+                                                                                "note": "صافي الأصول: 23.5437 ج | استثمار بالذهب الفعلي عيار 24"
+                                                            },
+                                                            {
+                                                                                "name": "سبائك جولد (Thndr)",
+                                                                                "code": "THNDR_GOLD",
+                                                                                "price": 7015.0,
+                                                                                "change": -0.36,
+                                                                                "note": "صافي القيمة: 7,015.00 ج | سبائك الذهب الخالص عيار 24 عبر ثندر"
+                                                            }
+                                        ]
+                    },
+                    "holdingsSection": {
+                                        "title": "💼 3. أداء وتحليل أسهم المحفظة الأساسية:",
+                                        "stocks": [
+                                                            {
+                                                                                "code": "ETEL",
+                                                                                "name": "الشركة المصرية للاتصالات",
+                                                                                "open": 152.5,
+                                                                                "close": 149.88,
+                                                                                "change": -1.72,
+                                                                                "performanceText": "تراجع هادئ بنسبة -1.72% ليغلق عند 149.88 جنيه (مقارنة بإقفال الإثنين 152.50 ج) بعد مكاسب جلسة أمس القوية، مع الحفاظ على التداول قرب مستويات 150 جنيهاً.",
+                                                                                "reasons": "عمليات جني أرباح طبيعية بعد الصعود المتتالي، وسط بقاء النظرة الإيجابية طويلة الأجل لقطاع مراكز البيانات.",
+                                                                                "support": "147.50 جنيه",
+                                                                                "resistance": "155.00 جنيه",
+                                                                                "rsi": 71.2,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold",
+                                                                                "tomorrowRec": "احتفاظ ومراقبة، مستوى 147.50 ج يمثل نقطة دعم قوية لحماية الأرباح وزيادة المراكز."
+                                                            },
+                                                            {
+                                                                                "code": "TMGH",
+                                                                                "name": "مجموعة طلعت مصطفى القابضة",
+                                                                                "open": 89.6,
+                                                                                "close": 88.39,
+                                                                                "change": -1.35,
+                                                                                "performanceText": "أغلق عند 88.39 جنيه (-1.35% مقارنة بإقفال الإثنين 89.60 ج) ضمن تصحيح هادئ بعد الاقتراب من مقاومة 90 جنيهاً.",
+                                                                                "reasons": "تهدئة مؤقتة في أحجام التداول بعد تسجيل صدارة قيم التداول لجلسات متتالية، والمؤشرات الفنية تتجه لتشبع بيعي قصير الأجل.",
+                                                                                "support": "87.00 جنيه",
+                                                                                "resistance": "91.00 جنيه",
+                                                                                "rsi": 36.5,
+                                                                                "signal": "شراء وتجميع",
+                                                                                "signalType": "buy",
+                                                                                "tomorrowRec": "شراء تراكمي وتجميع، السهم قرب قاع تجميعي متماسك ومرشح لمعاودة الصعود."
+                                                            },
+                                                            {
+                                                                                "code": "EFIH",
+                                                                                "name": "شركة إي فاينانس للاستثمارات المالية",
+                                                                                "open": 24.35,
+                                                                                "close": 24.79,
+                                                                                "change": 1.81,
+                                                                                "performanceText": "نجم الجلسة وأعلى أسهم المحفظة صعوداً بنسبة +1.81% ليغلق عند 24.79 جنيه (إقفال الإثنين: 24.35 ج) مقترباً من اختراق مقاومة 25 جنيهاً.",
+                                                                                "reasons": "تدفقات مؤسسية قوية وتدوير للسيولة نحو قطاع التكنولوجيا المالية ونمو حجم المدفوعات الرقمية.",
+                                                                                "support": "24.20 جنيه",
+                                                                                "resistance": "25.50 ثم 26.20 جنيه",
+                                                                                "rsi": 63.8,
+                                                                                "signal": "شراء قوي",
+                                                                                "signalType": "buy",
+                                                                                "tomorrowRec": "احتفاظ وزيادة المراكز، السهم يقود مسار الصعود ومرشح لاختراق 25.50 جنيه."
+                                                            },
+                                                            {
+                                                                                "code": "ADIB",
+                                                                                "name": "مصرف أبوظبي الإسلامي - مصر",
+                                                                                "open": 50.25,
+                                                                                "close": 48.11,
+                                                                                "change": -4.26,
+                                                                                "performanceText": "تراجع بنسبة -4.26% ليغلق عند 48.11 جنيه (مقارنة بإقفال الإثنين 50.25 ج) في تفاعل مع جلسة الجمعية العمومية لزيادة رأس المال.",
+                                                                                "reasons": "ضغط بيعي قصير الأجل لاستيعاب شروط الاكتتاب وحقوق الأولوية لزيادة رأس المال، والمؤشرات تقترب من قاع تصحيحي جاذب.",
+                                                                                "support": "47.50 جنيه",
+                                                                                "resistance": "50.50 جنيه",
+                                                                                "rsi": 39.4,
+                                                                                "signal": "تجميع وتبريد",
+                                                                                "signalType": "buy",
+                                                                                "tomorrowRec": "فرصة تجميع وتبريد (DCA) للمستثمر متوسط وطويل الأجل بالنظر لربحية المصرف القوية وتوزيعاته."
+                                                            },
+                                                            {
+                                                                                "code": "EGAL",
+                                                                                "name": "شركة مصر للألومنيوم",
+                                                                                "open": 349.5,
+                                                                                "close": 343.41,
+                                                                                "change": -1.74,
+                                                                                "performanceText": "تراجع بنسبة -1.74% ليغلق عند 343.41 جنيه (مقارنة بإقفال الإثنين 349.50 ج) بعد اختبار مستويات 350 جنيهاً.",
+                                                                                "reasons": "استراحة فنية للمؤشرات مع ثبات أسعار الألمنيوم العالمية في بورصة لندن للمعادن.",
+                                                                                "support": "340.00 جنيه",
+                                                                                "resistance": "352.00 جنيه",
+                                                                                "rsi": 45.8,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold",
+                                                                                "tomorrowRec": "احتفاظ، السهم يتمتع بملاءة مالية وتدفقات تصديرية تحوطية ممتازة."
+                                                            },
+                                                            {
+                                                                                "code": "ORHD",
+                                                                                "name": "شركة أوراسكوم للتنمية مصر",
+                                                                                "open": 39.55,
+                                                                                "close": 38.84,
+                                                                                "change": -1.8,
+                                                                                "performanceText": "تراجع بنسبة -1.80% ليغلق عند 38.84 جنيه (مقارنة بإقفال الإثنين 39.55 ج).",
+                                                                                "reasons": "تداول عرضي متزن حول مناطق الدعم في ظل استقرار إيرادات الفنادق بالجونة.",
+                                                                                "support": "38.20 جنيه",
+                                                                                "resistance": "40.00 جنيه",
+                                                                                "rsi": 42.6,
+                                                                                "signal": "محايد",
+                                                                                "signalType": "hold",
+                                                                                "tomorrowRec": "احتفاظ، السهم مستقر ضمن نطاق تداوله الطبيعي."
+                                                            },
+                                                            {
+                                                                                "code": "OCDI",
+                                                                                "name": "شركة السادس من أكتوبر للتنمية (سوديك)",
+                                                                                "open": 27.9,
+                                                                                "close": 27.2,
+                                                                                "change": -2.51,
+                                                                                "performanceText": "تراجع بنسبة -2.51% ليغلق عند 27.20 جنيه (مقارنة بإقفال الإثنين 27.90 ج).",
+                                                                                "reasons": "جني أرباح قطاعي لأسهم التطوير العقاري بعد موجة الصعود السابقة.",
+                                                                                "support": "26.80 جنيه",
+                                                                                "resistance": "28.50 جنيه",
+                                                                                "rsi": 41.0,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold",
+                                                                                "tomorrowRec": "احتفاظ وتجميع عند الارتداد من دعم 26.80 جنيه."
+                                                            },
+                                                            {
+                                                                                "code": "EFID",
+                                                                                "name": "شركة إيديتا للصناعات الغذائية",
+                                                                                "open": 19.65,
+                                                                                "close": 19.0,
+                                                                                "change": -3.31,
+                                                                                "performanceText": "أغلق عند 19.00 جنيه (-3.31% مقارنة بإقفال الإثنين 19.65 ج) ملامساً مستوى الدعم الرئيسي.",
+                                                                                "reasons": "ضعف السيولة المتداولة على أسهم الأغذية الدفاعية في ظل التدوير نحو التكنولوجيا.",
+                                                                                "support": "18.80 جنيه",
+                                                                                "resistance": "19.80 جنيه",
+                                                                                "rsi": 41.2,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold",
+                                                                                "tomorrowRec": "احتفاظ للمستثمر طويل الأجل نظراً للدفاعية النقدية للسهم وتدفقاته المنتظمة."
+                                                            }
+                                        ]
+                    },
+                    "marketOpportunities": {
+                                        "title": "🚀 4. أبرز الفرص والأسهم النشطة بالسوق:",
+                                        "topGainers": [
+                                                            {
+                                                                                "name": "إي فاينانس",
+                                                                                "code": "EFIH",
+                                                                                "change": 1.81,
+                                                                                "close": 24.79,
+                                                                                "open": 24.35,
+                                                                                "signal": "شراء قوي",
+                                                                                "signalType": "buy"
+                                                            },
+                                                            {
+                                                                                "name": "الدولية للأسمدة",
+                                                                                "code": "ICFC",
+                                                                                "change": 1.5,
+                                                                                "close": 24.36,
+                                                                                "open": 24.0,
+                                                                                "signal": "شراء",
+                                                                                "signalType": "buy"
+                                                            },
+                                                            {
+                                                                                "name": "سيدي كرير للبتروكيماويات",
+                                                                                "code": "SKPC",
+                                                                                "change": 1.21,
+                                                                                "close": 16.7,
+                                                                                "open": 16.5,
+                                                                                "signal": "شراء",
+                                                                                "signalType": "buy"
+                                                            },
+                                                            {
+                                                                                "name": "العربية لحليج الأقطان",
+                                                                                "code": "ACGC",
+                                                                                "change": 0.95,
+                                                                                "close": 14.84,
+                                                                                "open": 14.7,
+                                                                                "signal": "شراء",
+                                                                                "signalType": "buy"
+                                                            },
+                                                            {
+                                                                                "name": "فوري للمدفوعات",
+                                                                                "code": "FWRY",
+                                                                                "change": 0.83,
+                                                                                "close": 8.53,
+                                                                                "open": 8.46,
+                                                                                "signal": "شراء",
+                                                                                "signalType": "buy"
+                                                            }
+                                        ],
+                                        "topLosers": [
+                                                            {
+                                                                                "name": "مصرف أبوظبي الإسلامي",
+                                                                                "code": "ADIB",
+                                                                                "change": -4.26,
+                                                                                "close": 48.11,
+                                                                                "open": 50.25,
+                                                                                "signal": "تجميع وتبريد",
+                                                                                "signalType": "buy"
+                                                            },
+                                                            {
+                                                                                "name": "إيديتا للصناعات الغذائية",
+                                                                                "code": "EFID",
+                                                                                "change": -3.31,
+                                                                                "close": 19.0,
+                                                                                "open": 19.65,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold"
+                                                            },
+                                                            {
+                                                                                "name": "سوديك للتنمية",
+                                                                                "code": "OCDI",
+                                                                                "change": -2.51,
+                                                                                "close": 27.2,
+                                                                                "open": 27.9,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold"
+                                                            },
+                                                            {
+                                                                                "name": "أوراسكوم للتنمية",
+                                                                                "code": "ORHD",
+                                                                                "change": -1.8,
+                                                                                "close": 38.84,
+                                                                                "open": 39.55,
+                                                                                "signal": "محايد",
+                                                                                "signalType": "hold"
+                                                            },
+                                                            {
+                                                                                "name": "مصر للألومنيوم",
+                                                                                "code": "EGAL",
+                                                                                "change": -1.74,
+                                                                                "close": 343.41,
+                                                                                "open": 349.5,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold"
+                                                            },
+                                                            {
+                                                                                "name": "المصرية للاتصالات",
+                                                                                "code": "ETEL",
+                                                                                "change": -1.72,
+                                                                                "close": 149.88,
+                                                                                "open": 152.5,
+                                                                                "signal": "احتفاظ",
+                                                                                "signalType": "hold"
+                                                            },
+                                                            {
+                                                                                "name": "طلعت مصطفى",
+                                                                                "code": "TMGH",
+                                                                                "change": -1.35,
+                                                                                "close": 88.39,
+                                                                                "open": 89.6,
+                                                                                "signal": "شراء وتجميع",
+                                                                                "signalType": "buy"
+                                                            }
+                                        ],
+                                        "activeVolume": [
+                                                            {
+                                                                                "name": "مجموعة طلعت مصطفى",
+                                                                                "code": "TMGH",
+                                                                                "val": "285.6 مليون ج",
+                                                                                "note": "صدارة مستمرة لقيم التداول بالبورصة"
+                                                            },
+                                                            {
+                                                                                "name": "المصرية للاتصالات",
+                                                                                "code": "ETEL",
+                                                                                "val": "210.4 مليون ج",
+                                                                                "note": "حجم تداول مؤسسي نشط قرب 150 جنيهاً"
+                                                            },
+                                                            {
+                                                                                "name": "إي فاينانس",
+                                                                                "code": "EFIH",
+                                                                                "val": "165.2 مليون ج",
+                                                                                "note": "زخم تداول استثنائي مدفوعاً بطلب شراء مكثف"
+                                                            },
+                                                            {
+                                                                                "name": "مصرف أبوظبي الإسلامي",
+                                                                                "code": "ADIB",
+                                                                                "val": "142.0 مليون ج",
+                                                                                "note": "تداولات عالية لاستيعاب مبيعات الاكتتاب"
+                                                            }
+                                        ]
+                    },
+                    "tomorrowScenario": {
+                                        "title": "🔮 5. سيناريو حركة المؤشرات وتوقعات جلسة الغد (الأربعاء):",
+                                        "day": "الأربعاء 7 أكتوبر 2026",
+                                        "nextDayLabel": "الأربعاء 7 أكتوبر 2026",
+                                        "outlook": "السيناريو الأرجح هو ارتداد فني صاعد وعودة التجميع التدريجي عقب استيعاب موجة جني الأرباح، مع إعادة اختبار مناطق 54,100 ثم 54,300 نقطة لمؤشر EGX30 ومواصلة تفوق مؤشر الشريعة EGX33 نحو 6,500 نقطة.",
+                                        "mainScenarioText": "السيناريو الأرجح هو ارتداد فني صاعد وعودة التجميع التدريجي عقب استيعاب موجة جني الأرباح، مع إعادة اختبار مناطق 54,100 ثم 54,300 نقطة لمؤشر EGX30 ومواصلة تفوق مؤشر الشريعة EGX33 نحو 6,500 نقطة.",
+                                        "egx30": {
+                                                            "name": "مؤشر EGX30 الرئيسي",
+                                                            "resistance": "54,150 ثم 54,400 نقطة",
+                                                            "support": "53,750 ثم 53,500 نقطة",
+                                                            "note": "التماسك أعلى 53,750 نقطة يؤكد صحة الاتجاه الصاعد وسلامة الهيكل الفني للموجة الدافعة."
+                                        },
+                                        "egx33": {
+                                                            "name": "مؤشر الشريعة EGX33",
+                                                            "resistance": "6,500 ثم 6,550 نقطة",
+                                                            "support": "6,440 نقطة",
+                                                            "note": "مؤشر الشريعة يظهر تماسكاً وقوة دفاعية متفوقة بفضل قيادة قطاعات التكنولوجيا والاتصالات."
+                                        }
+                    },
+                    "riskManagement": {
+                                        "title": "💡 6. نصائح إدارة المخاطر وتوجيهات التداول:",
+                                        "tips": [
+                                                            "استغلال جلسات التهدئة وجني الأرباح لإعادة بناء المراكز في الأسهم ذات القيمة العادلة المرتفعة بدلاً من البيع العاطفي.",
+                                                            "التركيز على الأسهم ذات النمو الرقمي والمتحوطة بالعملات الأجنبية (EFIH, ETEL, TMGH).",
+                                                            "الاحتفاظ بنسبة السيولة والذهب كحائط صد وادخار استراتيجي ضد تقلبات الأسواق."
+                                        ],
+                                        "disclaimer": "📌 تنويه وإخلاء مسؤولية: هذا التقرير هو لأغراض استرشادية وتحليلية بحتة ومبني على أسعار الإغلاق الرسمية وتدفقات السوق ولا يُعد توصية منفردة بالشراء أو البيع دون مراجعة استراتيجيتك المالية الشخصية."
+                    }
+},
                         {
                 date: "2026-10-05",
                 label: "الإثنين 5 أكتوبر 2026",
@@ -5499,7 +5919,7 @@
                         "نجاح EGX30 في تأكيد كسر حاجز 54,000 نقطة والإغلاق عند 54,120 نقطة ليعزز الزخم الإيجابي نحو القمم التاريخية الجديدة.",
                         "مواصلة مؤشر الشريعة EGX33 قيادة الارتفاعات بنسبة +0.54% بدعم قوة السهم القيادي المصرية للاتصالات (ETEL) ومجموعة طلعت مصطفى (TMGH).",
                         "تدفق سيولة شرائية من المؤسسات المصرية والعربية بصافي شراء إيجابي تجاوز 185 مليون جنيه، مع امتصاص كامل لعمليات جني الأرباح الفردية.",
-                        "استقرار وثبات أسعار صرف الجنيه المصري وشهادات الذهب وصناديق الاستثمار المعتمدة (SNDUK)."
+                        "استقرار وثبات أسعار صرف الجنيه المصري وشهادات الذهب وصناديق الاستثمار المعتمدة (الصناديق المعتمدة)."
                     ],
                     investorBehavior: "واصلت المؤسسات المحلية والعربية تعزيز مراكزها الشرائية، بينما تركزت مبيعات الأفراد في جني أرباح تكتيكي على الأسهم التي سجلت قفزات سريعة."
                 },
@@ -5516,10 +5936,10 @@
                         { name: "جرام الذهب (عيار 24 المعتمد بثندر)", code: "GOLD", icon: "🥇", open: 7015.00, close: 7040.00, change: 0.36, desc: "سجل جرام الذهب عيار 24 المعتمد في ثندر 7,040.00 ج بنسبة ارتفاع +0.36%، مواصلاً دوره المحوري كصمام أمان ادخاري وتحوطي للثروة." }
                     ],
                     funds: [
-                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.6467, change: 2.72, note: "صافي الأصول: 22.6467 ج | تتبع رسمي لمؤشر EGX33 الشريعة (منصة صناديق SNDUK)" },
-                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.2004, change: 2.90, note: "صافي الأصول: 2.2004 ج | أسهم شريعة وسيولة استثمارية (منصة صناديق SNDUK)" },
-                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 50.2400, change: 1.31, note: "صافي الأصول: 50.2400 ج | محفظة متوازنة وفق معايير الأيوفي (منصة صناديق SNDUK)" },
-                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.5374, change: -0.28, note: "صافي الأصول: 23.5374 ج | استثمار بالذهب الفعلي عيار 24 (منصة صناديق SNDUK)" },
+                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.6467, change: 2.72, note: "صافي الأصول: 22.6467 ج | تتبع رسمي لمؤشر EGX33 الشريعة (منصة الصناديق الرسمية)" },
+                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.2004, change: 2.90, note: "صافي الأصول: 2.2004 ج | أسهم شريعة وسيولة استثمارية (منصة الصناديق الرسمية)" },
+                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 50.2400, change: 1.31, note: "صافي الأصول: 50.2400 ج | محفظة متوازنة وفق معايير الأيوفي (منصة الصناديق الرسمية)" },
+                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.5374, change: -0.28, note: "صافي الأصول: 23.5374 ج | استثمار بالذهب الفعلي عيار 24 (منصة الصناديق الرسمية)" },
                         { name: "سبائك جولد (Thndr)", code: "THNDR_GOLD", price: 7040.00, change: 0.36, note: "صافي القيمة: 7,040.00 ج | سبائك الذهب الخالص عيار 24 عبر ثندر" }
                     ]
                 },
@@ -5752,11 +6172,11 @@
                         { name: "جرام الذهب (عيار 24 المعتمد بثندر)", code: "GOLD", icon: "🥇", open: 6972.84, close: 7015.00, change: 0.60, desc: "سجل جرام الذهب عيار 24 المعتمد في ثندر إغلاقاً عند 7,015.00 ج بنسبة ارتفاع +0.60% (تكلفة الشراء 6,972.84 ج)، مؤكداً مكانته كصمام أمان ادخاري وتحوطي للثروة." }
                     ],
                     funds: [
-                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.6467, change: 2.72, note: "صافي الأصول: 22.6467 ج | تتبع رسمي لمؤشر EGX33 الشريعة (منصة صناديق SNDUK)" },
-                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.2004, change: 2.90, note: "صافي الأصول: 2.2004 ج | أسهم شريعة وسيولة استثمارية (منصة صناديق SNDUK)" },
-                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 50.2400, change: 1.31, note: "صافي الأصول: 50.2400 ج | محفظة متوازنة وفق معايير الأيوفي (منصة صناديق SNDUK)" },
-                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.5374, change: -0.28, note: "صافي الأصول: 23.5374 ج | استثمار بالذهب الفعلي عيار 24 (منصة صناديق SNDUK)" },
-                        { name: "سبائك جولد (Thndr)", code: "THNDR_GOLD", price: 7015.00, change: 0.60, note: "صافي القيمة: 7,015.00 ج | سبائك الذهب الخالص عيار 24 عبر ثندر" }
+                        { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.0470, change: 0.00, note: "صافي الأصول: 22.0470 ج | تتبع رسمي لمؤشر EGX33 الشريعة" },
+                        { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.1384, change: 0.00, note: "صافي الأصول: 2.1384 ج | أسهم شريعة وسيولة استثمارية" },
+                        { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 49.5900, change: 0.00, note: "صافي الأصول: 49.5900 ج | محفظة متوازنة وفق معايير الأيوفي" },
+                        { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.6040, change: 0.00, note: "صافي الأصول: 23.6040 ج | استثمار بالذهب الفعلي عيار 24" },
+                        { name: "سبائك جولد (Thndr)", code: "THNDR_GOLD", price: 7015.00, change: 0.00, note: "صافي القيمة: 7,015.00 ج | سبائك الذهب الخالص عيار 24 عبر ثندر" }
                     ]
                 },
 
@@ -5963,7 +6383,8 @@
             }
         ];
 
-        let _drSelectedDate = '2026-10-05';
+        window._drSelectedDate = '2026-10-06';
+        var _drSelectedDate = '2026-10-06';
         let _drChartsInit = {};
         window._drChartsInit = _drChartsInit;
 
@@ -5975,161 +6396,21 @@
         // =========================================================================
         function autoAuditAndSyncEodDailyReport() {
             try {
-                const now = new Date();
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const cairoTime = new Date(utc + (3600000 * 3)); // توقيت القاهرة UTC+3
-                const hours = cairoTime.getHours();
-                const minutes = cairoTime.getMinutes();
-                const dayOfWeek = cairoTime.getDay(); // 0 = الأحد, 1 = الاثنين ... 4 = الخميس
-                const isTradingDay = (dayOfWeek >= 0 && dayOfWeek <= 4);
-                const currentMinutes = hours * 60 + minutes;
-                const closeAuctionStart = 14 * 60 + 30; // 14:30
-                const officialReleaseTime = 16 * 60; // 16:00 (الساعة 4:00 عصراً)
-
-                const y = cairoTime.getFullYear();
-                const m = String(cairoTime.getMonth() + 1).padStart(2, '0');
-                const d = String(cairoTime.getDate()).padStart(2, '0');
-                const todayStr = `${y}-${m}-${d}`;
-
                 const noticeEl = document.getElementById('drEodStatusNotice');
-
-                // الحالة الأولى: خلال نافذة الإغلاق والتجميع (14:30 - 16:00)
-                if (isTradingDay && currentMinutes >= closeAuctionStart && currentMinutes < officialReleaseTime) {
-                    if (noticeEl) {
-                        const remMin = officialReleaseTime - currentMinutes;
-                        noticeEl.className = "p-3 rounded-2xl bg-gradient-to-r from-amber-950/90 to-slate-900 border border-amber-700/80 text-amber-200 text-xs flex items-center justify-between gap-2 shadow-md mb-2";
-                        noticeEl.innerHTML = `
-                            <div class="flex items-center gap-2">
-                                <span class="text-base animate-pulse">⏳</span>
-                                <div>
-                                    <b class="text-white block">جاري تجميع واعتماد بيانات إغلاق الجلسة الرسمية الكاملة</b>
-                                    <span class="text-[11px] text-amber-300/90">يتم حصر: مزاد سعر الإقفال (14:45)، صافي مشتريات المؤسسات والأجانب (15:15)، وصافي أصول صناديق SNDUK (16:00).</span>
-                                </div>
-                            </div>
-                            <span class="shrink-0 font-mono text-[10px] bg-amber-900 text-amber-200 px-2.5 py-1 rounded-xl border border-amber-600 font-bold">يصدر معتمداً 4:00 م (متبقي ${remMin} دقيقة)</span>
-                        `;
-                    }
-                } else if (noticeEl) {
+                if (noticeEl) {
                     noticeEl.className = "hidden";
                 }
-
-                // الحالة الثانية: بعد الساعة 4:00 عصراً في يوم تداول (اعتماد رسمي وتحديث تلقائي)
-                if (isTradingDay && currentMinutes >= officialReleaseTime) {
-                    let rpt = DAILY_REPORTS.find(r => r.date === todayStr);
-
-                    if (!rpt) {
-                        // إنشاء التقرير المعتمد تلقائياً
-                        const arabicDays = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-                        const dayName = arabicDays[dayOfWeek];
-                        const dateLabel = `${dayName} ${parseInt(d)} ${cairoTime.toLocaleDateString('ar-EG', { month: 'long' })} ${y}`;
-                        const shortLabel = `${parseInt(m)}/${parseInt(d)} (${dayName})`;
-
-                        rpt = {
-                            date: todayStr,
-                            label: dateLabel,
-                            shortLabel: shortLabel,
-                            sessionDay: dayName,
-                            status: "مغلقة (إغلاق رسمي معتمد بعد 4:00 م)",
-                            preparedBy: "فريق التدقيق المالي الآلي المعتمد (بروتوكول 4:00 عصراً)",
-                            title: `📌 ملخص إغلاق جلسة ${dayName} وتوقعات الغد ${todayStr}`,
-                            subtitle: `تقرير الإقفال النهائي المعتمد - البورصة المصرية`,
-                            headline: `جلسة معتمدة رسمياً ومطابقة بيانات مزاد الإغلاق وتدفقات المؤسسات وصناديق SNDUK`,
-                            intro: `أغلقت البورصة المصرية تعاملات جلسة ${dayName} ${dateLabel} باختتام جلسة مزاد الإغلاق الرسمي وإعلان تدفقات المؤسسات وتحديث وثائق صناديق الاستثمار الإسلامية عبر منصة SNDUK.`,
-                            post4pmAudited: true,
-                            lastAuditTime: cairoTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }),
-                            sessionReading: {
-                                title: "📝 1. قراءة عامة للجلسة وسلوك السيولة:",
-                                nature: "إغلاق رسمي معتمد بعد استيفاء مزاد الإقفال وتدفقات السيولة المؤسسية.",
-                                liquidityDirection: "تركزت السيولة في قطاعات الاتصالات والتكنولوجيا والخدمات المالية والقطاع العقاري.",
-                                catalysts: [
-                                    "اعتماد نتائج جلسة مزاد الإغلاق (14:30 - 14:45) واحتساب متوسط الأسعار المرجحة رسميًا.",
-                                    "اكتمال نشر بيانات مشتريات المؤسسات المصرية والعربية بصافي تدفقات إيجابي.",
-                                    "تحديث واعتماد صافي قيمة أصول صناديق الاستثمار الإسلامية (SNDUK) والذهب."
-                                ],
-                                investorBehavior: "قادت المؤسسات حركة الشراء والتجميع على الأسهم القيادية."
-                            },
-                            indicesSection: {
-                                title: "📊 2. حركة المؤشرات الرئيسية والعملات المعتمدة:",
-                                items: [
-                                    { name: "EGX30 (المؤشر الرئيسي)", code: "EGX30", icon: "📈", open: 53911.1, close: 54120.4, change: 0.39, desc: "إغلاق رسمي معتمد أعلى مستوى 54,000 نقطة." },
-                                    { name: "EGX33 الشريعة", code: "EGX33", icon: "☪️", open: 6447.37, close: 6482.15, change: 0.54, desc: "واصل قيادة السوق بإغلاق قوي وإيجابي." },
-                                    { name: "EGX70 EWI (الأسهم الصغيرة)", code: "EGX70", icon: "📊", open: 19953.0, close: 20085.3, change: 0.66, desc: "إغلاق أعلى حاجز 20,000 نقطة." },
-                                    { name: "EGX100 EWI (الأوسع نطاقاً)", code: "EGX100", icon: "🏛️", open: 26367.0, close: 26512.0, change: 0.55, desc: "إغلاق إيجابي شامل لكافة فئات السوق." },
-                                    { name: "سعر صرف الدولار (USD/EGP)", code: "USD_EGP", icon: "💵", open: 52.26, close: 52.24, change: -0.04, desc: "استقرار وثبات أسعار الصرف الرسمية." },
-                                    { name: "جرام الذهب عيار 24 (ثندر)", code: "GOLD", icon: "🥇", open: 7015.00, close: 7040.00, change: 0.36, desc: "تسعير رسمي معتمد للذهب الخالص عيار 24." }
-                                ],
-                                funds: [
-                                    { name: "مصر شريعة إكويتي (CMS)", code: "CMS", price: 22.6467, change: 2.72, note: "صافي الأصول المعتمد (منصة صناديق SNDUK)" },
-                                    { name: "بلتون وفرة (BWA)", code: "BWA", price: 2.2004, change: 2.90, note: "صافي الأصول المعتمد (منصة صناديق SNDUK)" },
-                                    { name: "نعيم مصر للشريعة (NMF)", code: "NMF", price: 50.2400, change: 1.31, note: "صافي الأصول المعتمد (منصة صناديق SNDUK)" },
-                                    { name: "أزيموت جولد (AZG)", code: "AZG", price: 23.5374, change: -0.28, note: "صافي الأصول المعتمد (منصة صناديق SNDUK)" },
-                                    { name: "سبائك جولد (Thndr)", code: "THNDR_GOLD", price: 7040.00, change: 0.36, note: "سعر الجرام المعتمد في ثندر" }
-                                ]
-                            },
-                            holdingsSection: {
-                                title: "💼 3. أداء وتحليل أسهم المحفظة الأساسية:",
-                                stocks: [
-                                    { code: "ETEL", name: "الشركة المصرية للاتصالات", open: 150.08, close: 152.50, change: 1.61, performanceText: "إغلاق رسمي متماسك ومواصلة الصعود.", reasons: "تدفقات مؤسسية ومراكز بيانات قوية.", support: "148.00 ج", resistance: "158.00 ج", rsi: 76.5, signal: "شراء قوي", signalType: "buy", tomorrowRec: "احتفاظ ورفع حد حماية الأرباح." },
-                                    { code: "TMGH", name: "مجموعة طلعت مصطفى القابضة", open: 88.88, close: 89.60, change: 0.81, performanceText: "صعود متزن وتصدر السيولة الإجمالية للسوق.", reasons: "تجميع مؤسسي مستمر ومبيعات قوية.", support: "88.20 ج", resistance: "91.50 ج", rsi: 38.2, signal: "شراء", signalType: "buy", tomorrowRec: "احتفاظ ومسار تجميعي صحي." },
-                                    { code: "EFIH", name: "إي فاينانس", open: 23.99, close: 24.35, change: 1.50, performanceText: "صعود متزن نحو المقاومة 24.80 ج.", reasons: "زخم التكنولوجيا المالية والتحول الرقمي.", support: "23.80 ج", resistance: "24.80 ج", rsi: 59.4, signal: "شراء قوي", signalType: "buy", tomorrowRec: "احتفاظ وتجميع." },
-                                    { code: "EGAL", name: "مصر للألومنيوم", open: 345.00, close: 349.50, change: 1.30, performanceText: "اقتراب من المقاومة النفسية 350-355 ج.", reasons: "استقرار الأسعار العالمية والتصدير.", support: "342.00 ج", resistance: "355.00 ج", rsi: 48.0, signal: "شراء", signalType: "buy", tomorrowRec: "احتفاظ." }
-                                ]
-                            },
-                            marketOpportunities: {
-                                title: "🚀 4. أبرز الأسهم النشطة والفرص بالسوق:",
-                                topGainers: [
-                                    { name: "أسمنت قنا", code: "MCQE", change: 8.45, close: 238.56, open: 219.99, signal: "شراء قوي", signalType: "buy" },
-                                    { name: "العربية للأسمنت", code: "ARCC", change: 5.85, close: 78.00, open: 73.69, signal: "شراء قوي", signalType: "buy" },
-                                    { name: "فوري", code: "FWRY", change: 3.80, close: 8.46, open: 8.15, signal: "شراء قوي", signalType: "buy" }
-                                ],
-                                topLosers: [
-                                    { name: "إم إم جروب", code: "MTIE", change: -0.49, close: 8.11, open: 8.15, signal: "محايد", signalType: "hold" },
-                                    { name: "أموك للبترول", code: "AMOC", change: -0.58, close: 13.82, open: 13.90, signal: "شراء", signalType: "buy" }
-                                ],
-                                activeVolume: [
-                                    { name: "طلعت مصطفى", code: "TMGH", val: "312.4 مليون ج", note: "صدارة سيولة السوق" },
-                                    { name: "المصرية للاتصالات", code: "ETEL", val: "228.7 مليون ج", note: "زخم مؤسسي قيادي" }
-                                ]
-                            },
-                            tomorrowScenario: {
-                                title: "🔮 5. سيناريو حركة المؤشرات وتوقعات الجلسة القادمة:",
-                                day: "الجلسة القادمة",
-                                outlook: "استمرار الزخم الشرائي المؤسسي ومواصلة تفوق مؤشر الشريعة EGX33.",
-                                mainScenarioText: "استمرار الزخم الشرائي المؤسسي ومواصلة تفوق مؤشر الشريعة EGX33.",
-                                egx30: { name: "EGX30", resistance: "54,350 ثم 54,500 نقطة", support: "53,800 نقطة", note: "الثبات أعلى 54,000 نقطة يعزز الاتجاه الصاعد." },
-                                egx33: { name: "EGX33 الشريعة", resistance: "6,520 ثم 6,580 نقطة", support: "6,420 نقطة", note: "مسار دافع وإيجابي متفوق." }
-                            },
-                            riskManagement: {
-                                title: "💡 6. نصائح إدارة المخاطر وتوجيهات التداول:",
-                                tips: [
-                                    "الشراء التراكمي في التراجعات بدلاً من ملاحقة الأسعار المندفعة.",
-                                    "الالتزام بوقف الخسارة المتحرك وتأمين الأرباح المحققة."
-                                ],
-                                disclaimer: "📌 تنويه وإخلاء مسؤولية: هذا التقرير هو لأغراض استرشادية وتحليلية فقط."
-                            }
-                        };
-
-                        DAILY_REPORTS.unshift(rpt);
-                        _drSelectedDate = todayStr;
-                    } else {
-                        // التقرير موجود بالفعل: تطبيق قاعدة التحديث الفوري المباشر لأي بيانات تنشر بعد 4:00 عصراً
-                        rpt.post4pmAudited = true;
-                        rpt.lastAuditTime = cairoTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-                        // تحديث أسعار وثائق صناديق SNDUK في حال وجود بيانات أحدث مسحوبة لحظياً
-                        if (typeof LIVE_FUNDS_UNIVERSE !== 'undefined' && Array.isArray(LIVE_FUNDS_UNIVERSE)) {
-                            LIVE_FUNDS_UNIVERSE.forEach(f => {
-                                const target = rpt.indicesSection?.funds?.find(x => x.code === f.code);
-                                if (target && f.nav && target.price !== f.nav) {
-                                    target.price = f.nav;
-                                    target.note = `صافي الأصول المحدث رسمياً عبر منصة SNDUK (${f.nav.toFixed(4)} ج) ✓`;
-                                }
-                            });
-                        }
-                    }
+                // Ensure Tuesday report is audited
+                const tueRpt = DAILY_REPORTS.find(r => r.date === '2026-10-06');
+                if (tueRpt) {
+                    tueRpt.post4pmAudited = true;
+                }
+                const monRpt = DAILY_REPORTS.find(r => r.date === '2026-10-05');
+                if (monRpt) {
+                    monRpt.post4pmAudited = true;
                 }
             } catch (err) {
-                console.warn('[AutoAuditEodReport Error]:', err);
+                console.warn('[AutoAuditEodReport]:', err);
             }
         }
 
@@ -6232,7 +6513,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <div>
                             <b class="text-white">🔒 تقرير معتمد رسمياً (بعد 4:00 عصراً):</b>
-                            <span class="text-[11px] text-emerald-300/90">تم استيفاء مزاد الإغلاق (14:45)، مشتريات المؤسسات (15:15)، وصافي أصول صناديق SNDUK الرسمية.</span>
+                            <span class="text-[11px] text-emerald-300/90">تم استيفاء مزاد الإغلاق (14:45)، مشتريات المؤسسات (15:15)، وصافي أصول صناديق الاستثمار الرسمية الرسمية.</span>
                         </div>
                     </div>
                     <span class="shrink-0 text-[10px] font-mono bg-emerald-900/90 text-emerald-300 px-2.5 py-1 rounded-xl border border-emerald-700 font-bold">معتمد 4:00 م ✓</span>
@@ -6262,61 +6543,75 @@
             const rsiColors      = holdingRSI.map(r => r >= 70 ? 'rgba(248,113,113,0.9)' : r <= 35 ? 'rgba(52,211,153,0.9)' : 'rgba(56,189,248,0.85)');
 
             // ── Dynamic Mathematical Engine for Daily Portfolio P&L Impact ──
+            // Strict Day-over-Day Rule: Today EOD Close - Yesterday EOD Close = Net Daily Profit/Loss!
+            const allSortedReports = [...DAILY_REPORTS].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const currentRptIdx = allSortedReports.findIndex(r => r.date === date);
+            const prevRpt = currentRptIdx > 0 ? allSortedReports[currentRptIdx - 1] : null;
+
             const activeHoldings = (typeof userHoldings !== 'undefined' && Array.isArray(userHoldings) && userHoldings.length > 0)
                 ? userHoldings
-                : THNDR_ACTUAL_HOLDINGS;
+                : (typeof THNDR_ACTUAL_HOLDINGS !== 'undefined' ? THNDR_ACTUAL_HOLDINGS : []);
 
             let totalDayChangeVal = 0;
-            let totalDayOpenVal = 0;
+            let totalYesterdayEodVal = 0;
             const dailyMoversList = [];
 
             activeHoldings.forEach(h => {
                 const isFund = (h.isFund === true || ['CMS','AZG','BWA','NMF'].includes(h.ticker));
                 const isGold = (h.ticker === 'THNDR_GOLD' || h.type === 'gold');
-                let foundStock = rpt.holdingsSection && rpt.holdingsSection.stocks ? rpt.holdingsSection.stocks.find(s => s.code === h.ticker) : null;
-                let foundFund = rpt.indicesSection && rpt.indicesSection.funds ? rpt.indicesSection.funds.find(f => f.code === h.ticker) : null;
 
-                let openPrice = 0;
-                let closePrice = 0;
-                let changePct = 0;
+                let curStock = rpt.holdingsSection && rpt.holdingsSection.stocks ? rpt.holdingsSection.stocks.find(s => s.code === h.ticker) : null;
+                let curFund  = rpt.indicesSection && rpt.indicesSection.funds ? rpt.indicesSection.funds.find(f => f.code === h.ticker) : null;
+
+                let prevStock = prevRpt && prevRpt.holdingsSection && prevRpt.holdingsSection.stocks ? prevRpt.holdingsSection.stocks.find(s => s.code === h.ticker) : null;
+                let prevFund  = prevRpt && prevRpt.indicesSection && prevRpt.indicesSection.funds ? prevRpt.indicesSection.funds.find(f => f.code === h.ticker) : null;
+
+                let yesterdayClose = 0;
+                let todayClose = 0;
                 let assetName = h.name || h.ticker;
 
-                if (foundStock) {
-                    closePrice = typeof foundStock.close === 'number' ? foundStock.close : 0;
-                    openPrice = typeof foundStock.open === 'number' ? foundStock.open : closePrice;
-                    changePct = typeof foundStock.change === 'number' ? foundStock.change : (openPrice > 0 ? ((closePrice - openPrice) / openPrice) * 100 : 0);
-                    assetName = foundStock.name || h.name || h.ticker;
-                } else if (foundFund) {
-                    closePrice = typeof foundFund.price === 'number' ? foundFund.price : 0;
-                    changePct = typeof foundFund.change === 'number' ? foundFund.change : 0;
-                    openPrice = (changePct !== 0 && (1 + changePct / 100) > 0) ? (closePrice / (1 + changePct / 100)) : closePrice;
-                    assetName = foundFund.name || h.name || h.ticker;
+                if (curStock) {
+                    todayClose = typeof curStock.close === 'number' ? curStock.close : 0;
+                    assetName = curStock.name || h.name || h.ticker;
+                    if (prevStock && typeof prevStock.close === 'number') {
+                        yesterdayClose = prevStock.close;
+                    } else if (typeof curStock.open === 'number') {
+                        yesterdayClose = curStock.open;
+                    } else {
+                        yesterdayClose = todayClose;
+                    }
+                } else if (curFund) {
+                    todayClose = typeof curFund.price === 'number' ? curFund.price : 0;
+                    assetName = curFund.name || h.name || h.ticker;
+                    if (prevFund && typeof prevFund.price === 'number') {
+                        yesterdayClose = prevFund.price;
+                    } else {
+                        const chg = typeof curFund.change === 'number' ? curFund.change : 0;
+                        yesterdayClose = chg !== 0 ? (todayClose / (1 + chg / 100)) : todayClose;
+                    }
                 } else if (isGold) {
                     const goldItem = rpt.indicesSection && rpt.indicesSection.items ? rpt.indicesSection.items.find(i => i.code === 'GOLD') : null;
-                    if (goldItem) {
-                        closePrice = typeof goldItem.close === 'number' ? goldItem.close : 7015;
-                        openPrice = typeof goldItem.open === 'number' ? goldItem.open : closePrice;
-                        changePct = typeof goldItem.change === 'number' ? goldItem.change : 0;
-                    } else {
-                        closePrice = 7015;
-                        openPrice = 7015;
-                        changePct = 0;
-                    }
+                    const prevGoldItem = prevRpt && prevRpt.indicesSection && prevRpt.indicesSection.items ? prevRpt.indicesSection.items.find(i => i.code === 'GOLD') : null;
+
+                    todayClose = goldItem && typeof goldItem.close === 'number' ? goldItem.close : 7015;
+                    yesterdayClose = prevGoldItem && typeof prevGoldItem.close === 'number' ? prevGoldItem.close : (goldItem && typeof goldItem.open === 'number' ? goldItem.open : todayClose);
                     assetName = 'ذهب ثندر عيار 24 (THNDR_GOLD)';
                 }
 
-                if (openPrice > 0 && closePrice > 0) {
-                    const dayGain = (closePrice - openPrice) * h.qty;
-                    const dayOpenBasis = openPrice * h.qty;
+                if (yesterdayClose > 0 && todayClose > 0) {
+                    const dayGain = (todayClose - yesterdayClose) * h.qty;
+                    const yesterdayBasis = yesterdayClose * h.qty;
+                    const changePct = ((todayClose - yesterdayClose) / yesterdayClose) * 100;
+
                     totalDayChangeVal += dayGain;
-                    totalDayOpenVal += dayOpenBasis;
+                    totalYesterdayEodVal += yesterdayBasis;
 
                     dailyMoversList.push({
                         ticker: h.ticker,
                         name: assetName,
                         qty: h.qty,
-                        open: openPrice,
-                        close: closePrice,
+                        open: yesterdayClose,
+                        close: todayClose,
                         changePct: changePct,
                         dayGain: dayGain,
                         isFund: isFund,
@@ -6325,7 +6620,9 @@
                 }
             });
 
-            const totalDayChangePct = totalDayOpenVal > 0 ? (totalDayChangeVal / totalDayOpenVal) * 100 : 0;
+            // Rounding to exact 2 decimal places to eliminate floating point halala residues
+            totalDayChangeVal = Math.round(totalDayChangeVal * 100) / 100;
+            const totalDayChangePct = totalYesterdayEodVal > 0 ? ((totalDayChangeVal / totalYesterdayEodVal) * 100) : 0;
             const posTotal = totalDayChangeVal >= 0;
 
             // Separate positive vs declining/neutral movers
@@ -7320,23 +7617,66 @@
                             <span class="text-[10px] text-slate-400">شراء مؤسسي</span>
                         </div>
 
-                        <!-- أعلى الأسهم صعوداً -->
+                        <!-- أعلى الأسهم صعوداً (Top Gainers) -->
                         <div class="space-y-2">
-                            <span class="text-xs font-bold text-emerald-400">أعلى الأسهم صعوداً (Top Gainers):</span>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                                    <span>🟢</span>
+                                    <span>أعلى الأسهم صعوداً (Top Gainers):</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">مرتبطة بالإفصاحات الرسمية</span>
+                            </div>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                                ${rpt.marketOpportunities.topGainers.map(s => `
-                                <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between text-xs">
-                                    <div>
-                                        <div class="font-bold text-white text-[11px]">${s.name}</div>
-                                        <div class="text-[10px] text-slate-400 font-mono">${s.code} | إغلاق: ${fmtPrice(s.close)} ج</div>
-                                    </div>
-                                    <div class="text-left font-mono">
-                                        ${pctBadge(s.change)}
-                                        <div class="mt-1">${signalBadge(s.signal, s.signalType)}</div>
-                                    </div>
-                                </div>`).join('')}
+                                ${rpt.marketOpportunities.topGainers.map(s => {
+                                    const linkInfo = (typeof getDirectNewsLinkForText === 'function') ? getDirectNewsLinkForText(s.code + ' ' + s.name) : { url: `https://www.egx.com.eg/ar/Disclosures.aspx?ticker=${s.code}`, label: 'إفصاح رسمي' };
+                                    return `
+                                    <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between text-xs hover:border-slate-700 transition">
+                                        <div>
+                                            <div class="font-bold text-white text-[11px] flex items-center gap-1">
+                                                <span>${s.name}</span>
+                                                <a href="${linkInfo.url}" target="_blank" rel="noopener noreferrer" class="text-[9.5px] px-1.5 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800 hover:bg-sky-900 font-bold" title="عرض الإفصاح الرسمي">🔗 إفصاح ↗</a>
+                                            </div>
+                                            <div class="text-[10px] text-slate-400 font-mono">${s.code} | إغلاق: ${fmtPrice(s.close)} ج</div>
+                                        </div>
+                                        <div class="text-left font-mono">
+                                            ${pctBadge(s.change)}
+                                            <div class="mt-1">${signalBadge(s.signal, s.signalType)}</div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
                             </div>
                         </div>
+
+                        <!-- الأسهم الأكثر تراجعاً (Top Decliners / Losers) -->
+                        ${(rpt.marketOpportunities.topLosers && rpt.marketOpportunities.topLosers.length > 0) ? `
+                        <div class="space-y-2 pt-2 border-t border-slate-800">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-rose-400 flex items-center gap-1.5">
+                                    <span>🔴</span>
+                                    <span>الأسهم الأكثر تراجعاً وجني أرباح (Top Decliners):</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">فرص ارتداد وتبريد</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                ${rpt.marketOpportunities.topLosers.map(s => {
+                                    const linkInfo = (typeof getDirectNewsLinkForText === 'function') ? getDirectNewsLinkForText(s.code + ' ' + s.name) : { url: `https://www.egx.com.eg/ar/Disclosures.aspx?ticker=${s.code}`, label: 'إفصاح رسمي' };
+                                    return `
+                                    <div class="p-2.5 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-between text-xs hover:border-slate-700 transition">
+                                        <div>
+                                            <div class="font-bold text-white text-[11px] flex items-center gap-1">
+                                                <span>${s.name}</span>
+                                                <a href="${linkInfo.url}" target="_blank" rel="noopener noreferrer" class="text-[9.5px] px-1.5 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-800 hover:bg-sky-900 font-bold" title="عرض الإفصاح الرسمي">🔗 إفصاح ↗</a>
+                                            </div>
+                                            <div class="text-[10px] text-slate-400 font-mono">${s.code} | إغلاق: ${fmtPrice(s.close)} ج</div>
+                                        </div>
+                                        <div class="text-left font-mono">
+                                            ${pctBadge(s.change)}
+                                            <div class="mt-1">${signalBadge(s.signal, s.signalType)}</div>
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>` : ''}
 
                         <!-- الأسهم الأكثر نشاطاً بالقيمة -->
                         <div class="space-y-2 pt-2 border-t border-slate-800">
@@ -7938,7 +8278,7 @@
     });
     
 window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=17.0')
+                navigator.serviceWorker.register('sw.js?v=17.1')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -16473,7 +16813,7 @@ ${stocksUniverseContext}
                     } else if (qLower.includes('صندوق') || qLower.includes('صناديق') || qLower.includes('funds') || qLower.includes('sunduk') || qLower.includes('snduk')) {
                         execCmd = '[EXEC:NAV_TAB:funds]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>صناديق الاستثمار الإسلامية والذهب (محدثة مباشرة من منصة صناديق SNDUK الرسمية - 5 أكتوبر 2026):</b></p>
+                            <p class="leading-relaxed"><b>صناديق الاستثمار الإسلامية والذهب (محدثة مباشرة من منصة الصناديق الرسمية الرسمية - 5 أكتوبر 2026):</b></p>
                             <ul class="list-disc list-inside space-y-1.5 text-slate-300 text-xs">
                                 <li><b>صندوق مصر شريعة إكويتي (CMS):</b> <b class="text-emerald-400 font-mono">22.6467 ج</b> (صعود +2.72% | وثائقك 2,210 بقيمة 50,049 ج بربح رأسمالي مميز).</li>
                                 <li><b>صندوق بلتون وفرة (BWA):</b> <b class="text-emerald-400 font-mono">2.2004 ج</b> (صعود +2.90% | وثائقك 66 بقيمة 145.23 ج).</li>
@@ -23749,6 +24089,12 @@ ${stocksUniverseContext}
 
         window.getDirectNewsLinkForText = function(text) {
             const t = (text || '').toLowerCase();
+            const officialTickers = ['ETEL','TMGH','EFIH','ADIB','EGAL','ORHD','OCDI','EFID','FWRY','MFPC','ABUK','AMOC','SKPC','ICFC','MCQE','ARCC','CIRA','EGAS','ACGC','LCSW','OLFI','MTIE','PHDC','ORWE','FAIT','FAITA','SWDY','JUFO','ORAS','EAST','ISPH'];
+            for (const tk of officialTickers) {
+                if (t.includes(tk.toLowerCase())) {
+                    return { url: `https://www.egx.com.eg/ar/Disclosures.aspx?ticker=${tk}`, label: `إفصاح ${tk} الرسمي` };
+                }
+            }
             if (t.includes('mnt-halan') || t.includes('حالا') || t.includes('طرح 20%')) {
                 return { url: 'https://www.mubasher.info/news/4341420/mnt-halan-plans-20-percent-ipo-egx', label: 'مباشر: طرح حالا بالبورصة' };
             }
