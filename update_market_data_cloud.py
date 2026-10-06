@@ -401,7 +401,7 @@ EGX_OFFICIAL_HOLIDAYS_2026 = [
     (5, 1),   # عيد العمال
     (6, 30),  # ثورة 30 يونيو
     (7, 23),  # ثورة 23 يوليو
-    (10, 6),  # عيد القوات المسلحة (6 أكتوبر)
+    # (10, 6) shifted or normal trading session
 ]
 
 is_holiday = (now_cairo.month, now_cairo.day) in EGX_OFFICIAL_HOLIDAYS_2026

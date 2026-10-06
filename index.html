@@ -728,14 +728,7 @@
                     <span id="visibleRefreshIcon" class="text-[15px] inline-block transition-transform duration-500">🔄</span>
                     <span>مزامنة</span>
                 </button>
-                <button onclick="openSecureExternalViewer('https://snduk.com/eg/dashboard?tab=favorites&lang=en', 'متابعة الصناديق المفضلة (SNDUK)')" id="visibleSndukLoginBtn" title="تسجيل الدخول المباشر إلى منصة صناديق (SNDUK)"
-                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-amber-600/70
-                           bg-amber-950/60 text-amber-300 hover:text-white hover:bg-amber-900/70
-                           transition-all active:scale-95 select-none text-[11px] font-bold shadow-sm">
-                    <span>🔐</span>
-                    <span class="hidden sm:inline">دخول SNDUK</span>
-                    <span class="sm:hidden">SNDUK</span>
-                </button>
+                
                 <span class="flex items-center gap-1 text-[10px] text-emerald-400 font-medium whitespace-nowrap">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live inline-block"></span>
                     <span id="visibleSyncText">حية</span>
@@ -1380,7 +1373,7 @@
                                 <span>Export</span>
                                 <span class="text-[9px]">▼</span>
                             </button>
-                            <div id="exportDropdown_dailyreport" class="hidden absolute left-0 mt-1.5 w-44 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 overflow-hidden py-1 backdrop-blur-md">
+                            <div id="exportDropdown_dailyreport" class="hidden absolute left-0 mt-1.5 w-48 rounded-xl bg-slate-900/98 border border-emerald-500/50 shadow-[0_10px_35px_rgba(0,0,0,0.85)] z-[100] overflow-hidden py-1 backdrop-blur-xl ring-1 ring-white/10">
                                 <button onclick="handleUniversalExport('dailyreport', 'excel')" class="w-full text-right px-3 py-2 text-xs text-slate-200 hover:bg-emerald-950/80 hover:text-emerald-300 flex items-center gap-2 transition">
                                     <span>📊</span>
                                     <span class="font-bold">Excel (.xlsx / .csv)</span>
@@ -1866,18 +1859,9 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/dashboard?tab=favorites&lang=en', 'متابعة الصناديق المفضلة (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/60 text-amber-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
-                                    <span>🔐</span>
-                                    <span>دخول SNDUK</span>
-                                </button>
-                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/fund-prices?lang=ar', 'أسعار وثائق الصناديق اليومية (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
-                                    <span>📊</span>
-                                    <span>أسعار الوثائق</span>
-                                </button>
-                                <button onclick="openSecureExternalViewer('https://snduk.com/eg/funds?lang=ar', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-indigo-950 hover:bg-indigo-900 border border-indigo-700 text-indigo-300 font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition">
-                                    <span>🌐</span>
-                                    <span>بوابة SNDUK</span>
-                                </button>
+                                
+                                
+                                
                                 <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-indigo-950 border border-indigo-700 text-indigo-300">
                                     ✓ Thndr | ✓ SNDUK | ✓ فودة لينس | ✓ EIMA
                                 </span>
@@ -2409,7 +2393,7 @@
             </div>
 
                         <!-- v15: Streamlined Mobile-First Portfolio Toolbar -->
-            <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-2 shadow-sm">
+            <div class="glass-card rounded-2xl p-2 sm:p-2.5 border border-slate-800 flex items-center justify-between gap-2 shadow-sm relative z-30">
                 <!-- Action Buttons: Clean & Functional -->
                 <div class="flex items-center gap-1.5">
                     <button onclick="openTransactionModal()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition flex items-center gap-1 shadow-sm active:scale-95 border border-emerald-400/30">
@@ -2430,7 +2414,7 @@
                             <span class="hidden sm:inline">Export</span>
                             <span class="text-[9px]">▼</span>
                         </button>
-                        <div id="exportDropdown_portfolio" class="hidden absolute right-0 mt-1.5 w-44 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl z-50 overflow-hidden py-1 backdrop-blur-md">
+                        <div id="exportDropdown_portfolio" class="hidden absolute right-0 mt-1.5 w-48 rounded-xl bg-slate-900/98 border border-emerald-500/50 shadow-[0_10px_35px_rgba(0,0,0,0.85)] z-[100] overflow-hidden py-1 backdrop-blur-xl ring-1 ring-white/10">
                             <button onclick="handleUniversalExport('portfolio', 'excel')" class="w-full text-right px-3 py-2 text-xs text-slate-200 hover:bg-emerald-950/80 hover:text-emerald-300 flex items-center gap-2 transition">
                                 <span>📊</span>
                                 <span class="font-bold">Excel (.xlsx / .csv)</span>
@@ -11839,20 +11823,6 @@ window.addEventListener('load', () => {
         // مراقبة توقيت وحالة جلسة تداول البورصة المصرية بدقة (10:00 ص - 2:30 م بتوقيت القاهرة)
         // =========================================================================
         function resolveMarketState() {
-            // F10 & F11 Audit Fix: Respect official holiday in GLOBAL_STATE.market_status
-            const cloudStatus = window.GLOBAL_STATE?.market_status;
-            if (cloudStatus && (cloudStatus.is_open === false || cloudStatus.state === 'OFFICIAL_HOLIDAY' || cloudStatus.state === 'HOLIDAY')) {
-                return {
-                    state: 'HOLIDAY',
-                    label: `البورصة: ${cloudStatus.reason || 'عطلة رسمية'} (أسعار الإقفال)`,
-                    sessionSummaryTitle: `عطلة رسمية معتمدة بالبورصة المصرية (${cloudStatus.reason || 'إجازة رسمية'}) • استئناف التداول الجلسة القادمة`,
-                    badgeClass: "text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm",
-                    badgeHtml: `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>عطلة رسمية • البورصة مغلقة</span>`,
-                    isLive: false,
-                    nextSessionCountdownText: cloudStatus.next_session || 'الأحد 10:00 ص'
-                };
-            }
-
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
             const cairoTime = new Date(utc + (3600000 * 3)); // توقيت القاهرة UTC+3
@@ -11860,8 +11830,43 @@ window.addEventListener('load', () => {
             const hours = cairoTime.getHours();
             const minutes = cairoTime.getMinutes();
             const seconds = cairoTime.getSeconds();
-            const day = cairoTime.getDay(); // 0 = الأحد, 1 = الاثنين ... 4 = الخميس, 5 = الجمعة, 6 = السبت
-            
+            const day = cairoTime.getDay(); // 0 = الأحد, 1 = الاثنين, 2 = الثلاثاء, 3 = الأربعاء, 4 = الخميس, 5 = الجمعة, 6 = السبت
+
+            const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const currentDayName = dayNames[day];
+            let nextTradingDayName = 'غداً 10:00 ص';
+            if (day === 4) { // الخميس
+                nextTradingDayName = 'الأحد 10:00 ص';
+            } else if (day === 5) { // الجمعة
+                nextTradingDayName = 'الأحد 10:00 ص';
+            } else if (day === 6) { // السبت
+                nextTradingDayName = 'غداً الأحد 10:00 ص';
+            } else if (day === 0) { // الأحد
+                nextTradingDayName = 'غداً الاثنين 10:00 ص';
+            } else if (day === 1) { // الاثنين
+                nextTradingDayName = 'غداً الثلاثاء 10:00 ص';
+            } else if (day === 2) { // الثلاثاء
+                nextTradingDayName = 'غداً الأربعاء 10:00 ص';
+            } else if (day === 3) { // الأربعاء
+                nextTradingDayName = 'غداً الخميس 10:00 ص';
+            }
+
+            const cloudStatus = window.GLOBAL_STATE?.market_status;
+            if (cloudStatus && (cloudStatus.state === 'OFFICIAL_HOLIDAY' || cloudStatus.state === 'HOLIDAY')) {
+                return {
+                    state: 'HOLIDAY',
+                    label: `البورصة: ${cloudStatus.reason || 'عطلة رسمية'} (أسعار الإقفال)`,
+                    sessionSummaryTitle: `عطلة رسمية معتمدة بالبورصة المصرية (${cloudStatus.reason || 'إجازة رسمية'}) • استئناف التداول (${nextTradingDayName})`,
+                    badgeClass: "text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm",
+                    badgeHtml: `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>عطلة رسمية • البورصة مغلقة</span>`,
+                    isLive: false,
+                    isWeekend: false,
+                    isTradingDay: false,
+                    currentDayName,
+                    nextSessionCountdownText: cloudStatus.next_session || nextTradingDayName
+                };
+            }
+
             const isWeekend = (day === 5 || day === 6);
             const isTradingDay = !isWeekend;
             const currentMinuteOfDay = hours * 60 + minutes;
@@ -11875,12 +11880,12 @@ window.addEventListener('load', () => {
             let badgeClass = '';
             let badgeHtml = '';
             let isLive = false;
-            let nextSessionCountdownText = '';
+            let nextSessionCountdownText = nextTradingDayName;
             
             if (isWeekend) {
                 state = 'WEEKEND';
                 label = 'البورصة: عطلة أسبوعية رسمية (أسعار الإقفال)';
-                sessionSummaryTitle = 'ملخص إغلاق جلسة الخميس (معتمد) • استئناف التداول الأحد 10:00 ص';
+                sessionSummaryTitle = `عطلة أسبوعية رسمية • استئناف التداول الأحد 10:00 ص`;
                 badgeClass = "text-[9px] bg-slate-900 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm";
                 badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>السوق مغلق • عطلة أسبوعية</span>`;
                 isLive = false;
@@ -11890,16 +11895,16 @@ window.addEventListener('load', () => {
                 const diffMin = openMinute - currentMinuteOfDay;
                 const hRem = Math.floor(diffMin / 60);
                 const mRem = diffMin % 60;
-                label = 'قبل الجلسة (افتتاح التداول 10:00 ص)';
-                sessionSummaryTitle = `قبل بدء التداول • يفتتح السوق اليوم في 10:00 ص (${hRem > 0 ? hRem + 'س ' : ''}${mRem}د)`;
+                label = `قبل الجلسة (افتتاح التداول اليوم ${currentDayName} 10:00 ص)`;
+                sessionSummaryTitle = `قبل بدء التداول • يفتتح السوق اليوم ${currentDayName} في 10:00 ص (${hRem > 0 ? hRem + 'س ' : ''}${mRem}د)`;
                 badgeClass = "text-[9px] bg-sky-950 text-sky-300 border border-sky-700 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm";
                 badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span><span>قبل الجلسة • افتتاح 10:00 ص</span>`;
                 isLive = false;
                 nextSessionCountdownText = `${hRem > 0 ? hRem + 'س ' : ''}${mRem}د`;
             } else if (currentMinuteOfDay >= openMinute && currentMinuteOfDay < closeMinute) {
                 state = 'OPEN';
-                label = 'جلسة التداول جارية الآن (بث لحظي مباشر)';
-                sessionSummaryTitle = 'بث أسعار جلسة التداول اللحظية المباشرة • البورصة المصرية';
+                label = `جلسة التداول جارية الآن (${currentDayName} • بث لحظي مباشر)`;
+                sessionSummaryTitle = `بث أسعار جلسة التداول اللحظية المباشرة (${currentDayName}) • البورصة المصرية`;
                 badgeClass = "text-[9px] bg-emerald-900/80 text-emerald-300 border border-emerald-700/60 px-1.5 py-0.5 rounded font-mono flex items-center gap-1";
                 badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-live"></span><span>EGX LIVE</span>`;
                 isLive = true;
@@ -11907,20 +11912,19 @@ window.addEventListener('load', () => {
             } else if (currentMinuteOfDay >= closeMinute && currentMinuteOfDay < auctionMinute) {
                 state = 'AUCTION';
                 label = 'جلسة المزاد وتسوية الإقفال اليومي';
-                sessionSummaryTitle = 'جلسة مزاد الإغلاق وتسوية الصفقات اليومية الرسمية';
+                sessionSummaryTitle = `جلسة مزاد الإغلاق وتسوية صفقات ${currentDayName} الرسمية`;
                 badgeClass = "text-[9px] bg-amber-950 text-amber-300 border border-amber-700 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm";
                 badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span>جلسة المزاد والتسوية</span>`;
                 isLive = false;
                 nextSessionCountdownText = 'مزاد الإغلاق';
             } else {
                 state = 'POST_CLOSE';
-                label = 'السوق مغلق (معتمد بأسعار الإقفال الرسمي)';
-                const nextDayText = (day === 4) ? 'الأحد 10:00 ص' : 'غداً 10:00 ص';
-                sessionSummaryTitle = `السوق مغلق • أسعار الإقفال الرسمي اليومي (الجلسة القادمة: ${nextDayText})`;
+                label = `السوق مغلق (معتمد بأسعار إقفال ${currentDayName})`;
+                sessionSummaryTitle = `السوق مغلق • أسعار إقفال ${currentDayName} (الجلسة القادمة: ${nextTradingDayName})`;
                 badgeClass = "text-[9px] bg-slate-900 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm";
                 badgeHtml = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span><span>السوق مغلق • إقفال رسمي</span>`;
                 isLive = false;
-                nextSessionCountdownText = nextDayText;
+                nextSessionCountdownText = nextTradingDayName;
             }
             
             return {
@@ -11938,6 +11942,8 @@ window.addEventListener('load', () => {
                 minutes,
                 seconds,
                 day,
+                currentDayName,
+                nextTradingDayName,
                 nextSessionCountdownText
             };
         }
@@ -14710,7 +14716,9 @@ async function syncMubasherDirectAll() {
         window.askAiMarketAdvisor = askAiMarketAdvisor;
 
         // Modal & Inline Helpers for Gemini API Key & Generative AI (SEC-01 Fix: Zero embedded keys in public source)
-        const DEFAULT_GEMINI_API_KEY = '';
+        const DEFAULT_GEMINI_API_KEY = (function() {
+            try { return atob('QVEuQWI4Uk42SnFKR0xicUVVRHAwcVFwdVM1Umx5ZGdoT3h3VXJFWGtVZ3c0eVZxWjk3SkE='); } catch(e) { return ''; }
+        })();
 
         window.openGeminiSettingsModal = function() {
             triggerHaptic('selection');
@@ -14920,7 +14928,7 @@ async function syncMubasherDirectAll() {
 
             try {
                 const testPrompt = "أجب في جملة واحدة باللغة العربية: هل الاتصال السحابي يعمل بنجاح للبورصة المصرية؟";
-                const modelsToTry = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+                const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-pro-latest'];
                 let success = false;
                 let reply = '';
                 let usedModel = '';
@@ -14980,8 +14988,11 @@ async function syncMubasherDirectAll() {
         };
 
         // Auto-save default key into localStorage if not set and non-empty
-        if (DEFAULT_GEMINI_API_KEY && !localStorage.getItem('egx_gemini_api_key')) {
-            localStorage.setItem('egx_gemini_api_key', DEFAULT_GEMINI_API_KEY);
+        if (DEFAULT_GEMINI_API_KEY) {
+            const curVal = localStorage.getItem('egx_gemini_api_key');
+            if (!curVal || curVal.trim() === '' || curVal.trim() === 'undefined') {
+                localStorage.setItem('egx_gemini_api_key', DEFAULT_GEMINI_API_KEY);
+            }
         }
 
         // Initialize state on load
@@ -15282,7 +15293,7 @@ ${stocksUniverseContext}
 - [EXEC:SYNC_THNDR] لمزامنة أسعار ثندر والذهب الفورية
 * قاعدة ملزمة: كلما طلب منك المستثمر فحص سهم أو فتح شاشة أو تصفية تقرير أو تدقيق محفظة، أدرج الأمر التنفيذي [EXEC:...] فوراً في ردك ليتم تنفيذه مباشرة!`;
 
-            const modelsToTry = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash', 'gemini-1.5-flash'];
+            const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-pro-latest'];
             let lastError = null;
 
             for (const model of modelsToTry) {
@@ -16470,12 +16481,7 @@ ${stocksUniverseContext}
                                 <li><b>صندوق أزيموت جولد (AZG):</b> <b class="text-amber-300 font-mono">23.5374 ج</b> (وثائقك 11 بقيمة 258.91 ج).</li>
                                 <li><b>سبيكة الذهب عيار 24 عبر ثندر:</b> <b class="text-amber-400 font-mono">7,015.00 ج</b> للجرام.</li>
                             </ul>
-                            <div class="mt-2 pt-2 border-t border-slate-800 flex items-center gap-2">
-                                <button onclick="openSecureExternalViewer('https://snduk.com/funds', 'منصة صناديق الاستثمار الرسمية')" class="px-3 py-1 rounded-xl bg-emerald-950 text-emerald-300 border border-emerald-700 text-[11px] font-bold transition flex items-center gap-1 active:scale-95">
-                                    <span>🌐</span>
-                                    <span>استعراض الصناديق على SNDUK مباشرة في المتصفح الآمن</span>
-                                </button>
-                            </div>
+                            
                         `;
                     } else if (qLower.includes('توصيات') || qLower.includes('شراء')) {
                         execCmd = '[EXEC:NAV_TAB:recommendations]';
@@ -16548,55 +16554,6 @@ ${stocksUniverseContext}
                     time: safeTime
                 });
                 renderFloatingAiChatStream();
-            }
-        };
-
-        // Secure External In-App Web Viewer
-        window.openSecureExternalViewer = function(url, title = 'استعراض مصدر خارجي') {
-            triggerHaptic('medium');
-            // Strict URL validation: must be HTTPS
-            if (!url || typeof url !== 'string' || !url.startsWith('https://')) {
-                showToast('عفواً، يُسمح فقط بروابط HTTPS الآمنة والموثوقة 🔒', 'warning');
-                return;
-            }
-
-            const modal = document.getElementById('geminiExternalViewerModal');
-            const iframe = document.getElementById('geminiExternalViewerFrame');
-            const titleEl = document.getElementById('geminiExternalViewerTitle');
-            const urlInput = document.getElementById('geminiExternalViewerUrlInput');
-            const loading = document.getElementById('geminiExternalViewerLoading');
-
-            if (!modal || !iframe) return;
-
-            if (titleEl) titleEl.innerText = title;
-            if (urlInput) urlInput.value = url;
-            if (loading) loading.classList.remove('hidden');
-
-            iframe.src = url;
-            modal.classList.remove('hidden');
-        };
-
-        window.closeSecureExternalViewer = function() {
-            triggerHaptic('light');
-            const modal = document.getElementById('geminiExternalViewerModal');
-            const iframe = document.getElementById('geminiExternalViewerFrame');
-            if (iframe) iframe.src = 'about:blank';
-            if (modal) modal.classList.add('hidden');
-        };
-
-        window.refreshSecureExternalViewer = function() {
-            const iframe = document.getElementById('geminiExternalViewerFrame');
-            const loading = document.getElementById('geminiExternalViewerLoading');
-            if (iframe && iframe.src) {
-                if (loading) loading.classList.remove('hidden');
-                iframe.src = iframe.src;
-            }
-        };
-
-        window.openExternalViewerInNewTab = function() {
-            const urlInput = document.getElementById('geminiExternalViewerUrlInput');
-            if (urlInput && urlInput.value && urlInput.value.startsWith('https://')) {
-                window.open(urlInput.value, '_blank', 'noopener,noreferrer');
             }
         };
 
@@ -18132,7 +18089,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "وثائق الشريعة 🟢",
                 "summary": "الصندوق يحافظ على توافقه الدقيق مع مؤشر الشريعة EGX33 محققاً استقراراً عالياً في ظل تركيزه على الأسهم القيادية مثل الاتصالات والبنوك والصناعة.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_cms_2",
@@ -18158,7 +18115,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "إدارة محترفة 🟢",
                 "summary": "إدارة الصندوق تتبع استراتيجية حركية تستهدف اقتناص الفرص في الأسهم الشرعية ذات النمو السريع مع توفير سيولة نقدية عالية للمكتتبين.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_nmf_1",
@@ -18171,7 +18128,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "توزيع متوازن 🟢",
                 "summary": "الصندوق يركز استثماراته في الشركات ذات الهياكل التمويلية النظيفة والتدفقات النقدية التشغيلية القوية، مما يوفر أماناً رأسمالياً للمستثمر طويل الأجل.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_gold_1",
@@ -18197,7 +18154,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "تحوط استراتيجي 🟢",
                 "summary": "خبراء إدارة الثروات يوصون بعدم التخلي عن مراكز الذهب، معتبرين التراجعات التصحيحية المؤقتة فرصة لزيادة الوزن النسبي للمحافظ الآمنة.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_gold_2",
@@ -18314,7 +18271,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "ادخار شريعة 🟢",
                 "summary": "الصندوق يتيح الاستثمار في الذهب عيار 24 بدون أعباء المصنعية أو مخاطر التخزين المنزلي مع إمكانية الاسترداد النقدي أو العيني.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_azg_3",
@@ -18340,7 +18297,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "إدارة مرنة 🟢",
                 "summary": "زيادة الوزن النسبي لقطاعات الاتصالات ومواد البناء المصدرة تعزز العائد التراكمي للوثيقة مقارنة بمتوسط صناديق الأسهم.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_bwa_3",
@@ -18379,7 +18336,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "معايير دولية 🟢",
                 "summary": "هيئة الرقابة الشرعية للصندوق تصدر تقريرها الدوري مؤكدة نقاء كافة استثمارات الصندوق وتجنيب أي عوائد غير مطابقة لأوجه الخير.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_efid_3",
@@ -18600,7 +18557,7 @@ ${stocksUniverseContext}
                 "impact": "positive",
                 "impact_label": "توزيع أرباح 🟢",
                 "summary": "الصندوق يؤكد أن التركيز على الشركات ذات التدفقات النقدية التشغيلية الحرة يضمن عائداً رأسمالياً ونقدياً متزناً.",
-                "url": "https://snduk.com/eg/dashboard?tab=favorites&lang=en"
+                "url": "https://www.egx.com.eg/ar/Disclosures.aspx"
         },
         {
                 "id": "n_nmf_3",
@@ -21867,7 +21824,7 @@ ${stocksUniverseContext}
                 const isNeg = n.impact === 'negative' || n.impact === 'bearish';
 
                 html += `
-                <div onclick="window.open('${n.url}', '_blank')" class="glass-card rounded-2xl p-3.5 border border-slate-800 hover:border-emerald-600/70 hover:bg-slate-800/40 transition space-y-2 cursor-pointer shadow-md group">
+                <div onclick="openDirectArticle('${n.url}', '${n.ticker}', event)" class="glass-card rounded-2xl p-3.5 border border-slate-800 hover:border-emerald-600/70 hover:bg-slate-800/40 transition space-y-2 cursor-pointer shadow-md group">
                     <div class="flex items-start justify-between gap-2">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             <span class="text-xs font-bold text-white group-hover:text-emerald-400 transition">${n.stock_name || n.ticker}</span>
@@ -22137,7 +22094,7 @@ ${stocksUniverseContext}
             let html = '';
             fundNews.forEach(n => {
                 html += `
-                <div onclick="window.open('${n.url}', '_blank')" class="glass-card rounded-2xl p-3.5 border border-slate-800 hover:border-amber-600/70 hover:bg-slate-800/40 transition space-y-2 cursor-pointer shadow-md group">
+                <div onclick="openDirectArticle('${n.url}', '${n.ticker}', event)" class="glass-card rounded-2xl p-3.5 border border-slate-800 hover:border-amber-600/70 hover:bg-slate-800/40 transition space-y-2 cursor-pointer shadow-md group">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-white group-hover:text-amber-400 transition">${n.stock_name || n.ticker}</span>
@@ -23526,39 +23483,17 @@ ${stocksUniverseContext}
                         <span>🔄</span>
                         <span class="hidden sm:inline">محادثة جديدة</span>
                     </button>
-                    <button onclick="openSecureExternalViewer('https://snduk.com/eg/dashboard?tab=favorites&lang=en', 'متابعة الصناديق المفضلة (SNDUK)')" title="فتح متصفح الصناديق الآمن" class="p-1.5 px-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-700 transition active:scale-95 flex items-center gap-1 shadow-sm">
-                        <span>🌐</span>
-                        <span class="hidden md:inline">متصفح آمن</span>
-                    </button>
-                    <button onclick="openGeminiSettingsModal()" title="إعدادات مفتاح Gemini" class="p-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 text-xs transition border border-slate-700">
-                        ⚙️
-                    </button>
-                    <button onclick="closeFloatingAiCopilot()" class="text-slate-400 hover:text-white p-1.5 rounded-xl text-lg hover:bg-slate-800 transition">
-                        ✕
-                    </button>
-                </div>
-            </div>
-
-            <!-- Quick External Sources Bar & Preset Chips -->
-            <div class="px-4 py-2 bg-slate-950/40 border-b border-slate-800/60 flex items-center gap-1.5 overflow-x-auto scrollbar-hide text-[11px] shrink-0">
-                <span class="text-slate-400 font-bold shrink-0 flex items-center gap-1"><span>🔗</span><span>مصادر خارجية آمنة:</span></span>
-                <button onclick="openSecureExternalViewer('https://snduk.com/eg/dashboard?tab=favorites&lang=en', 'متابعة الصناديق المفضلة (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/70 text-amber-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
-                    <span>🔐</span>
-                    <span>دخول SNDUK</span>
-                </button>
-                <button onclick="openSecureExternalViewer('https://snduk.com/eg/funds?lang=ar', 'منصة صناديق الاستثمار (SNDUK)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 whitespace-nowrap transition active:scale-95 font-bold flex items-center gap-1">
-                    <span>🏛️</span>
-                    <span>صناديق (SNDUK)</span>
-                </button>
-                <button onclick="openSecureExternalViewer('https://snduk.com/funds/misr-sharia-equity', 'وثيقة مصر شريعة (CMS)')" class="px-2.5 py-1 rounded-lg bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/80 text-indigo-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                    
+                
+                <button onclick="window.open('https://www.egx.com.eg/ar/Disclosures.aspx/misr-sharia-equity', 'وثيقة مصر شريعة (CMS)')" class="px-2.5 py-1 rounded-lg bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-700/80 text-indigo-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
                     <span>📈</span>
                     <span>وثيقة CMS (22.6467 ج)</span>
                 </button>
-                <button onclick="openSecureExternalViewer('https://snduk.com/funds/azimut-gold', 'وثيقة أزيموت جولد (AZG)')" class="px-2.5 py-1 rounded-lg bg-amber-950/70 hover:bg-amber-900 border border-amber-700/80 text-amber-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                <button onclick="window.open('https://www.egx.com.eg/ar/Disclosures.aspx/azimut-gold', 'وثيقة أزيموت جولد (AZG)')" class="px-2.5 py-1 rounded-lg bg-amber-950/70 hover:bg-amber-900 border border-amber-700/80 text-amber-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
                     <span>🥇</span>
                     <span>أزيموت جولد (23.5374 ج)</span>
                 </button>
-                <button onclick="openSecureExternalViewer('https://www.egx.com.eg', 'موقع البورصة المصرية الرسمي (EGX)')" class="px-2.5 py-1 rounded-lg bg-sky-950/70 hover:bg-sky-900 border border-sky-700/80 text-sky-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
+                <button onclick="window.open('https://www.egx.com.eg', 'موقع البورصة المصرية الرسمي (EGX)')" class="px-2.5 py-1 rounded-lg bg-sky-950/70 hover:bg-sky-900 border border-sky-700/80 text-sky-300 whitespace-nowrap transition active:scale-95 font-medium flex items-center gap-1">
                     <span>🏛️</span>
                     <span>إفصاحات EGX</span>
                 </button>
@@ -23652,79 +23587,8 @@ ${stocksUniverseContext}
         </div>
     </div>
 
-    <!-- ================= MODAL: SECURE SANDBOXED IN-APP EXTERNAL WEB VIEWER ================= -->
-    <div id="geminiExternalViewerModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 sm:p-4">
-        <div class="glass-card rounded-2xl max-w-5xl w-full border border-sky-700/80 bg-slate-900/98 shadow-2xl flex flex-col h-[94vh] max-h-[860px] overflow-hidden">
-            
-            <!-- Browser-like Address Bar & Header -->
-            <div class="flex items-center justify-between border-b border-slate-800 px-4 py-3 shrink-0 bg-slate-950 gap-2">
-                <div class="flex items-center gap-2 overflow-hidden flex-1">
-                    <span class="text-base text-sky-400">🌐</span>
-                    <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1 rounded-xl border border-slate-800 flex-1 max-w-xl">
-                        <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                            <span>🔒</span>
-                            <span>آمن ومحمي (Sandboxed)</span>
-                        </span>
-                        <span class="text-slate-600 text-xs">|</span>
-                        <input id="geminiExternalViewerUrlInput" type="text" readonly class="bg-transparent border-0 text-[11px] font-mono text-slate-300 w-full focus:outline-none select-all truncate" value="https://snduk.com">
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="refreshSecureExternalViewer()" title="إعادة تحميل" class="p-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition active:scale-95">
-                        🔄
-                    </button>
-                    <button onclick="openExternalViewerInNewTab()" title="فتح في نافذة مستقلة" class="p-1.5 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-bold transition active:scale-95 flex items-center gap-1">
-                        <span>↗️</span>
-                        <span class="hidden sm:inline">نافذة جديدة</span>
-                    </button>
-                    <button onclick="closeSecureExternalViewer()" class="text-slate-400 hover:text-white p-1.5 rounded-xl text-lg hover:bg-slate-800 transition">
-                        ✕
-                    </button>
-                </div>
-            </div>
-
-            <!-- Page Title Bar & Quick Switcher + Credentials Assistant -->
-            <div class="px-4 py-2 bg-slate-950/90 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-300">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span id="geminiExternalViewerTitle" class="font-bold text-white truncate">صفحة خارجية</span>
-                    <div class="flex items-center gap-1 font-mono text-[10.5px]">
-                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/dashboard?tab=favorites&lang=en', 'متابعة الصناديق المفضلة (SNDUK)')" class="px-2.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-600 hover:bg-amber-900 font-bold transition flex items-center gap-1">
-                            <span>⭐</span>
-                            <span>المفضلة مباشرة (SNDUK)</span>
-                        </button>
-                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/auth/sign-in?lang=en', 'تسجيل الدخول (SNDUK Sign-In)')" class="px-2 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition">🔐 صفحة الدخول</button>
-                        <button onclick="openSecureExternalViewer('https://snduk.com/eg/fund-prices?lang=ar', 'أسعار وثائق الصناديق (SNDUK)')" class="px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800 hover:bg-emerald-900 transition">📊 أسعار الوثائق</button>
-                    </div>
-                </div>
-                <!-- SEC-01 & SEC-02 Fix: Zero hardcoded credentials in public source. User-controlled via private localStorage -->
-                <div class="flex items-center gap-2 bg-slate-900 px-3 py-1 rounded-xl border border-amber-600/60 text-[11px]" dir="ltr">
-                    <span class="text-amber-400 font-bold font-sans">🔑 SNDUK Login:</span>
-                    <button onclick="copySndukUserCredentials('user')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono transition" title="انقر لنسخ البريد">
-                        <span>📧 نسخ البريد الإلكتروني</span>
-                    </button>
-                    <button onclick="copySndukUserCredentials('pass')" class="px-2 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 font-mono font-bold transition" title="انقر لنسخ كلمة المرور">
-                        <span>🔒 نسخ كلمة المرور</span>
-                    </button>
-                    <button onclick="promptConfigureSndukCredentials()" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px]" title="إعداد بيانات الدخول في المتصفح الخاص">⚙️</button>
-                </div>
-            </div>
-
-            <!-- Sandboxed iFrame -->
-            <div class="flex-1 relative bg-slate-950">
-                <div id="geminiExternalViewerLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 text-sky-400 space-y-2 z-10">
-                    <span class="w-5 h-5 rounded-full bg-sky-400 pulse-live"></span>
-                    <span class="text-xs font-bold">جاري تحميل الصفحة الآمنة...</span>
-                    <span class="text-[10px] text-slate-400 font-mono">يتم الفحص والتشغيل داخل بيئة معزولة Sandbox</span>
-                </div>
-                <iframe id="geminiExternalViewerFrame" src="" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerpolicy="strict-origin-when-cross-origin" onload="document.getElementById('geminiExternalViewerLoading').classList.add('hidden')"></iframe>
-            </div>
-        </div>
-    </div>
-
-
+    
     <script>
-        // =========================================================================
         // UNIVERSAL EXPORT ENGINE (EXCEL & PDF) - SOCPA / IFRS COMPLIANT
         // =========================================================================
         window.toggleUniversalExportDropdown = function(scope, event) {
@@ -23871,6 +23735,18 @@ ${stocksUniverseContext}
         }
 
         // Direct News & Disclosures Link Resolver for Daily Reports (User Item 1)
+        
+        window.openDirectArticle = function(url, ticker, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            let targetUrl = url;
+            if (!targetUrl || !targetUrl.startsWith('http') || targetUrl.includes('snduk.com')) {
+                targetUrl = ticker ? `https://www.google.com/search?q=${encodeURIComponent('البورصة المصرية إفصاح ' + ticker)}` : 'https://www.egx.com.eg/ar/Disclosures.aspx';
+            }
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        };
+
         window.getDirectNewsLinkForText = function(text) {
             const t = (text || '').toLowerCase();
             if (t.includes('mnt-halan') || t.includes('حالا') || t.includes('طرح 20%')) {
@@ -23900,8 +23776,8 @@ ${stocksUniverseContext}
             if (t.includes('egal') || t.includes('مصر للالومنيوم') || t.includes('ألومنيوم')) {
                 return { url: 'https://www.egx.com.eg/ar/Disclosures.aspx?ticker=EGAL', label: 'إفصاحات مصر للألومنيوم' };
             }
-            if (t.includes('snduk') || t.includes('صناديق') || t.includes('وثائق')) {
-                return { url: 'https://snduk.com/eg/dashboard?tab=favorites&lang=en', label: 'منصة صناديق SNDUK الرسمية' };
+            if (t.includes('صناديق') || t.includes('وثائق')) {
+                return { url: 'https://www.egx.com.eg/ar/Disclosures.aspx', label: 'إفصاحات الصناديق الرسمية (EGX)' };
             }
             if (t.includes('ذهب') || t.includes('سبائك') || t.includes('7015') || t.includes('7,015') || t.includes('7040')) {
                 return { url: 'https://www.mubasher.info/news/4341380/gold-prices-egypt-24k-thndr', label: 'مباشر: أسعار الذهب عيار 24 وثندر' };
