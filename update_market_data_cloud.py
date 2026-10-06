@@ -311,9 +311,9 @@ try:
 except Exception as fxe:
     print(f"  [FX SKIP] {fxe}")
 
-# Gold: 21K Local, 24K Local (computed as 24/21), XAU/USD Ounce
-gold_21k_price = 4142.7
-gold_21k_chg = -0.83
+# Gold: Global XAU/USD Spot Ounce, and Computed Parity Rates for 24K and 21K in EGP
+xau_usd_ounce = 2650.0
+xau_usd_chg = 0.60
 try:
     gold_payload = json.dumps({
         'symbols': {'tickers': ['TVC:GOLD']},
@@ -329,40 +329,42 @@ try:
         for item in g_res.get('data', []):
             d = item.get('d', [])
             if len(d) >= 3 and d[0] is not None:
-                gold_21k_price = round(float(d[0]), 1)
-                gold_21k_chg = round(float(d[2]), 2) if d[2] is not None else -0.83
+                xau_usd_ounce = round(float(d[0]), 2)
+                xau_usd_chg = round(float(d[2]), 2) if d[2] is not None else 0.60
 except Exception as ge:
     print(f"  [GOLD SCAN SKIP] {ge}")
 
-gold_24k_price = round(gold_21k_price * (24.0 / 21.0), 1)
-theoretical_gram_usd = round(2650.0 / 31.1034768 * usd_rate, 1)
+# Exact Global Formula: (XAU/USD / 31.1034768) * USD/EGP
+gold_24k_theoretical = round((xau_usd_ounce / 31.1034768) * usd_rate, 2)
+gold_21k_theoretical = round(gold_24k_theoretical * (21.0 / 24.0), 2)
 
 fx_gold = {
     "usd_egp": {
         "close": usd_rate,
         "chgPct": usd_chg,
         "unit": "ج.م / USD",
-        "source": "البنك المركزي المصري / البنوك التجارية المصرية"
-    },
-    "gold_21k_local": {
-        "close": gold_21k_price,
-        "chgPct": gold_21k_chg,
-        "unit": "ج.م / جرام عيار 21",
-        "purity": "21K",
-        "source": "شعبة الذهب والبورصة السلعية المصرية"
+        "source": "TradingView (FX_IDC:USDEGP) / البنوك المصرية"
     },
     "gold_24k_local": {
-        "close": gold_24k_price,
-        "chgPct": gold_21k_chg,
+        "close": gold_24k_theoretical,
+        "chgPct": xau_usd_chg,
         "unit": "ج.م / جرام عيار 24",
         "purity": "24K",
-        "source": "شعبة الذهب والبورصة السلعية المصرية (محسوب عيار 24)"
+        "calc": f"({xau_usd_ounce} USD / 31.1035 oz) * {usd_rate} USDEGP",
+        "source": "سعر الذهب عيار 24 المعادل عالمياً (TradingView TVC:GOLD)"
+    },
+    "gold_21k_local": {
+        "close": gold_21k_theoretical,
+        "chgPct": xau_usd_chg,
+        "unit": "ج.م / جرام عيار 21",
+        "purity": "21K",
+        "source": "سعر الذهب عيار 21 المعادل (عيار 24 * 21/24)"
     },
     "xau_usd_ounce": {
-        "close": 2650.0,
-        "chgPct": gold_21k_chg,
+        "close": xau_usd_ounce,
+        "chgPct": xau_usd_chg,
         "unit": "USD / أونصة عالمية",
-        "source": "الأسواق العالمية (Spot Gold XAU/USD)"
+        "source": "الأسواق العالمية (TradingView TVC:GOLD Spot)"
     },
     "clawdz_yield": {
         "annual_rate": 17.31,

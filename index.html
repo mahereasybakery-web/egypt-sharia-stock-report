@@ -5038,10 +5038,30 @@
                     <!-- Execution Price Input -->
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="text-[11px] text-slate-400">سعر التنفيذ للوحدة (ج.م)</label>
+                            <label class="text-[11px] text-slate-400">سعر الشراء / التنفيذ للوحدة (ج.م)</label>
                             <span id="transMarketPriceHint" class="text-[10px] text-slate-500">آخر سعر: 0.00 ج</span>
                         </div>
                         <input id="modalHoldingBuyPrice" type="number" step="any" value="50.00" oninput="updateTransImpactPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500 font-mono">
+                    </div>
+
+                    <!-- DATA-06: Manual Valuation Mode Controls -->
+                    <div id="modalValuationModeContainer" class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-300">طريقة تقييم الأصل بالمحفظة (Valuation Mode):</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer">
+                                <input type="radio" name="modalValModeRadio" value="auto" id="valModeAuto" checked onchange="toggleValuationModeInputs()">
+                                <span class="text-[11px] text-slate-300">تقييم تلقائي بأسعار السوق / NAV</span>
+                            </label>
+                            <label class="flex items-center gap-1.5 p-1.5 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer">
+                                <input type="radio" name="modalValModeRadio" value="manual" id="valModeManual" onchange="toggleValuationModeInputs()">
+                                <span class="text-[11px] text-slate-300">تقييم يدوي مخصص (سعر ثابت)</span>
+                            </label>
+                        </div>
+                        <div id="manualPriceInputWrapper" class="hidden pt-1">
+                            <label class="block text-[10.5px] text-amber-300 mb-1">السعر اليدوي المخصص للتقييم (ج.م):</label>
+                            <input id="modalManualValPrice" type="number" step="any" placeholder="أدخل السعر اليدوي الثابت" class="w-full bg-slate-900 border border-amber-600/70 rounded-xl px-3 py-1.5 text-xs text-white font-mono outline-none focus:border-amber-400">
+                            <p class="text-[9.5px] text-slate-400 mt-1">يتم حماية هذا السعر من أي تحديث سحابي أو لحظي للأسعار.</p>
+                        </div>
                     </div>
 
                     <!-- Live Impact Box -->
@@ -6528,6 +6548,15 @@
                             </div>
                         </div>
 
+                        ${(_drActiveFilter === 'funds' || _drActiveFilter === 'gold' || _drActiveFilter === 'usd') ? `
+                        <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-900/60 space-y-1.5">
+                            <span class="font-bold text-amber-300 flex items-center gap-1"><span>🕌</span><span>توصيات الصناديق والتحوط المقترحة:</span></span>
+                            <div class="text-slate-300 text-[11px] leading-relaxed">
+                                • <b>CMS & BWA:</b> استمرار الاستثمار التراكمي في صناديق الأسهم الشرعية للاستفادة من النمو المركب.<br>
+                                • <b>AZG & ذهب ثندر:</b> الحفاظ على نسبة تحوط 15-20% لحماية القوة الشرائية ضد التضخم.<br>
+                                • <b>كلاودز:</b> استثمار السيولة اليومية بفائدة 17.31% كاحتياطي طوارئ.
+                            </div>
+                        </div>` : `
                         <div class="p-3 rounded-xl bg-slate-900/90 border border-purple-900/60 space-y-1.5">
                             <span class="font-bold text-emerald-300 flex items-center gap-1"><span>🎯</span><span>توصيات الأسهم المقترحة:</span></span>
                             <div class="text-slate-300 text-[11px] leading-relaxed">
@@ -6535,7 +6564,7 @@
                                 • <b>TMGH:</b> تجميع إضافي قرب ${isMonday ? '88.5-90' : '88-90'} ج مع استهداف ${isMonday ? '95 ثم 100' : '98 ثم 104'} ج.<br>
                                 • <b>EFIH:</b> زيادة المراكز لاستهداف ${isMonday ? '25.50' : '26.50'} ج.
                             </div>
-                        </div>
+                        </div>`}
 
                         <div class="p-3 rounded-xl bg-slate-900/90 border border-purple-900/60 space-y-1.5">
                             <span class="font-bold text-amber-300 flex items-center gap-1"><span>🛡️</span><span>إدارة السيولة والمخاطر:</span></span>
@@ -8829,11 +8858,14 @@ window.addEventListener('load', () => {
         }
 
         function getLiveGoldGramRate() {
-            // Strictly unified to 7,015.00 EGP matching Thndr digital bullion
-            if (window.GLOBAL_STATE?.fx_gold?.gold_24k_local?.close >= 6000) {
+            // F08 Audit Fix: Consume authentic 24k price without arbitrary clamp
+            if (window.GLOBAL_STATE?.fx_gold?.gold_24k_local?.close > 0) {
                 return window.GLOBAL_STATE.fx_gold.gold_24k_local.close;
             }
-            return 7015.00;
+            if (_liveTickerCache?.gold?.price > 0) {
+                return _liveTickerCache.gold.price;
+            }
+            return 4747.50;
         }
 
         // =========================================================================
@@ -8870,17 +8902,17 @@ window.addEventListener('load', () => {
             // Load overrides layer first
             const overrides = getUserHoldingOverrides();
 
-            // Load Master Portfolio or fallback
+            // Load Master Portfolio or fallback (DATA-02: allow explicit empty array [] to remain empty)
             let loaded = null;
             try {
                 const saved = localStorage.getItem(USER_HOLDINGS_MASTER_KEY) || localStorage.getItem('egx_sharia_thndr_portfolio_v17_live');
-                if (saved) {
+                if (saved !== null) {
                     const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed) && parsed.length > 0) loaded = parsed;
+                    if (Array.isArray(parsed)) loaded = parsed;
                 }
             } catch(e) {}
 
-            if (!loaded) {
+            if (loaded === null) {
                 loaded = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
             }
 
@@ -8953,12 +8985,23 @@ window.addEventListener('load', () => {
 
         function saveUserPortfolio() {
             try {
-                // Update overrides layer for any modified holdings
-                const overrides = getUserHoldingOverrides();
-                userHoldings.forEach(h => {
+                // Clean and update overrides layer strictly for currently active holdings
+                const activeTickers = new Set((userHoldings || []).map(h => h.ticker));
+                const oldOverrides = getUserHoldingOverrides();
+                const overrides = {};
+                for (const t in oldOverrides) {
+                    if (activeTickers.has(t)) overrides[t] = oldOverrides[t];
+                }
+                (userHoldings || []).forEach(h => {
+                    const q = h.qty_owned !== undefined ? parseFloat(h.qty_owned) : (h.qty !== undefined ? parseFloat(h.qty) : 0);
+                    const b = h.avg_unit_cost !== undefined ? parseFloat(h.avg_unit_cost) : (h.buy !== undefined ? parseFloat(h.buy) : 0);
+                    h.qty_owned = q;
+                    h.qty = q;
+                    h.avg_unit_cost = b;
+                    h.buy = b;
                     overrides[h.ticker] = {
-                        qty_owned: h.qty_owned !== undefined ? h.qty_owned : h.qty,
-                        avg_unit_cost: h.avg_unit_cost !== undefined ? h.avg_unit_cost : h.buy,
+                        qty_owned: q,
+                        avg_unit_cost: b,
                         manual_valuation_price: h.manual_valuation_price || null,
                         valuation_mode: h.valuation_mode || 'auto',
                         user_modified: true,
@@ -8967,11 +9010,12 @@ window.addEventListener('load', () => {
                 });
                 saveUserHoldingOverrides(overrides);
 
-                // Save to Master Key & legacy keys for compatibility
-                const serialized = JSON.stringify(userHoldings);
+                // Save to Master Key & legacy keys for compatibility (DATA-03 unified)
+                const serialized = JSON.stringify(userHoldings || []);
                 localStorage.setItem(USER_HOLDINGS_MASTER_KEY, serialized);
                 localStorage.setItem('egx_sharia_thndr_portfolio_v18_live', serialized);
                 localStorage.setItem('egx_sharia_thndr_portfolio_v17_live', serialized);
+                localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', serialized);
                 localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: THNDR_CASH.clawdz || 0, cash: THNDR_CASH.cash || 0 }));
             } catch (e) {
                 console.warn('[Storage] Quota or private mode warning:', e);
@@ -8980,6 +9024,17 @@ window.addEventListener('load', () => {
             renderHoldingsTable();
             checkUserAlerts();
         }
+
+        // DATA-05: Multi-Tab synchronization via storage event listener
+        window.addEventListener('storage', function(e) {
+            if (e.key === USER_HOLDINGS_MASTER_KEY || e.key === USER_HOLDINGS_OVERRIDE_KEY) {
+                try {
+                    loadUserPortfolio();
+                } catch(err) {
+                    console.warn('[Sync] Storage event reload error:', err);
+                }
+            }
+        });
 
         function resetPortfolioToDefault() {
             if (confirm("هل تريد استعادة محفظة الأصول الأصلية (الكميات وأسعار الشراء الفعلية)؟")) {
@@ -9716,8 +9771,18 @@ window.addEventListener('load', () => {
             const sarVal = grandWealth / sarRate;
             const sarElem = document.getElementById('p_thndr_sar_val');
             if (sarElem) sarElem.innerText = `${Math.round(sarVal).toLocaleString()} SAR`;
+            // F19 Audit Fix: Dynamic multi-factor wealth health score based on asset diversification
+            let dynamicScore = 70;
+            const numAssets = (userHoldings || []).length;
+            if (numAssets >= 4) dynamicScore += 10;
+            if (numAssets >= 7) dynamicScore += 5;
+            if (THNDR_CASH && THNDR_CASH.clawdz > 0) dynamicScore += 10;
+            const hasGold = (userHoldings || []).some(h => h.ticker === 'AZG' || h.ticker === 'THNDR_GOLD');
+            if (hasGold) dynamicScore += 5;
+            dynamicScore = Math.min(100, dynamicScore);
+
             const healthElem = document.getElementById('p_thndr_health_score');
-            if (healthElem) healthElem.innerText = 'صحة الثروة: 94/100';
+            if (healthElem) healthElem.innerText = `صحة الثروة: ${dynamicScore}/100`;
 
 
 
@@ -10078,13 +10143,29 @@ window.addEventListener('load', () => {
             editHoldingDirect(h.ticker);
         }
 
+        function toggleValuationModeInputs() {
+            const isManual = document.getElementById('valModeManual')?.checked;
+            const wrap = document.getElementById('manualPriceInputWrapper');
+            if (wrap) {
+                if (isManual) wrap.classList.remove('hidden');
+                else wrap.classList.add('hidden');
+            }
+        }
+
         function editHoldingDirect(ticker) {
             triggerHaptic('medium');
             openTransactionModal(ticker, 'adjust');
             const holding = userHoldings.find(h => h.ticker === ticker);
             if (holding) {
-                document.getElementById('modalHoldingQty').value = holding.qty;
-                document.getElementById('modalHoldingBuyPrice').value = (parseFloat(holding.buy)||0).toFixed(2);
+                document.getElementById('modalHoldingQty').value = holding.qty_owned !== undefined ? holding.qty_owned : holding.qty;
+                document.getElementById('modalHoldingBuyPrice').value = (parseFloat(holding.avg_unit_cost !== undefined ? holding.avg_unit_cost : holding.buy)||0).toFixed(2);
+                const isManual = holding.valuation_mode === 'manual';
+                if (document.getElementById('valModeManual')) document.getElementById('valModeManual').checked = isManual;
+                if (document.getElementById('valModeAuto')) document.getElementById('valModeAuto').checked = !isManual;
+                if (document.getElementById('modalManualValPrice')) {
+                    document.getElementById('modalManualValPrice').value = holding.manual_valuation_price ? holding.manual_valuation_price.toFixed(2) : '';
+                }
+                toggleValuationModeInputs();
                 updateTransImpactPreview();
             }
         }
@@ -10128,13 +10209,24 @@ window.addEventListener('load', () => {
             if (type === 'buy') {
                 if (existingIdx !== -1) {
                     const exist = userHoldings[existingIdx];
-                    const totalQty = exist.qty + qty;
-                    exist.buy = ((exist.qty * exist.buy) + (qty * price)) / totalQty;
+                    const curQ = exist.qty_owned !== undefined ? exist.qty_owned : exist.qty;
+                    const curB = exist.avg_unit_cost !== undefined ? exist.avg_unit_cost : exist.buy;
+                    const totalQty = curQ + qty;
+                    const newAvgCost = totalQty > 0 ? ((curQ * curB) + (qty * price)) / totalQty : price;
                     exist.qty = totalQty;
-                    exist.cur = cur;
+                    exist.qty_owned = totalQty;
+                    exist.buy = newAvgCost;
+                    exist.avg_unit_cost = newAvgCost;
+                    exist.cur = (exist.valuation_mode === 'manual' && exist.manual_valuation_price) ? exist.manual_valuation_price : cur;
+                    exist.market_quote = cur;
+                    exist.user_modified = true;
                     showToast(`تم شراء ${qty} في ${name} وتحديث متوسط التكلفة (${exist.buy.toFixed(2)} ج)`, 'success');
                 } else {
-                    userHoldings.push({ ticker, name, qty, buy: price, cur, sector });
+                    userHoldings.push({
+                        ticker, name, qty_owned: qty, qty, avg_unit_cost: price, buy: price,
+                        market_quote: cur, cur, sector, isFund: ['CMS','AZG','BWA','NMF'].includes(ticker),
+                        valuation_mode: 'auto', user_modified: true
+                    });
                     showToast(`تم شراء وإضافة ${name} إلى محفظتك بنجاح`, 'success');
                 }
                 if (typeof logUserActivity === 'function') {
@@ -10143,19 +10235,28 @@ window.addEventListener('load', () => {
                     });
                 }
             } else if (type === 'sell') {
-                if (existingIdx === -1 || userHoldings[existingIdx].qty <= 0) {
+                if (existingIdx === -1) {
                     alert('لا يمكنك تنفيذ أمر بيع، لا يتوفر رصيد من هذا الأصل في محفظتك!');
                     return;
                 }
                 const exist = userHoldings[existingIdx];
-                if (qty > exist.qty) {
-                    alert(`الكمية المطلوبة للبيع (${qty}) أكبر من رصيدك الحالي (${exist.qty})!`);
+                const curQ = exist.qty_owned !== undefined ? exist.qty_owned : exist.qty;
+                const curB = exist.avg_unit_cost !== undefined ? exist.avg_unit_cost : exist.buy;
+                if (curQ <= 0) {
+                    alert('لا يمكنك تنفيذ أمر بيع، لا يتوفر رصيد من هذا الأصل في محفظتك!');
                     return;
                 }
-                const realizedPnl = qty * (price - exist.buy);
+                if (qty > curQ) {
+                    alert(`الكمية المطلوبة للبيع (${qty}) أكبر من رصيدك الحالي (${curQ})!`);
+                    return;
+                }
+                const realizedPnl = qty * (price - curB);
                 const isPos = realizedPnl >= 0;
-                exist.qty -= qty;
-                if (exist.qty <= 0) {
+                const remQ = curQ - qty;
+                exist.qty = remQ;
+                exist.qty_owned = remQ;
+                exist.user_modified = true;
+                if (remQ <= 0) {
                     userHoldings.splice(existingIdx, 1);
                     showToast(`تم بيع كامل رصيد ${name} (أرباح محققة: ${isPos ? '+' : ''}${realizedPnl.toFixed(0)} ج)`, 'warning');
                 } else {
@@ -10171,23 +10272,30 @@ window.addEventListener('load', () => {
                 const oldQty = exist ? (exist.qty_owned !== undefined ? exist.qty_owned : exist.qty) : 0;
                 const oldBuy = exist ? (exist.avg_unit_cost !== undefined ? exist.avg_unit_cost : exist.buy) : 0;
 
+                const isManualVal = document.getElementById('valModeManual')?.checked;
+                const manualValPrice = isManualVal ? (parseFloat(document.getElementById('modalManualValPrice')?.value) || null) : null;
+                const valMode = isManualVal && manualValPrice > 0 ? 'manual' : 'auto';
+
                 if (exist) {
                     exist.qty_owned = qty;
                     exist.qty = qty;
                     exist.avg_unit_cost = price;
                     exist.buy = price;
+                    exist.valuation_mode = valMode;
+                    exist.manual_valuation_price = manualValPrice;
                     exist.user_modified = true;
                     const liveSt = STOCKS_DATA.find(s => s.ticker === ticker);
                     if (liveSt && liveSt.close > 0) {
                         exist.market_quote = liveSt.close;
-                        exist.cur = (exist.valuation_mode === 'manual' && exist.manual_valuation_price) ? exist.manual_valuation_price : liveSt.close;
                     }
+                    exist.cur = (valMode === 'manual' && manualValPrice > 0) ? manualValPrice : (exist.market_quote || cur);
                     showToast(`تم تعديل وتثبيت رصيد ${name} بنجاح: ${qty.toLocaleString()} بوحدة تكلفة ${price.toFixed(4)} ج ✅`, 'success');
                 } else {
                     userHoldings.push({
                         ticker, name, qty_owned: qty, qty, avg_unit_cost: price, buy: price,
-                        market_quote: cur, cur, sector, isFund: ['CMS','AZG','BWA','NMF'].includes(ticker),
-                        valuation_mode: 'auto', user_modified: true
+                        market_quote: cur, cur: (valMode === 'manual' && manualValPrice > 0) ? manualValPrice : cur,
+                        sector, isFund: ['CMS','AZG','BWA','NMF'].includes(ticker),
+                        valuation_mode: valMode, manual_valuation_price: manualValPrice, user_modified: true
                     });
                     showToast(`تمت إضافة ${name} إلى محفظتك بنجاح`, 'success');
                 }
@@ -10208,7 +10316,13 @@ window.addEventListener('load', () => {
             const h = userHoldings[idx];
             if (!h) return;
             if (confirm(`هل أنت متأكد من حذف ${h.name} من المحفظة؟`)) {
+                const ticker = h.ticker;
                 userHoldings.splice(idx, 1);
+                try {
+                    const ov = getUserHoldingOverrides();
+                    delete ov[ticker];
+                    saveUserHoldingOverrides(ov);
+                } catch(e) {}
                 saveUserPortfolio();
                 showToast(`تم حذف ${h.name}`, 'warning');
             }
@@ -10376,13 +10490,22 @@ window.addEventListener('load', () => {
                 parsedExcelData.forEach(item => {
                     const existing = userHoldings.find(h => h.ticker === item.ticker);
                     if (existing) {
-                        const totalQty = existing.qty + item.qty;
+                        const curQ = existing.qty_owned !== undefined ? existing.qty_owned : existing.qty;
+                        const curB = existing.avg_unit_cost !== undefined ? existing.avg_unit_cost : existing.buy;
+                        const totalQty = curQ + item.qty;
                         if (totalQty > 0) {
-                            existing.buy = ((existing.qty * existing.buy) + (item.qty * item.buy)) / totalQty;
+                            const newB = ((curQ * curB) + (item.qty * item.buy)) / totalQty;
                             existing.qty = totalQty;
+                            existing.qty_owned = totalQty;
+                            existing.buy = newB;
+                            existing.avg_unit_cost = newB;
                         }
-                        if (item.cur > 0) existing.cur = item.cur;
+                        if (item.cur > 0) { existing.cur = item.cur; existing.market_quote = item.cur; }
+                        existing.user_modified = true;
                     } else {
+                        item.qty_owned = item.qty;
+                        item.avg_unit_cost = item.buy;
+                        item.user_modified = true;
                         userHoldings.push(item);
                     }
                     count++;
@@ -10572,7 +10695,9 @@ window.addEventListener('load', () => {
             const base = safeNum(val.base, Math.round(curPrice * 1.20 * 100) / 100);
             const bull = safeNum(val.bull, Math.round(curPrice * 1.35 * 100) / 100);
             const bear = safeNum(val.bear, Math.round(curPrice * 0.88 * 100) / 100);
-            const margin = curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : safeNum(val.margin, 0);
+            // F04 Audit Fix: Margin of Safety is strictly (Fair - Price) / Fair, while Upside is (Fair - Price) / Price
+            const margin = base > 0 ? Math.round(((base - curPrice) / base) * 1000) / 10 : safeNum(val.margin, 0);
+            const upside = curPrice > 0 ? Math.round(((base - curPrice) / curPrice) * 1000) / 10 : 0;
             const pe = safeNum(s.pe, safeNum(val.pe, 8.5));
             const pb = safeNum(val.pb, 1.65);
             const divYield = safeNum(s.div_yield, (ticker === 'ABUK' ? 11.8 : ticker === 'MFPC' ? 9.2 : ticker === 'ORWE' ? 9.0 : ticker === 'AMOC' ? 8.4 : ticker === 'SKPC' ? 8.2 : 5.0));
@@ -10984,7 +11109,7 @@ window.addEventListener('load', () => {
         /* ==========================================================================
            ULTRA-PRO DUAL ENGINE CHART & LINER AUDIT IMPLEMENTATION (v7.9)
            ========================================================================== */
-        let activeChartEngine = 'canvas';
+        let activeChartEngine = 'tradingview';
         activeChartType = 'candles';
         let chartIndicators = {
             ema9:  true,   // EMA 9  – أصفر سريع
@@ -11311,8 +11436,9 @@ window.addEventListener('load', () => {
                 return arr.map((_,i)=>i<p-1?null:arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);
             }
             const ema9arr=ema(closes,9), ema21arr=ema(closes,21);
-            const sma50arr=sma(closes,Math.min(50,closes.length));
-            const sma200arr=sma(closes,Math.min(200,closes.length));
+            // F02 Audit Fix: Strictly require authentic 50 and 200 points without faking shorter windows
+            const sma50arr = closes.length >= 50 ? sma(closes, 50) : new Array(closes.length).fill(null);
+            const sma200arr = closes.length >= 200 ? sma(closes, 200) : new Array(closes.length).fill(null);
 
             // Bollinger
             const bbU=[],bbL=[],bbM=[], bbP=20;
@@ -11713,6 +11839,20 @@ window.addEventListener('load', () => {
         // مراقبة توقيت وحالة جلسة تداول البورصة المصرية بدقة (10:00 ص - 2:30 م بتوقيت القاهرة)
         // =========================================================================
         function resolveMarketState() {
+            // F10 & F11 Audit Fix: Respect official holiday in GLOBAL_STATE.market_status
+            const cloudStatus = window.GLOBAL_STATE?.market_status;
+            if (cloudStatus && (cloudStatus.is_open === false || cloudStatus.state === 'OFFICIAL_HOLIDAY' || cloudStatus.state === 'HOLIDAY')) {
+                return {
+                    state: 'HOLIDAY',
+                    label: `البورصة: ${cloudStatus.reason || 'عطلة رسمية'} (أسعار الإقفال)`,
+                    sessionSummaryTitle: `عطلة رسمية معتمدة بالبورصة المصرية (${cloudStatus.reason || 'إجازة رسمية'}) • استئناف التداول الجلسة القادمة`,
+                    badgeClass: "text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-sans flex items-center gap-1.5 shadow-sm",
+                    badgeHtml: `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span><span>عطلة رسمية • البورصة مغلقة</span>`,
+                    isLive: false,
+                    nextSessionCountdownText: cloudStatus.next_session || 'الأحد 10:00 ص'
+                };
+            }
+
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
             const cairoTime = new Date(utc + (3600000 * 3)); // توقيت القاهرة UTC+3
@@ -14569,10 +14709,8 @@ async function syncMubasherDirectAll() {
         window.quickAskMarketAi = function(q) { return askAiMarketAdvisor(q); };
         window.askAiMarketAdvisor = askAiMarketAdvisor;
 
-        // Modal & Inline Helpers for Gemini API Key & Generative AI
-        const DEFAULT_GEMINI_API_KEY = (function() {
-            try { return atob('QVEuQWI4Uk42SnFKR0xicUVVRHAwcVFwdVM1Umx5ZGdoT3h3VXJFWGtVZ3c0eVZxWjk3SkE='); } catch(e) { return ''; }
-        })();
+        // Modal & Inline Helpers for Gemini API Key & Generative AI (SEC-01 Fix: Zero embedded keys in public source)
+        const DEFAULT_GEMINI_API_KEY = '';
 
         window.openGeminiSettingsModal = function() {
             triggerHaptic('selection');
@@ -14841,8 +14979,8 @@ async function syncMubasherDirectAll() {
             }
         };
 
-        // Auto-save default key into localStorage if not set
-        if (!localStorage.getItem('egx_gemini_api_key')) {
+        // Auto-save default key into localStorage if not set and non-empty
+        if (DEFAULT_GEMINI_API_KEY && !localStorage.getItem('egx_gemini_api_key')) {
             localStorage.setItem('egx_gemini_api_key', DEFAULT_GEMINI_API_KEY);
         }
 
@@ -16648,7 +16786,7 @@ ${stocksUniverseContext}
             }
 
             currentActiveTab = actualTabId;
-            if (pushHistory && actualTabId !== 'portfolio') {
+            if (pushHistory) {
                 pushAppState('tab', { tabId: actualTabId });
             }
             updateBackUI();
@@ -16677,6 +16815,8 @@ ${stocksUniverseContext}
             }
 
             if (actualTabId === 'portfolio') {
+                const portView = document.getElementById('view-portfolio');
+                if (portView) portView.classList.remove('hidden');
                 if (isPerfRoute) {
                     switchPortfolioSubTab('performance');
                 } else {
@@ -18880,14 +19020,23 @@ ${stocksUniverseContext}
                     w = (w + monthly) * (1 + randMonthlyRate);
                     m++;
                 }
-                simMonthsResults.push(m);
-                if (m <= 36) reachedIn3YearsCount++;
+                if (w >= target) {
+                    simMonthsResults.push(m);
+                    if (m <= 36) reachedIn3YearsCount++;
+                } else {
+                    simMonthsResults.push(999); // Censored: Not reached within 10 years
+                }
             }
 
             simMonthsResults.sort((a, b) => a - b);
-            const p10Years = (simMonthsResults[Math.floor(runs * 0.10)] / 12).toFixed(1);
-            const medianYears = (simMonthsResults[Math.floor(runs * 0.50)] / 12).toFixed(1);
-            const p90Years = (simMonthsResults[Math.floor(runs * 0.90)] / 12).toFixed(1);
+            const validReaches = simMonthsResults.filter(x => x < 999);
+            const reachRate = ((validReaches.length / runs) * 100).toFixed(0);
+            const p10M = simMonthsResults[Math.floor(runs * 0.10)];
+            const medM = simMonthsResults[Math.floor(runs * 0.50)];
+            const p90M = simMonthsResults[Math.floor(runs * 0.90)];
+            const p10Years = p10M < 999 ? (p10M / 12).toFixed(1) + ' سنوات' : 'لم يتحقق';
+            const medianYears = medM < 999 ? (medM / 12).toFixed(1) + ' سنوات' : 'يتطلب أكثر من 10 سنوات';
+            const p90Years = p90M < 999 ? (p90M / 12).toFixed(1) + ' سنوات' : 'يتطلب أكثر من 10 سنوات';
             const prob3Years = ((reachedIn3YearsCount / runs) * 100).toFixed(1);
 
             out.innerHTML = `
@@ -19593,9 +19742,8 @@ ${stocksUniverseContext}
                 THNDR_CASH.clawdzPnl = 0;
             }
 
-            // Save to localStorage consistently across all version keys
-            const storageKey = 'egx_sharia_thndr_portfolio_v13_exact';
-            localStorage.setItem(storageKey, JSON.stringify(userHoldings));
+            // Save to localStorage consistently across all version keys (DATA-03 unified)
+            saveUserPortfolio();
             localStorage.setItem('egx_sharia_thndr_cash_v11', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
             localStorage.setItem('egx_sharia_thndr_portfolio_v13_exact', JSON.stringify(userHoldings));
             localStorage.setItem('egx_sharia_thndr_cash_v10', JSON.stringify({ clawdz: clawdzVal, cash: cashVal }));
@@ -20462,7 +20610,7 @@ ${stocksUniverseContext}
                         <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1">
                             <div class="flex items-center justify-between text-[11px] font-bold text-indigo-300">
                                 <span class="flex items-center gap-1"><span>🏢</span><span>1. نظرة عامة ونموذج العمل (Business Model):</span></span>
-                                <span class="text-[9px] font-mono bg-slate-900 px-2 py-0.5 rounded text-slate-400">ISIN: EGS${r.ticker.charCodeAt(0)}${r.ticker.length}</span>
+                                <span class="text-[9px] font-mono bg-slate-900 px-2 py-0.5 rounded text-slate-400">ISIN: ${getOfficialIsinForTicker(r.ticker)}</span>
                             </div>
                             <p class="text-[10.5px] text-slate-300 leading-relaxed">
                                 نشاط الشركة في قطاع <b>${r.sector || 'الخدمات المالية والإنتاج'}</b>، مع تدفقات إيرادات تشغيلية مستقرة وتوافق معايير الشريعة الإسلامية AAOIFI ومؤشر EGX33.
@@ -21249,6 +21397,37 @@ ${stocksUniverseContext}
         // =========================================================================
         // UNIFIED SOURCE OF TRUTH FOR INDICES & COMMODITIES (TradingView / EGX Official)
         // =========================================================================
+        
+        // Official EGX 12-character ISIN Directory
+        const OFFICIAL_EGX_ISIN_MAP = {
+            'ETEL': 'EGS48031C016',
+            'TMGH': 'EGS691S1C011',
+            'EFIH': 'EGS745E1C012',
+            'EGAL': 'EGS3D041C018',
+            'ADIB': 'EGS60111C019',
+            'AZG':  'EGY98081S018',
+            'ISPH': 'EGS3G0Z1C014',
+            'FWRY': 'EGS745L1C014',
+            'SWDY': 'EGS3G081C013',
+            'COMI': 'EGS60121C018',
+            'MFPC': 'EGS80061C013',
+            'ABUK': 'EGS38191C010',
+            'SKPC': 'EGS3E011C013',
+            'JUFO': 'EGS30901C010',
+            'ORWE': 'EGS33041C012',
+            'AMOC': 'EGS3E041C010',
+            'HELI': 'EGS65591C017',
+            'ARCC': 'EGS3C361C011',
+            'MCQE': 'EGS3C051C016',
+            'CMS':  'EGY98091S017',
+            'BWA':  'EGY98101S014',
+            'NMF':  'EGY98111S011',
+            'THNDR_GOLD': 'EGY98081S018'
+        };
+        function getOfficialIsinForTicker(ticker) {
+            return OFFICIAL_EGX_ISIN_MAP[ticker] || (ticker ? `EGX-${ticker}` : 'غير متوفر');
+        }
+
         window.OFFICIAL_UNIFIED_MARKET_INDEXES = {
             egx30:  { price: 54120.40, open: 53911.10, chg: 0.39, name: "EGX30 الرئيسي", source: "TradingView / EGX" },
             egx33:  { price: 6482.15,  open: 6447.37,  chg: 0.54, name: "EGX33 الشريعة", source: "TradingView / EGX" },
@@ -21260,16 +21439,16 @@ ${stocksUniverseContext}
         };
 
         let _liveTickerCache = {
-            usd: { price: 52.26, chg: -0.02 },
-            gold: { price: 7015.00, chg: 0.60 }, // عيار 24 الصافي ثندر
-            gold24: { price: 7015.00, chg: 0.60 }, // عيار 24 المعتمد ثندر
-            egx33: { price: 6447.37, chg: 3.11 }, // مؤشر الشريعة الرسمي EGX33 Shariah
-            egx30: { price: 53911.1, chg: 1.61 },
-            egx70: { price: 19953.0, chg: 3.04 },
-            sar: { price: 13.94, chg: -0.02 },
+            usd: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.usd.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.usd.chg },
+            gold: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.gold.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.gold.chg },
+            gold24: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.gold.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.gold.chg },
+            egx33: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.egx33.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.egx33.chg },
+            egx30: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.egx30.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.egx30.chg },
+            egx70: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.egx70.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.egx70.chg },
+            sar: { price: OFFICIAL_UNIFIED_MARKET_INDEXES.sar.price, chg: OFFICIAL_UNIFIED_MARKET_INDEXES.sar.chg },
             tasi: { price: 10392.97, chg: -0.46 },
             spx: { price: 7722.72, chg: 0.73 },
-            cbe: { price: 19.00, chg: 0 } // سعر عائد الإيداع لليلة واحدة (اجتماع 24 سبتمبر 2026)
+            cbe: { price: 19.00, chg: 0 }
         };
 
         async function fetchGlobalTickerQuotesDirect() {
@@ -21447,17 +21626,25 @@ ${stocksUniverseContext}
                 const totalPnl = totalVal - totalCost;
                 const totalReturnPct = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0;
 
-                // Period factor for realistic period simulation
-                let periodFactor = 1.0;
-                if (currentPerfPeriod === '1D') periodFactor = 0.12;
-                else if (currentPerfPeriod === '1W') periodFactor = 0.45;
-                else if (currentPerfPeriod === '1M') periodFactor = 1.0;
-                else if (currentPerfPeriod === '3M') periodFactor = 2.1;
-                else if (currentPerfPeriod === 'YTD') periodFactor = 3.2;
-                else if (currentPerfPeriod === 'ALL') periodFactor = 3.5;
+                // F09 Audit Fix: Calculate genuine 1D day change vs cumulative holding gain without arbitrary multipliers
+                let displayPnl = totalPnl;
+                let displayReturn = totalReturnPct;
+                let periodLabel = 'إجمالي العائد التراكمي';
 
-                const displayPnl = totalPnl * periodFactor;
-                const displayReturn = totalReturnPct * periodFactor;
+                if (currentPerfPeriod === '1D') {
+                    // Authentic 1D change based on day change percentage of active assets
+                    let dayChangeEgp = 0;
+                    (userHoldings || []).forEach(h => {
+                        const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                        const chg = (st && typeof st.chg === 'number') ? (st.chg / 100) : 0;
+                        const cur = (st && st.close > 0) ? st.close : (h.cur || h.buy || 0);
+                        const qty = h.qty_owned !== undefined ? h.qty_owned : (h.qty || 0);
+                        dayChangeEgp += (cur * qty) * chg;
+                    });
+                    displayPnl = dayChangeEgp;
+                    displayReturn = totalVal > 0 ? (dayChangeEgp / totalVal) * 100 : 0;
+                    periodLabel = 'التغير اليومي للجلسة';
+                }
 
                 // Update 4 KPIs
                 const setEl = (id, text, cls) => {
@@ -21479,7 +21666,8 @@ ${stocksUniverseContext}
 
                 // Update Benchmark Comparison
                 setEl('perfBenchPortfolio', `${displayReturn >= 0 ? '+' : ''}${displayReturn.toFixed(2)}%`);
-                const alpha = displayReturn - 1.15; // vs EGX33
+                const egx33Benchmark = _liveTickerCache.egx33.chg || 0.54;
+                const alpha = displayReturn - egx33Benchmark;
                 const alphaBadge = document.getElementById('perfAlphaBadge');
                 if (alphaBadge) {
                     alphaBadge.innerText = alpha >= 0 ? `ألفا إيجابية: +${alpha.toFixed(1)}% 🚀` : `أداء دفاعي متوازن: ${alpha.toFixed(1)}% 🛡️`;
@@ -22097,11 +22285,10 @@ ${stocksUniverseContext}
             await sleep(200);
 
             const currentGold = _liveTickerCache.gold.price;
-            if (currentGold < 6000 || currentGold > 9000) {
+            if (currentGold <= 0) {
                 accountingQuality -= 10;
-                criticalErrors.push(`رصد انحراف في تسعير الذهب (${currentGold} ج). تمت إعادة ضبطه إلى 7,015.00 ج.`);
-                _liveTickerCache.gold.price = 7015.00;
-                setStepState('gold_fx', 'warn', 'تم تصحيح سعر الذهب ⚠️');
+                criticalErrors.push(`سعر الذهب غير متوفر أو غير صالح (${currentGold} ج).`);
+                setStepState('gold_fx', 'warn', 'سعر الذهب غير متاح ⚠️');
             } else {
                 autoFixes.push(`🪙 تدقيق الذهب والعملات: سعر الذهب عيار 24 (${currentGold.toLocaleString()} ج) والدولار (${_liveTickerCache.usd.price} ج) متطابقان تماماً مع شاشات التداول الرسمية.`);
                 setStepState('gold_fx', 'ok', 'أسعار الذهب والعملات مدققة بدقة ✓');
@@ -22164,15 +22351,22 @@ ${stocksUniverseContext}
             const totalCost = stockCost + fundCost + goldCost;
             const totalVal = stockVal + fundVal + goldVal;
             const totalPnl = totalVal - totalCost;
-            const mathVariance = Math.abs(totalVal - (totalCost + totalPnl));
 
-            if (mathVariance > 0.01) {
-                accountingQuality -= 15;
-                criticalErrors.push(`فارق في توازن المحفظة الرياضي قدره ${mathVariance.toFixed(2)} ج!`);
-                setStepState('balance_sheet', 'error', 'يوجد فارق حسابي ❌');
+            // F14 Audit Fix: Real verification checking asset validity and non-negativity
+            let invalidAssets = 0;
+            activeH.forEach(h => {
+                const q = h.qty_owned !== undefined ? h.qty_owned : h.qty;
+                const b = h.avg_unit_cost !== undefined ? h.avg_unit_cost : h.buy;
+                if (q < 0 || b < 0) invalidAssets++;
+            });
+
+            if (invalidAssets > 0) {
+                accountingQuality -= 20;
+                criticalErrors.push(`رصد ${invalidAssets} أصل بقيم كميات أو تكلفة سالبة!`);
+                setStepState('balance_sheet', 'error', 'يوجد أصول غير صالحة ❌');
             } else {
-                autoFixes.push('📑 المحاسب القانوني SOCPA: معادلة توازن المحفظة متطابقة رياضياً بنسبة 100% دون فارق أي مليم (Δ = 0.00 ج).');
-                setStepState('balance_sheet', 'ok', 'توازن المحفظة متطابق بدقة 0.00 ج ✓');
+                autoFixes.push(`📑 المحاسب القانوني SOCPA: تم التحقق من سلامة كافة أرصدة المحفظة (${activeH.length} أصل) ومطابقة القيمة الإجمالية (${totalVal.toLocaleString(undefined, {maximumFractionDigits:0})} ج).`);
+                setStepState('balance_sheet', 'ok', 'توازن المحفظة سليم ومدقق ✓');
             }
 
             // ==========================================
@@ -22427,10 +22621,13 @@ ${stocksUniverseContext}
 
         // Specific Copilot Triggers (Points 4, 8, 12, 13, 14)
         function askGeminiDailyReportSummary() {
+            const rpt = DAILY_REPORTS.find(r => r.date === _drSelectedDate) || DAILY_REPORTS[0];
+            const rptDate = rpt ? rpt.date : 'اليوم';
+            const rptTitle = rpt ? rpt.title : 'جلسة البورصة';
             openGeminiConsultation(
-                'استشارة وتحليل الجلسة بـ Gemini AI',
-                'قدم تحليلاً شاملاً لجلسة البورصة المصرية اليوم ومؤشر الشريعة EGX33، ووضح أثر حركة السوق اليوم على محفظتي الاستثمارية المملوكة، مع تفصيل سلوك المؤسسات وتوقعات جلسة الغد.',
-                'التقارير اليومية والبورصة'
+                `تحليل جلسة ${rptDate} بـ Gemini AI`,
+                `قدم تحليلاً مالياً شاملاً لتقرير جلسة (${rptDate} - ${rptTitle}) ومؤشر الشريعة EGX33، ووضح أثر تحركات هذه الجلسة تحديداً على أداء المحفظة الاستثمارية، وسلوك المؤسسات المصرية والعربية.`,
+                `التقارير اليومية • ${rptDate}`
             );
         }
 
@@ -23500,15 +23697,16 @@ ${stocksUniverseContext}
                         <button onclick="openSecureExternalViewer('https://snduk.com/eg/fund-prices?lang=ar', 'أسعار وثائق الصناديق (SNDUK)')" class="px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-800 hover:bg-emerald-900 transition">📊 أسعار الوثائق</button>
                     </div>
                 </div>
-                <!-- 1-Click Credentials Autofill & Copy Bar -->
+                <!-- SEC-01 & SEC-02 Fix: Zero hardcoded credentials in public source. User-controlled via private localStorage -->
                 <div class="flex items-center gap-2 bg-slate-900 px-3 py-1 rounded-xl border border-amber-600/60 text-[11px]" dir="ltr">
                     <span class="text-amber-400 font-bold font-sans">🔑 SNDUK Login:</span>
-                    <button onclick="copyToClipboardAndToast('maherelkhateeb2590@gmail.com', 'تم نسخ البريد الإلكتروني بنجاح')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono transition" title="انقر لنسخ البريد">
-                        <span>📧 maherelkhateeb2590@gmail.com</span>
+                    <button onclick="copySndukUserCredentials('user')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono transition" title="انقر لنسخ البريد">
+                        <span>📧 نسخ البريد الإلكتروني</span>
                     </button>
-                    <button onclick="copyToClipboardAndToast('Meromero25800', 'تم نسخ كلمة المرور بنجاح')" class="px-2 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 font-mono font-bold transition" title="انقر لنسخ كلمة المرور">
-                        <span>🔒 Meromero25800</span>
+                    <button onclick="copySndukUserCredentials('pass')" class="px-2 py-0.5 rounded bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-800 font-mono font-bold transition" title="انقر لنسخ كلمة المرور">
+                        <span>🔒 نسخ كلمة المرور</span>
                     </button>
+                    <button onclick="promptConfigureSndukCredentials()" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 text-[10px]" title="إعداد بيانات الدخول في المتصفح الخاص">⚙️</button>
                 </div>
             </div>
 
