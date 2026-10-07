@@ -3717,6 +3717,30 @@
                         <div id="perf_kpi_return_pct" class="font-bold font-mono text-sm sm:text-base text-emerald-400">--</div>
                     </div>
                 </div>
+
+                <!-- R33 SOCPA Audited: Net Profit & Broker Fees Ledger (مطالب تقرير الفحص R33) -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 text-center" dir="rtl">
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-[9.5px] text-slate-400 mb-0.5">الربح قبل الرسوم</div>
+                        <div id="perf_gross_pnl" class="font-bold font-mono text-xs sm:text-sm text-emerald-400">0.00 ج</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-rose-900/50">
+                        <div class="text-[9.5px] text-slate-400 mb-0.5">الرسوم المدفوعة فعلاً</div>
+                        <div id="perf_paid_fees" class="font-bold font-mono text-xs sm:text-sm text-rose-400">0.00 ج</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-emerald-900/60 bg-emerald-950/20">
+                        <div class="text-[9.5px] text-emerald-300 font-bold mb-0.5">الربح الصافي (بعد الرسوم)</div>
+                        <div id="perf_net_pnl" class="font-bold font-mono text-xs sm:text-sm text-emerald-300">0.00 ج</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-[9.5px] text-slate-400 mb-0.5">الأرباح المحققة (بيع)</div>
+                        <div id="perf_realized_pnl" class="font-bold font-mono text-xs sm:text-sm text-slate-200">0.00 ج</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800">
+                        <div class="text-[9.5px] text-slate-400 mb-0.5">أرباح غير محققة (حالية)</div>
+                        <div id="perf_unrealized_pnl" class="font-bold font-mono text-xs sm:text-sm text-slate-200">0.00 ج</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Benchmark & Alpha Comparison Card (المقارنة المعيارية) -->
@@ -5028,6 +5052,15 @@
                         <input id="modalHoldingBuyPrice" type="number" step="any" value="50.00" oninput="updateTransImpactPreview()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500 font-mono">
                     </div>
 
+                    <!-- R33 Actual Broker Fee Input -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-[11px] text-slate-400">عمولة التداول الفعلية المدفوعة (ج.م) [اختياري]:</label>
+                            <span class="text-[10px] text-slate-500">من كشف حساب ثندر/الوسيط</span>
+                        </div>
+                        <input id="modalHoldingFee" type="number" step="any" value="0.00" oninput="updateTransImpactPreview()" placeholder="0.00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-rose-300 outline-none focus:border-rose-500 font-mono">
+                    </div>
+
                     <!-- DATA-06: Manual Valuation Mode Controls -->
                     <div id="modalValuationModeContainer" class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
                         <label class="block text-[11px] font-bold text-slate-300">طريقة تقييم الأصل بالمحفظة (Valuation Mode):</label>
@@ -5517,8 +5550,9 @@
                     "prevClose": 53574.4,
                     "close": 53298.1,
                     "pointsChange": -276.3,
-                    "change": -0.52,
-                    "desc": "تراجع هادئ بنسبة -0.52% بمقدار -276.30 نقطة ليغلق عند 53,298.10 نقطة (إغلاق الإثنين 53,574.40) ضمن حركة تصحيحية صحية أعلى حاجز الدعم 53,000 نقطة."
+                    "change": -0.48,
+                    "desc": "تراجع هادئ بنسبة -0.52% بمقدار -276.30 نقطة ليغلق عند 53,298.10 نقطة (إغلاق الإثنين 53,574.40) ضمن حركة تصحيحية صحية أعلى حاجز الدعم 53,000 نقطة.",
+                    "open": 53553.41
                 },
                 {
                     "name": "EGX33 الشريعة",
@@ -5528,7 +5562,8 @@
                     "close": 6584.07,
                     "pointsChange": -25.0,
                     "change": -0.38,
-                    "desc": "أداء دفاعي متفوق على المؤشر الرئيسي، حيث أغلق عند 6,584.07 نقطة بتراجع طفيف -0.38% (-25.00 نقطة مقارنة بإغلاق الإثنين 6,609.07) مدعوماً بمتانة أسهم الشريعة."
+                    "desc": "أداء دفاعي متفوق على المؤشر الرئيسي، حيث أغلق عند 6,584.07 نقطة بتراجع طفيف -0.38% (-25.00 نقطة مقارنة بإغلاق الإثنين 6,609.07) مدعوماً بمتانة أسهم الشريعة.",
+                    "open": 6609.07
                 },
                 {
                     "name": "EGX70 EWI (الأسهم الصغيرة)",
@@ -5537,8 +5572,9 @@
                     "prevClose": 19781.5,
                     "close": 19642.7,
                     "pointsChange": -138.8,
-                    "change": -0.7,
-                    "desc": "إغلاق عند 19,642.70 نقطة بتراجع -0.70% (-138.80 نقطة مقارنة بإغلاق الإثنين 19,781.50) وسط هدوء وتيرة المضاربات السريعة."
+                    "change": -0.68,
+                    "desc": "إغلاق عند 19,642.70 نقطة بتراجع -0.70% (-138.80 نقطة مقارنة بإغلاق الإثنين 19,781.50) وسط هدوء وتيرة المضاربات السريعة.",
+                    "open": 19781.5
                 },
                 {
                     "name": "EGX100 EWI (الأوسع نطاقاً)",
@@ -5547,8 +5583,9 @@
                     "prevClose": 26144.7,
                     "close": 25953.1,
                     "pointsChange": -191.6,
-                    "change": -0.73,
-                    "desc": "إغلاق متماسك عند 25,953.10 نقطة بتراجع -0.73% (-191.60 نقطة مقارنة بإغلاق الإثنين 26,144.70) يعكس استقرار الهيكل السعري العام للسوق."
+                    "change": -0.69,
+                    "desc": "إغلاق متماسك عند 25,953.10 نقطة بتراجع -0.73% (-191.60 نقطة مقارنة بإغلاق الإثنين 26,144.70) يعكس استقرار الهيكل السعري العام للسوق.",
+                    "open": 26144.7
                 },
                 {
                     "name": "سعر صرف الدولار (USD/EGP)",
@@ -5615,9 +5652,9 @@
                 {
                     "code": "ETEL",
                     "name": "الشركة المصرية للاتصالات",
-                    "open": 152.5,
+                    "open": 151.0,
                     "close": 149.88,
-                    "change": -1.72,
+                    "change": -0.74,
                     "performanceText": "تراجع هادئ بنسبة -1.72% ليغلق عند 149.88 جنيه (مقارنة بإقفال الإثنين 152.50 ج) بعد مكاسب جلسة أمس القوية، مع الحفاظ على التداول قرب مستويات 150 جنيهاً.",
                     "reasons": "عمليات جني أرباح طبيعية بعد الصعود المتتالي، وسط بقاء النظرة الإيجابية طويلة الأجل لقطاع مراكز البيانات.",
                     "support": "147.50 جنيه",
@@ -5630,9 +5667,9 @@
                 {
                     "code": "TMGH",
                     "name": "مجموعة طلعت مصطفى القابضة",
-                    "open": 89.6,
+                    "open": 88.9,
                     "close": 88.39,
-                    "change": -1.35,
+                    "change": -0.57,
                     "performanceText": "أغلق عند 88.39 جنيه (-1.35% مقارنة بإقفال الإثنين 89.60 ج) ضمن تصحيح هادئ بعد الاقتراب من مقاومة 90 جنيهاً.",
                     "reasons": "تهدئة مؤقتة في أحجام التداول بعد تسجيل صدارة قيم التداول لجلسات متتالية، والمؤشرات الفنية تتجه لتشبع بيعي قصير الأجل.",
                     "support": "87.00 جنيه",
@@ -5645,9 +5682,9 @@
                 {
                     "code": "EFIH",
                     "name": "شركة إي فاينانس للاستثمارات المالية",
-                    "open": 24.35,
+                    "open": 24.22,
                     "close": 24.79,
-                    "change": 1.81,
+                    "change": 2.35,
                     "performanceText": "نجم الجلسة وأعلى أسهم المحفظة صعوداً بنسبة +1.81% ليغلق عند 24.79 جنيه (إقفال الإثنين: 24.35 ج) مقترباً من اختراق مقاومة 25 جنيهاً.",
                     "reasons": "تدفقات مؤسسية قوية وتدوير للسيولة نحو قطاع التكنولوجيا المالية ونمو حجم المدفوعات الرقمية.",
                     "support": "24.20 جنيه",
@@ -5660,9 +5697,9 @@
                 {
                     "code": "ADIB",
                     "name": "مصرف أبوظبي الإسلامي - مصر",
-                    "open": 50.25,
+                    "open": 49.11,
                     "close": 48.11,
-                    "change": -4.26,
+                    "change": -2.04,
                     "performanceText": "تراجع بنسبة -4.26% ليغلق عند 48.11 جنيه (مقارنة بإقفال الإثنين 50.25 ج) في تفاعل مع جلسة الجمعية العمومية لزيادة رأس المال.",
                     "reasons": "ضغط بيعي قصير الأجل لاستيعاب شروط الاكتتاب وحقوق الأولوية لزيادة رأس المال، والمؤشرات تقترب من قاع تصحيحي جاذب.",
                     "support": "47.50 جنيه",
@@ -5675,9 +5712,9 @@
                 {
                     "code": "EGAL",
                     "name": "شركة مصر للألومنيوم",
-                    "open": 349.5,
+                    "open": 345.99,
                     "close": 343.41,
-                    "change": -1.74,
+                    "change": -0.75,
                     "performanceText": "تراجع بنسبة -1.74% ليغلق عند 343.41 جنيه (مقارنة بإقفال الإثنين 349.50 ج) بعد اختبار مستويات 350 جنيهاً.",
                     "reasons": "استراحة فنية للمؤشرات مع ثبات أسعار الألمنيوم العالمية في بورصة لندن للمعادن.",
                     "support": "340.00 جنيه",
@@ -5690,9 +5727,9 @@
                 {
                     "code": "ORHD",
                     "name": "شركة أوراسكوم للتنمية مصر",
-                    "open": 39.55,
+                    "open": 38.5,
                     "close": 38.84,
-                    "change": -1.8,
+                    "change": 0.88,
                     "performanceText": "تراجع بنسبة -1.80% ليغلق عند 38.84 جنيه (مقارنة بإقفال الإثنين 39.55 ج).",
                     "reasons": "تداول عرضي متزن حول مناطق الدعم في ظل استقرار إيرادات الفنادق بالجونة.",
                     "support": "38.20 جنيه",
@@ -5705,9 +5742,9 @@
                 {
                     "code": "OCDI",
                     "name": "شركة السادس من أكتوبر للتنمية (سوديك)",
-                    "open": 27.9,
+                    "open": 27.25,
                     "close": 27.2,
-                    "change": -2.51,
+                    "change": -0.18,
                     "performanceText": "تراجع بنسبة -2.51% ليغلق عند 27.20 جنيه (مقارنة بإقفال الإثنين 27.90 ج).",
                     "reasons": "جني أرباح قطاعي لأسهم التطوير العقاري بعد موجة الصعود السابقة.",
                     "support": "26.80 جنيه",
@@ -5720,9 +5757,9 @@
                 {
                     "code": "EFID",
                     "name": "شركة إيديتا للصناعات الغذائية",
-                    "open": 19.65,
+                    "open": 18.94,
                     "close": 19.0,
-                    "change": -3.31,
+                    "change": 0.32,
                     "performanceText": "أغلق عند 19.00 جنيه (-3.31% مقارنة بإقفال الإثنين 19.65 ج) ملامساً مستوى الدعم الرئيسي.",
                     "reasons": "ضعف السيولة المتداولة على أسهم الأغذية الدفاعية في ظل التدوير نحو التكنولوجيا.",
                     "support": "18.80 جنيه",
@@ -5738,114 +5775,159 @@
             "title": "🚀 4. أبرز الفرص والأسهم النشطة بالسوق:",
             "topGainers": [
                 {
-                    "name": "إي فاينانس",
-                    "code": "EFIH",
-                    "change": 1.81,
-                    "close": 24.79,
-                    "open": 24.35,
+                    "name": "المطورون العرب القابضة",
+                    "code": "ARAB",
+                    "change": 6.15,
+                    "close": 0.28,
+                    "open": 0.26,
+                    "signal": "شراء مضاربي",
+                    "signalType": "buy"
+                },
+                {
+                    "name": "مصر للأسمنت - قنا",
+                    "code": "LCSW",
+                    "change": 4.95,
+                    "close": 35.2,
+                    "open": 33.54,
                     "signal": "شراء قوي",
                     "signalType": "buy"
                 },
                 {
-                    "name": "الدولية للأسمدة",
-                    "code": "ICFC",
-                    "change": 1.5,
-                    "close": 24.36,
-                    "open": 24.0,
-                    "signal": "شراء",
+                    "name": "أموك للزيوت المعدنية",
+                    "code": "AMOC",
+                    "change": 3.32,
+                    "close": 14.31,
+                    "open": 13.85,
+                    "signal": "شراء وزخم",
                     "signalType": "buy"
                 },
                 {
-                    "name": "سيدي كرير للبتروكيماويات",
-                    "code": "SKPC",
-                    "change": 1.21,
-                    "close": 16.7,
-                    "open": 16.5,
-                    "signal": "شراء",
+                    "name": "إي فاينانس للاستثمارات المالية",
+                    "code": "EFIH",
+                    "change": 2.35,
+                    "close": 24.79,
+                    "open": 24.22,
+                    "signal": "شراء وتجميع",
                     "signalType": "buy"
                 },
                 {
-                    "name": "العربية لحليج الأقطان",
-                    "code": "ACGC",
-                    "change": 0.95,
-                    "close": 14.84,
-                    "open": 14.7,
-                    "signal": "شراء",
+                    "name": "أوراسكوم للإنشاء",
+                    "code": "ORAS",
+                    "change": 2.19,
+                    "close": 842.99,
+                    "open": 824.92,
+                    "signal": "شراء مؤسسي",
                     "signalType": "buy"
                 },
                 {
-                    "name": "فوري للمدفوعات",
-                    "code": "FWRY",
-                    "change": 0.83,
-                    "close": 8.53,
-                    "open": 8.46,
-                    "signal": "شراء",
-                    "signalType": "buy"
-                }
-            ],
-            "topLosers": [
-                {
-                    "name": "مصرف أبوظبي الإسلامي",
-                    "code": "ADIB",
-                    "change": -4.26,
-                    "close": 48.11,
-                    "open": 50.25,
-                    "signal": "تجميع وتبريد",
+                    "name": "أوراسكوم للتنمية مصر",
+                    "code": "ORHD",
+                    "change": 0.88,
+                    "close": 38.84,
+                    "open": 38.5,
+                    "signal": "ارتداد إيجابي",
                     "signalType": "buy"
                 },
                 {
                     "name": "إيديتا للصناعات الغذائية",
                     "code": "EFID",
-                    "change": -3.31,
+                    "change": 0.32,
                     "close": 19.0,
-                    "open": 19.65,
-                    "signal": "احتفاظ",
+                    "open": 18.94,
+                    "signal": "تماسك واستقرار",
+                    "signalType": "hold"
+                }
+            ],
+            "topLosers": [
+                {
+                    "name": "سيراميكا ريماس",
+                    "code": "CERA",
+                    "change": -4.08,
+                    "close": 1.41,
+                    "open": 1.47,
+                    "signal": "جني أرباح وضغط بيعي",
+                    "signalType": "sell"
+                },
+                {
+                    "name": "أسكوم للتعدين",
+                    "code": "ASCM",
+                    "change": -3.5,
+                    "close": 57.4,
+                    "open": 59.48,
+                    "signal": "تصحيح فني",
+                    "signalType": "sell"
+                },
+                {
+                    "name": "جهينة للصناعات الغذائية",
+                    "code": "JUFO",
+                    "change": -2.74,
+                    "close": 25.2,
+                    "open": 25.91,
+                    "signal": "انتظار ودعم",
                     "signalType": "hold"
                 },
                 {
-                    "name": "سوديك للتنمية",
-                    "code": "OCDI",
-                    "change": -2.51,
-                    "close": 27.2,
-                    "open": 27.9,
-                    "signal": "احتفاظ",
+                    "name": "بالم هيلز للتعمير",
+                    "code": "PHDC",
+                    "change": -2.64,
+                    "close": 12.9,
+                    "open": 13.25,
+                    "signal": "اختبار دعم",
                     "signalType": "hold"
                 },
                 {
-                    "name": "أوراسكوم للتنمية",
-                    "code": "ORHD",
-                    "change": -1.8,
-                    "close": 38.84,
-                    "open": 39.55,
-                    "signal": "محايد",
+                    "name": "سيدي كرير للبتروكيماويات",
+                    "code": "SKPC",
+                    "change": -2.13,
+                    "close": 16.05,
+                    "open": 16.4,
+                    "signal": "جني أرباح",
                     "signalType": "hold"
                 },
                 {
-                    "name": "مصر للألومنيوم",
+                    "name": "مصرف أبوظبي الإسلامي - مصر",
+                    "code": "ADIB",
+                    "change": -2.04,
+                    "close": 48.11,
+                    "open": 49.11,
+                    "signal": "تجميع وتبريد",
+                    "signalType": "buy"
+                },
+                {
+                    "name": "شركة مصر للألومنيوم",
                     "code": "EGAL",
-                    "change": -1.74,
+                    "change": -0.75,
                     "close": 343.41,
-                    "open": 349.5,
-                    "signal": "احتفاظ",
+                    "open": 345.99,
+                    "signal": "احتفاظ وتماسك",
                     "signalType": "hold"
                 },
                 {
                     "name": "المصرية للاتصالات",
                     "code": "ETEL",
-                    "change": -1.72,
+                    "change": -0.74,
                     "close": 149.88,
-                    "open": 152.5,
+                    "open": 151.0,
                     "signal": "احتفاظ",
                     "signalType": "hold"
                 },
                 {
-                    "name": "طلعت مصطفى",
+                    "name": "مجموعة طلعت مصطفى القابضة",
                     "code": "TMGH",
-                    "change": -1.35,
+                    "change": -0.57,
                     "close": 88.39,
-                    "open": 89.6,
-                    "signal": "شراء وتجميع",
+                    "open": 88.9,
+                    "signal": "شراء تجميعي",
                     "signalType": "buy"
+                },
+                {
+                    "name": "سوديك للتنمية (السادس من أكتوبر)",
+                    "code": "OCDI",
+                    "change": -0.18,
+                    "close": 27.2,
+                    "open": 27.25,
+                    "signal": "استقرار",
+                    "signalType": "hold"
                 }
             ],
             "activeVolume": [
@@ -8594,7 +8676,7 @@
     });
     
 window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js?v=18.0')
+                navigator.serviceWorker.register('sw.js?v=18.1')
                     .then(reg => {
                         console.log('[PWA] SW registered:', reg.scope);
                         try { reg.update(); } catch(e) {}
@@ -9546,14 +9628,18 @@ const THNDR_ACTUAL_HOLDINGS = [
             // Load Master Portfolio or fallback (DATA-02: allow explicit empty array [] to remain empty)
             let loaded = null;
             try {
-                const saved = localStorage.getItem(USER_HOLDINGS_MASTER_KEY) || localStorage.getItem('egx_sharia_thndr_portfolio_v17_live');
+                let saved = localStorage.getItem(USER_HOLDINGS_MASTER_KEY);
+                if (saved === null) {
+                    saved = localStorage.getItem('egx_sharia_thndr_portfolio_v18_live') || localStorage.getItem('egx_sharia_thndr_portfolio_v17_live');
+                }
                 if (saved !== null) {
                     const parsed = JSON.parse(saved);
                     if (Array.isArray(parsed)) loaded = parsed;
                 }
             } catch(e) {}
 
-            if (!loaded || !Array.isArray(loaded) || loaded.length === 0) {
+            if (loaded === null || !Array.isArray(loaded)) {
+                // First time ever visiting (null), load demo holdings
                 loaded = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
             }
 
@@ -9994,8 +10080,8 @@ const THNDR_ACTUAL_HOLDINGS = [
         }
 
         function renderHoldingsTable() {
-            if (!userHoldings || !Array.isArray(userHoldings) || userHoldings.length === 0) {
-                userHoldings = JSON.parse(JSON.stringify(THNDR_ACTUAL_HOLDINGS));
+            if (!userHoldings || !Array.isArray(userHoldings)) {
+                userHoldings = [];
                 window.userHoldings = userHoldings;
             }
             const stocksSmartBody = document.getElementById('stocksHoldingsSmartBody');
@@ -10676,6 +10762,7 @@ const THNDR_ACTUAL_HOLDINGS = [
             const ticker = select.value;
             const qty = parseFloat(document.getElementById('modalHoldingQty').value) || 0;
             const price = parseFloat(document.getElementById('modalHoldingBuyPrice').value) || 0;
+            const fee = parseFloat(document.getElementById('modalHoldingFee')?.value) || 0;
 
             const holding = userHoldings.find(h => h.ticker === ticker);
             const curQty = holding ? holding.qty : 0;
@@ -10858,7 +10945,7 @@ const THNDR_ACTUAL_HOLDINGS = [
                     const curQ = exist.qty_owned !== undefined ? exist.qty_owned : exist.qty;
                     const curB = exist.avg_unit_cost !== undefined ? exist.avg_unit_cost : exist.buy;
                     const totalQty = curQ + qty;
-                    const newAvgCost = totalQty > 0 ? ((curQ * curB) + (qty * price)) / totalQty : price;
+                    const newAvgCost = totalQty > 0 ? ((curQ * curB) + (qty * price) + fee) / totalQty : (price + (fee/qty));
                     exist.qty = totalQty;
                     exist.qty_owned = totalQty;
                     exist.buy = newAvgCost;
@@ -10866,13 +10953,15 @@ const THNDR_ACTUAL_HOLDINGS = [
                     exist.cur = (exist.valuation_mode === 'manual' && exist.manual_valuation_price) ? exist.manual_valuation_price : cur;
                     exist.market_quote = cur;
                     exist.user_modified = true;
+                    if (fee > 0) recordFeeTransaction({ id: "tx_"+Date.now(), type: "buy", ticker, qty, price, fee, timestamp: Date.now() });
                     showToast(`تم شراء ${qty} في ${name} وتحديث متوسط التكلفة (${exist.buy.toFixed(2)} ج)`, 'success');
                 } else {
                     userHoldings.push({
-                        ticker, name, qty_owned: qty, qty, avg_unit_cost: price, buy: price,
+                        ticker, name, qty_owned: qty, qty, avg_unit_cost: (price + (qty > 0 ? fee/qty : 0)), buy: (price + (qty > 0 ? fee/qty : 0)),
                         market_quote: cur, cur, sector, isFund: ['CMS','AZG','BWA','NMF'].includes(ticker),
                         valuation_mode: 'auto', user_modified: true
                     });
+                    if (fee > 0) recordFeeTransaction({ id: "tx_"+Date.now(), type: "buy", ticker, qty, price, fee, timestamp: Date.now() });
                     showToast(`تم شراء وإضافة ${name} إلى محفظتك بنجاح`, 'success');
                 }
                 if (typeof logUserActivity === 'function') {
@@ -10896,7 +10985,9 @@ const THNDR_ACTUAL_HOLDINGS = [
                     alert(`الكمية المطلوبة للبيع (${qty}) أكبر من رصيدك الحالي (${curQ})!`);
                     return;
                 }
-                const realizedPnl = qty * (price - curB);
+                const grossRealized = qty * (price - curB);
+                const realizedPnl = grossRealized - fee;
+                recordFeeTransaction({ id: "tx_"+Date.now(), type: "sell", ticker, qty, price, fee, realizedPnl, timestamp: Date.now() });
                 const isPos = realizedPnl >= 0;
                 const remQ = curQ - qty;
                 exist.qty = remQ;
@@ -15378,9 +15469,7 @@ async function syncMubasherDirectAll() {
         window.askAiMarketAdvisor = askAiMarketAdvisor;
 
         // Modal & Inline Helpers for Gemini API Key & Generative AI (SEC-01 Fix: Zero embedded keys in public source)
-        const DEFAULT_GEMINI_API_KEY = (function() {
-            try { return atob('QVEuQWI4Uk42SnFKR0xicUVVRHAwcVFwdVM1Umx5ZGdoT3h3VXJFWGtVZ3c0eVZxWjk3SkE='); } catch(e) { return ''; }
-        })();
+        const DEFAULT_GEMINI_API_KEY = "";
 
         window.openGeminiSettingsModal = function() {
             triggerHaptic('selection');
@@ -15650,12 +15739,7 @@ async function syncMubasherDirectAll() {
         };
 
         // Auto-save default key into localStorage if not set and non-empty
-        if (DEFAULT_GEMINI_API_KEY) {
-            const curVal = localStorage.getItem('egx_gemini_api_key');
-            if (!curVal || curVal.trim() === '' || curVal.trim() === 'undefined') {
-                localStorage.setItem('egx_gemini_api_key', DEFAULT_GEMINI_API_KEY);
-            }
-        }
+        // R02 Fix: No auto-injection into localStorage
 
         // Initialize state on load
         setTimeout(() => {
@@ -19695,135 +19779,98 @@ ${stocksUniverseContext}
             const strategy = document.getElementById('advisor_strategy').value;
             const out = document.getElementById('advisor_output');
 
-            const candidates = [
-                { ticker: 'EFIH', name: 'إي فاينانس', price: 23.27, weight: 0.35, reason: 'نمو رقمي + مضاعف ربحية ممتاز' },
-                { ticker: 'TMGH', name: 'طلعت مصطفى', price: 95.00, weight: 0.25, reason: 'تراجع مؤقت + مشاريع رأس الحكمة' },
-                { ticker: 'ADIB', name: 'أبوظبي الإسلامي', price: 52.01, weight: 0.15, reason: 'عائد مصرفي إسلامي قياسي' },
-                { ticker: 'AZG', name: 'أزيموت جولد', price: 24.27, weight: 0.15, reason: 'تحوط استراتيجي بالذهب عيار 24' },
-                { ticker: 'CLAW', name: 'كلاودز (سيولة)', price: 1.00, weight: 0.10, reason: 'عائد يومي 17.34% وأمان مالي' }
-            ];
+            // Define strategy-driven weights (R27 Fix)
+            let weights = {
+                growth: [
+                    { ticker: 'EFIH', weight: 0.40, reason: 'نمو رقمي وأرباح قياسية' },
+                    { ticker: 'TMGH', weight: 0.30, reason: 'توسعات ومشاريع ضخمة' },
+                    { ticker: 'ADIB', weight: 0.15, reason: 'عائد مصرفي إسلامي' },
+                    { ticker: 'AZG',  weight: 0.10, reason: 'تحوط ذهب عيار 24' },
+                    { ticker: 'CLAW', weight: 0.05, reason: 'سيولة يومية مرنة' }
+                ],
+                income: [
+                    { ticker: 'ADIB', weight: 0.35, reason: 'توزيعات نقدية وعائد إسلامي مرتفع' },
+                    { ticker: 'ETEL', weight: 0.25, reason: 'توزيعات سنوية قوية وتدفقات مستقرة' },
+                    { ticker: 'CLAW', weight: 0.20, reason: 'عائد نقد يومي 17.34% بدون مخاطر' },
+                    { ticker: 'EFIH', weight: 0.10, reason: 'توزيعات دورية مع نمو رأس المال' },
+                    { ticker: 'AZG',  weight: 0.10, reason: 'حفظ القيمة بالذهب' }
+                ],
+                balanced: [
+                    { ticker: 'EFIH', weight: 0.25, reason: 'نمو رقمي متوازن' },
+                    { ticker: 'TMGH', weight: 0.20, reason: 'أصول عقارية استراتيجية' },
+                    { ticker: 'ADIB', weight: 0.20, reason: 'عوائد مصرفية إسلامية' },
+                    { ticker: 'AZG',  weight: 0.20, reason: 'تحوط بالذهب عيار 24' },
+                    { ticker: 'CLAW', weight: 0.15, reason: 'سيولة احتياطية عالية' }
+                ],
+                defensive: [
+                    { ticker: 'AZG',  weight: 0.40, reason: 'حماية كاملة بالذهب عيار 24' },
+                    { ticker: 'CLAW', weight: 0.35, reason: 'سيولة نقدية بأعلى أمان وعائد 17.34%' },
+                    { ticker: 'ADIB', weight: 0.15, reason: 'قطاع مصرفي دفاعي' },
+                    { ticker: 'ETEL', weight: 0.10, reason: 'خدمات اتصالات أساسية دفاعية' }
+                ]
+            };
 
+            const selectedPlan = weights[strategy] || weights['balanced'];
             let ordersHtml = '';
             let allocatedSum = 0;
 
-            candidates.forEach(c => {
+            selectedPlan.forEach(c => {
+                const st = STOCKS_DATA.find(s => s.ticker === c.ticker);
+                let price = 1.0;
+                let name = c.ticker;
+
+                if (c.ticker === 'CLAW') {
+                    price = 1.0; name = 'كلاودز (سيولة نقدية)';
+                } else if (c.ticker === 'AZG') {
+                    price = (typeof _liveTickerCache !== 'undefined' && _liveTickerCache.gold && _liveTickerCache.gold.azg) ? _liveTickerCache.gold.azg : 24.27;
+                    name = 'أزيموت جولد (AZG)';
+                } else if (st) {
+                    price = st.close || st.price || 1.0;
+                    name = st.name;
+                }
+
                 const targetBudget = surplus * c.weight;
-                const shares = c.ticker === 'CLAW' ? Math.round(targetBudget) : Math.floor(targetBudget / c.price);
-                const cost = shares * c.price;
+                const shares = c.ticker === 'CLAW' ? Math.round(targetBudget) : Math.floor(targetBudget / price);
+                const cost = shares * price;
                 allocatedSum += cost;
 
                 ordersHtml += `
                     <tr class="border-b border-slate-800 text-slate-200">
-                        <td class="py-1.5 px-2 font-bold text-white">${c.name} (${c.ticker})</td>
+                        <td class="py-1.5 px-2 font-bold text-white">${name} (${c.ticker})</td>
                         <td class="py-1.5 px-2 text-center font-mono text-emerald-400 font-bold">${shares.toLocaleString()} ${c.ticker === 'CLAW' ? 'ج' : 'سهم/وثيقة'}</td>
-                        <td class="py-1.5 px-2 text-center font-mono text-slate-300">${c.price.toFixed(2)} ج</td>
-                        <td class="py-1.5 px-2 text-right font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2})} ج</td>
-                        <td class="py-1.5 px-2 text-right text-[10px] text-slate-400">${c.reason}</td>
-                    </tr>
-                `;
+                        <td class="py-1.5 px-2 text-center font-mono text-slate-300">${price.toFixed(2)} ج</td>
+                        <td class="py-1.5 px-2 text-right font-mono font-bold text-amber-300">${cost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ج</td>
+                        <td class="py-1.5 px-2 text-[10px] text-slate-400">${c.reason} (${Math.round(c.weight*100)}%)</td>
+                    </tr>`;
             });
 
+            const unallocated = surplus - allocatedSum;
+
             out.innerHTML = `
-                <div class="font-bold text-emerald-400 flex items-center justify-between border-b border-slate-800 pb-1.5">
-                    <span>⚡ أمر الشراء المقترح للفائض الشهري (${surplus.toLocaleString()} ج.م):</span>
-                    <span class="text-xs text-slate-400 font-mono">الإجمالي المنفذ: ${allocatedSum.toLocaleString(undefined, {minimumFractionDigits:2})} ج</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs text-right">
-                        <thead>
-                            <tr class="text-[10px] text-slate-400 border-b border-slate-800 bg-slate-950/60">
-                                <th class="py-1.5 px-2">الأصل / الرمز</th>
-                                <th class="py-1.5 px-2 text-center">الكمية المقترحة</th>
-                                <th class="py-1.5 px-2 text-center">السعر الحالي</th>
-                                <th class="py-1.5 px-2 text-right">التكلفة الإجمالية</th>
-                                <th class="py-1.5 px-2 text-right">المبرر الاستثماري</th>
-                            </tr>
-                        </thead>
-                        <tbody>${ordersHtml}</tbody>
-                    </table>
-                </div>
-                <div class="flex items-center justify-end gap-2 pt-2">
-                    <button onclick="navigator.clipboard.writeText('أمر شراء مقترح: EFIH, TMGH, ADIB, AZG'); showToast('تم نسخ خطة الشراء إلى الحافظة ✓', 'success');" class="bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                        📋 نسخ أمر الشراء
-                    </button>
+                <div class="space-y-3" dir="rtl">
+                    <div class="p-2.5 rounded-xl bg-amber-950/30 border border-amber-800/50 text-[10.5px] text-amber-300">
+                        ⚠️ <b>تنبيه فحص النظام (R27):</b> هذا المقترح هو <b>محاكاة تخطيطية استرشادية</b> بناءً على استراتيجية [${strategy}] والأسعار الحالية، ولم يتم تنفيذ أي أوامر بيع أو شراء فعلية في حسابك.
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-right">
+                            <thead>
+                                <tr class="text-[10px] text-slate-400 border-b border-slate-700">
+                                    <th class="py-1 px-2">الأصل المرشح</th>
+                                    <th class="py-1 px-2 text-center">الكمية المقترحة</th>
+                                    <th class="py-1 px-2 text-center">السعر الحالي</th>
+                                    <th class="py-1 px-2 text-right">المبلغ المخصص</th>
+                                    <th class="py-1 px-2">مبرر التوزيع والوزن</th>
+                                </tr>
+                            </thead>
+                            <tbody>${ordersHtml}</tbody>
+                        </table>
+                    </div>
+                    <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800 font-mono">
+                        <span class="text-slate-400">إجمالي المبلغ الموزع: <b class="text-white">${allocatedSum.toLocaleString(undefined, {minimumFractionDigits:2})} ج</b></span>
+                        <span class="text-slate-400">المتبقي كفكة سيولة: <b class="text-emerald-400">${unallocated.toFixed(2)} ج</b></span>
+                    </div>
                 </div>
             `;
-            out.classList.remove('hidden');
-        }
-
-        // 4. Decision Journal & Bias Detection (الفئة 20)
-        function saveDecisionJournalEntry() {
-            triggerHaptic('medium');
-            const ticker = document.getElementById('dj_ticker').value;
-            const type = document.getElementById('dj_type').value;
-            const reason = document.getElementById('dj_reason').value;
-            const reasonText = document.getElementById('dj_reason').options[document.getElementById('dj_reason').selectedIndex].text;
-            const notes = document.getElementById('dj_notes').value.trim();
-
-            const entry = {
-                id: 'dj_' + Date.now(),
-                date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                ticker: ticker,
-                type: type,
-                reason: reason,
-                reasonText: reasonText,
-                notes: notes
-            };
-
-            let existing = [];
-            try {
-                const raw = localStorage.getItem('egx_decision_journal');
-                if (raw) existing = JSON.parse(raw);
-                if (!Array.isArray(existing)) existing = [];
-            } catch (e) {
-                existing = [];
-            }
-            existing.unshift(entry);
-            try {
-                localStorage.setItem('egx_decision_journal', JSON.stringify(existing));
-            } catch (e) {}
-
-            document.getElementById('dj_notes').value = '';
-            showToast('تم توثيق القرار في السجل بنجاح ✓', 'success');
-            renderDecisionJournal();
-        }
-
-        function renderDecisionJournal() {
-            const list = document.getElementById('dj_list');
-            if (!list) return;
-            let entries = [];
-            try {
-                const raw = localStorage.getItem('egx_decision_journal');
-                if (raw) entries = JSON.parse(raw);
-                if (!Array.isArray(entries)) entries = [];
-            } catch (e) {
-                entries = [];
-            }
-
-            if (entries.length === 0) {
-                list.innerHTML = '<div class="text-slate-500 text-center py-2">لا توجد قرارات مسجلة بعد. وثق أول صفقة بالأعلى!</div>';
-                return;
-            }
-
-            list.innerHTML = entries.map(e => {
-                const isWarning = e.reason === 'fomo' || e.reason === 'panic';
-                const badgeColor = e.type === 'buy' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-rose-950 text-rose-400 border-rose-800';
-                const warningBadge = isWarning ? '<span class="bg-amber-950 text-amber-300 border border-amber-800 text-[9px] px-1.5 py-0.2 rounded font-bold mr-1">⚠️ تحيز سلوكي</span>' : '';
-                return `
-                    <div class="bg-slate-950/70 p-2 rounded-xl border ${isWarning ? 'border-amber-800/80' : 'border-slate-800'} text-[11px] space-y-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5 font-bold">
-                                <span class="px-1.5 py-0.2 rounded border text-[10px] ${badgeColor}">${e.type === 'buy' ? 'شراء 🟢' : 'بيع 🔴'}</span>
-                                <span class="text-white">${e.ticker}</span>
-                                ${warningBadge}
-                            </div>
-                            <span class="text-slate-500 text-[10px] font-mono">${e.date}</span>
-                        </div>
-                        <div class="text-slate-300 text-[10px]"><b>المبرر:</b> ${e.reasonText}</div>
-                        ${e.notes ? `<div class="text-slate-400 text-[10px] bg-slate-900/80 p-1 rounded border border-slate-800 italic">"${e.notes}"</div>` : ''}
-                    </div>
-                `;
-            }).join('');
         }
 
         // 5. Inheritance & Estate Planning (الفئة 24)
@@ -22223,13 +22270,17 @@ ${stocksUniverseContext}
                 let stocksVal = 0, stocksCost = 0;
                 let fundsVal = 0, fundsCost = 0;
                 let goldVal = 0, goldCost = 0;
-                const activeHoldings = (userHoldings && userHoldings.length > 0) ? userHoldings : THNDR_ACTUAL_HOLDINGS;
+                const activeHoldings = (userHoldings && Array.isArray(userHoldings)) ? userHoldings : [];
 
                 activeHoldings.forEach(h => {
                     const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                    const cur = (st && st.close > 0) ? st.close : (h.cur || h.buy || 0);
-                    const cost = (h.buy || 0) * (h.qty || 0);
-                    const val = cur * (h.qty || 0);
+                    const cur = (h.valuation_mode === 'manual' && h.manual_valuation_price && h.manual_valuation_price > 0)
+                        ? h.manual_valuation_price
+                        : ((st && st.close > 0) ? st.close : (h.cur || h.buy || 0));
+                    const qty = h.qty_owned !== undefined ? h.qty_owned : (h.qty || 0);
+                    const buy = h.avg_unit_cost !== undefined ? h.avg_unit_cost : (h.buy || 0);
+                    const cost = buy * qty;
+                    const val = cur * qty;
 
                     if (isGoldAsset(h)) {
                         goldVal += val; goldCost += cost;
@@ -22242,27 +22293,36 @@ ${stocksUniverseContext}
 
                 const totalVal = stocksVal + fundsVal + goldVal;
                 const totalCost = stocksCost + fundsCost + goldCost;
-                const totalPnl = totalVal - totalCost;
-                const totalReturnPct = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0;
+                const unrealizedPnl = totalVal - totalCost;
+                const totalReturnPct = totalCost > 0 ? (unrealizedPnl / totalCost) * 100 : 0;
 
-                // F09 Audit Fix: Calculate genuine 1D day change vs cumulative holding gain without arbitrary multipliers
-                let displayPnl = totalPnl;
+                // Load Fees & Realized Ledger (R33)
+                const ledger = getUserFeesLedger();
+                const totalPaidFees = ledger.totalPaidFees || 0;
+                const realizedPnl = ledger.realizedPnl || 0;
+                // R33 Double deduction prevention:
+                // realizedPnl (net of sell fee & allocated buy fee) + unrealizedPnl (based on cost basis with buy fee) = Net PnL
+                const netPnl = unrealizedPnl + realizedPnl;
+                const grossPnl = netPnl + totalPaidFees;
+
+                let displayPnl = unrealizedPnl;
                 let displayReturn = totalReturnPct;
-                let periodLabel = 'إجمالي العائد التراكمي';
 
                 if (currentPerfPeriod === '1D') {
-                    // Authentic 1D change based on day change percentage of active assets
+                    // Authentic 1D change based on (cur - prev) * qty
                     let dayChangeEgp = 0;
-                    (userHoldings || []).forEach(h => {
+                    activeHoldings.forEach(h => {
                         const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                        const chg = (st && typeof st.chg === 'number') ? (st.chg / 100) : 0;
-                        const cur = (st && st.close > 0) ? st.close : (h.cur || h.buy || 0);
+                        const cur = (h.valuation_mode === 'manual' && h.manual_valuation_price && h.manual_valuation_price > 0)
+                            ? h.manual_valuation_price
+                            : ((st && st.close > 0) ? st.close : (h.cur || h.buy || 0));
                         const qty = h.qty_owned !== undefined ? h.qty_owned : (h.qty || 0);
-                        dayChangeEgp += (cur * qty) * chg;
+                        const chgPct = (st && typeof st.chg === 'number') ? st.chg : 0;
+                        const prevPrice = chgPct !== 0 ? (cur / (1 + (chgPct / 100))) : cur;
+                        dayChangeEgp += (cur - prevPrice) * qty;
                     });
                     displayPnl = dayChangeEgp;
                     displayReturn = totalVal > 0 ? (dayChangeEgp / totalVal) * 100 : 0;
-                    periodLabel = 'التغير اليومي للجلسة';
                 }
 
                 // Update 4 KPIs
@@ -22283,10 +22343,24 @@ ${stocksUniverseContext}
                 setEl('perf_kpi_return_pct', `${pSign}${displayReturn.toFixed(2)}%`, 
                     `font-bold font-mono text-sm sm:text-base ${displayReturn >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
 
-                // Update Benchmark Comparison
+                // Update R33 Realized, Paid Fees and Net Profit cards
+                setEl('perf_gross_pnl', `${grossPnl >= 0 ? '+' : ''}${Math.round(grossPnl).toLocaleString()} ج`,
+                    `font-mono font-bold ${grossPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
+                setEl('perf_paid_fees', `${Math.round(totalPaidFees).toLocaleString()} ج`, 'font-mono font-bold text-rose-400');
+                setEl('perf_net_pnl', `${netPnl >= 0 ? '+' : ''}${Math.round(netPnl).toLocaleString()} ج`,
+                    `font-mono font-bold ${netPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
+                setEl('perf_realized_pnl', `${realizedPnl >= 0 ? '+' : ''}${Math.round(realizedPnl).toLocaleString()} ج`,
+                    `font-mono font-bold ${realizedPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
+                setEl('perf_unrealized_pnl', `${unrealizedPnl >= 0 ? '+' : ''}${Math.round(unrealizedPnl).toLocaleString()} ج`,
+                    `font-mono font-bold ${unrealizedPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
+
+                // Update Benchmark Comparison (R09 check)
                 setEl('perfBenchPortfolio', `${displayReturn >= 0 ? '+' : ''}${displayReturn.toFixed(2)}%`);
-                const egx33Benchmark = _liveTickerCache.egx33.chg || 0.54;
-                const alpha = displayReturn - egx33Benchmark;
+                const egx33Chg = (typeof _liveTickerCache !== 'undefined' && _liveTickerCache.egx33 && typeof _liveTickerCache.egx33.chg === 'number')
+                    ? _liveTickerCache.egx33.chg
+                    : -0.38;
+                setEl('perfBenchEgx33', `${egx33Chg >= 0 ? '+' : ''}${egx33Chg.toFixed(2)}%`);
+                const alpha = displayReturn - egx33Chg;
                 const alphaBadge = document.getElementById('perfAlphaBadge');
                 if (alphaBadge) {
                     alphaBadge.innerText = alpha >= 0 ? `ألفا إيجابية: +${alpha.toFixed(1)}% 🚀` : `أداء دفاعي متوازن: ${alpha.toFixed(1)}% 🛡️`;
@@ -22294,7 +22368,7 @@ ${stocksUniverseContext}
                 }
 
                 // Update Asset Breakdown
-                const sPnl = (stocksVal - stocksCost) * periodFactor;
+                const sPnl = stocksVal - stocksCost;
                 const sRet = stocksCost > 0 ? (sPnl / stocksCost) * 100 : 0;
                 setEl('perf_stocks_val', Math.round(stocksVal).toLocaleString() + ' ج');
                 setEl('perf_stocks_pnl_egp', `${sPnl >= 0 ? '+' : ''}${Math.round(sPnl).toLocaleString()} ج`, 
@@ -22302,7 +22376,7 @@ ${stocksUniverseContext}
                 setEl('perf_stocks_return_pct', `${sRet >= 0 ? '+' : ''}${sRet.toFixed(2)}%`, 
                     `font-mono font-bold ${sRet >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
 
-                const fPnl = (fundsVal - fundsCost) * periodFactor;
+                const fPnl = fundsVal - fundsCost;
                 const fRet = fundsCost > 0 ? (fPnl / fundsCost) * 100 : 0;
                 setEl('perf_funds_val', Math.round(fundsVal).toLocaleString() + ' ج');
                 setEl('perf_funds_pnl_egp', `${fPnl >= 0 ? '+' : ''}${Math.round(fPnl).toLocaleString()} ج`, 
@@ -22310,7 +22384,7 @@ ${stocksUniverseContext}
                 setEl('perf_funds_return_pct', `${fRet >= 0 ? '+' : ''}${fRet.toFixed(2)}%`, 
                     `font-mono font-bold ${fRet >= 0 ? 'text-emerald-400' : 'text-rose-400'}`);
 
-                const gPnl = (goldVal - goldCost) * periodFactor;
+                const gPnl = goldVal - goldCost;
                 const gRet = goldCost > 0 ? (gPnl / goldCost) * 100 : 0;
                 setEl('perf_gold_val', goldVal.toFixed(2) + ' ج');
                 setEl('perf_gold_pnl_egp', `${gPnl >= 0 ? '+' : ''}${gPnl.toFixed(2)} ج`, 
@@ -22321,86 +22395,129 @@ ${stocksUniverseContext}
                 // Populate Detailed SOCPA / IFRS Holdings Statement Table
                 const tableBody = document.getElementById('perfHoldingsDetailedTableBody');
                 if (tableBody) {
-                    let rowsHtml = '';
-                    activeHoldings.forEach(h => {
-                        const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                        const cur = (st && st.close > 0) ? st.close : (h.cur || h.buy || 0);
-                        const qty = h.qty || 0;
-                        const buy = h.buy || 0;
-                        const cost = buy * qty;
-                        const val = cur * qty;
-                        const pnl = (val - cost) * periodFactor;
-                        const ret = cost > 0 ? (pnl / cost) * 100 : 0;
-                        const isWin = pnl >= 0;
+                    if (activeHoldings.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">لا توجد أصول في المحفظة حالياً. يمكنك إضافة عمليات شراء عبر زر "تسجيل عملية جديدة".</td></tr>`;
+                    } else {
+                        let rowsHtml = '';
+                        activeHoldings.forEach(h => {
+                            const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
+                            const cur = (h.valuation_mode === 'manual' && h.manual_valuation_price && h.manual_valuation_price > 0)
+                                ? h.manual_valuation_price
+                                : ((st && st.close > 0) ? st.close : (h.cur || h.buy || 0));
+                            const qty = h.qty_owned !== undefined ? h.qty_owned : (h.qty || 0);
+                            const buy = h.avg_unit_cost !== undefined ? h.avg_unit_cost : (h.buy || 0);
+                            const cost = buy * qty;
+                            const val = cur * qty;
+                            const pnl = val - cost;
+                            const ret = cost > 0 ? (pnl / cost) * 100 : 0;
+                            const isWin = pnl >= 0;
 
-                        rowsHtml += `
-                        <tr class="hover:bg-slate-800/30 transition text-xs">
-                            <td class="py-2.5 text-right font-medium text-white">
-                                <div class="font-bold">${st ? st.name : h.name || h.ticker}</div>
-                                <span class="text-[9px] font-mono text-emerald-400">${h.ticker}</span>
-                            </td>
-                            <td class="py-2.5 text-center font-mono text-slate-300">${isGoldAsset(h) ? qty.toFixed(4) : qty.toLocaleString()}</td>
-                            <td class="py-2.5 text-center font-mono text-slate-400">${Math.round(cost).toLocaleString()} ج</td>
-                            <td class="py-2.5 text-center font-mono font-bold text-white">${Math.round(val).toLocaleString()} ج</td>
-                            <td class="py-2.5 text-center font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${isWin ? '+' : ''}${Math.round(pnl).toLocaleString()} ج
-                            </td>
-                            <td class="py-2.5 text-left font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
-                                ${isWin ? '▲ +' : '▼ '}${ret.toFixed(1)}%
-                            </td>
-                        </tr>`;
-                    });
-                    tableBody.innerHTML = rowsHtml;
+                            rowsHtml += `
+                            <tr class="hover:bg-slate-800/30 transition text-xs">
+                                <td class="py-2.5 text-right font-medium text-white">
+                                    <div class="font-bold">${st ? st.name : h.name || h.ticker}</div>
+                                    <span class="text-[9px] font-mono text-emerald-400">${h.ticker}</span>
+                                </td>
+                                <td class="py-2.5 text-center font-mono text-slate-300">${isGoldAsset(h) ? qty.toFixed(4) : qty.toLocaleString()}</td>
+                                <td class="py-2.5 text-center font-mono text-slate-400">${Math.round(cost).toLocaleString()} ج</td>
+                                <td class="py-2.5 text-center font-mono font-bold text-white">${Math.round(val).toLocaleString()} ج</td>
+                                <td class="py-2.5 text-center font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
+                                    ${isWin ? '+' : ''}${Math.round(pnl).toLocaleString()} ج
+                                </td>
+                                <td class="py-2.5 text-left font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
+                                    ${isWin ? '▲ +' : '▼ '}${ret.toFixed(1)}%
+                                </td>
+                            </tr>`;
+                        });
+                        tableBody.innerHTML = rowsHtml;
+                    }
                 }
 
                 // Best & Worst Asset Rankings
                 const ranked = activeHoldings.map(h => {
                     const st = STOCKS_DATA.find(s => s.ticker === h.ticker);
-                    const cur = (st && st.close > 0) ? st.close : (h.cur || h.buy || 0);
-                    const cost = (h.buy || 0) * (h.qty || 0);
-                    const val = cur * (h.qty || 0);
-                    const pnl = (val - cost) * periodFactor;
+                    const cur = (h.valuation_mode === 'manual' && h.manual_valuation_price && h.manual_valuation_price > 0)
+                        ? h.manual_valuation_price
+                        : ((st && st.close > 0) ? st.close : (h.cur || h.buy || 0));
+                    const qty = h.qty_owned !== undefined ? h.qty_owned : (h.qty || 0);
+                    const buy = h.avg_unit_cost !== undefined ? h.avg_unit_cost : (h.buy || 0);
+                    const cost = buy * qty;
+                    const val = cur * qty;
+                    const pnl = val - cost;
                     const ret = cost > 0 ? (pnl / cost) * 100 : 0;
                     return { ticker: h.ticker, name: (st ? st.name : h.name) || h.ticker, pnl, ret, val };
                 }).sort((a, b) => b.ret - a.ret);
 
                 const container = document.getElementById('perfBestWorstContainer');
                 if (container) {
-                    let html = '';
-                    ranked.forEach((item, idx) => {
-                        const isWin = item.pnl >= 0;
-                        const rankBadge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx+1}`));
-                        html += `
-                        <div class="flex items-center justify-between p-2.5 rounded-xl border ${isWin ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-rose-950/20 border-rose-900/30'}">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-bold">${rankBadge}</span>
-                                <div>
-                                    <div class="text-xs font-bold text-white flex items-center gap-1">
-                                        <span>${item.name}</span>
-                                        <span class="text-[9px] font-mono text-slate-400 px-1 py-0.2 rounded bg-slate-800">${item.ticker}</span>
+                    if (ranked.length === 0) {
+                        container.innerHTML = `<div class="p-3 text-center text-slate-500 text-xs">لا توجد بيانات كافية للترتيب.</div>`;
+                    } else {
+                        let html = '';
+                        ranked.forEach((item, idx) => {
+                            const isWin = item.pnl >= 0;
+                            const rankBadge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : `#${idx+1}`));
+                            html += `
+                            <div class="flex items-center justify-between p-2.5 rounded-xl border ${isWin ? 'bg-emerald-950/20 border-emerald-900/30' : 'bg-rose-950/20 border-rose-900/30'}">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold">${rankBadge}</span>
+                                    <div>
+                                        <div class="text-xs font-bold text-white flex items-center gap-1">
+                                            <span>${item.name}</span>
+                                            <span class="text-[9px] font-mono text-slate-400 px-1 py-0.2 rounded bg-slate-800">${item.ticker}</span>
+                                        </div>
+                                        <div class="text-[10px] text-slate-400 font-mono">القيمة: ${Math.round(item.val).toLocaleString()} ج</div>
                                     </div>
-                                    <div class="text-[10px] text-slate-400 font-mono">القيمة: ${Math.round(item.val).toLocaleString()} ج</div>
                                 </div>
-                            </div>
-                            <div class="text-left font-mono">
-                                <div class="text-xs font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
-                                    ${isWin ? '+' : ''}${Math.round(item.pnl).toLocaleString()} ج
+                                <div class="text-left font-mono">
+                                    <div class="text-xs font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
+                                        ${isWin ? '+' : ''}${Math.round(item.pnl).toLocaleString()} ج
+                                    </div>
+                                    <div class="text-[10px] ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
+                                        ${isWin ? '▲ +' : '▼ '}${item.ret.toFixed(2)}%
+                                    </div>
                                 </div>
-                                <div class="text-[10px] ${isWin ? 'text-emerald-400' : 'text-rose-400'}">
-                                    ${isWin ? '▲ +' : '▼ '}${item.ret.toFixed(2)}%
-                                </div>
-                            </div>
-                        </div>`;
-                    });
-                    container.innerHTML = html;
+                            </div>`;
+                        });
+                        container.innerHTML = html;
+                    }
                 }
             } catch (err) {
                 console.warn('[renderPerformanceTab] Error:', err);
             }
         }
 
+        // =========================================================================
+        // R33: USER FEES & REALIZED P&L LEDGER STORAGE ENGINE
+        // =========================================================================
+        const USER_FEES_LEDGER_KEY = 'egx_sharia_user_fees_ledger_v1';
 
-        // 3. NEWS HUB & TECHNICAL ANALYSIS ENGINE
+        function getUserFeesLedger() {
+            try {
+                const raw = localStorage.getItem(USER_FEES_LEDGER_KEY);
+                if (raw) return JSON.parse(raw);
+            } catch(e) {}
+            return {
+                totalPaidFees: 0,
+                realizedPnl: 0,
+                transactions: []
+            };
+        }
+
+        function recordFeeTransaction(tx) {
+            try {
+                const ledger = getUserFeesLedger();
+                ledger.transactions.push(tx);
+                if (tx.fee && tx.fee > 0) ledger.totalPaidFees += parseFloat(tx.fee);
+                if (tx.realizedPnl !== undefined) ledger.realizedPnl += parseFloat(tx.realizedPnl);
+                localStorage.setItem(USER_FEES_LEDGER_KEY, JSON.stringify(ledger));
+            } catch(e) {
+                console.warn('[recordFeeTransaction] Error:', e);
+            }
+        }
+
+
+        // 3. NEWS HUB   // 3. NEWS HUB & TECHNICAL ANALYSIS ENGINE
         let activeNewsSubTab = 'stocks';
 
         function switchNewsSubTab(sub) {
@@ -24348,13 +24465,13 @@ ${stocksUniverseContext}
                 csv += "المؤشر / الأصل,سعر الإغلاق,سعر الافتتاح,نسبة التغير (%),البيان التحليلي\n";
                 if (rpt.indicesSection && rpt.indicesSection.items) {
                     rpt.indicesSection.items.forEach(i => {
-                        csv += `"${i.name}",${i.close},${i.open},${i.change}備,"${i.desc || ''}"\n`;
+                        csv += `"${(i.name||'').replace(/"/g, '""')}",${i.close||0},${i.open||0},${i.change||0}%,"${(i.desc||'').replace(/"/g, '""')}"\n`;
                     });
                 }
                 csv += "\nالرمز,اسم السهم,سعر الشراء بالمحفظة,سعر الإغلاق,نسبة التغير اليومي,مستوى الدعم,مستوى المقاومة,التوصية\n";
                 if (rpt.holdingsSection && rpt.holdingsSection.stocks) {
                     rpt.holdingsSection.stocks.forEach(s => {
-                        csv += `"${s.code}","${s.name}",${s.open || 0},${s.close || 0},${s.change}備,"${s.support || ''}","${s.resistance || ''}","${s.tomorrowRec || ''}"\n`;
+                        csv += `"${(s.code||'').replace(/"/g, '""')}","${(s.name||'').replace(/"/g, '""')}",${s.open || 0},${s.close || 0},${s.change || 0}%,"${(s.support || '').replace(/"/g, '""')}","${s.resistance || ''}","${s.tomorrowRec || ''}"\n`;
                     });
                 }
 
