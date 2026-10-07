@@ -15782,7 +15782,7 @@ async function syncMubasherDirectAll() {
 
             try {
                 const testPrompt = "أجب في جملة واحدة باللغة العربية: هل الاتصال السحابي يعمل بنجاح للبورصة المصرية؟";
-                const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-pro-latest'];
+                const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.5-pro'];
                 let success = false;
                 let reply = '';
                 let usedModel = '';
@@ -17302,75 +17302,129 @@ ${stocksUniverseContext}
                     let execCmd = '';
                     let localAnalysisHtml = '';
 
-                    if (qLower.includes('سويدي') || qLower.includes('swdy')) {
-                        execCmd = '[EXEC:OPEN_STOCK:SWDY]';
+                    // Find if user mentioned any stock in STOCKS_DATA
+                    const foundStock = STOCKS_DATA.find(s => 
+                        qLower.includes(s.ticker.toLowerCase()) || 
+                        qLower.includes(s.name.toLowerCase()) ||
+                        (s.ticker === 'TMGH' && (qLower.includes('طلعت') || qLower.includes('مصطفى'))) ||
+                        (s.ticker === 'EFIH' && (qLower.includes('فاينانس') || qLower.includes('اي فاينانس'))) ||
+                        (s.ticker === 'ADIB' && (qLower.includes('ابوظبي') || qLower.includes('أبوظبي') || qLower.includes('اسلامي'))) ||
+                        (s.ticker === 'ETEL' && (qLower.includes('اتصالات') || qLower.includes('المصرية') || qLower.includes('وي'))) ||
+                        (s.ticker === 'SWDY' && (qLower.includes('سويدي') || qLower.includes('السويدي'))) ||
+                        (s.ticker === 'COMI' && (qLower.includes('تجاري') || qLower.includes('cib'))) ||
+                        (s.ticker === 'EKHO' && (qLower.includes('كويتية') || qLower.includes('قابضة')))
+                    );
+
+                    if (foundStock) {
+                        execCmd = `[EXEC:OPEN_STOCK:${foundStock.ticker}]`;
+                        const rec = (typeof MASTER_RECOMMENDATIONS !== 'undefined' && Array.isArray(MASTER_RECOMMENDATIONS))
+                            ? MASTER_RECOMMENDATIONS.find(r => r.ticker === foundStock.ticker)
+                            : null;
+                        const val = (typeof VALUATION_DATA !== 'undefined' && VALUATION_DATA[foundStock.ticker]) ? VALUATION_DATA[foundStock.ticker] : null;
+                        const holding = userHoldingsList.find(h => h.ticker === foundStock.ticker);
+
+                        const curP = foundStock.close || foundStock.price || 0;
+                        const chgP = (typeof foundStock.chg === 'number') ? foundStock.chg : 0;
+                        const chgSign = chgP >= 0 ? '+' : '';
+                        const rsi = foundStock.rsi || 50;
+                        const pe = foundStock.pe ? `${foundStock.pe}x` : '10.5x';
+                        const supp = foundStock.support || rec?.stopLoss || (curP * 0.95).toFixed(2);
+                        const res = foundStock.resistance || rec?.targetPrice || (curP * 1.10).toFixed(2);
+                        const fair = val?.base || rec?.fairValue || (curP * 1.15).toFixed(2);
+                        const safety = curP > 0 ? (((fair - curP) / fair) * 100).toFixed(1) : '15.0';
+
+                        let actionBadge = 'احتفاظ ومراقبة 🟡';
+                        let actionDesc = 'التداول عند مستويات متوازنة مع ترقب إشارات الزخم.';
+                        if (rsi < 40 || parseFloat(safety) > 15) {
+                            actionBadge = 'تجميع وشراء تدريجي (DCA) 🟢';
+                            actionDesc = 'السهم يتداول بخصم عن قيمته العادلة مع مؤشرات فنية داعمة لبناء مراكز استثمارية.';
+                        } else if (rsi > 70) {
+                            actionBadge = 'جني أرباح جزئي 🔴';
+                            actionDesc = 'السهم وصل لمناطق تشبع شرائي بالقرب من المقاومات الرئيسية.';
+                        }
+
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>سهم السويدي إليكتريك (SWDY):</b> يتداول عند <b>59.00 ج</b>، بقيمة عادلة معتمدة <b>78.40 ج</b> وهامش أمان ممتاز يتجاوز <b>+32.8%</b>. مؤشر RSI عند 42.5 ومكرر الربحية P/E عند 6.8x. السهم يعتبر فرصة استثمارية قوية ذات جودة عالية ويتمتع بتدفقات نقدية تشغيلية متينة.</p>
-                            <p class="text-xs text-indigo-300">⚡ <b>الأمر التنفيذي:</b> جاري فتح بطاقة السهم والتحليل الفني مباشرة في واجهة البرنامج...</p>
+                            <div class="space-y-2.5" dir="rtl">
+                                <div class="flex items-center justify-between pb-2 border-b border-indigo-900/40">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base font-bold text-white">${foundStock.name}</span>
+                                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800">${foundStock.ticker}</span>
+                                    </div>
+                                    <span class="text-xs font-bold text-emerald-400 font-mono">${curP.toFixed(2)} ج.م (${chgSign}${chgP}%)</span>
+                                </div>
+                                <p class="text-xs text-slate-200 leading-relaxed">
+                                    <b>الرأي الفني والكمي:</b> يمر السهم بمرحلة <b>${actionBadge}</b>، حيث يُظهر ${actionDesc}
+                                </p>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[10.5px] font-mono pt-1">
+                                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                        <div class="text-[9.5px] text-slate-400">القوة النسبية RSI</div>
+                                        <div class="font-bold text-white">${rsi}</div>
+                                    </div>
+                                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                        <div class="text-[9.5px] text-slate-400">الدعم / المقاومة</div>
+                                        <div class="font-bold text-amber-300">${supp} / ${res}</div>
+                                    </div>
+                                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                        <div class="text-[9.5px] text-slate-400">القيمة العادلة</div>
+                                        <div class="font-bold text-emerald-400">${fair} ج.م</div>
+                                    </div>
+                                    <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                        <div class="text-[9.5px] text-slate-400">هامش الأمان</div>
+                                        <div class="font-bold text-indigo-300">+${safety}%</div>
+                                    </div>
+                                </div>
+                                ${holding ? `<div class="p-2 rounded-xl bg-amber-950/20 border border-amber-800/40 text-[10.5px] text-amber-300">💼 <b>حالة محفظتك:</b> تمتلك ${holding.shares || holding.qty} سهم بمتوسط تكلفة ${(holding.buy||0).toFixed(2)} ج.م (القيمة الإجمالية: ${Math.round((holding.shares||holding.qty||0)*(curP)).toLocaleString()} ج.م).</div>` : ''}
+                            </div>
                         `;
-                    } else if (qLower.includes('طلعت') || qLower.includes('tmgh')) {
-                        execCmd = '[EXEC:OPEN_STOCK:TMGH]';
+                    } else if (qLower.includes('ذهب') || qLower.includes('azg') || qLower.includes('gold')) {
+                        execCmd = '[EXEC:OPEN_FUND:AZG]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>مجموعة طلعت مصطفى (TMGH):</b> يتداول عند <b>89.32 ج</b>، مدعوماً بمبيعات مشروع رأس الحكمة التاريخية. مستويات الدعم الرئيسية عند 86.50 ج والمقاومة عند 94.00 ج ثم 100.00 ج. المحفظة تحتفظ بـ 115 سهماً بتكلفة 97.88 ج، ويُنصح بالاحتفاظ والترقب لجني الأرباح عند اختراق 95 ج.</p>
-                            <p class="text-xs text-indigo-300">⚡ <b>الأمر التنفيذي:</b> جاري فتح بطاقة طلعت مصطفى ومستويات الدعم والمقاومة...</p>
+                            <div class="space-y-2" dir="rtl">
+                                <p class="text-xs text-slate-200 leading-relaxed">
+                                    <b>تحوط الذهب عيار 24 (صندوق AZG):</b> يُعد الذهب الركيزة الأساسية لحماية القوة الشرائية ضد تقلبات التضخم والعملة. السعر الاسترشادي لجرام الذهب عيار 24 يسجل حالياً <b>7,015.00 ج.م</b>.
+                                </p>
+                                <div class="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/50 text-[11px] text-indigo-300">
+                                    💡 <b>توصية الرادار:</b> تخصيص ما بين <b>10% إلى 20%</b> من إجمالي ثروة المحفظة في صناديق الذهب المادية لحفظ القيمة وتخفيف تذبذب الأسهم.
+                                </div>
+                            </div>
                         `;
-                    } else if (qLower.includes('فوري') || qLower.includes('fwry')) {
-                        execCmd = '[EXEC:OPEN_STOCK:FWRY]';
+                    } else if (qLower.includes('فائض') || qLower.includes('سيولة') || qLower.includes('توزيع')) {
+                        execCmd = '[EXEC:NAV_TAB:tools]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>سهم فوري للمدفوعات (FWRY):</b> يتداول عند <b>9.15 ج</b>، بمكرر ربحية نمو ومؤشر RSI عند 48.0. مناطق الدعم الصلبة عند 8.80 ج والمقاومة عند 9.60 ج ثم 10.20 ج. السهم متوافق تماماً مع ضوابط الشريعة ويقترب من نقطة دخول استثمارية جيدة.</p>
-                        `;
-                    } else if (qLower.includes('صندوق') || qLower.includes('صناديق') || qLower.includes('funds') || qLower.includes('sunduk') || qLower.includes('snduk')) {
-                        execCmd = '[EXEC:NAV_TAB:funds]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>صناديق الاستثمار الإسلامية والذهب (محدثة مباشرة من منصة الصناديق الرسمية الرسمية - 5 أكتوبر 2026):</b></p>
-                            <ul class="list-disc list-inside space-y-1.5 text-slate-300 text-xs">
-                                <li><b>صندوق مصر شريعة إكويتي (CMS):</b> <b class="text-emerald-400 font-mono">22.6467 ج</b> (صعود +2.72% | وثائقك 2,210 بقيمة 50,049 ج بربح رأسمالي مميز).</li>
-                                <li><b>صندوق بلتون وفرة (BWA):</b> <b class="text-emerald-400 font-mono">2.2004 ج</b> (صعود +2.90% | وثائقك 66 بقيمة 145.23 ج).</li>
-                                <li><b>صندوق نعيم مصر للشريعة (NMF):</b> <b class="text-emerald-400 font-mono">50.2400 ج</b> (صعود +1.31% | وثائقك 2 بقيمة 100.48 ج).</li>
-                                <li><b>صندوق أزيموت جولد (AZG):</b> <b class="text-amber-300 font-mono">23.5374 ج</b> (وثائقك 11 بقيمة 258.91 ج).</li>
-                                <li><b>سبيكة الذهب عيار 24 عبر ثندر:</b> <b class="text-amber-400 font-mono">7,015.00 ج</b> للجرام.</li>
-                            </ul>
-                            
-                        `;
-                    } else if (qLower.includes('توصيات') || qLower.includes('شراء')) {
-                        execCmd = '[EXEC:NAV_TAB:recommendations]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>التوصيات الذكية وإشارات التداول:</b> أقوى فرص الشراء حالياً هي الأسهم ذات هوامش الأمان التي تتعدى 20% ومكررات ربحية أحادية مثل <b>السويدي إليكتريك (SWDY)</b>، <b>موبكو (MFPC)</b>، و<b>أبو قير للأسمدة (ABUK)</b>.</p>
-                        `;
-                    } else if (qLower.includes('ذهب') || qLower.includes('gold') || qLower.includes('سبائك') || qLower.includes('7000') || qLower.includes('4000')) {
-                        execCmd = '[EXEC:FILTER_DR:gold]';
-                        localAnalysisHtml = `
-                            <p class="leading-relaxed"><b>تسعير الذهب عيار 24 الصافي:</b> سعر الجرام المعتمد في محفظة ثندر الرقمية هو <b>7,015.00 ج</b> (مقارنة بتكلفة الشراء بالمحفظة 6,972.84 ج للكمية 0.0081 جم)، بقيمة محفظة 56.82 ج وأرباح +0.34 ج (+0.60%). السعر 4,734 ج هو سعر الخام في الصاغة قبل تكاليف الحفظ والتأمين الرقمي والدمغة الرسمية.</p>
+                            <div class="space-y-2" dir="rtl">
+                                <p class="text-xs text-slate-200 leading-relaxed">
+                                    <b>خطة توزيع الفائض الشهري الذكي:</b> تم بناء استراتيجية الفائض لتوجيه السيولة النقدية شهرياً نحو 5 ركائز (إي فاينانس 35%، طلعت مصطفى 25%، أبوظبي الإسلامي 15%، صندوق الذهب 15%، صندوق السيولة اليومي 10%).
+                                </p>
+                                <div class="p-2 rounded-xl bg-emerald-950/30 border border-emerald-800/50 text-[11px] text-emerald-300">
+                                    ✨ يمكنك الانتقال لأداة <b>مستشار الفائض</b> لحساب الكميات الدقيقة فورياً ونسخ أوامر الشراء لتطبيق ثندر.
+                                </div>
+                            </div>
                         `;
                     } else {
-                        execCmd = '[EXEC:NAV_TAB:portfolio]';
                         localAnalysisHtml = `
-                            <p class="leading-relaxed">
-                                استناداً إلى بيانات محفظتك وسياق محادثتنا المستمرة (قيمة سوقية <b>${Math.round(currentMarketVal).toLocaleString()} ج</b> بأرباح رأسمالية <b>+${unearnedPnlPct}%</b>) ومقارنة ذلك مع مؤشر الشريعة EGX33 (${egx33} نقطة) والذهب عيار 24 (${gold24k} ج) وصناديق الاستثمار المحدثة (CMS: 22.6467 ج):
-                            </p>
-                            <ul class="space-y-1.5 list-disc list-inside text-slate-300 text-xs">
-                                <li><b>إدارة السيولة والمخاطر:</b> نسبة الكاش الحالية تمثل صمام أمان استراتيجي لاقتناص فرص التبريد (DCA) في الأسهم القيادية.</li>
-                                <li><b>تدقيق الرسوم:</b> عمولة ثندر 7 في الألف بإجمالي <b>${thndrFeesVal} ج</b>، معالجة كمصروف تشغيلي لا تمس القيمة الدفترية للأصول.</li>
-                                <li><b>التوصية التنفيذية:</b> الحفاظ على وقف الربح المتحرك والمحافظة على توزيع المحفظة المتوازن بين الأسهم والصناديق والذهب.</li>
-                            </ul>
+                            <div class="space-y-2.5" dir="rtl">
+                                <p class="text-xs text-slate-200 leading-relaxed">
+                                    <b>الرادار الاستثماري (المحلل المالي والكمي المدمج):</b> بناءً على بيانات جلسة البورصة المصرية ومؤشر الشريعة <b>EGX33</b> (${egx33} نقطة)، تواصل المؤسسات المحلية والعربية التجميع الانتقائي في الأسهم ذات التدفقات النقدية التشغيلية والتقييمات الجاذبة.
+                                </p>
+                                <div class="grid grid-cols-2 gap-2 text-[10.5px] pt-1">
+                                    <div class="bg-slate-900/70 p-2 rounded-xl border border-slate-800">
+                                        <span class="text-slate-400 block mb-0.5">أفضل فرص التجميع:</span>
+                                        <b class="text-emerald-400">EFIH (23.35 ج) | TMGH (95.20 ج)</b>
+                                    </div>
+                                    <div class="bg-slate-900/70 p-2 rounded-xl border border-slate-800">
+                                        <span class="text-slate-400 block mb-0.5">أفضل عوائد نقدية:</span>
+                                        <b class="text-amber-300">ADIB (52.15 ج) | ETEL (48.50 ج)</b>
+                                    </div>
+                                </div>
+                            </div>
                         `;
                     }
 
-                    responseText = `
-                        <div class="space-y-2">
-                            ${localAnalysisHtml}
-                            ${execCmd}
-                        </div>
-                    `;
+                    responseText = localAnalysisHtml + (execCmd ? `\n${execCmd}` : '');
+                    modelName = 'المحرك الخوارزمي المدمج';
                 }
 
-                // Process response with Executive Command Parser & Auto-Actuator
-                const parsedResult = (typeof window.parseAndRenderGeminiExecutiveCommands === 'function')
-                    ? window.parseAndRenderGeminiExecutiveCommands(responseText, true)
-                    : { html: responseText, commands: [] };
-
-                // Push Model Turn to History
-                window._geminiChatHistory.push({
+                    window._geminiChatHistory.push({
                     role: 'model',
                     text: responseText,
                     html: parsedResult.html,
@@ -24587,7 +24641,7 @@ ${stocksUniverseContext}
 
     <!-- ================= MODAL: FLOATING AI GEMINI COPILOT (CONTEXT-AWARE) ================= -->
     <!-- ================= MODAL: FLOATING AI GEMINI COPILOT (MULTI-TURN & ATTACHMENTS & SECURE VIEWER) ================= -->
-    <div id="floatingAiCopilotModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-2 sm:p-4">
+    <div id="floatingAiCopilotModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[100] hidden flex items-center justify-center p-2 sm:p-4">
         <div class="glass-card rounded-2xl max-w-3xl w-full border border-indigo-700/80 bg-slate-900/98 shadow-2xl flex flex-col h-[94vh] max-h-[820px] overflow-hidden">
             
             <!-- Modal Header -->
