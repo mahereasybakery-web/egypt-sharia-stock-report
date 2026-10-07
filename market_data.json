@@ -15,7 +15,7 @@
     "EGX30": {
       "close": 53298.1,
       "open": 53574.4,
-      "chgPct": -0.48,
+      "chgPct": -0.52,
       "name": "مؤشر EGX30 الرئيسي",
       "source": "TradingView Official Egypt Scanner"
     },
@@ -29,14 +29,14 @@
     "EGX70": {
       "close": 19642.7,
       "open": 19781.5,
-      "chgPct": -0.68,
+      "chgPct": -0.7,
       "name": "مؤشر EGX70 EWI للشركات المتوسطة والصغيرة",
       "source": "TradingView Official Egypt Scanner"
     },
     "EGX100": {
       "close": 25953.1,
       "open": 26144.7,
-      "chgPct": -0.69,
+      "chgPct": -0.73,
       "name": "مؤشر EGX100 EWI الأوسع نطاقاً",
       "source": "TradingView Official Egypt Scanner"
     }
@@ -78,8 +78,8 @@
     },
     "EFIH": {
       "close": 24.79,
-      "chg": 2.35,
-      "open": 24.22,
+      "chg": 1.81,
+      "open": 24.35,
       "high": 24.89,
       "low": 24.15,
       "volume": 6361938,
@@ -95,8 +95,8 @@
     },
     "EFID": {
       "close": 19.0,
-      "chg": 0.32,
-      "open": 18.94,
+      "chg": -3.31,
+      "open": 19.65,
       "high": 19.12,
       "low": 18.77,
       "volume": 1616785,
@@ -112,8 +112,8 @@
     },
     "ADIB": {
       "close": 48.11,
-      "chg": -2.04,
-      "open": 49.11,
+      "chg": -4.26,
+      "open": 50.25,
       "high": 49.31,
       "low": 48.02,
       "volume": 1995527,
@@ -129,8 +129,8 @@
     },
     "OCDI": {
       "close": 27.2,
-      "chg": -0.18,
-      "open": 27.25,
+      "chg": -2.51,
+      "open": 27.9,
       "high": 28.2,
       "low": 27.2,
       "volume": 2181703,
@@ -214,8 +214,8 @@
     },
     "ORHD": {
       "close": 38.84,
-      "chg": 0.88,
-      "open": 38.5,
+      "chg": -1.8,
+      "open": 39.55,
       "high": 39.17,
       "low": 38.5,
       "volume": 4323098,
@@ -418,8 +418,8 @@
     },
     "ETEL": {
       "close": 149.88,
-      "chg": -0.74,
-      "open": 151.0,
+      "chg": -1.72,
+      "open": 152.5,
       "high": 151.0,
       "low": 147.58,
       "volume": 1540205,
@@ -520,8 +520,8 @@
     },
     "EGAL": {
       "close": 343.41,
-      "chg": -0.75,
-      "open": 345.99,
+      "chg": -1.74,
+      "open": 349.5,
       "high": 348.75,
       "low": 342.02,
       "volume": 108432,
@@ -588,8 +588,8 @@
     },
     "TMGH": {
       "close": 88.39,
-      "chg": -0.57,
-      "open": 88.9,
+      "chg": -1.35,
+      "open": 89.6,
       "high": 89.49,
       "low": 87.7,
       "volume": 1682932,
