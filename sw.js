@@ -1,5 +1,5 @@
-// EGX Sharia Portal - Advanced PWA Service Worker v18.4 (Audited Indices & Instant Mobile Portfolio)
-const CACHE_NAME = 'egx-sharia-v18.4';
+// EGX Sharia Portal - Advanced PWA Service Worker v18.5 (Audited Indices & Instant Mobile Portfolio)
+const CACHE_NAME = 'egx-sharia-v18.5';
 const STATIC_ASSETS = [
   './',
   './index.html',
